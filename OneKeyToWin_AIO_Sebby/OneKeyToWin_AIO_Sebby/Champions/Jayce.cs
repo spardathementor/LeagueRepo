@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using SharpDX.Direct3D9;
+
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
     class Jayce
@@ -33,19 +35,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R);
 
             Q.SetSkillshot(0.25f, 80, 1200, true, SkillshotType.SkillshotLine);
-            Qext.SetSkillshot(0.25f, 100, 1600, false, SkillshotType.SkillshotLine);
-            QextCol.SetSkillshot(0.25f, 100, 1600, true, SkillshotType.SkillshotLine);
+            Qext.SetSkillshot(0.25f, 80, 1600, false, SkillshotType.SkillshotLine);
+            QextCol.SetSkillshot(0.25f, 80, 1600, true, SkillshotType.SkillshotLine);
             Q2.SetTargetted(0.25f, float.MaxValue);
             E.SetSkillshot(0.1f, 120, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E2.SetTargetted(0.25f, float.MaxValue);
             #endregion
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("showcd", "Show cooldown", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQm", "Auto Q melee", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEsplash", "Q + E splash minion damage", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEsplashAdjust", "Q + E splash minion radius", true).SetValue(new Slider(150, 250, 50)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWm", "Auto W melee", true).SetValue(true));
@@ -469,14 +474,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 return; 
             }
 
-            var poutput = QextCol.GetPrediction(t);
             bool cast = true;
 
-            foreach (var minion in poutput.CollisionObjects.Where(minion => minion.IsEnemy && minion.Distance(poutput.CastPosition) > 130))
+            if (Config.Item("QEsplash", true).GetValue<bool>())
             {
-                cast = false;
-                break;
+                var poutput = QextCol.GetPrediction(t);
+
+                foreach (var minion in poutput.CollisionObjects.Where(minion => minion.IsEnemy && minion.Distance(poutput.CastPosition) > Config.Item("QEsplashAdjust", true).GetValue<Slider>().Value))
+                {
+                    cast = false;
+                    break;
+                }
             }
+            else
+                cast = false;
 
             if (cast)
                 Program.CastSpell(Qext, t);
@@ -567,6 +578,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnDraw(EventArgs args)
         {
+            if (Config.Item("showcd", true).GetValue<bool>())
+            {
+                string msg = " ";
+
+                if (Range)
+                {
+                    msg = "Q " + (int)Q2cd + "   W " + (int)W2cd + "   E " + (int)E2cd;
+                    Drawing.DrawText(Drawing.Width * 0.5f - 50, Drawing.Height * 0.3f, System.Drawing.Color.Orange, msg);
+                }
+                else
+                {
+                    msg = "Q " + (int)Qcd + "   W " + (int)Wcd + "   E " + (int)Ecd;
+                    Drawing.DrawText(Drawing.Width * 0.5f - 50, Drawing.Height * 0.3f, System.Drawing.Color.Aqua, msg);
+                }
+            }
+            
+
             if (Config.Item("qRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
