@@ -251,6 +251,11 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void PositionHelper()
         {
+            if (Player.IsMelee)
+            {
+                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            }
+
             if (!Config.Item("positioningAssistant").GetValue<bool>() || Player.ChampionName == "Draven" || Player.IsMelee)
                 return;
             
