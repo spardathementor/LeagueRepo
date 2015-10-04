@@ -91,9 +91,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         }
                     }
                     if (sender.MaxHealth == 3)
-                        AddWard("sightward", sender.Position);
+                        HiddenObjList.Add(new HiddenObj() { type = 1, pos = sender.Position, endTime = Game.Time + sender.Mana });
                     if (sender.MaxHealth == 5)
-                        AddWard("visionward", sender.Position);
+                        HiddenObjList.Add(new HiddenObj() { type = 2, pos = sender.Position, endTime = float.MaxValue });
                 }
             }
 
@@ -209,6 +209,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (!sender.IsEnemy || sender.IsAlly )
                 return;
 
+
             if (sender.Type == GameObjectType.MissileClient && (sender is MissileClient))
             {
                 var missile = (MissileClient)sender;
@@ -236,7 +237,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         }
                     }
                 }
-                AddWard(sender.Name.ToLower(), sender.Position);
+
+                var dupa = (Obj_AI_Minion)sender;
+                if(dupa.Mana == 0)
+                    HiddenObjList.Add(new HiddenObj() { type = 2, pos = sender.Position, endTime = float.MaxValue });
+                else
+                    HiddenObjList.Add(new HiddenObj() { type = 1, pos = sender.Position, endTime = Game.Time + dupa.Mana });
             }
 
             if (rengar &&  sender.Position.Distance(Player.Position) < 800)
