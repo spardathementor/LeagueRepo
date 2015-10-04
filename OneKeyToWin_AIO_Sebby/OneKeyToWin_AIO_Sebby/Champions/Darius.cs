@@ -131,9 +131,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (!Orbwalking.InAutoAttackRange(target))
                     {
                         E.Cast(target);
-                        Program.debug("dupa");
                     }
-                    Program.debug("dupa2");
                 }
             }
         }
