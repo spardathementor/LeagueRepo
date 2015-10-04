@@ -256,7 +256,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Player.Distance(enemy.ServerPosition) < dodgeRange)
                 {
-                    var points = OktwCommon.CirclePoints(20, dodgeRange - 50, Player.Position);
+                    var points = OktwCommon.CirclePoints(20, 200, Player.Position);
                     Vector3 bestPoint = Vector3.Zero;
                     foreach (var point in points)
                     {
