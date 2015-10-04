@@ -25,7 +25,7 @@ namespace OneKeyToWin_AIO_Sebby
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
 
-        private static float dodgeRange = 400;
+        private static float dodgeRange = 420;
         private static float dodgeTime = Game.Time;
 
         static void Main(string[] args) { CustomEvents.Game.OnGameLoad += GameOnOnGameLoad;}
@@ -256,7 +256,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Player.Distance(enemy.ServerPosition) < dodgeRange)
                 {
-                    var points = OktwCommon.CirclePoints(20, dodgeRange - 200, Player.Position);
+                    var points = OktwCommon.CirclePoints(20, dodgeRange - 50, Player.Position);
                     Vector3 bestPoint = Vector3.Zero;
                     foreach (var point in points)
                     {
@@ -272,6 +272,7 @@ namespace OneKeyToWin_AIO_Sebby
                         return;
                     }
                 }
+                return;
             }
             Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
         }
