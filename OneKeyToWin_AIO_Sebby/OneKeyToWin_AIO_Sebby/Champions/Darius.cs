@@ -21,10 +21,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             Q = new Spell(SpellSlot.Q, 400);
             W = new Spell(SpellSlot.W, 145);
-            E = new Spell(SpellSlot.E, 540);
+            E = new Spell(SpellSlot.E, 550);
             R = new Spell(SpellSlot.R, 460);
 
-            E.SetSkillshot(0.1f, 50f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.01f, 100f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             LoadMenuOKTW();
 
@@ -47,7 +47,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
-            
+            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoRbuff", "Auto R if darius execute multi cast time out ", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoRdeath", "Auto R if darius execute multi cast and under 10 % hp", true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Farm W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
         }
@@ -68,12 +70,44 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
                 W.Cast();
-            else if (Config.Item("farmW", true).GetValue<bool>())
+
+        }
+
+        private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+
+
+        }
+
+        private void Game_OnGameUpdate(EventArgs args)
+        {
+            if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active )
+            {
+                var targetR = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.True);
+                if (targetR.IsValidTarget())
+                    R.Cast(targetR, true);
+            }
+
+            if (Program.LagFree(0))
+            {
+                SetMana();
+            }
+
+            if (Program.LagFree(1) && W.IsReady())
+                LogicW();
+            if (Program.LagFree(2) && Q.IsReady())
+                LogicQ();
+            if (Program.LagFree(3) && E.IsReady())
+                LogicE();
+            if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                LogicR();
+        }
+
+        private void LogicW()
+        {
+            if (Config.Item("farmW", true).GetValue<bool>() && !Player.IsWindingUp)
             {
                 var minions = MinionManager.GetMinions(Player.Position, Player.AttackRange, MinionTypes.All);
-
-                if (minions == null || minions.Count == 0)
-                    return;
 
                 int countMinions = 0;
 
@@ -87,34 +121,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
-        {
-           
-            
-        }
-
-        private void Game_OnGameUpdate(EventArgs args)
-        {
-            if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
-            {
-                var targetR = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.True);
-                if (targetR.IsValidTarget())
-                    R.Cast(targetR, true);
-            }
-            
-            if (Program.LagFree(0))
-            {
-                SetMana();
-            }
-
-            if (Program.LagFree(2) && Q.IsReady())
-                LogicQ();
-            if (Program.LagFree(3) && E.IsReady())
-                LogicE();
-            if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
-                LogicR();
-        }
-
         private void LogicE()
         {
             if (Player.Mana > RMANA + EMANA )
@@ -123,7 +129,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (target.IsValidTarget() && ((Player.UnderTurret(false) && !Player.UnderTurret(true)) || Program.Combo) )
                 {
                     if (!Orbwalking.InAutoAttackRange(target))
-                        E.Cast(target, true);
+                    {
+                        E.Cast(target);
+                        Program.debug("dupa");
+                    }
+                    Program.debug("dupa2");
                 }
             }
         }
@@ -154,6 +164,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
+            var targetR = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.True);
+            if (targetR.IsValidTarget() && Config.Item("autoRbuff", true).GetValue<bool>())
+            {
+                var buffTime = OktwCommon.GetPassiveTime(Player, "dariusexecutemulticast");
+                if((buffTime < 2 || (Player.HealthPercent < 10 && Config.Item("autoRdeath", true).GetValue<bool>())) && buffTime > 0)
+                    R.Cast(targetR, true);
+            }
+
             foreach (var target in Program.Enemies.Where(target => OktwCommon.ValidUlt(target) && target.IsValidTarget(R.Range) ))
             {
                 var dmgR = R.GetDamage(target);
