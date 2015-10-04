@@ -107,7 +107,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var t = TargetSelector.GetTarget(800, TargetSelector.DamageType.Physical);
                 if (Program.Combo && target is Obj_AI_Hero && Player.Mana > RMANA + WMANA)
                     W.Cast();
-                else if (Config.Item("harasW", true).GetValue<bool>() && (target is Obj_AI_Hero || t.IsValidTarget()) && Player.Mana > RMANA + WMANA + QMANA)
+                else if (Config.Item("harasW", true).GetValue<bool>() && !Player.UnderTurret(true) && (target is Obj_AI_Hero || t.IsValidTarget()) && Player.Mana > RMANA + WMANA + QMANA)
                     W.Cast();
                 else if (Config.Item("farmW", true).GetValue<bool>() && Program.Farm && Player.Mana > RMANA + WMANA + QMANA && !Player.UnderTurret(true))
                 {
