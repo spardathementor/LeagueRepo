@@ -16,7 +16,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public Spell Q, W, E, R, DrawSpell;
-        private static Font Tahoma13, Tahoma13B, TextBold;
+        public static Font Tahoma13, Tahoma13B, TextBold;
         private float spellFarmTimer = 0;
 
         public void LoadOKTW()
@@ -112,24 +112,24 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         }
 
-        public void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
+        public static void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
         {
             var wts = Drawing.WorldToScreen(Hero);
             Drawing.DrawText(wts[0] - (msg.Length) * 5, wts[1] + weight, color, msg);
         }
 
-        public void DrawFontTextScreen(Font vFont, string vText, float vPosX, float vPosY, ColorBGRA vColor)
+        public static void DrawFontTextScreen(Font vFont, string vText, float vPosX, float vPosY, ColorBGRA vColor)
         {
             vFont.DrawText(null, vText, (int)vPosX, (int)vPosY, vColor);
         }
 
-        public void DrawFontTextMap(Font vFont, string vText, Vector3 Pos, ColorBGRA vColor)
+        public static void DrawFontTextMap(Font vFont, string vText, Vector3 Pos, ColorBGRA vColor)
         {
             var wts = Drawing.WorldToScreen(Pos);
             vFont.DrawText(null, vText, (int)wts[0] , (int)wts[1], vColor);
         }
 
-        public void drawLine(Vector3 pos1, Vector3 pos2, int bold, System.Drawing.Color color)
+        public static void drawLine(Vector3 pos1, Vector3 pos2, int bold, System.Drawing.Color color)
         {
             var wts1 = Drawing.WorldToScreen(pos1);
             var wts2 = Drawing.WorldToScreen(pos2);
