@@ -105,7 +105,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            if (Config.Item("farmW", true).GetValue<bool>() && !Player.IsWindingUp)
+            if (!Player.IsWindingUp && Config.Item("farmW", true).GetValue<bool>() && Program.Farm)
             {
                 var minions = MinionManager.GetMinions(Player.Position, Player.AttackRange, MinionTypes.All);
 
