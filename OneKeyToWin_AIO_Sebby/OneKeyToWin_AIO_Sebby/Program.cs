@@ -251,14 +251,12 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void PositionHelper()
         {
-            if (Player.IsMelee)
+            if (!Config.Item("positioningAssistant").GetValue<bool>() || Player.ChampionName == "Draven" || Player.IsMelee)
             {
-                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+                Orbwalker.SetOrbwalkingPoint(new Vector3());
+                return;
             }
 
-            if (!Config.Item("positioningAssistant").GetValue<bool>() || Player.ChampionName == "Draven" || Player.IsMelee)
-                return;
-            
             foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player)))
             {
                 if (Player.Distance(enemy.ServerPosition) < dodgeRange)
@@ -281,7 +279,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 return;
             }
-            Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            Orbwalker.SetOrbwalkingPoint(new Vector3());
         }
 
         private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
