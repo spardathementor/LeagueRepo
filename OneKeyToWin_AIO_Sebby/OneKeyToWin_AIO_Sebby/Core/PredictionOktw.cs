@@ -468,7 +468,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (distanceFromToWaypoint > input.Unit.Distance(input.From) && GetAngle(input.From, input.Unit) > angleMove)
                 result.Hitchance = HitChance.VeryHigh;
 
-            if (input.Unit.Distance(input.From) < 300 || distanceFromToWaypoint < 300 || input.Unit.MoveSpeed < 200f)
+            if (input.Unit.Distance(input.From) < 400 || distanceFromToWaypoint < 300 || input.Unit.MoveSpeed < 200f)
                 result.Hitchance = HitChance.VeryHigh;
 
             return result;
