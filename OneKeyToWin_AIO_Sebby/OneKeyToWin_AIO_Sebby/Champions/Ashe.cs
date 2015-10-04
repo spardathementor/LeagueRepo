@@ -243,10 +243,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if (Config.Item("debug", true).GetValue<bool>())
-            {
-                Drawing.DrawText(Drawing.Height * 0.5f, Drawing.Height * 0.5f, System.Drawing.Color.GreenYellow, "ManaCost: Q " + QMANA + " W " + WMANA + " E " + 0 + " R " + RMANA);
-            }
             if (Config.Item("wRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
