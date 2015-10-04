@@ -127,13 +127,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 if (need == null || need.PredictedPos == null)
                     return;
 
-                if (Player.ChampionName == "Quinn" && W.IsReady() && Game.Time - need.LastVisableTime > 0.5 && Game.Time - need.LastVisableTime < 4 && need.PredictedPos.Distance(Player.Position) < 1500 && Config.Item("autoW").GetValue<bool>())
+                if (Player.ChampionName == "Quinn" && W.IsReady() && Game.Time - need.LastVisableTime > 0.5 && Game.Time - need.LastVisableTime < 4 && need.PredictedPos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
                 {
                     W.Cast();
                     return;
                 }
 
-                if (Player.ChampionName == "Ashe" && E.IsReady() && Player.Spellbook.GetSpell(SpellSlot.E).Ammo > 1 && Player.CountEnemiesInRange(800) == 0 && Game.Time - need.LastVisableTime > 3 && Game.Time - need.LastVisableTime < 1 && Config.Item("autoE").GetValue<bool>())
+                if (Player.ChampionName == "Ashe" && E.IsReady() && Player.Spellbook.GetSpell(SpellSlot.E).Ammo > 1 && Player.CountEnemiesInRange(800) == 0 && Game.Time - need.LastVisableTime > 3 && Game.Time - need.LastVisableTime < 1 && Config.Item("autoE", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 3000)
                     {
@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                 }
 
-                if (Player.ChampionName == "Caitlyn" && W.IsReady() && Game.Time - need.LastVisableTime < 2 && Player.Mana > 200f && !Player.IsWindingUp && Config.Item("bushW").GetValue<bool>())
+                if (Player.ChampionName == "Caitlyn" && W.IsReady() && Game.Time - need.LastVisableTime < 2 && Player.Mana > 200f && !Player.IsWindingUp && Config.Item("bushW", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 800)
                     {
