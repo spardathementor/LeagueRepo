@@ -68,6 +68,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("comboDisableMode", "Disable auto-attack in combo mode", true).SetValue(false));
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("manaDisable", "Disable mana manager in combo", true).SetValue(false));
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("positioningAssistant", "Anti-Melee Positioning Assistant OKTW©").SetValue(true));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsMelee))
+                Config.SubMenu("Extra settings OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+
             Config.Item("manaDisable", true).SetValue(false);
             Config.Item("comboDisableMode", true).SetValue(false);
             Config.Item("supportMode", true).SetValue(false);
@@ -250,9 +253,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (!Config.Item("positioningAssistant").GetValue<bool>() || Player.ChampionName == "Draven" || Player.IsMelee)
                 return;
-
             
-            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player)))
+            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player)))
             {
                 if (Player.Distance(enemy.ServerPosition) < dodgeRange)
                 {
