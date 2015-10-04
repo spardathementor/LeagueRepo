@@ -73,19 +73,19 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (args.Target == null && !Q.IsReady())
+            if (!sender.IsEnemy || !args.SData.IsAutoAttack() || !Q.IsReady())
                 return;
             
-            if (sender.IsValid<Obj_AI_Hero>() && sender.IsEnemy && args.Target.IsMe && args.SData.IsAutoAttack())
+            if (sender.IsValid<Obj_AI_Hero>() && args.Target.IsMe )
             {
-                var target2 = ObjectManager.Get<Obj_AI_Hero>().Find(x => x.NetworkId == sender.NetworkId);
-                if (ActiveR && target2.IsValidTarget(500))
+
+                if (ActiveR && sender.IsValidTarget(500))
                 {
                     Q.Cast();
                     return;
                 }
-
-                Q.Cast(target2);
+                if (sender.IsValidTarget(Q.Range))
+                 Q.Cast(sender);
                 //Game.PrintChat("" + HpPercentage);
             }
         }
