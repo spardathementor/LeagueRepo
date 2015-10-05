@@ -275,6 +275,8 @@ namespace OneKeyToWin_AIO_Sebby
                     if (enemy.Distance(bestPoint) > dodgeRange)
                     {
                         Orbwalker.SetOrbwalkingPoint(bestPoint);
+                        if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
+                            OktwCommon.blockAttack = true;
                         dodgeTime = Game.Time;
                         return;
                     }
@@ -282,6 +284,8 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             }
             Orbwalker.SetOrbwalkingPoint(new Vector3());
+            if(OktwCommon.blockAttack == true)
+                OktwCommon.blockAttack = false;
         }
 
         private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
