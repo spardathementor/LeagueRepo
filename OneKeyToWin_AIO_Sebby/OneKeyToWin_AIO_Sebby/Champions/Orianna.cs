@@ -62,6 +62,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rks", "R ks", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rlifesaver", "auto R life saver", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rblock", "Block R if 0 hit ", true).SetValue(true));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("Always R").AddItem(new MenuItem("Ralways" + enemy.ChampionName, enemy.ChampionName,true).SetValue(false));
+
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("W", "Auto W SpeedUp logic", true).SetValue(true));
             Game.OnUpdate += Game_OnGameUpdate;
@@ -206,14 +209,15 @@ namespace OneKeyToWin_AIO_Sebby
         }
 
         private void LogicR()
-        {
-            var Rturrent = Config.Item("Rturrent", true).GetValue<bool>();
-            var Rks = Config.Item("Rks", true).GetValue<bool>();
-            var Rlifesaver = Config.Item("Rlifesaver", true).GetValue<bool>();
-            
+        {            
             foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Width && BallPos.Distance(t.ServerPosition) < R.Width))
             {
-                if (Rks)
+                if (Config.Item("Ralways" + t.ChampionName, true).GetValue<bool>())
+                {
+                    R.Cast();
+                }
+
+                if (Config.Item("Rks", true).GetValue<bool>())
                 {
                     var comboDmg = R.GetDamage(t);
 
@@ -227,12 +231,12 @@ namespace OneKeyToWin_AIO_Sebby
                         R.Cast();
                     Program.debug("ks");
                 }
-                if (Rturrent && BallPos.UnderTurret(false) && !BallPos.UnderTurret(true))
+                if (Config.Item("Rturrent", true).GetValue<bool>() && BallPos.UnderTurret(false) && !BallPos.UnderTurret(true))
                 {
                     R.Cast();
                     Program.debug("Rturrent");
                 }
-                if (Rlifesaver && Player.Health < Player.CountEnemiesInRange(800) * Player.Level * 20 && Player.Distance(BallPos) > t.Distance(Player.Position))
+                if (Config.Item("Rlifesaver", true).GetValue<bool>() && Player.Health < Player.CountEnemiesInRange(800) * Player.Level * 20 && Player.Distance(BallPos) > t.Distance(Player.Position))
                 {
                     R.Cast();
                     Program.debug("ls");
