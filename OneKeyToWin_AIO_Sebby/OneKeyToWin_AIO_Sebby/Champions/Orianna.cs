@@ -24,13 +24,13 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 840);
+            Q = new Spell(SpellSlot.Q, 870);
             W = new Spell(SpellSlot.W, 210);
             E = new Spell(SpellSlot.E, 1095);
             R = new Spell(SpellSlot.R, 380);
             QR = new Spell(SpellSlot.Q, 825);
 
-            Q.SetSkillshot(0.05f, 60f, 1150f, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.1f, 60f, 1150f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 210f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 100f, 1700f, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.6f, 375f, float.MaxValue, false, SkillshotType.SkillshotCircle);
@@ -108,7 +108,10 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Player.HasBuff("Recall") || Player.IsDead)
                 return;
-            
+
+            if (R.IsReady())
+                LogicR();
+
             bool hadrCC = true, poison = true;
             if (Program.LagFree(0))
             {
@@ -181,14 +184,11 @@ namespace OneKeyToWin_AIO_Sebby
             else
                 Rsmart = false;
 
-            if (Program.LagFree(1))
+            if (Program.LagFree(2))
             {
                 LogicQ();
                 LogicFarm();
             }
-
-            if (Program.LagFree(2) && R.IsReady())
-                LogicR();
 
             if (Program.LagFree(3) && W.IsReady() )
                 LogicW();
@@ -201,9 +201,14 @@ namespace OneKeyToWin_AIO_Sebby
         {
             var ta = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Physical);
 
-            if ( Program.Combo && ta.IsValidTarget()  && !W.IsReady() && CountEnemiesInRangeDeley(BallPos, 100, 0.1f) > 0 && Player.Mana > RMANA + EMANA)
+            if (Program.Combo && ta.IsValidTarget() && !W.IsReady() && Player.Mana > RMANA + EMANA)
             {
-                E.CastOnUnit(best);
+                if (CountEnemiesInRangeDeley(BallPos, 100, 0.1f) > 0)
+                    E.CastOnUnit(best);
+                var castArea = ta.Distance(Player.ServerPosition) * (Player.ServerPosition - ta.ServerPosition).Normalized() + ta.ServerPosition;
+                if (castArea.Distance(ta.ServerPosition) < ta.BoundingRadius / 2)
+                    E.CastOnUnit(best);
+
                 Program.debug(best.ChampionName);
             }
         }
@@ -363,7 +368,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 var prepos5 = Core.Prediction.GetPrediction(target, delay);
 
-                if ((int)prepos5.Hitchance > 5)
+                if ((int)prepos5.Hitchance > 5 - Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex)
                 {
                     if (prepos5.CastPosition.Distance(prepos5.CastPosition) < Q.Range)
                     {
@@ -375,7 +380,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 var prepos = Prediction.GetPrediction(target, delay);
 
-                if ((int)prepos.Hitchance > 5)
+                if ((int)prepos.Hitchance > 5 - Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex)
                 {
                     if (prepos.CastPosition.Distance(prepos.CastPosition) < Q.Range)
                     {
