@@ -142,11 +142,10 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if ((ally.Health < best.Health || ally.CountEnemiesInRange(300) > 0) && ally.Distance(Player.Position) < E.Range && ally.CountEnemiesInRange(700) > 0)
                         best = ally;
-
-                    if (Program.LagFree(1) && E.IsReady() && Player.Mana > RMANA + EMANA && ally.Distance(Player.Position) < E.Range && ally.CountEnemiesInRange(R.Width) >= Config.Item("rCount", true).GetValue<Slider>().Value)
-                    {
-                        E.CastOnUnit(ally);
-                    }
+                }
+                if (Program.LagFree(1) && E.IsReady() && Player.Mana > RMANA + EMANA && ally.Distance(Player.Position) < E.Range && ally.CountEnemiesInRange(R.Width) >= Config.Item("rCount", true).GetValue<Slider>().Value)
+                {
+                    E.CastOnUnit(ally);
                 }
             }
             /*
