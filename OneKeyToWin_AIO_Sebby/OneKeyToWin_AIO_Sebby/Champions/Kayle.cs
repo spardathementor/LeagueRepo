@@ -59,26 +59,27 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!R.IsReady() || !sender.IsEnemy || sender.IsMinion || !sender.IsValidTarget(1500) || !Config.Item("autoR", true).GetValue<bool>())
+            if (!R.IsReady() || !sender.IsEnemy || sender.IsMinion || !sender.IsValidTarget(1600) || !Config.Item("autoR", true).GetValue<bool>())
                 return;
-
-            double dmg = 0;
 
             foreach (var ally in Program.Allies.Where(ally => Config.Item("Rally" + ally.ChampionName).GetValue<bool>() && ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < R.Range))
             {
+                double dmg = 0;
                 if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
                 {
                     dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                 }
-                else if (ally.Distance(args.End) <= 300f)
+                else
                 {
-                    if (!OktwCommon.CanMove(ObjectManager.Player) || ObjectManager.Player.Distance(sender.Position) < 300f)
+                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
+                    if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
                         dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
-                    else if (Player.Distance(args.End) < 100f)
-                        dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                    else
+                        continue;
                 }
-
-                if (ally.Health - dmg < ally.CountEnemiesInRange(900) * ally.Level * 20)
+                if(dmg > Player.Level * 30)
+                    R.Cast(ally);
+                else if (ally.Health - dmg < ally.CountEnemiesInRange(900) * ally.Level * 20)
                     R.Cast(ally);
                 else if (ally.Health - dmg <  ally.Level * 5)
                     R.Cast(ally);
