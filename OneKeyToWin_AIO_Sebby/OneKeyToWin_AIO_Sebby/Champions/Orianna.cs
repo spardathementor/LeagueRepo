@@ -94,7 +94,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            var Target = (Obj_AI_Hero)gapcloser.Sender;
+            var Target = gapcloser.Sender;
             if (Config.Item("AGC", true).GetValue<bool>() && E.IsReady() && Target.IsValidTarget(800) && Player.Mana > RMANA + EMANA)
                 E.CastOnUnit(Player);
             return;
@@ -381,30 +381,31 @@ namespace OneKeyToWin_AIO_Sebby
             if (sender.IsMe && args.SData.Name == "OrianaIzunaCommand")
                 BallPos = args.End;
 
-             if (args.Target == null 
-                || !args.Target.IsValid 
-                || !sender.IsEnemy 
-                || !args.Target.IsAlly 
-                || !Config.Item("autoW", true).GetValue<bool>() 
-                || Player.Mana < EMANA + RMANA
-                || args.Target.Position.Distance(Player.Position) > E.Range)
+             if (!E.IsReady() || !sender.IsEnemy || !Config.Item("autoW", true).GetValue<bool>() || Player.Mana < EMANA + RMANA || sender.Distance(Player.Position) > 1600)
                 return;
 
-             if (!E.IsReady())
-                 return;
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && ally.NetworkId == args.Target.NetworkId))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < E.Range))
             {
-                var dmg = sender.GetSpellDamage(ally, args.SData.Name);
+                double dmg = 0;
+                if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
+                {
+                    dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                }
+                else
+                {
+                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
+                    if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
+                        dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                    else
+                        continue;
+                }
+
                 double HpLeft = ally.Health - dmg;
-                
                 double HpPercentage = (dmg * 100) / ally.Health;
                 double shieldValue = 60 + E.Level * 40 + 0.4 * Player.FlatMagicDamageMod;
-                if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
+
+                if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value || dmg > shieldValue)
                     E.CastOnUnit(ally);
-                else if (dmg > shieldValue)
-                    E.CastOnUnit(ally);
-                
-                //Game.PrintChat("" + HpPercentage);
             }   
         }
 
