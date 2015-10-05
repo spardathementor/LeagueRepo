@@ -50,6 +50,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQout", "Farm Q out range aa minion", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 20)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "LaneClear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "LaneClear E", true).SetValue(false));
@@ -88,7 +89,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (Config.Item("Rblock", true).GetValue<bool>() && args.Slot == SpellSlot.R && CountEnemiesInRangeDeley(BallPos, R.Width, R.Delay) == 0)
+            if (args.Slot == SpellSlot.R && Config.Item("Rblock", true).GetValue<bool>() &&  CountEnemiesInRangeDeley(BallPos, R.Width, R.Delay) == 0)
                 args.Process = false;
         }
 
@@ -203,6 +204,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Program.debug(best.ChampionName);
             }
         }
+
         private void LogicR()
         {
             var Rturrent = Config.Item("Rturrent", true).GetValue<bool>();
@@ -219,6 +221,8 @@ namespace OneKeyToWin_AIO_Sebby
                         comboDmg += Q.GetDamage(t);
                     if (W.IsReady())
                         comboDmg += W.GetDamage(t);
+                    if (Orbwalker.InAutoAttackRange(t))
+                        comboDmg += (float)Player.GetAutoAttackDamage(t) * 2;
                     if (t.Health < comboDmg)
                         R.Cast();
                     Program.debug("ks");
@@ -284,8 +288,11 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicFarm()
         {
+            if (!Program.Farm)
+                return;
+
             var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All);
-            if (Program.Farm && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA + EMANA)
+            if (Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA + EMANA)
             {
                 foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion) && minion.Health > minion.FlatPhysicalDamageMod))
                 {
@@ -293,24 +300,24 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.Mana > RMANA + QMANA)
-            {
-                 var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 800, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-                if (mobs.Count > 0)
-                {
-                    var mob = mobs[0];
-                    if (Q.IsReady())
-                        Q.Cast(mob.Position);
-                    if (W.IsReady() && BallPos.Distance(mob.Position) < W.Width)
-                        W.Cast();
-                    else if (E.IsReady())
-                        E.CastOnUnit(Player);
-                    return;
-                }
-            }
+            if (!Program.LaneClear || Player.Mana < RMANA + QMANA)
+                return;
 
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
-                && (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value || (Player.UnderTurret(false) && !Player.UnderTurret(true) && Player.ManaPercent > 20)))
+            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 800, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            if (mobs.Count > 0)
+            {
+                var mob = mobs[0];
+                if (Q.IsReady())
+                    Q.Cast(mob.Position);
+                if (W.IsReady() && BallPos.Distance(mob.Position) < W.Width)
+                    W.Cast();
+                else if (E.IsReady())
+                    E.CastOnUnit(Player);
+                return;
+            }
+            
+
+            if ((Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value || (Player.UnderTurret(false) && !Player.UnderTurret(true))))
             {
                 var Qfarm = Q.GetCircularFarmLocation(allMinions, 100);
                 var QWfarm = Q.GetCircularFarmLocation(allMinions, W.Width);
@@ -319,9 +326,9 @@ namespace OneKeyToWin_AIO_Sebby
                     return;
                 if (Config.Item("farmQ", true).GetValue<bool>())
                 {
-                    if (Qfarm.MinionsHit > 2 && !W.IsReady() && Q.IsReady())
+                    if (Qfarm.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value && !W.IsReady() && Q.IsReady())
                     {
-                            Q.Cast(Qfarm.Position);
+                        Q.Cast(Qfarm.Position);
                     }
                     else if (QWfarm.MinionsHit > 2 && Q.IsReady())
                         Q.Cast(QWfarm.Position);
