@@ -38,12 +38,20 @@ namespace OneKeyToWin_AIO_Sebby
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += afterAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-            Spellbook.OnCastSpell += Spellbook_OnCastSpell;
         }
 
-        private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
+        private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            //sender.
+            if (E.IsReady() && Config.Item("AGC", true).GetValue<bool>() &&  Player.Mana > RMANA + EMANA)
+            {
+                var Target = gapcloser.Sender;
+                if (Target.IsValidTarget(E.Range))
+                {
+                    E.Cast(gapcloser.End);
+                }
+                return;
+            }
+            return;
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -164,16 +172,16 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Program.LagFree(0))
+            if (Program.LagFree(1))
             {
                 SetMana();
                 Jungle();
             }
 
-            if (Program.LagFree(1) && !Player.IsWindingUp && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
+            if (Program.LagFree(2) && !Player.IsWindingUp && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
 
-            if (Program.LagFree(2) && !Player.IsWindingUp && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
+            if (Program.LagFree(3) && !Player.IsWindingUp && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
 
             if (Program.LagFree(4) && !Player.IsWindingUp && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
@@ -225,18 +233,14 @@ namespace OneKeyToWin_AIO_Sebby
             if (t.IsValidTarget())
             {
                 if (Program.GetRealDmg(E, t) > t.Health)
-                    E.Cast(t, true, true);
+                    Program.CastSpell(E, t);
                 else if (E.GetDamage(t) + Q.GetDamage(t) > t.Health && Player.Mana > QMANA + EMANA + RMANA)
-                    E.Cast(t, true, true);
-                else if (Program.Combo)
+                    Program.CastSpell(E, t);
+                else if (Program.Combo && Player.Mana > RMANA + WMANA + QMANA + EMANA)
                 {
-                    if (Player.Mana > RMANA + WMANA + QMANA + EMANA && !Orbwalking.InAutoAttackRange(t))
-                        E.Cast(t, true, true);
-                    else if (Program.Combo && Player.Mana > RMANA + QMANA + EMANA && Player.CountEnemiesInRange(300) > 0)
-                        E.Cast(t, true, true);
-                    else if (Program.Combo && Player.Mana > RMANA + QMANA + EMANA && t.CountEnemiesInRange(250) > 1)
-                        E.Cast(t, true, true);
-                    else if (Player.Mana > RMANA + WMANA + QMANA + EMANA)
+                    if (!Orbwalking.InAutoAttackRange(t) || Player.CountEnemiesInRange(300) > 0 || t.CountEnemiesInRange(250) > 1)
+                        Program.CastSpell(E, t);
+                    else 
                     {
                         foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                             E.Cast(enemy, true, true);
@@ -339,6 +343,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Haras W", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("forceBlockMove", "Force block player", true).SetValue(true));
