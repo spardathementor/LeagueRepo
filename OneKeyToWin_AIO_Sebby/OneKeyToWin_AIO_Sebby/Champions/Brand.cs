@@ -82,7 +82,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 E.CastOnUnit(t);
                 if (Q.IsReady())
                     Q.Cast(t);
-
             }
         }
 
@@ -144,7 +143,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var otherEnemy = t;
 
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && enemy.HasBuff("brandablaze")))
-                        otherEnemy = enemy;
+                        t = enemy;
 
                     if (otherEnemy == t)
                         return;
