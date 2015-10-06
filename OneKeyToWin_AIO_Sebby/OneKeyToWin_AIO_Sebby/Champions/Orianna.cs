@@ -24,17 +24,17 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 870);
+            Q = new Spell(SpellSlot.Q, 860);
             W = new Spell(SpellSlot.W, 210);
             E = new Spell(SpellSlot.E, 1095);
-            R = new Spell(SpellSlot.R, 380);
+            R = new Spell(SpellSlot.R, 365);
             QR = new Spell(SpellSlot.Q, 825);
 
-            Q.SetSkillshot(0.1f, 60f, 1150f, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.07f, 60f, 1150f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 210f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 100f, 1700f, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.6f, 375f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            QR.SetSkillshot(0.6f, 400f, 100f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.5f, 365f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            QR.SetSkillshot(0.5f, 400f, 100f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -127,7 +127,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (ally.HasBuff("orianaghostself") || ally.HasBuff("orianaghost"))
                     BallPos = ally.ServerPosition;
 
-                if (Program.LagFree(4) )
+                if (Program.LagFree(3) )
                 {
                     if (E.IsReady() && Player.Mana > RMANA + EMANA && ally.Distance(Player.Position) < E.Range)
                     {
@@ -184,13 +184,13 @@ namespace OneKeyToWin_AIO_Sebby
             else
                 Rsmart = false;
 
-            if (Program.LagFree(2))
+            if (Program.LagFree(1))
             {
                 LogicQ();
                 LogicFarm();
             }
 
-            if (Program.LagFree(3) && W.IsReady() )
+            if (Program.LagFree(2) && W.IsReady() )
                 LogicW();
 
             if (Program.LagFree(4) && E.IsReady())
