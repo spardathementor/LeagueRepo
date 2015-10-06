@@ -255,38 +255,45 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Player.ChampionName == "Draven")
                 return;
-            if (!Config.Item("positioningAssistant").GetValue<bool>() || Player.IsMelee)
+
+            if (Player.IsMelee || !Config.Item("positioningAssistant").GetValue<bool>())
             {
                 Orbwalker.SetOrbwalkingPoint(new Vector3());
                 return;
             }
 
-            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player)))
+            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() && enemy.IsFacing(Player)))
             {
-                if (Player.Distance(enemy.ServerPosition) < dodgeRange)
+                if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
+                    OktwCommon.blockAttack = true;
+
+                var points = OktwCommon.CirclePoints(20, 200, Player.Position);
+                Vector3 bestPoint = Vector3.Zero;
+
+                foreach (var point in points)
                 {
-                    var points = OktwCommon.CirclePoints(20, 200, Player.Position);
-                    Vector3 bestPoint = Vector3.Zero;
-                    foreach (var point in points)
+                    if (enemy.Distance(point) > dodgeRange && (bestPoint == Vector3.Zero || Game.CursorPos.Distance(point) < Game.CursorPos.Distance(bestPoint)))
                     {
-                        if (enemy.Distance(point) > dodgeRange && (bestPoint == Vector3.Zero || Game.CursorPos.Distance(point) < Game.CursorPos.Distance(bestPoint)))
-                        {
-                            bestPoint = point;
-                        }
-                    }
-                    if (enemy.Distance(bestPoint) > dodgeRange)
-                    {
-                        Orbwalker.SetOrbwalkingPoint(bestPoint);
-                        if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
-                            OktwCommon.blockAttack = true;
-                        dodgeTime = Game.Time;
-                        return;
+                        bestPoint = point;
                     }
                 }
+
+                if (enemy.Distance(bestPoint) > dodgeRange)
+                {
+                    Orbwalker.SetOrbwalkingPoint(bestPoint);
+                    
+                }
+                else
+                {
+                    Orbwalker.SetOrbwalkingPoint(enemy.ServerPosition.Extend(Player.ServerPosition, dodgeRange));
+                }
+                dodgeTime = Game.Time;
                 return;
             }
+
             Orbwalker.SetOrbwalkingPoint(new Vector3());
-            if(OktwCommon.blockAttack == true)
+            Program.debug("" + OktwCommon.blockAttack); 
+            if (OktwCommon.blockAttack == true)
                 OktwCommon.blockAttack = false;
         }
 
@@ -485,7 +492,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
 
-            if (Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>() && Game.Time - dodgeTime < 1 && !Player.IsMelee)
+            if (Game.Time - dodgeTime < 0.01 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>() && )
             {
                 Render.Circle.DrawCircle(Player.Position, dodgeRange, System.Drawing.Color.DimGray, 1);
                 if((int)(Game.Time * 10) % 2 == 0)
