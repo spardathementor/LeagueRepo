@@ -493,7 +493,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
 
-            if (Game.Time - dodgeTime < 0.01 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>() && )
+            if (Game.Time - dodgeTime < 0.01 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>())
             {
                 Render.Circle.DrawCircle(Player.Position, dodgeRange, System.Drawing.Color.DimGray, 1);
                 if((int)(Game.Time * 10) % 2 == 0)
