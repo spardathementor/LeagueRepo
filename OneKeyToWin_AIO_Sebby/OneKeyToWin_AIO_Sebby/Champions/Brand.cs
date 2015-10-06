@@ -145,7 +145,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && enemy.HasBuff("brandablaze")))
                         t = enemy;
 
-                    if (otherEnemy == t)
+                    if (otherEnemy == t && !LogicQuse(t))
                         return;
                 }
 
@@ -160,6 +160,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Q.Cast(enemy);
                 }
             }
+        }
+
+        private bool LogicQuse(Obj_AI_Base t)
+        {
+            if (t.HasBuff("brandablaze"))
+                return true;
+            else if (E.Instance.CooldownExpires - Game.Time + 1 >= Q.Instance.Cooldown && W.Instance.CooldownExpires - Game.Time >= Q.Instance.Cooldown)
+                return true;
+            else
+                return false;
         }
 
         private void LogicW()
