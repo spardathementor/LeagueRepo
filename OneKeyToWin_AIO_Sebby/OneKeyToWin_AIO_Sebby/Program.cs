@@ -292,7 +292,6 @@ namespace OneKeyToWin_AIO_Sebby
             }
 
             Orbwalker.SetOrbwalkingPoint(new Vector3());
-            Program.debug("" + OktwCommon.blockAttack); 
             if (OktwCommon.blockAttack == true)
                 OktwCommon.blockAttack = false;
         }
