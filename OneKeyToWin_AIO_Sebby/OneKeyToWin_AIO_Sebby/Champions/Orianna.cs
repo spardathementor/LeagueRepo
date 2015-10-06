@@ -24,13 +24,13 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 860);
+            Q = new Spell(SpellSlot.Q, 800);
             W = new Spell(SpellSlot.W, 210);
             E = new Spell(SpellSlot.E, 1095);
             R = new Spell(SpellSlot.R, 365);
             QR = new Spell(SpellSlot.Q, 825);
 
-            Q.SetSkillshot(0.07f, 60f, 1150f, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.05f, 60f, 1200f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 210f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 100f, 1700f, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.5f, 365f, float.MaxValue, false, SkillshotType.SkillshotCircle);
@@ -106,6 +106,7 @@ namespace OneKeyToWin_AIO_Sebby
         
         private void Game_OnGameUpdate(EventArgs args)
         {
+            //Program.debug(""+BallPos.Distance(Player.Position));
             if (Player.HasBuff("Recall") || Player.IsDead)
                 return;
 
@@ -356,7 +357,7 @@ namespace OneKeyToWin_AIO_Sebby
         private void CastQ(Obj_AI_Hero target)
         {
             float distance = Vector3.Distance(BallPos, target.ServerPosition);
-            float delay = (distance / Q.Speed + Q.Delay);
+            
 
             if (E.IsReady() && Player.Mana > RMANA + QMANA + WMANA + EMANA && distance > Player.Distance(target.ServerPosition) + 300)
             {
@@ -366,7 +367,21 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
-                var prepos5 = Core.Prediction.GetPrediction(target, delay);
+                //var prepos5 = Core.Prediction.GetPrediction(target, delay, Q.Width);
+
+                var predInput2 = new Core.PredictionInput
+                {
+                    Aoe = true,
+                    Collision = Q.Collision,
+                    Speed = Q.Speed,
+                    Delay = Q.Delay,
+                    Range = float.MaxValue,
+                    From = BallPos,
+                    Radius = Q.Width,
+                    Unit = target,
+                    Type = Core.SkillshotType.SkillshotCircle
+                };
+                var prepos5 = Core.Prediction.GetPrediction(predInput2);
 
                 if ((int)prepos5.Hitchance > 5 - Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex)
                 {
@@ -378,7 +393,8 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else
             {
-                var prepos = Prediction.GetPrediction(target, delay);
+                float delay = (distance / Q.Speed + Q.Delay);
+                var prepos = Prediction.GetPrediction(target, delay, Q.Width);
 
                 if ((int)prepos.Hitchance > 5 - Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex)
                 {
