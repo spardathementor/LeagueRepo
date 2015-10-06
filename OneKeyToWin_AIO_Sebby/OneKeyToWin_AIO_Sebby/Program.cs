@@ -285,7 +285,9 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else
                 {
-                    Orbwalker.SetOrbwalkingPoint(enemy.ServerPosition.Extend(Player.ServerPosition, dodgeRange));
+                    var fastPoint = enemy.ServerPosition.Extend(Player.ServerPosition, dodgeRange);
+                    if(fastPoint.CountEnemiesInRange(dodgeRange) <= Player.CountEnemiesInRange(dodgeRange))
+                        Orbwalker.SetOrbwalkingPoint(fastPoint);
                 }
                 dodgeTime = Game.Time;
                 return;
