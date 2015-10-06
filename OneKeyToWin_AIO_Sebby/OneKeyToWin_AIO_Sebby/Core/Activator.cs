@@ -226,6 +226,8 @@ namespace OneKeyToWin_AIO_Sebby
                         TryCast(() => Player.Spellbook.CastSpell(barrier, Player));
                     else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
                         TryCast(() => Player.Spellbook.CastSpell(barrier, Player));
+                    else if (ally.Health - dmg < ally.Level * 10)
+                        TryCast(() => Seraph.Cast());
                 }
 
                 if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
