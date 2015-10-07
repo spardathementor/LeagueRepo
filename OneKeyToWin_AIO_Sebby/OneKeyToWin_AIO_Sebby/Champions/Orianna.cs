@@ -218,7 +218,7 @@ namespace OneKeyToWin_AIO_Sebby
         {            
             foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Width && BallPos.Distance(t.ServerPosition) < R.Width))
             {
-                if (Config.Item("Ralways" + t.ChampionName, true).GetValue<bool>())
+                if (Program.Combo && Config.Item("Ralways" + t.ChampionName, true).GetValue<bool>())
                 {
                     R.Cast();
                 }
