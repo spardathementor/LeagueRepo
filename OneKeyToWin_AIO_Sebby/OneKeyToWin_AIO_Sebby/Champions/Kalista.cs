@@ -25,14 +25,14 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 1130);
-            Q2 = new Spell(SpellSlot.Q, 1130);
-            W = new Spell(SpellSlot.W, 5200);
+            Q = new Spell(SpellSlot.Q, 1150);
+            Q2 = new Spell(SpellSlot.Q, 1150);
+            W = new Spell(SpellSlot.W, 5000);
             E = new Spell(SpellSlot.E, 1000);
-            R = new Spell(SpellSlot.R, 1400f);
+            R = new Spell(SpellSlot.R, 1500f);
 
-            Q.SetSkillshot(0.25f, 30f, 1700f, true, SkillshotType.SkillshotLine);
-            Q2.SetSkillshot(0.25f, 30f, 1700f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 40f, 1200f, true, SkillshotType.SkillshotLine);
+            Q2.SetSkillshot(0.25f, 40f, 1200f, false, SkillshotType.SkillshotLine);
 
             LoadMenuOKTW();
 
@@ -279,10 +279,27 @@ namespace OneKeyToWin_AIO_Sebby
 
         private float GetEdmg( Obj_AI_Base t)
         {
-            var defuffer = 1f;
+
+            var eDamage = E.GetDamage(t);
+
             if (Player.HasBuff("summonerexhaust"))
-                defuffer *= .4f;
-            return (defuffer * E.GetDamage(t) * 0.01f * (float)Config.Item("Edmg", true).GetValue<Slider>().Value) - t.HPRegenRate;
+                eDamage = eDamage * 0.6f;
+            if (Player.HasBuff("ferocioushowl"))
+                eDamage = eDamage * 0.7f;
+
+            if (t is Obj_AI_Hero)
+            {
+                var champion = (Obj_AI_Hero)t;
+                if (champion.ChampionName == "Blitzcrank" && !champion.HasBuff("BlitzcrankManaBarrierCD") && !champion.HasBuff("ManaBarrier"))
+                {
+                    eDamage -= champion.Mana / 2f;
+                }
+            }
+
+            eDamage -= t.HPRegenRate;
+            eDamage = eDamage * 0.01f * (float)Config.Item("Edmg", true).GetValue<Slider>().Value;
+
+            return eDamage;
         }
 
         private void CastE()
