@@ -208,10 +208,10 @@ namespace OneKeyToWin_AIO_Sebby
                              Program.CastSpell(Q, t);
                      }
                 }
-                if (Player.Mana > RMANA + QMANA + WMANA && Q.IsReady())
+                if (Player.Mana > RMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
-                        Q.Cast(enemy, true);
+                        Q.Cast(enemy);
                 }
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
