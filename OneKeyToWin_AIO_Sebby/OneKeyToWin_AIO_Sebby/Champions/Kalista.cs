@@ -39,7 +39,6 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-           // Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
 
@@ -284,7 +283,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Player.HasBuff("summonerexhaust"))
                 eDamage = eDamage * 0.6f;
-            if (Player.HasBuff("ferocioushowl"))
+
+            if (t.HasBuff("ferocioushowl"))
                 eDamage = eDamage * 0.7f;
 
             if (t is Obj_AI_Hero)
@@ -327,22 +327,19 @@ namespace OneKeyToWin_AIO_Sebby
         {
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && OktwCommon.ValidUlt(target)))
             {
-                var Edmg = GetEdmg(target);
-                if (target.Health  < Edmg)
+                var eDmg = GetEdmg(target);
+                if (target.Health  < eDmg)
                 {
                     CastE();
                     return;
                 }
-                if (0 < Edmg && count > 0)
+                if (0 < eDmg && count > 0)
                 {
                     CastE();
                     return;
                 }
                 
-                if (GetRStacks(target) >= countE && (GetPassiveTime(target) < 0.5 || Player.ServerPosition.Distance(target.ServerPosition) > E.Range - 150 
-                    || Player.Health < Player.MaxHealth * 0.3)
-                    && Player.Mana > RMANA + QMANA + EMANA + WMANA
-                    && Player.CountEnemiesInRange(800) == 0)
+                if (GetRStacks(target) >= countE && (GetPassiveTime(target) < 0.5 || Player.CountEnemiesInRange(800) == 0) && Player.Mana > RMANA +  EMANA )
                 {
                     CastE();
                     return;
@@ -380,7 +377,7 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValidTarget(E.Range) && minion.IsEnemy))
             {
                 var minionDmg = E.GetDamage(minion); 
-                if (minion.Health < minionDmg)
+                if (minion.Health < minionDmg - minion.HPRegenRate)
                 {
 
                     if (GetPassiveTime(minion) > 0.5 && HealthPrediction.LaneClearHealthPrediction(minion, 1000) > minion.GetAutoAttackDamage(minion) * 3 + Player.GetAutoAttackDamage(minion))
