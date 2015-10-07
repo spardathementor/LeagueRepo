@@ -171,7 +171,7 @@ namespace OneKeyToWin_AIO_Sebby
             if ((Config.Item("smartR", true).GetValue<KeyBind>().Active || Rsmart) && R.IsReady())
             {
                 Rsmart = true;
-                var target = TargetSelector.GetTarget(Q.Range + 100, TargetSelector.DamageType.Physical);
+                var target = TargetSelector.GetTarget(Q.Range + 100, TargetSelector.DamageType.Magical);
                 if (target.IsValidTarget())
                 {
                     if (CountEnemiesInRangeDeley(BallPos, R.Width, R.Delay) > 1)
@@ -202,7 +202,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE(Obj_AI_Hero best)
         {
-            var ta = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Physical);
+            var ta = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Magical);
 
             if (Program.Combo && ta.IsValidTarget() && !W.IsReady() && Player.Mana > RMANA + EMANA)
             {
@@ -273,7 +273,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget() && Q.IsReady())
             {
                 if (Q.GetDamage(t) + W.GetDamage(t) > t.Health)
