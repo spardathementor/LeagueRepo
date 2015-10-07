@@ -21,6 +21,7 @@ namespace OneKeyToWin_AIO_Sebby
         private Vector3 BallPos;
         private int FarmId;
         private bool Rsmart = false;
+        private Obj_AI_Hero best;
 
         public void LoadOKTW()
         {
@@ -121,7 +122,7 @@ namespace OneKeyToWin_AIO_Sebby
                 poison = Config.Item("poison", true).GetValue<bool>();
             }
 
-            Obj_AI_Hero best = Player;
+            best = Player;
 
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead))
             {
@@ -132,11 +133,12 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (E.IsReady() && Player.Mana > RMANA + EMANA && ally.Distance(Player.Position) < E.Range)
                     {
-                        if (ally.Health < ally.CountEnemiesInRange(600) * ally.Level * 20)
+                        var countEnemy = ally.CountEnemiesInRange(800);
+                        if (ally.Health < countEnemy * ally.Level * 25)
                         {
                             E.CastOnUnit(ally);
                         }
-                        else if (HardCC(ally) && hadrCC)
+                        else if (HardCC(ally) && hadrCC && countEnemy > 0)
                         {
                             E.CastOnUnit(ally);
                         }
@@ -206,11 +208,9 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (CountEnemiesInRangeDeley(BallPos, 100, 0.1f) > 0)
                     E.CastOnUnit(best);
-                var castArea = ta.Distance(Player.ServerPosition) * (Player.ServerPosition - ta.ServerPosition).Normalized() + ta.ServerPosition;
+                var castArea = ta.Distance(best.ServerPosition) * (best.ServerPosition - ta.ServerPosition).Normalized() + ta.ServerPosition;
                 if (castArea.Distance(ta.ServerPosition) < ta.BoundingRadius / 2)
                     E.CastOnUnit(best);
-
-                Program.debug(best.ChampionName);
             }
         }
 
@@ -322,7 +322,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (W.IsReady() && BallPos.Distance(mob.Position) < W.Width)
                     W.Cast();
                 else if (E.IsReady())
-                    E.CastOnUnit(Player);
+                    E.CastOnUnit(best);
                 return;
             }
             
