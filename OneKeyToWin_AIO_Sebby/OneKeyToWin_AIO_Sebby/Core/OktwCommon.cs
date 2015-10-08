@@ -73,7 +73,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (!sender.IsMe)
                 return;
-
+            
             if (blockMove  && !args.IsAttackMove)
             {
                 args.Process = false;
@@ -92,14 +92,19 @@ namespace OneKeyToWin_AIO_Sebby
             return false;
         }
 
-        public static bool ValidUlt(Obj_AI_Hero target)
+        public static bool ValidUlt(Obj_AI_Base target)
         {
             if (target.HasBuffOfType(BuffType.PhysicalImmunity)
                 || target.HasBuffOfType(BuffType.SpellImmunity)
                 || target.IsZombie
                 || target.HasBuffOfType(BuffType.Invulnerability)
                 || target.HasBuffOfType(BuffType.SpellShield)
-                || target.HasBuff("deathdefiedbuff"))
+                || target.HasBuff("deathdefiedbuff")
+                || target.HasBuff("Undying Rage")
+                || target.HasBuff("Chrono Shift")
+                || target.HasBuff("JudicatorIntervention")
+                || target.HasBuff("PoppyDITarget")
+                )
                 return false;
             else
                 return true;
