@@ -32,7 +32,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 430);
 
             Q.SetSkillshot(0.5f, 80, 1900f, true, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 200, float.MaxValue, false, SkillshotType.SkillshotLine);  
+            E.SetSkillshot(0.25f, 100, float.MaxValue, false, SkillshotType.SkillshotLine);  
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts1", "ON - only one target"));
@@ -51,8 +51,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("pushE", "Auto push", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("inter", "OnPossibleToInterrupt")).SetValue(true);
-            Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("Gap", "OnEnemyGapcloser")).SetValue(true);
+            Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("inter", "OnPossibleToInterrupt" , true)).SetValue(true);
+            Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("Gap", "OnEnemyGapcloser", true)).SetValue(true);
 
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if x enemies in range", true).SetValue(new Slider(3, 0, 5)));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rKs", "R ks", true).SetValue(false));
@@ -81,38 +81,46 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (E.IsReady() && Config.Item("Gap", true).GetValue<bool>())
+            if (E.IsReady() && Config.Item("Gap", true).GetValue<bool>() && gapcloser.Sender.IsValidTarget(E.Range))
             {
-                E.Cast(gapcloser.End);
+                E.Cast(gapcloser.Sender);
             }
-            else if (Q.IsReady() && Config.Item("GapQ", true).GetValue<bool>())
+            else if (Q.IsReady() && Config.Item("GapQ", true).GetValue<bool>() && gapcloser.Sender.IsValidTarget(Q.Range))
             {
-                Q.Cast(gapcloser.End);
+                Q.Cast(gapcloser.Sender);
             }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!W.IsReady() || !Config.Item("autoW", true).GetValue<bool>() || !sender.IsEnemy || !sender.IsValidTarget(1500) )
+            if (!W.IsReady() || !sender.IsEnemy || !Config.Item("autoW", true).GetValue<bool>()  || !sender.IsValidTarget(1500) )
                 return;
+            double value = 20 + (Player.Level * 20) + (0.4 * Player.FlatMagicDamageMod);
 
-            double dmg = 0;
-            double shieldValue = 20 + (W.Level * 40) + (0.4 * Player.FlatMagicDamageMod);
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 300))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 200))
             {
+                double dmg = 0;
                 if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
                 {
                     dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                 }
+                else
+                {
+                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
+                    if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
+                        dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                    else
+                        continue;
+                }
 
                 if ( dmg > 0)
                 {
-                    if (ally.Health - dmg < ally.CountEnemiesInRange(600) * ally.Level * 20)
-                        W.Cast(ally.ServerPosition);
+                    if (dmg > value && Config.Item("autoW3", true).GetValue<bool>())
+                        CastW(ally.Position);
+                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
+                        CastW(ally.Position);
                     else if (ally.Health - dmg < ally.Level * 10)
-                        W.Cast(ally.ServerPosition);
-                    else if (dmg > shieldValue * 3 && Config.Item("autoW3", true).GetValue<bool>())
-                        W.Cast(ally.ServerPosition);
+                        CastW(ally.Position);
                 }
             }
         }
@@ -132,7 +140,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicE()
         {
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-            if (t.IsValidTarget() && !t.HasBuff("ThreshQ"))
+            if (t.IsValidTarget() && !t.HasBuff("ThreshQ") && OktwCommon.CanMove(t))
             {
                 foreach (var buff in t.Buffs)
                 {
@@ -161,11 +169,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (W.IsReady() && Config.Item("autoW2", true).GetValue<bool>())
                     {
                         var allyW = Player;
-                        foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 300))
+                        foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 500))
                         {
                             if (enemy.Distance(ally.ServerPosition) > 800 && Player.Distance(ally.ServerPosition) > 600)
                             {
-                                W.Cast(Prediction.GetPrediction(ally, 1f).CastPosition);
+                                CastW(Prediction.GetPrediction(ally, 1f).CastPosition);
                             }
                         }
                     }
@@ -184,6 +192,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (t.IsValidTarget(maxGrab) && !t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) && Config.Item("grab" + t.ChampionName).GetValue<bool>() && Player.Distance(t.ServerPosition) > minGrab)
                     Program.CastSpell(Q, t);
             }
+
             foreach (var t in Program.Enemies.Where(t => t.IsValidTarget(maxGrab) && Config.Item("grab" + t.ChampionName).GetValue<bool>()))
             {
                 if (!t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) && Player.Distance(t.ServerPosition) > minGrab)
@@ -225,12 +234,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(Prediction.GetPrediction(ally, 1f).CastPosition) < W.Range + 300))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally) < W.Range + 500))
             {
-                if (ally.CountEnemiesInRange(700) >= Config.Item("wCount", true).GetValue<Slider>().Value && Config.Item("wCount", true).GetValue<Slider>().Value > 0)
-                    W.Cast(Prediction.GetPrediction(ally, 1f).CastPosition);
+                var prePos = Prediction.GetPrediction(ally, 1f).CastPosition;
+                if (ally.CountEnemiesInRange(800) >= Config.Item("wCount", true).GetValue<Slider>().Value && Config.Item("wCount", true).GetValue<Slider>().Value > 0)
+                    CastW(prePos);
             }
         }
+
+        private void CastW(Vector3 pos)
+        {
+            if (Player.Distance(pos) < W.Range)
+                W.Cast(pos);
+            else
+                W.Cast(Player.Position.Extend(pos, W.Range));
+        }
+
 
         private void CastE(bool pull, Obj_AI_Base target)
         {
