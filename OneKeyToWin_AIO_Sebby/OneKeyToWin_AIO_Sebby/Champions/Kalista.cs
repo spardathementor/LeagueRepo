@@ -294,7 +294,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range )))
                 {
-                    if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate && GetEStacks(minion) > 1)
+                    if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate)
                     {
                         if (GetPassiveTime(minion) > 0.5 && HealthPrediction.GetHealthPrediction(minion, 500, 250) > Player.GetAutoAttackDamage(minion))
                         {
