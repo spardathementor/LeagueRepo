@@ -8,6 +8,7 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 using System.Drawing;
+using SPrediction;
 
 namespace OneKeyToWin_AIO_Sebby
 {
@@ -38,7 +39,7 @@ namespace OneKeyToWin_AIO_Sebby
             R = new Spell(SpellSlot.R);
 
             Config = new Menu("OneKeyToWin AIO", "OneKeyToWin_AIO" + ObjectManager.Player.ChampionName, true);
-
+            SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
@@ -60,9 +61,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("3", "GREEN - jungler visable"));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
 
-            Config.SubMenu("Prediction OKTW©").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION" }, 1)));
-            Config.SubMenu("Prediction OKTW©").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
-            Config.SubMenu("Prediction OKTW©").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(true).DontSave());
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction"}, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(true).DontSave());
 
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("supportMode", "Support Mode", true).SetValue(false));
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("comboDisableMode", "Disable auto-attack in combo mode", true).SetValue(false));
@@ -469,6 +470,33 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     QWER.CastIfHitchanceEquals(target, HitChance.Medium);
                     return;
+                }
+            }
+            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2 )
+            {
+                
+                if (target is Obj_AI_Hero && target.IsValid)
+                {
+                    var t = target as Obj_AI_Hero;
+                    if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                    {
+                        QWER.SPredictionCast(t, HitChance.VeryHigh);
+                        return;
+                    }
+                    else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                    {
+                        QWER.SPredictionCast(t, HitChance.High);
+                        return;
+                    }
+                    else if (Config.Item("HitChance ", true).GetValue<StringList>().SelectedIndex == 2)
+                    {
+                        QWER.SPredictionCast(t, HitChance.Medium);
+                        return;
+                    }
+                }
+                else
+                {
+                    QWER.CastIfHitchanceEquals(target, HitChance.High);
                 }
             }
         }
