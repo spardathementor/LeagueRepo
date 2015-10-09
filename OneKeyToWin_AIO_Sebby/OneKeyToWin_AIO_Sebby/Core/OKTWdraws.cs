@@ -68,7 +68,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Game_OnWndProc(WndEventArgs args)
         {
-            if (args.Msg == 520 && Config.Item("spellFarm", true) != null)
+            if (args.Msg == 0x20a && Config.Item("spellFarm", true) != null)
             {
                 if (!Config.Item("spellFarm", true).GetValue<bool>())
                 {
