@@ -244,7 +244,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t2.IsValidTarget())
             {
-                if (t2.CountAlliesInRange(550) == 0 || Player.HealthPercent < 40 || t2.CountEnemiesInRange(bounceRange) > 1)
+                if (t2.CountAlliesInRange(550) == 0 || Player.HealthPercent < 50 || t2.CountEnemiesInRange(bounceRange) > 1)
                 {
                     var prepos = R.GetPrediction(t2).CastPosition;
                     var dmgR = R.GetDamage(t2);
