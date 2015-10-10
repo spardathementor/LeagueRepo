@@ -71,9 +71,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("hitchanceR", "Hit Chance R", true).SetValue(new Slider(2, 3, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "OneKeyToCast R", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Q farm", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQout", "Q farm out range AA", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Q LaneClear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Q Mana", true).SetValue(new Slider(80, 100, 30)));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("debug", "Debug", true).SetValue(false));
+
         }
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
@@ -93,7 +94,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LaneClear && !FishBoneActive && Config.Item("farmQ", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Player.Mana > RMANA + EMANA + WMANA + 30)
             {
 
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, bonusRange(), MinionTypes.All);
+                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, bonusRange());
                 foreach (var minion in allMinionsQ.Where(
                     minion => args.Target.NetworkId != minion.NetworkId && minion.Distance(args.Target.Position) < 200 && (5 - Q.Level) * Player.GetAutoAttackDamage(minion) < args.Target.Health && (5 - Q.Level) * Player.GetAutoAttackDamage(minion) < minion.Health))
                 {
@@ -101,6 +102,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
         }
+
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
             if (Config.Item("AGC", true).GetValue<bool>() && E.IsReady() && Player.Mana > RMANA + EMANA)
@@ -108,8 +110,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var Target = gapcloser.Sender;
                 if (Target.IsValidTarget(E.Range))
                 {
-                    E.Cast(Player.ServerPosition, true);
-                    debug("E agc");
+                    E.Cast(gapcloser.End);
                 }
                 return;
             }
@@ -131,7 +132,6 @@ namespace OneKeyToWin_AIO_Sebby
                 if (unit.IsEnemy && Config.Item("opsE", true).GetValue<bool>() &&  unit.IsValidTarget(E.Range) && ShouldUseE(args.SData.Name))
                 {
                     E.Cast(unit.ServerPosition, true);
-                    debug("E ope");
                 }
                 if (unit.IsAlly && args.SData.Name == "RocketGrab" && Player.Distance(unit.Position) < E.Range)
                 {
@@ -177,7 +177,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            if ((Game.Time - lag > 0.1) && Program.Farm && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10 && !FishBoneActive)
+            if ((Game.Time - lag > 0.1) && !FishBoneActive &&  Program.Farm && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
             {
                 farmQ();
                 lag = Game.Time;
@@ -270,7 +270,6 @@ namespace OneKeyToWin_AIO_Sebby
                         if (t.HasBuffOfType(BuffType.Slow) || OktwCommon.CountEnemiesInRangeDeley(E.GetPrediction(t).CastPosition, 250, E.Delay) > 1)
                         {
                             Program.CastSpell(E, t);
-                            debug("E slow");
                         }
                         else
                         {
@@ -330,12 +329,10 @@ namespace OneKeyToWin_AIO_Sebby
                         if (cast && GetRealDistance(target) > bonusRange() + 300 + target.BoundingRadius && target.CountAlliesInRange(600) == 0 && Player.CountEnemiesInRange(400) == 0)
                         {
                             castR(target);
-                            debug("R normal High");
                         }
                         else if (cast && target.CountEnemiesInRange(200) > 2 && GetRealDistance(target) > bonusRange() + 200 + target.BoundingRadius)
                         {
                             R.Cast(target, true, true);
-                            debug("R aoe 1");
                         }
                     }
                 }
@@ -425,10 +422,9 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var mob in mobs)
             {
                 //debug(mob.SkinName);
-                if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
+                if (mob.Health < mob.MaxHealth && ((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>()))
                     && mob.CountAlliesInRange(1000) == 0
-                    && mob.Health < mob.MaxHealth
                     && mob.Distance(Player.Position) > 1000)
                 {
                     if (DragonDmg == 0)
@@ -479,12 +475,6 @@ namespace OneKeyToWin_AIO_Sebby
                 missilespeed = (1350f * speed + acceldifference * (speed + accelerationrate * acceldifference) + difference * 2200f) / distance;
             }
             return (distance / missilespeed + delay);
-        }
-
-        public void debug(string msg)
-        {
-            if (Config.Item("debug", true).GetValue<bool>())
-                Console.WriteLine(msg);
         }
 
         private void SetMana()
