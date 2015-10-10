@@ -9,7 +9,6 @@ using LeagueSharp.Common;
 using SharpDX;
 using System.Drawing;
 using SPrediction;
-
 namespace OneKeyToWin_AIO_Sebby
 {
     internal class Program
@@ -39,7 +38,7 @@ namespace OneKeyToWin_AIO_Sebby
             R = new Spell(SpellSlot.R);
 
             Config = new Menu("OneKeyToWin AIO", "OneKeyToWin_AIO" + ObjectManager.Player.ChampionName, true);
-            SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
+            
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
@@ -61,6 +60,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("3", "GREEN - jungler visable"));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
 
+            SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(true).DontSave());
