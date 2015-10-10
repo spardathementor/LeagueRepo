@@ -172,9 +172,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             foreach (var target in Program.Enemies.Where(target => OktwCommon.ValidUlt(target) && target.IsValidTarget(R.Range) ))
             {
-                var dmgR = R.GetDamage(target);
+
+                var dmgR = OktwCommon.GetKsDamage(target, R);
                 if (target.HasBuff("dariushemo"))
-                    dmgR += R.GetDamage(target) * target.GetBuff("dariushemo").Count * 0.2f;
+                    dmgR += dmgR * target.GetBuff("dariushemo").Count * 0.2f;
 
                 if (dmgR > target.Health + target.HPRegenRate)
                 {
