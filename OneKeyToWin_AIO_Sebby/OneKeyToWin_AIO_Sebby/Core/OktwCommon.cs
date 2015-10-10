@@ -92,6 +92,32 @@ namespace OneKeyToWin_AIO_Sebby
             return false;
         }
 
+        public float GetKsDamage(Obj_AI_Base t, Spell QWER)
+        {
+
+            var eDamage = QWER.GetDamage(t);
+
+            if (Player.HasBuff("summonerexhaust"))
+                eDamage = eDamage * 0.6f;
+
+            if (t.HasBuff("ferocioushowl"))
+                eDamage = eDamage * 0.7f;
+
+            if (t is Obj_AI_Hero)
+            {
+                var champion = (Obj_AI_Hero)t;
+                if (champion.ChampionName == "Blitzcrank" && !champion.HasBuff("BlitzcrankManaBarrierCD") && !champion.HasBuff("ManaBarrier"))
+                {
+                    eDamage -= champion.Mana / 2f;
+                }
+            }
+
+            eDamage -= t.HPRegenRate;
+            eDamage -= t.PercentLifeStealMod * 0.005f * t.FlatPhysicalDamageMod;
+
+            return eDamage;
+        }
+
         public static bool ValidUlt(Obj_AI_Base target)
         {
             if (target.HasBuffOfType(BuffType.PhysicalImmunity)
