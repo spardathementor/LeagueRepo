@@ -70,7 +70,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmR", "Lane clear R", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("AntiGapcloser").AddItem(new MenuItem("AGCQ", "Q", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("AntiGapcloser").AddItem(new MenuItem("AGCW", "W", true).SetValue(false));
@@ -148,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 var qDmg = Q.GetDamage(t);
@@ -175,7 +176,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.Combo && Player.Mana > RMANA + EMANA + WMANA)
             {
-                var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(W.Range) && W.GetPrediction(t).CastPosition.Distance(t.Position) > 100)
                 {
                     if (Player.Position.Distance(t.ServerPosition) > Player.Position.Distance(t.Position))
@@ -194,7 +195,7 @@ namespace OneKeyToWin_AIO_Sebby
         
         private void LogicE()
         {
-            var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 var qCd = Q.Instance.CooldownExpires - Game.Time;
@@ -244,11 +245,8 @@ namespace OneKeyToWin_AIO_Sebby
                 var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
                 foreach (var minion in minions.Where(minion => minion.Health > Player.GetAutoAttackDamage(minion)))
                 {
-                    var eDmg = E.GetDamage(minion);
-                    if (minion.HasBuff("chilled"))
-                        eDmg = 2 * eDmg;
-
-                    if (minion.Health < eDmg * 0.9)
+                    var eDmg = E.GetDamage(minion) * 2;
+                    if (minion.Health < eDmg && minion.HasBuff("chilled"))
                         E.Cast(minion);
                 }
             }
@@ -256,38 +254,72 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicR()
         {
-            var t = TargetSelector.GetTarget(R.Range + 400, TargetSelector.DamageType.Physical);
-            if (RMissile == null && t.IsValidTarget() && Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
+            if (RMissile == null)
             {
-                if (R.GetDamage(t) > t.Health)
-                    R.Cast(t, true, true);
-                else if (Player.Mana > RMANA + EMANA && E.GetDamage(t) * 2 + R.GetDamage(t) > t.Health)
-                    R.Cast(t, true, true);
-                if (Player.Mana > RMANA + EMANA + QMANA + WMANA)
-                    R.Cast(t, true, true);
+                var t = TargetSelector.GetTarget(R.Range + 400, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget())
+                {
+                    if (R.GetDamage(t) > t.Health)
+                        R.Cast(t, true, true);
+                    else if (Player.Mana > RMANA + EMANA && E.GetDamage(t) * 2 + R.GetDamage(t) > t.Health)
+                        R.Cast(t, true, true);
+                    if (Player.Mana > RMANA + EMANA + QMANA + WMANA && Program.Combo)
+                        R.Cast(t, true, true);
+                }
+                if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmR", true).GetValue<bool>())
+                {
+                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, R.Range);
+                    var farmPos = R.GetCircularFarmLocation(allMinions, R.Width);
+                    if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                        R.Cast(farmPos.Position);
+                }
             }
-
-            var allMinionsQ = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, R.Range + 400, MinionTypes.All);
-            var Rfarm = R.GetCircularFarmLocation(allMinionsQ, R.Width);
-
-            if (RMissile == null
-                && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value
-                && Config.Item("farmR", true).GetValue<bool>() && Player.Mana > QMANA + EMANA
-                && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear
-                && Rfarm.MinionsHit > 2)
+            else
             {
-                R.Cast(Rfarm.Position);
+                if (Program.LaneClear)
+                {
+                    if (Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value || !Config.Item("farmR", true).GetValue<bool>())
+                        R.Cast();
+                    else
+                    {
+                        var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
+                        if (allMinions.Count < 2)
+                            R.Cast();
+                    }
+                }
+                else if (!Program.None &&(RMissile.Position.CountEnemiesInRange(450) == 0 || Player.Mana < EMANA + QMANA))
+                {
+                    R.Cast();
+                }
             }
+        }
 
-            if (Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None && Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.LaneClear && RMissile != null && (RMissile.Position.CountEnemiesInRange(450) == 0 || Player.Mana < EMANA + QMANA))
+        private void Jungle()
+        {
+            if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
             {
-                R.Cast();
-                Program.debug("combo");
-            }
-            else if (RMissile != null && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && (Rfarm.MinionsHit < 3 || Player.Mana < QMANA + EMANA + WMANA || Rfarm.Position.Distance(RMissile.Position) > 400))
-            {
-                R.Cast();
-                Program.debug("farm");
+                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                if (mobs.Count > 0)
+                {
+                    var mob = mobs[0];
+                    if (R.IsReady() && Config.Item("jungleR", true).GetValue<bool>())
+                    {
+                        R.Cast(mob.ServerPosition);
+                        return;
+                    }
+
+                    if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>())
+                    {
+                        Q.Cast(mob.ServerPosition);
+                        return;
+                    }
+
+                    if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
+                    {
+                        E.Cast(mob);
+                        return;
+                    }
+                }
             }
         }
 
