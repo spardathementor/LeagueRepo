@@ -51,7 +51,7 @@ namespace OneKeyToWin_AIO_Sebby
             var Target = gapcloser.Sender;
             if (Q.IsReady() && Config.Item("AGCQ", true).GetValue<bool>())
             {
-                if (Target.IsValidTarget(Q.Range))
+                if (Target.IsValidTarget(300))
                 {
                     Q.Cast(Target);
                     Program.debug("AGC Q");
