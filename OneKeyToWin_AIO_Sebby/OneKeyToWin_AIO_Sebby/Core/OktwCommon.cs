@@ -92,7 +92,7 @@ namespace OneKeyToWin_AIO_Sebby
             return false;
         }
 
-        public float GetKsDamage(Obj_AI_Base t, Spell QWER)
+        public static float GetKsDamage(Obj_AI_Base t, Spell QWER)
         {
 
             var eDamage = QWER.GetDamage(t);
