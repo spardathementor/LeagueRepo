@@ -332,7 +332,7 @@ namespace OneKeyToWin_AIO_Sebby
                         R.Cast(mob.ServerPosition);
                         return;
                     }
-                    if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
+                    if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>() && mob.HasBuff("chilled"))
                     {
                         E.Cast(mob);
                         return;
