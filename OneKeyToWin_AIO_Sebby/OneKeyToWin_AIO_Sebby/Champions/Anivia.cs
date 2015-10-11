@@ -87,7 +87,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleR", "Jungle clear R", true).SetValue(true));
+            
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("AACombo", "Disable AA if can use E", true).SetValue(true));
         }
@@ -276,8 +279,6 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Program.LaneClear)
                 {
-                    
-
                     var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
                     var mobs = MinionManager.GetMinions(RMissile.Position, R.Width, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
                     if (mobs.Count > 0)
@@ -335,6 +336,11 @@ namespace OneKeyToWin_AIO_Sebby
                     if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>() && mob.HasBuff("chilled"))
                     {
                         E.Cast(mob);
+                        return;
+                    }
+                    if (W.IsReady() && Config.Item("jungleW", true).GetValue<bool>())
+                    {
+                        W.Cast(mob.Position.Extend(Player.Position , 100));
                         return;
                     }
                 }
