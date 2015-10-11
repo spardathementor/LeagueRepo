@@ -276,22 +276,27 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Program.LaneClear)
                 {
-                    if (Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value || !Config.Item("farmR", true).GetValue<bool>())
-                        R.Cast();
-                    else
+                    
+
+                    var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
+                    var mobs = MinionManager.GetMinions(RMissile.Position, R.Width, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                    if (mobs.Count > 0)
                     {
-                        var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
-                        if (allMinions.Count < 2)
-                            R.Cast();
-                        else
+                        if (!Config.Item("jungleR", true).GetValue<bool>())
                         {
-                            var mobs = MinionManager.GetMinions(RMissile.Position, R.Width, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-                            if (mobs.Count == 0 || !Config.Item("jungleR", true).GetValue<bool>())
-                            {
-                                R.Cast();
-                            }
+                            R.Cast();
                         }
                     }
+                    else if (allMinions.Count > 0)
+                    {
+                        if (allMinions.Count < 2 || Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value || !Config.Item("farmR", true).GetValue<bool>())
+                            R.Cast();
+                        else if (Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value)
+                            R.Cast();
+                    }
+                    else
+                        R.Cast();
+
                 }
                 else if (!Program.None &&(RMissile.Position.CountEnemiesInRange(450) == 0 || Player.Mana < EMANA + QMANA))
                 {
@@ -322,7 +327,7 @@ namespace OneKeyToWin_AIO_Sebby
                         
                         return;
                     }
-                    if (R.IsReady() && Config.Item("jungleR", true).GetValue<bool>())
+                    if (R.IsReady() && Config.Item("jungleR", true).GetValue<bool>() && RMissile == null)
                     {
                         R.Cast(mob.ServerPosition);
                         return;
