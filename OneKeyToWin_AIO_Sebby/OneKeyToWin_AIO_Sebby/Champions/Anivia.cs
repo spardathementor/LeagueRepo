@@ -68,11 +68,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LoadMenuOKTW()
         {
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmR", "Lane clear R", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
-
             Config.SubMenu(Player.ChampionName).SubMenu("AntiGapcloser").AddItem(new MenuItem("AGCQ", "Q", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("AntiGapcloser").AddItem(new MenuItem("AGCW", "W", true).SetValue(false));
 
@@ -86,6 +81,13 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmR", "Lane clear R", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleR", "Jungle clear R", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("AACombo", "Disable AA if can use E", true).SetValue(true));
         }
@@ -143,8 +145,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(3) && Q.IsReady() && QMissile == null)
                 LogicQ();
 
-            if (Program.LagFree(4) && E.IsReady() )
-                LogicE();
+            if (Program.LagFree(4) )
+            {
+                if(E.IsReady())
+                    LogicE();
+
+                Jungle();
+            }
         }
 
         private void LogicQ()
@@ -233,16 +240,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > QMANA + EMANA + WMANA && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
-
-                var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-                if (mobs.Count > 0)
-                {
-                    var mob = mobs[0];
-                    E.Cast(mob, true);
-                    return;
-                }
-
-                var minions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
+                var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
                 foreach (var minion in minions.Where(minion => minion.Health > Player.GetAutoAttackDamage(minion)))
                 {
                     var eDmg = E.GetDamage(minion) * 2;
@@ -285,6 +283,14 @@ namespace OneKeyToWin_AIO_Sebby
                         var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
                         if (allMinions.Count < 2)
                             R.Cast();
+                        else
+                        {
+                            var mobs = MinionManager.GetMinions(RMissile.Position, R.Width, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                            if (mobs.Count == 0 || !Config.Item("jungleR", true).GetValue<bool>())
+                            {
+                                R.Cast();
+                            }
+                        }
                     }
                 }
                 else if (!Program.None &&(RMissile.Position.CountEnemiesInRange(450) == 0 || Player.Mana < EMANA + QMANA))
@@ -296,24 +302,31 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Jungle()
         {
-            if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
+            if (Program.LaneClear)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
+                    if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>())
+                    {
+                        if (QMissile != null)
+                        {
+                            if (QMissile.Position.Distance(mob.ServerPosition) < 230)
+                                Q.Cast();
+                        }
+                        else
+                        {
+                            Q.Cast(mob.ServerPosition);
+                        }
+                        
+                        return;
+                    }
                     if (R.IsReady() && Config.Item("jungleR", true).GetValue<bool>())
                     {
                         R.Cast(mob.ServerPosition);
                         return;
                     }
-
-                    if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>())
-                    {
-                        Q.Cast(mob.ServerPosition);
-                        return;
-                    }
-
                     if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
                     {
                         E.Cast(mob);
