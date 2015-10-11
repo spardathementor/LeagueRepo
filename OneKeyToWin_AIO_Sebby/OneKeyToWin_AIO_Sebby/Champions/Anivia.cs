@@ -228,7 +228,7 @@ namespace OneKeyToWin_AIO_Sebby
                         E.Cast(t, true);
                     }
                 }
-                else if (Program.Combo && Player.Mana > RMANA + EMANA && QMissile == null && RMissile == null && R.IsReady())
+                else if (Program.Combo && R.IsReady() && Player.Mana > RMANA + EMANA && QMissile == null )
                 {
                     R.Cast(t, true, true);
                 }
