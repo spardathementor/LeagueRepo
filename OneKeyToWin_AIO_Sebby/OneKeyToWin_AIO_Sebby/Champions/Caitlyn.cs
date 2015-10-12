@@ -130,9 +130,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.CountEnemiesInRange(500) == 1 && target.CountAlliesInRange(500) == 0))
             {
-                float predictedHealth = target.Health + target.HPRegenRate * 2;
-                var Rdmg = R.GetDamage(target);
-                if (Rdmg > predictedHealth && GetRealDistance(target) > bonusRange() + 400 + target.BoundingRadius )
+
+                if (OktwCommon.GetKsDamage(target, R) > target.Health && GetRealDistance(target) > bonusRange() + 400 + target.BoundingRadius )
                 {
                     cast = true;
                     PredictionOutput output = R.GetPrediction(target);
