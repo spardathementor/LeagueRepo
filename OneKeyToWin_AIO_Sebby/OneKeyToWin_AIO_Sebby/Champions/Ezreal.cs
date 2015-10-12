@@ -97,7 +97,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("AGC", true).GetValue<bool>() && E.IsReady() && Player.Mana > RMANA + EMANA && Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(400) < 3)
             {
-                var Target = (Obj_AI_Hero)gapcloser.Sender;
+                var Target = gapcloser.Sender;
                 if (Target.IsValidTarget(E.Range))
                 {
                     if (Config.Item("autoEwall", true).GetValue<bool>())
