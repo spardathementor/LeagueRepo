@@ -229,10 +229,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.HasBuff("LuxLightStrikeKugel") && !Program.None)
             {
-                int eBig = Epos.CountEnemiesInRange(330);
+                int eBig = Epos.CountEnemiesInRange(350);
                 if (Config.Item("autoEslow", true).GetValue<bool>())
                 {
-                    int detonate = eBig - Epos.CountEnemiesInRange(150);
+                    int detonate = eBig - Epos.CountEnemiesInRange(160);
 
                     if (detonate > 0 || eBig > 1)
                         E.Cast();
