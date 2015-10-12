@@ -72,6 +72,7 @@
     <Compile Include="Champions\Evelynn.cs" />
     <Compile Include="Champions\Kayle.cs" />
     <Compile Include="Champions\Lux.cs" />
+    <Compile Include="Champions\Malzahar.cs" />
     <Compile Include="Champions\Morgana.cs" />
     <Compile Include="Champions\Jayce.cs" />
     <Compile Include="Champions\Thresh.cs" />
