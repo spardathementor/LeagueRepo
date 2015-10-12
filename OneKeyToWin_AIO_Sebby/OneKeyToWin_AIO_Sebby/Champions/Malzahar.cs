@@ -40,29 +40,29 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QAblazed", "Q only if ablazed", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
-
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("gapQ", "Gapcloser E + Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("intQ", "Interrupt spells E + Q", true).SetValue(true));
-
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("intQ", "Interrupt spells Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harras E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("minionE", "use E on ablazed minion", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasEminion", "Try harras E on minion", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if can hit x enemies", true).SetValue(new Slider(3, 0, 5)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("gapR", "Gapcloser E + Q", true).SetValue(true));
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Gapcloser").AddItem(new MenuItem("gapcloser" + enemy.ChampionName, enemy.ChampionName).SetValue(false));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
@@ -120,33 +120,27 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (!Config.Item("gapQ", true).GetValue<bool>() || Player.Mana < QMANA + EMANA)
+            if (!R.IsReady() && !Config.Item("gapcloser" + gapcloser.Sender.ChampionName).GetValue<bool>())
                 return;
 
             var t = gapcloser.Sender;
 
-            if (t.IsValidTarget(E.Range))
+            if (t.IsValidTarget(R.Range))
             {
-
-                E.CastOnUnit(t);
-                if (Q.IsReady())
-                    Q.Cast(t);
+                R.CastOnUnit(t);
             }
         }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero t, Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (!Config.Item("intQ", true).GetValue<bool>() || Player.Mana < QMANA + EMANA)
+            if (!Config.Item("intQ", true).GetValue<bool>() || !Q.IsReady())
                 return;
 
-            if (t.IsValidTarget(E.Range) && (t.HasBuff("brandablaze") || E.IsReady()))
+            if (t.IsValidTarget(Q.Range))
             {
-                E.CastOnUnit(t);
-                if (Q.IsReady())
-                    Q.Cast(t);
+                 Q.Cast(t);
             }
         }
 
@@ -167,11 +161,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Program.Combo)
             {
-                if (!E.IsReady())
-                    Orbwalking.Attack = true;
-
-                else
+                if (E.IsReady() || R.IsReady())
                     Orbwalking.Attack = false;
+                else
+                    Orbwalking.Attack = true;
             }
             else
                 Orbwalking.Attack = true;
@@ -217,11 +210,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Q.Cast(enemy);
                 }
             }
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() )
+            {
+                var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                var farmPos = Q.GetCircularFarmLocation(allMinions, 150);
+                if (farmPos.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
+                    Q.Cast(farmPos.Position);
+            }
         }
 
         private void LogicW()
         {
-            var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 var qDmg = Q.GetDamage(t);
@@ -243,11 +243,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         W.Cast(enemy, true);
                 }
             }
-            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() )
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range, MinionTypes.All);
+                var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range);
                 var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
-                if (farmPos.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
+                if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     W.Cast(farmPos.Position);
             }
         }
@@ -271,13 +271,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     E.CastOnUnit(t);
             }
-            else if (Config.Item("minionE", true).GetValue<bool>())
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>())
             {
-                if ((Program.Combo && Player.Mana > RMANA + EMANA) || (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA))
+                var allMinions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
+                if (allMinions.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                 {
-                    foreach (var minion in MinionManager.GetMinions(E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion)))
+                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion) && !minion.HasBuff("AlZaharMaleficVisions")))
                     {
-                        //E.CastOnUnit(minion);
+                        E.CastOnUnit(minion);
+                    }
+                }
+            }
+            else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harrasEminion", true).GetValue<bool>())
+            {
+                var te = TargetSelector.GetTarget(E.Range + 400, TargetSelector.DamageType.Magical);
+                if (te.IsValidTarget())
+                {
+                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
+                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion) && te.Distance(minion.Position) < 400 && !minion.HasBuff("AlZaharMaleficVisions")))
+                    {
+                        E.CastOnUnit(minion);
                     }
                 }
             }
@@ -286,7 +299,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget())
+            if (Player.CountEnemiesInRange(900) < 3 && t.IsValidTarget() && OktwCommon.ValidUlt(t))
             {
                 var totalComboDamage = OktwCommon.GetKsDamage(t, R);
                 // E calculation
@@ -299,7 +312,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (W.IsReady() || (WMissile != null && WMissile.Position.Distance(t.Position) < 200) && Player.Mana > RMANA + WMANA)
                 {
-                    totalComboDamage += W.GetDamage(t) * 4;
+                    totalComboDamage += W.GetDamage(t) * 5;
                 }
 
                 if (Q.IsReady() && Player.Mana > RMANA + QMANA)
@@ -314,7 +327,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Jungle()
         {
-            if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
+            if (Program.LaneClear && Player.Mana > RMANA + EMANA)
             {
                 var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
                 if (mobs.Count > 0)
@@ -434,27 +447,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("noti", true).GetValue<bool>() && R.IsReady())
             {
-                var t = TargetSelector.GetTarget(1000, TargetSelector.DamageType.Physical);
-
-                if (t.IsValidTarget())
-                {
-                    var rDamage = R.GetDamage(t);
-                    if (rDamage * 3 > t.Health)
-                    {
-                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "3 x Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                        drawLine(t.Position, Player.Position, 10, System.Drawing.Color.Yellow);
-                    }
-                    else if (rDamage * 2 > t.Health)
-                    {
-                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "2 x Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                        drawLine(t.Position, Player.Position, 10, System.Drawing.Color.Yellow);
-                    }
-                    else if (rDamage > t.Health)
-                    {
-                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "1 x Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                        drawLine(t.Position, Player.Position, 10, System.Drawing.Color.Yellow);
-                    }
-                }
+              
             }
         }
     }
