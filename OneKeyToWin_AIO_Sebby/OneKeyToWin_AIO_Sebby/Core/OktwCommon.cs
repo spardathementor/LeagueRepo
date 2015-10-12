@@ -94,28 +94,38 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static float GetKsDamage(Obj_AI_Base t, Spell QWER)
         {
+            var totalDmg = QWER.GetDamage(t);
 
-            var eDamage = QWER.GetDamage(t);
+            if (Player.HasBuff("itemmagicshankcharge"))
+            {
+                if (Player.GetBuff("itemmagicshankcharge").Count == 100)
+                {
+                    totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
+                }
+            }
 
             if (Player.HasBuff("summonerexhaust"))
-                eDamage = eDamage * 0.6f;
+                totalDmg = totalDmg * 0.6f;
 
             if (t.HasBuff("ferocioushowl"))
-                eDamage = eDamage * 0.7f;
+                totalDmg = totalDmg * 0.7f;
 
             if (t is Obj_AI_Hero)
             {
                 var champion = (Obj_AI_Hero)t;
                 if (champion.ChampionName == "Blitzcrank" && !champion.HasBuff("BlitzcrankManaBarrierCD") && !champion.HasBuff("ManaBarrier"))
                 {
-                    eDamage -= champion.Mana / 2f;
+                    totalDmg -= champion.Mana / 2f;
                 }
             }
 
-            eDamage -= t.HPRegenRate;
-            eDamage -= t.PercentLifeStealMod * 0.005f * t.FlatPhysicalDamageMod;
+            var extraHP = t.Health - HealthPrediction.GetHealthPrediction(t, 500);
 
-            return eDamage;
+            totalDmg += extraHP;
+            totalDmg -= t.HPRegenRate;
+            totalDmg -= t.PercentLifeStealMod * 0.005f * t.FlatPhysicalDamageMod;
+
+            return totalDmg;
         }
 
         public static bool ValidUlt(Obj_AI_Base target)
