@@ -49,6 +49,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQm", "Auto Q melee", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEforce", "force E + Q", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEsplash", "Q + E splash minion damage", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEsplashAdjust", "Q + E splash minion radius", true).SetValue(new Slider(150, 250, 50)));
 
@@ -57,6 +58,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E range (Q + E)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoEm", "Auto E melee", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoEks", "E melee ks only", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("gapE", "Gapcloser R + E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("intE", "Interrupt spells R + Q + E", true).SetValue(true));
@@ -152,8 +154,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (args.Slot == SpellSlot.Q)
             {
-                if (!Range && Player.Mana > 80)
+                if (W.IsReady() && !Range && Player.Mana > 80)
                     W.Cast();
+                if (E.IsReady() && Range && Config.Item("QEforce", true).GetValue<bool>())
+                    E.Cast(Player.ServerPosition.Extend(args.EndPosition, 120));
             }
         }
 
@@ -345,7 +349,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (E2.GetDamage(t) > t.Health)
                     E2.Cast(t);
-                else if (Program.Combo && !Player.HasBuff("jaycehyperchargevfx"))
+                else if (Program.Combo && !Config.Item("autoEks", true).GetValue<bool>() && !Player.HasBuff("jaycehyperchargevfx"))
                     E2.Cast(t);
             }
         }
@@ -372,7 +376,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast();
                 }
 
-                if (!Q.IsReady() && !E.IsReady())
+                if (!Q.IsReady() && (!E.IsReady() || Config.Item("autoEks", true).GetValue<bool>()))
                 {
                     R.Cast();
                 }   
