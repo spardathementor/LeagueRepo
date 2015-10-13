@@ -40,9 +40,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("SS", "SS notification").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("showWards", "Show hidden objects , wards BETA").SetValue(true));
             
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarm", "ENABLE").SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmMode", "SPELLS FARM TOGGLE MODE").SetValue(new StringList(new[] { "Scroll down", "Scroll press", "Key toogle" }, 1)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmKeyToggle", "Key toggle").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("showNot", "Show notification").SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("spellFarm", "OKTW SPELLS FARM (°)", true).SetValue(true));
-            Config.Item("spellFarm", true).Permashow(true);
+            Config.Item("spellFarm").Permashow(true);
 
             Tahoma13B = new Font( Drawing.Direct3DDevice, new FontDescription
                { FaceName = "Tahoma", Height = 14, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.ClearType });
@@ -68,11 +71,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Game_OnWndProc(WndEventArgs args)
         {
-            if (args.Msg == 0x20a && Config.Item("spellFarm", true) != null)
+            if (Config.Item("spellFarm") == null)
+                return;
+
+            if ((Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 0 && args.Msg == 0x20a)
+                || (Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 1 && args.Msg == 520)
+                )
             {
-                if (!Config.Item("spellFarm", true).GetValue<bool>())
+                if (!Config.Item("spellFarm").GetValue<bool>())
                 {
-                    Config.Item("spellFarm", true).SetValue<bool>(true);
+                    Config.Item("spellFarm").SetValue<bool>(true);
                     spellFarmTimer = Game.Time;
 
                     if(Config.Item("farmQ", true) != null)
@@ -89,7 +97,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
                 else
                 {
-                    Config.Item("spellFarm", true).SetValue<bool>(false);
+                    Config.Item("spellFarm").SetValue<bool>(false);
                     spellFarmTimer = Game.Time;
 
                     if (Config.Item("farmQ", true) != null)
@@ -109,7 +117,43 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Game_OnUpdate(EventArgs args)
         {
+            if (Program.LagFree(0) && Config.Item("spellFarm") != null && Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 2 && Config.Item("spellFarmKeyToggle").GetValue<KeyBind>().Active != Config.Item("spellFarm").GetValue<bool>())
+            {
+                if (Config.Item("spellFarmKeyToggle").GetValue<KeyBind>().Active )
+                {
+                    Config.Item("spellFarm").SetValue<bool>(true);
+                    spellFarmTimer = Game.Time;
 
+                    if (Config.Item("farmQ", true) != null)
+                        Config.Item("farmQ", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmW", true) != null)
+                        Config.Item("farmW", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmE", true) != null)
+                        Config.Item("farmE", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmR", true) != null)
+                        Config.Item("farmR", true).SetValue<bool>(true);
+                }
+                else
+                {
+                    Config.Item("spellFarm").SetValue<bool>(false);
+                    spellFarmTimer = Game.Time;
+
+                    if (Config.Item("farmQ", true) != null)
+                        Config.Item("farmQ", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmW", true) != null)
+                        Config.Item("farmW", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmE", true) != null)
+                        Config.Item("farmE", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmR", true) != null)
+                        Config.Item("farmR", true).SetValue<bool>(false);
+                }
+            }
         }
 
         public static void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
@@ -199,9 +243,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
 
-            if (Config.Item("spellFarm", true) != null && spellFarmTimer + 1 > Game.Time)
+            if (Config.Item("showNot").GetValue<bool>() && Config.Item("spellFarm") != null && spellFarmTimer + 1 > Game.Time)
             {
-                if (Config.Item("spellFarm", true).GetValue<bool>())
+                if (Config.Item("spellFarm").GetValue<bool>())
                     DrawFontTextScreen(TextBold, "SPELLS FARM ON", Drawing.Width * 0.5f, Drawing.Height * 0.4f, SharpDX.Color.GreenYellow);
                 else
                     DrawFontTextScreen(TextBold, "SPELLS FARM OFF", Drawing.Width * 0.5f , Drawing.Height * 0.4f, SharpDX.Color.OrangeRed);
