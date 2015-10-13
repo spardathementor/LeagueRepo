@@ -320,7 +320,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             PositionHelper();
             tickIndex++;
-
+             
             if (tickIndex > 4)
                 tickIndex = 0;
 
@@ -430,7 +430,9 @@ namespace OneKeyToWin_AIO_Sebby
                 var poutput2 = Core.Prediction.GetPrediction(predInput2);
 
                 //var poutput2 = QWER.GetPrediction(target);
-                
+
+                if (QWER.Speed != float.MaxValue && OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
+                    return;
 
                 if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
                 {

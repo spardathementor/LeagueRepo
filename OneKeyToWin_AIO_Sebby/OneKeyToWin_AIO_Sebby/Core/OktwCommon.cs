@@ -8,6 +8,19 @@ using LeagueSharp.Common;
 using SharpDX;
 namespace OneKeyToWin_AIO_Sebby
 {
+    class YasuoWall
+    {
+        public Vector3 YasuoPosition { get; set; }
+        public float CastTime { get; set; }
+        public Vector3 CastPosition { get; set; }
+        public float WallLvl { get; set; }
+
+        public YasuoWall()
+        {
+            CastTime = 0;
+        }
+    }
+
     class OktwCommon
     {
         public static bool 
@@ -18,11 +31,27 @@ namespace OneKeyToWin_AIO_Sebby
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private static List<Obj_AI_Base> minions;
+        private static YasuoWall yasuoWall = new YasuoWall();
         public void LoadOKTW()
         {
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell +=Spellbook_OnCastSpell;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             
+        }
+
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!sender.IsEnemy && args.SData.IsAutoAttack() || !sender.IsValid<Obj_AI_Hero>() || Player.Distance(sender.ServerPosition) > 2000)
+                return;
+            
+            if (args.SData.Name == "YasuoWMovingWall")
+            {
+                yasuoWall.CastTime = Game.Time;
+                yasuoWall.CastPosition = sender.Position.Extend(args.End, 400);
+                yasuoWall.YasuoPosition = sender.Position;
+                yasuoWall.WallLvl = sender.Spellbook.Spells[1].Level;
+            }
         }
 
         public static bool CanHarras()
@@ -83,6 +112,25 @@ namespace OneKeyToWin_AIO_Sebby
                 args.Process = false;
             }
         }
+
+        public static bool CollisionYasuo(Vector3 from, Vector3 to)
+        {
+            if ( Game.Time - yasuoWall.CastTime > 4)
+                return false;
+
+            var level = yasuoWall.WallLvl;
+            var wallWidth = (350 + 50 * level);
+            var wallDirection = (yasuoWall.CastPosition.To2D() - yasuoWall.YasuoPosition.To2D()).Normalized().Perpendicular();
+            var wallStart = yasuoWall.CastPosition.To2D() + wallWidth / 2f * wallDirection;
+            var wallEnd = wallStart - wallWidth * wallDirection;
+
+            if (wallStart.Intersection(wallEnd, to.To2D(), from.To2D()).Intersects)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public static bool IsFaced(Obj_AI_Hero target)
         {
             Vector2 LastWaypoint = target.GetWaypoints().Last();
