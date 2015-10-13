@@ -68,6 +68,8 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("supportMode", "Support Mode", true).SetValue(false));
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("comboDisableMode", "Disable auto-attack in combo mode", true).SetValue(false));
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("manaDisable", "Disable mana manager in combo", true).SetValue(false));
+            Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("collAA", "Disable auto-attack if Yasuo wall collision", true).SetValue(true));
+
             Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistant", "Anti-Melee Positioning Assistant OKTW©").SetValue(true));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy ))
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -306,6 +308,11 @@ namespace OneKeyToWin_AIO_Sebby
         {
 
             if (Config.Item("comboDisableMode", true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && 2 * Player.GetAutoAttackDamage((Obj_AI_Base)args.Target) < args.Target.Health)
+            {
+                args.Process = false;
+            }
+
+            if (OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) && !Player.IsMelee && Config.Item("collAA", true).GetValue<bool>())
             {
                 args.Process = false;
             }
