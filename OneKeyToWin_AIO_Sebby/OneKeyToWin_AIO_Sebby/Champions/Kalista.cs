@@ -104,8 +104,9 @@ namespace OneKeyToWin_AIO_Sebby
                 grabTime = Game.Time;
             }
 
-            if (!sender.IsEnemy)
+            if (!sender.IsEnemy || sender.IsMinion)
                 return;
+
             if (E.IsReady()  && Config.Item("Edead", true).GetValue<bool>() && sender.IsValidTarget(1500))
             {
                 double dmg = 0;
