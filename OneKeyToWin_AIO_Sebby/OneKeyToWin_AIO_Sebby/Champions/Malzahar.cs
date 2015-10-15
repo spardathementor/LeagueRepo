@@ -315,12 +315,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     totalComboDamage += W.GetDamage(t) * 5;
                 }
 
-                if (Q.IsReady() && Player.Mana > RMANA + QMANA)
+                if ( Player.Mana > RMANA + QMANA)
                     totalComboDamage += Q.GetDamage(t);
 
                 if (totalComboDamage > t.Health)
                 {
                     R.CastOnUnit(t);
+                }
+                else
+                {
+
                 }
             }
         }
