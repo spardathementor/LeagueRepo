@@ -29,8 +29,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 700);
 
             Qr.SetSkillshot(0.25f, 100, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            Q.SetSkillshot(1f, 100, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            W.SetSkillshot(0.7f, 230, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(1.05f, 100, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(1.2f, 230, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -42,6 +42,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("intQ", "Interrupt spells Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("gapQ", "Gapcloser Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
@@ -52,6 +53,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("gapR", "Gapcloser E + Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast combo key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Gapcloser").AddItem(new MenuItem("gapcloser" + enemy.ChampionName, enemy.ChampionName).SetValue(false));
@@ -101,14 +103,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (args.Slot == SpellSlot.R )
             {
-
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-                if (Q.IsReady() && t.IsValidTarget() &&  Player.Mana > RMANA + QMANA)
+
+                if (E.IsReady() && t.IsValidTarget() && Player.Mana > RMANA + EMANA)
                 {
-                    Qr.Cast(t);
+                    E.CastOnUnit(t);
                     args.Process = false;
                     return;
                 }
+
                 if (W.IsReady() && t.IsValidTarget() && Player.Mana > RMANA + WMANA)
                 {
                     W.Cast(t.ServerPosition);
@@ -116,18 +119,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 }
 
+                if (Q.IsReady() && t.IsValidTarget() &&  Player.Mana > RMANA + QMANA)
+                {
+                    Qr.Cast(t);
+                    args.Process = false;
+                    return;
+                }
                 Rtime = Game.Time;
             }
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (!R.IsReady() && !Config.Item("gapcloser" + gapcloser.Sender.ChampionName).GetValue<bool>())
-                return;
-
             var t = gapcloser.Sender;
 
-            if (t.IsValidTarget(R.Range))
+            if (Q.IsReady() && Config.Item("gapQ", true).GetValue<bool>() && t.IsValidTarget(Q.Range))
+            {
+                Q.Cast(gapcloser.End);
+            }
+            else if (R.IsReady() && Config.Item("gapcloser" + gapcloser.Sender.ChampionName).GetValue<bool>() && t.IsValidTarget(R.Range))
             {
                 R.CastOnUnit(t);
             }
@@ -159,15 +169,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Orbwalking.Move = true;
             }
 
-            if (Program.Combo)
+            if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
             {
-                if (E.IsReady() || R.IsReady())
-                    Orbwalking.Attack = false;
-                else
-                    Orbwalking.Attack = true;
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget(R.Range))
+                {
+                    R.CastOnUnit(t);
+                    return;
+                }
             }
-            else
-                Orbwalking.Attack = true;
 
             if (Program.LagFree(0))
             {
@@ -288,7 +298,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (te.IsValidTarget())
                 {
                     var allMinions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
-                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion) && te.Distance(minion.Position) < 400 && !minion.HasBuff("AlZaharMaleficVisions")))
+                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion) && te.Distance(minion.Position) < 500 && !minion.HasBuff("AlZaharMaleficVisions")))
                     {
                         E.CastOnUnit(minion);
                     }
@@ -303,14 +313,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 var totalComboDamage = OktwCommon.GetKsDamage(t, R);
                 // E calculation
-                if (t.HasBuff("AlZaharMaleficVisions"))
-                {
-                    totalComboDamage += E.GetDamage(t) * (OktwCommon.GetPassiveTime(t, "AlZaharMaleficVisions") / 4);
-                }
-                else if (E.Instance.CooldownExpires - Game.Time < 2.5 && Player.Mana > RMANA + EMANA)
-                    totalComboDamage += E.GetDamage(t);
 
-                if (W.IsReady() || (WMissile != null && WMissile.Position.Distance(t.Position) < 200) && Player.Mana > RMANA + WMANA)
+                totalComboDamage += E.GetDamage(t);
+
+                if (W.IsReady() || (WMissile != null && WMissile.Position.Distance(t.Position) < 250) && Player.Mana > RMANA + WMANA)
                 {
                     totalComboDamage += W.GetDamage(t) * 5;
                 }
@@ -321,10 +327,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (totalComboDamage > t.Health)
                 {
                     R.CastOnUnit(t);
-                }
-                else
-                {
-
                 }
             }
         }
