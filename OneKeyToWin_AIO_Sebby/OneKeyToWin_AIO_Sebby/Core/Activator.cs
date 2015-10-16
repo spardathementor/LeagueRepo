@@ -19,8 +19,8 @@ namespace OneKeyToWin_AIO_Sebby
         private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public int Muramana = 3042;
         public int Manamune = 3004;
-
-        private SpellSlot heal, barrier, ignite, exhaust, flash;
+        private int [] SmiteDamage = { 390, 410, 430, 450, 480, 510, 540, 570, 600, 640, 680, 720, 760, 800, 850, 900, 950, 1000};
+        private SpellSlot heal, barrier, ignite, exhaust, flash, smite;
 
         public static Items.Item
 
@@ -58,6 +58,22 @@ namespace OneKeyToWin_AIO_Sebby
             ignite = Player.GetSpellSlot("summonerdot");
             exhaust = Player.GetSpellSlot("summonerexhaust");
             flash = Player.GetSpellSlot("summonerflash");
+
+            smite = Player.GetSpellSlot("summonersmite");
+            if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("itemsmiteaoe"); }
+            if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("s5_summonersmiteplayerganker"); }
+            if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("s5_summonersmitequick"); }
+            if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("s5_summonersmiteduel"); }
+
+            if (smite != SpellSlot.Unknown)
+            {
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("SmiteEnemy", "Auto Smite enemy under 50% hp").SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Smite", "Auto Smite mobs").SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rred", "Red", true).SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rblue", "Blue", true).SetValue(true));
+            }
 
             if (flash != SpellSlot.Unknown)
             {
@@ -297,6 +313,7 @@ namespace OneKeyToWin_AIO_Sebby
         private void Game_OnGameUpdate(EventArgs args)
         {
             Cleansers();
+            Smite();
 
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
@@ -309,6 +326,34 @@ namespace OneKeyToWin_AIO_Sebby
             Offensive();
             Defensive();
             ZhonyaCast();
+        }
+
+        private void Smite()
+        {
+            if (CanUse(smite) && Config.Item("Smite").GetValue<bool>())
+            {
+                var mobs = MinionManager.GetMinions(Player.ServerPosition, 520, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.Health);
+                if (mobs.Count == 0 && Config.Item("SmiteEnemy").GetValue<bool>() && (Player.GetSpellSlot("s5_summonersmiteplayerganker") != SpellSlot.Unknown || Player.GetSpellSlot("s5_summonersmiteduel") != SpellSlot.Unknown))
+                {
+                    var enemy = TargetSelector.GetTarget(500, TargetSelector.DamageType.True);
+                    if (enemy.IsValidTarget() && enemy.HealthPercent < 50)
+                    {
+                        Player.Spellbook.CastSpell(smite, enemy);
+                    }
+                }
+
+                foreach (var mob in mobs)
+                {
+                    if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
+                        || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
+                        || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
+                        || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
+                        && HealthPrediction.GetHealthPrediction(mob,100,20)< SmiteDamage[Player.Level])
+                    {
+                        Player.Spellbook.CastSpell(smite, mob);
+                    }
+                }
+            }
         }
 
         private void Exhaust()
