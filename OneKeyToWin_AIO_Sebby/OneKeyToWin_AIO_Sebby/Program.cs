@@ -59,11 +59,14 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("2", "ORANGE - you have time"));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("3", "GREEN - jungler visable"));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
-
-            SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction"}, 1)));
+            
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(true).DontSave());
+            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
+                SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
+            else
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
 
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("supportMode", "Support Mode", true).SetValue(false));
             Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("comboDisableMode", "Disable auto-attack in combo mode", true).SetValue(false));
@@ -248,6 +251,7 @@ namespace OneKeyToWin_AIO_Sebby
             new OktwCommon().LoadOKTW();
             new Core.OKTWtracker().LoadOKTW();
             new Core.OKTWdraws().LoadOKTW();
+            //new Core.OKTWtargetSelector().LoadOKTW();
 
             //new AfkMode().LoadOKTW();
             Config.AddToMainMenu();
