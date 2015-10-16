@@ -1224,7 +1224,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!(sender is Obj_AI_Hero)) { return; }
+            if (sender.IsMinion  || !sender.IsValid<Obj_AI_Hero>())
+                return;
+
             if (args.SData.IsAutoAttack())
                 UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).AaTick = Utils.TickCount;
             else
