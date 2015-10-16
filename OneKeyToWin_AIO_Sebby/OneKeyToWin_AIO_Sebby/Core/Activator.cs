@@ -499,10 +499,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Defensive()
         {
-            if (Config.Item("Randuin").GetValue<bool>())
+            if (Randuin.IsReady() && Config.Item("Randuin").GetValue<bool>() && Player.CountEnemiesInRange(Randuin.Range) > 0)
             {
-                if (Randuin.IsReady() && Player.CountEnemiesInRange(Randuin.Range) > 0)
-                    Randuin.Cast();
+                Randuin.Cast();
             } 
         }
 
