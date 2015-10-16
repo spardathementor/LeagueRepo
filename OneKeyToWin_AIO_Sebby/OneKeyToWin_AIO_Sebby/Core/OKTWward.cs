@@ -74,7 +74,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
-
+            /*
             foreach (var sender in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.IsEnemy && Obj.MaxHealth<6 && (Obj.Name == "SightWard" || Obj.Name == "VisionWard") ))
             {
                 if (!HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100) && (sender.Name.ToLower() == "visionward" || sender.Name.ToLower() == "sightward"))
@@ -96,7 +96,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         HiddenObjList.Add(new HiddenObj() { type = 2, pos = sender.Position, endTime = float.MaxValue });
                 }
             }
-
+            */
             foreach (var obj in HiddenObjList)
             {
                 if (obj.endTime < Game.Time)
