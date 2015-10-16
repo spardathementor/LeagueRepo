@@ -1090,50 +1090,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 }
                             }
                             break;
-
-                        case CollisionableObjects.YasuoWall:
-
-                            if (Utils.TickCount - _wallCastT > 4000)
-                            {
-                                break;
-                            }
-
-                            GameObject wall = null;
-                            foreach (var gameObject in
-                                ObjectManager.Get<GameObject>()
-                                    .Where(
-                                        gameObject =>
-                                            gameObject.IsValid &&
-                                            Regex.IsMatch(
-                                                gameObject.Name, "_w_windwall_enemy_0.\\.troy", RegexOptions.IgnoreCase))
-                                )
-                            {
-                                wall = gameObject;
-                            }
-                            if (wall == null)
-                            {
-                                break;
-                            }
-                            var level = wall.Name.Substring(wall.Name.Length - 6, 1);
-                            var wallWidth = (300 + 50 * Convert.ToInt32(level));
-
-                            var wallDirection =
-                                (wall.Position.To2D() - _yasuoWallCastedPos).Normalized().Perpendicular();
-                            var wallStart = wall.Position.To2D() + wallWidth / 2f * wallDirection;
-                            var wallEnd = wallStart - wallWidth * wallDirection;
-
-                            if (wallStart.Intersection(wallEnd, position.To2D(), input.From.To2D()).Intersects)
-                            {
-                                var t = Utils.TickCount +
-                                        (wallStart.Intersection(wallEnd, position.To2D(), input.From.To2D())
-                                            .Point.Distance(input.From) / input.Speed + input.Delay) * 1000;
-                                if (t < _wallCastT + 4000)
-                                {
-                                    result.Add(ObjectManager.Player);
-                                }
-                            }
-
-                            break;
                     }
                 }
             }
