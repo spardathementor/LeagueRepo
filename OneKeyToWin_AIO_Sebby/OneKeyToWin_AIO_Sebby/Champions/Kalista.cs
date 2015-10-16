@@ -329,7 +329,7 @@ namespace OneKeyToWin_AIO_Sebby
                     CastE();
 
                 }
-                if (GetEStacks(target) >= countE && (GetPassiveTime(target) < 0.5 || Player.CountEnemiesInRange(800) == 0) && Player.Mana > RMANA + EMANA)
+                if (GetEStacks(target) >= countE && (GetPassiveTime(target) < 0.5 || Player.CountEnemiesInRange(750) == 0) && Player.Mana > RMANA + EMANA)
                 {
                     CastE();
                 }
