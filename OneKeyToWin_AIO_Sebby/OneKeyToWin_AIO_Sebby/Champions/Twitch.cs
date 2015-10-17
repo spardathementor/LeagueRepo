@@ -9,6 +9,12 @@ using SharpDX;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
+    class BuffClass
+    {
+        public int NetworkId { get; set; }
+        public int BuffCount { get; set; }
+
+    }
     class Twitch
     {
         private Menu Config = Program.Config;
@@ -19,6 +25,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private int count = 0, countE = 0;
         private float grabTime = Game.Time;
+        private bool synch = false;
+
+        private static List<BuffClass> buffData = new List<BuffClass>();
+
 
         public void LoadOKTW()
         {
@@ -41,17 +51,59 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eks", "E ks", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("countE", "Auto E if x stacks & out range AA", true).SetValue(new Slider(6, 6, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("5e", "Always E if 6 stacks", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("jungleE", "Jungle ks E", true).SetValue(true));
+            //Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("jungleE", "Jungle ks E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Edead", "Cast E before Twitch die", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rks", "R KS out range AA", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("countR", "Auto R if x enemies (combo)", true).SetValue(new Slider(3, 5, 0)));
-           
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                buffData.Add(new BuffClass() { NetworkId = enemy.NetworkId, BuffCount = 0 });
+
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
+            Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
+            Obj_AI_Base.OnBuffRemove += Obj_AI_Base_OnBuffRemove;
             //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             // Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+        }
+
+        private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
+        {
+            if (sender.IsEnemy && sender.IsValid && sender.Type == GameObjectType.obj_GeneralParticleEmitter && Player.Distance(sender.Position) < 2000)
+            {
+                var buffName = sender.Name.ToLower();
+                if ((buffName.Contains("twitch_poison")))
+                {
+                    int count = 0;
+                    if ((buffName.Contains("01")))
+                        count = 1;
+                    else if ((buffName.Contains("02")))
+                        count = 2;
+                    else if ((buffName.Contains("03")))
+                        count = 3;
+                    else if ((buffName.Contains("04")))
+                        count = 4;
+                    else if ((buffName.Contains("05")))
+                        count = 5;
+                    else if ((buffName.Contains("06")))
+                        count = 6;
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.Distance(sender.Position) < 50))
+                    {
+                        buffData.Find(x => x.NetworkId == enemy.NetworkId).BuffCount = count;
+                    }
+                }
+            }
+        }
+
+        private void Obj_AI_Base_OnBuffRemove(Obj_AI_Base sender, Obj_AI_BaseBuffRemoveEventArgs args)
+        {
+            if (sender.IsEnemy && sender is Obj_AI_Hero && args.Buff.Name == "twitchdeadlyvenom")
+            {
+                var item = buffData.Find(x => x.NetworkId == sender.NetworkId);
+                item.BuffCount = 0;
+            }
         }
 
         private void Game_OnUpdate(EventArgs args)
@@ -60,8 +112,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 SetMana();
             }
-            if (Program.LagFree(1) && E.IsReady() )
+            if (Program.LagFree(1) && E.IsReady())
+            {
                 LogicE();
+            }
             if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp)
                 LogicQ();
             if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp)
@@ -114,7 +168,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-
+               
                 if (Program.Combo && Player.Mana > WMANA + RMANA + EMANA && (Player.GetAutoAttackDamage(t) * 2 < t.Health || !Orbwalking.InAutoAttackRange(t)))
                     Program.CastSpell(W, t);
                 else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
@@ -151,11 +205,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("twitchdeadlyvenom")))
             {
-                if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) + passiveDmg(enemy) > enemy.Health)
+                //Program.debug("dupa" + enemy.GetBuffCount("twitchdeadlyvenom") );                          
+                if (Config.Item("Eks", true).GetValue<bool>() && getEdamage(enemy) + passiveDmg(enemy) > enemy.Health)
                     E.Cast();
                 if (Player.Mana > RMANA + EMANA)
                 {
-                    int buffsNum = OktwCommon.GetBuffCount(enemy, "twitchdeadlyvenom");
+                    int buffsNum = Estack(enemy);
+                    
                     if (Config.Item("5e", true).GetValue<bool>() && buffsNum == 6 )
                          E.Cast();
                     if (!Orbwalking.InAutoAttackRange(enemy) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
@@ -163,6 +219,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
             JungleE();
+        }
+
+        private double getEdamage(Obj_AI_Base target)
+        {
+            return
+             Estack(target) * (new double[] { 15, 20, 25, 30, 35 }[E.Level]
+                                       + 0.2 * Player.FlatMagicDamageMod
+                                       + 0.25 * Player.FlatPhysicalDamageMod)
+                                    + new double[] { 20, 35, 50, 65, 80 }[E.Level];
+        }
+
+        private int Estack(Obj_AI_Base target)
+        {
+            return buffData.Find(x => x.NetworkId == target.NetworkId).BuffCount;
         }
 
         private float passiveDmg(Obj_AI_Base target)
@@ -179,7 +249,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.Level < 5)
                 dmg = 2;
             float buffTime = OktwCommon.GetPassiveTime(target, "twitchdeadlyvenom");
-            return (dmg * OktwCommon.GetBuffCount(target, "twitchdeadlyvenom") * buffTime) - target.HPRegenRate * buffTime;
+            return (dmg * Estack(target) * buffTime) - target.HPRegenRate * buffTime;
         }
 
         private void JungleE()
