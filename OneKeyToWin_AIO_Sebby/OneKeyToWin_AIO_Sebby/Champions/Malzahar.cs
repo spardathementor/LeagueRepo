@@ -54,7 +54,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast combo key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
-
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Gapcloser").AddItem(new MenuItem("gapcloser" + enemy.ChampionName, enemy.ChampionName).SetValue(false));
 
@@ -174,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
             {
-                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(R.Range) && Config.Item("Ron" + t.ChampionName).GetValue<bool>())
                 {
                     R.CastOnUnit(t);
@@ -200,7 +199,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 var qDmg = Q.GetDamage(t) + BonusDmg(t) + OktwCommon.GetEchoLudenDamage(t);
