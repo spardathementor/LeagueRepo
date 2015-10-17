@@ -254,6 +254,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void JungleE()
         {
+            return;
             if (!Config.Item("jungleE", true).GetValue<bool>() || Player.Mana < RMANA + EMANA)
                 return;
 
