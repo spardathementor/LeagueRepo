@@ -177,9 +177,15 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            if ((Game.Time - lag > 0.1) && !FishBoneActive &&  Program.Farm && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
+            if (Program.Farm && (Game.Time - lag > 0.1) && !FishBoneActive  &&  Program.Farm && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
             {
-                farmQ();
+                foreach (var minion in MinionManager.GetMinions(bonusRange() + 30).Where(
+                minion => !Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
+                {
+                    Orbwalker.ForceTarget(minion);
+                    Q.Cast();
+                    return;
+                }
                 lag = Game.Time;
             }
             var t = TargetSelector.GetTarget(bonusRange() + 60, TargetSelector.DamageType.Physical);
@@ -190,7 +196,7 @@ namespace OneKeyToWin_AIO_Sebby
                     var distance = GetRealDistance(t);
                     if (Program.Combo && (Player.Mana > RMANA + WMANA + 10 || Player.GetAutoAttackDamage(t) * 3 > t.Health))
                         Q.Cast();
-                    else if (Program.Farm && Config.Item("Qharras", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + 20 && distance < bonusRange() + t.BoundingRadius + Player.BoundingRadius)
+                    else if (Program.Farm && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("Qharras", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + 20 && distance < bonusRange() + t.BoundingRadius + Player.BoundingRadius)
                         Q.Cast();
                 }
             }
@@ -210,10 +216,10 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Game.Time - QCastTime > 0.6 && Player.CountEnemiesInRange(400) == 0)
             {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range + 200) && GetRealDistance(enemy) > bonusRange()))
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range + 200) && GetRealDistance(enemy) > bonusRange() + 100))
                 {
                     var comboDmg = W.GetDamage(enemy);
-                    if (R.IsReady() && Player.Mana > RMANA + WMANA)
+                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
                     {
                         comboDmg += R.GetDamage(enemy, 1);
                     }
@@ -361,17 +367,6 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     Program.CastSpell(R, target);
                 }
-            }
-        }
-
-        public void farmQ()
-        {
-            foreach (var minion in MinionManager.GetMinions(bonusRange() + 30).Where(
-                minion => !Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
-            {
-                Orbwalker.ForceTarget(minion);
-                Q.Cast();
-                return;
             }
         }
 
