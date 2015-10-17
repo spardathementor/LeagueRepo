@@ -186,8 +186,6 @@ namespace OneKeyToWin_AIO_Sebby
                 || target.HasBuff("deathdefiedbuff")
                 || target.HasBuff("Undying Rage")
                 || target.HasBuff("Chrono Shift")
-                || target.HasBuff("JudicatorIntervention")
-                || target.HasBuff("PoppyDITarget")
                 )
                 return false;
             else
