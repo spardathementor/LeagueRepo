@@ -62,7 +62,7 @@ namespace OneKeyToWin_AIO_Sebby
             
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(true).DontSave());
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
                 SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
             else
