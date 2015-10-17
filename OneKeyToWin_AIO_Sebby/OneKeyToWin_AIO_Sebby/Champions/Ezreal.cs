@@ -57,6 +57,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Items").AddItem(new MenuItem("mura", "Auto Muramana", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Items").AddItem(new MenuItem("stack", "Stack Tear if full mana", true).SetValue(false));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("wPush", "W ally (push tower)", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("harrasW", "Harras W", true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("smartE", "SmartCast E key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("smartEW", "SmartCast E + W key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -79,10 +83,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LC", "LaneClear", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 20)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCP", "LaneClear passiv stack & E,R CD", true).SetValue(true));
+
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("harrasW", "Harras W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("wPush", "W ally (push tower)", true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("noob", "Noob KS bronze mode", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("debug", "Debug", true).SetValue(false));
 
@@ -174,7 +178,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(2) && Q.IsReady())
                 LogicQ();
 
-            if (Program.LagFree(3) && W.IsReady() && (Game.Time - QCastTime > 0.6))
+            if (Program.LagFree(3) && W.IsReady() && (Game.Time - QCastTime > 0.6) && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
 
             if ( R.IsReady())
