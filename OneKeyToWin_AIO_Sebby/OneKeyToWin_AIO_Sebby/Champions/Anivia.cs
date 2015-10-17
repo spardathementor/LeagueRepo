@@ -68,18 +68,27 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LoadMenuOKTW()
         {
-            Config.SubMenu(Player.ChampionName).SubMenu("AntiGapcloser").AddItem(new MenuItem("AGCQ", "Q", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("AntiGapcloser").AddItem(new MenuItem("AGCW", "W", true).SetValue(false));
-
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("inter", "OnPossibleToInterrupt W")).SetValue(true);
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("Haras Q").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("AGCQ", "Q gapcloser", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Haras Q").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+
+
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGCW", "AntiGapcloser W", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("inter", "OnPossibleToInterrupt W")).SetValue(true);
+
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmR", "Lane clear R", true).SetValue(false));
@@ -139,18 +148,18 @@ namespace OneKeyToWin_AIO_Sebby
                 SetMana();
             }
 
-            if (Program.LagFree(1) && R.IsReady() )
+            if (Program.LagFree(1) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
                 LogicR();
 
-            if (Program.LagFree(2) && W.IsReady() )
+            if (Program.LagFree(2) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
 
-            if (Program.LagFree(3) && Q.IsReady() && QMissile == null)
+            if (Program.LagFree(3) && Q.IsReady() && QMissile == null && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
 
             if (Program.LagFree(4) )
             {
-                if(E.IsReady())
+                if(E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                     LogicE();
 
                 Jungle();
@@ -168,12 +177,10 @@ namespace OneKeyToWin_AIO_Sebby
                     Program.CastSpell(Q, t);
                 else if (Program.Combo && Player.Mana > EMANA + QMANA - 10)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + WMANA && !Player.UnderTurret(true) && OktwCommon.CanHarras())
                 {
-                    foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("haras" + enemy.ChampionName).GetValue<bool>()))
-                        Program.CastSpell(Q, enemy);
+                    Program.CastSpell(Q, t);
                 }
-
                 else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + EMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
