@@ -55,8 +55,7 @@ namespace OneKeyToWin_AIO_Sebby
         }
 
         public static bool CanHarras()
-        {
-            if ( Player.IsWindingUp)
+        {            if ( Player.IsWindingUp)
                 return false;
             //if (!Program.Farm)
               //  return true;
@@ -181,6 +180,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (target.HasBuffOfType(BuffType.PhysicalImmunity)
                 || target.HasBuffOfType(BuffType.SpellImmunity)
                 || target.IsZombie
+                || target.IsInvulnerable
                 || target.HasBuffOfType(BuffType.Invulnerability)
                 || target.HasBuffOfType(BuffType.SpellShield)
                 || target.HasBuff("deathdefiedbuff")
