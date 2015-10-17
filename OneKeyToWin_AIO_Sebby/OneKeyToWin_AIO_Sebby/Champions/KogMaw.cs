@@ -29,7 +29,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Q.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.25f, 120f, 1400f, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(1.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(1.2f, 120f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             LoadMenuOKTW();
 
             Game.OnUpdate += Game_OnUpdate;
