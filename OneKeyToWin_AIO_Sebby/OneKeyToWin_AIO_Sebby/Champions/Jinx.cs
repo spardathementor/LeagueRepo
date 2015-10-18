@@ -214,7 +214,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-            if (Game.Time - QCastTime > 0.6 && Player.CountEnemiesInRange(400) == 0)
+            if (Game.Time - QCastTime > 0.6 && Player.CountEnemiesInRange(350) == 0)
             {
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range + 200) && GetRealDistance(enemy) > bonusRange() + 100))
                 {
@@ -232,7 +232,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
 
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
-            if (t.IsValidTarget() && Player.CountEnemiesInRange(bonusRange()) == 0)
+            if (t.IsValidTarget() && Player.CountEnemiesInRange(bonusRange()+50) == 0)
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA + 10 && GetRealDistance(t) > bonusRange() - 50)
                 {
