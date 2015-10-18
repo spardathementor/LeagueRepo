@@ -266,10 +266,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void PositionHelper()
         {
-            if (Player.ChampionName == "Draven")
+            if (Player.ChampionName == "Draven" || !Config.Item("positioningAssistant").GetValue<bool>())
                 return;
 
-            if (Player.IsMelee || !Config.Item("positioningAssistant").GetValue<bool>())
+            if (Player.IsMelee)
             {
                 Orbwalker.SetOrbwalkingPoint(new Vector3());
                 return;
@@ -548,8 +548,6 @@ namespace OneKeyToWin_AIO_Sebby
                 if((int)(Game.Time * 10) % 2 == 0)
                     drawText("Anti-Melle Positioning Assistant" , Player.Position, System.Drawing.Color.Gray);
             }
-
-            
 
             if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1  )
             {
