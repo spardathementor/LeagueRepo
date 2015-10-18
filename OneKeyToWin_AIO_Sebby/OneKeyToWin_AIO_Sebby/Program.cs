@@ -23,7 +23,7 @@ namespace OneKeyToWin_AIO_Sebby
         public static Core.PredictionOutput DrawSpellPos;
         public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>() , Allies = new List<Obj_AI_Hero>();
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-
+        public static bool SPredictionLoad = false;
 
         private static float dodgeRange = 420;
         private static float dodgeTime = Game.Time;
@@ -64,7 +64,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
+            {
                 SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
+                SPredictionLoad = true;
+            }
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
 
@@ -533,6 +536,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnDraw(EventArgs args)
         {
+            if (!SPredictionLoad && (int)Game.Time % 2 == 0 && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
+                drawText("PRESS F5 TO LOAD SPREDICTION", Player.Position, System.Drawing.Color.Yellow, -300);
 
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
@@ -544,7 +549,9 @@ namespace OneKeyToWin_AIO_Sebby
                     drawText("Anti-Melle Positioning Assistant" , Player.Position, System.Drawing.Color.Gray);
             }
 
-            if (Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1 && Game.Time - DrawSpellTime < 0.5)
+            
+
+            if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1  )
             {
                 if (DrawSpell.Type == SkillshotType.SkillshotLine)
                     OktwCommon.DrawLineRectangle(DrawSpellPos.CastPosition, Player.Position, (int)DrawSpell.Width, 1, System.Drawing.Color.DimGray);
