@@ -262,7 +262,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (R.IsReady())
                     R.Cast();
             }
-            Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            //Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
         }
 
         private void LogicQ()
