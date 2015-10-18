@@ -229,7 +229,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (eDmg * 3 > t.Health)
                         E.Cast(t, true);
-                    else if (Program.Combo && Player.Mana > RMANA + EMANA)
+                    else if (Program.Combo && (t.HasBuff("chilled") || Player.Mana > RMANA + EMANA))
                     {
                         E.Cast(t, true);
                     }
