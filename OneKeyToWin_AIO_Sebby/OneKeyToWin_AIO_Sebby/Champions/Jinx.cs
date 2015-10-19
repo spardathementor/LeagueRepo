@@ -78,9 +78,9 @@ namespace OneKeyToWin_AIO_Sebby
         }
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            if (!Q.IsReady() || !Config.Item("autoQ", true).GetValue<bool>())
+            if (!Q.IsReady() || !Config.Item("autoQ", true).GetValue<bool>() || !(args.Target is Obj_AI_Hero))
                 return;
-            var t = TargetSelector.GetTarget(bonusRange() + 60, TargetSelector.DamageType.Physical);
+            var t = (Obj_AI_Hero)args.Target;
 
             if (FishBoneActive && t.IsValidTarget())
             {
@@ -219,7 +219,7 @@ namespace OneKeyToWin_AIO_Sebby
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range + 200) && GetRealDistance(enemy) > bonusRange() + 100))
                 {
                     var comboDmg = W.GetDamage(enemy);
-                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
+                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)    
                     {
                         comboDmg += R.GetDamage(enemy, 1);
                     }
@@ -374,11 +374,16 @@ namespace OneKeyToWin_AIO_Sebby
 
         private bool FishBoneActive { get { return Player.AttackRange > 525f; } }
 
-        private float GetRealPowPowRange(GameObject target) { return 650f + Player.BoundingRadius + target.BoundingRadius; }
+        private float GetRealPowPowRange(GameObject target)
+        {
+            return 650f + Player.BoundingRadius + target.BoundingRadius;
+
+        }
 
         private float GetRealDistance(Obj_AI_Base target)
         {
-            return Player.ServerPosition.Distance(target.ServerPosition) + Player.BoundingRadius + target.BoundingRadius;
+            
+            return Player.ServerPosition.Distance(Prediction.GetPrediction(target, 0.05f).CastPosition) + Player.BoundingRadius + target.BoundingRadius;
         }
 
         public bool ShouldUseE(string SpellName)
