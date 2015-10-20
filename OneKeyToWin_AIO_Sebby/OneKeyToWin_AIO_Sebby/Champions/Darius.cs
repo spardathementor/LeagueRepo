@@ -21,7 +21,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             Q = new Spell(SpellSlot.Q, 400);
             W = new Spell(SpellSlot.W, 145);
-            E = new Spell(SpellSlot.E, 550);
+            E = new Spell(SpellSlot.E, 540);
             R = new Spell(SpellSlot.R, 460);
 
             E.SetSkillshot(0.01f, 100f, float.MaxValue, false, SkillshotType.SkillshotLine);
@@ -175,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 var dmgR = OktwCommon.GetKsDamage(target, R);
                 if (target.HasBuff("dariushemo"))
-                    dmgR += dmgR * target.GetBuff("dariushemo").Count * 0.2f;
+                    dmgR += R.GetDamage(target) * target.GetBuff("dariushemo").Count * 0.2f;
 
                 if (dmgR > target.Health + target.HPRegenRate)
                 {
