@@ -255,13 +255,12 @@ namespace Jinx_Genesis
                         if (cast)
                         {
 
-                            if (target.CountEnemiesInRange(300) > Config.Item("Raoe").GetValue<Slider>().Value)
+                            if (target.CountEnemiesInRange(400) > Config.Item("Raoe").GetValue<Slider>().Value)
                                 R.Cast(target, true, true);
-                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 2> W.Instance.Cooldown))
+                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 3> W.Instance.Cooldown))
                                 return;
                             if (WValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
                                 R.Cast(target, true, true);
-                            
                         }
                     }
                 }
@@ -424,11 +423,11 @@ namespace Jinx_Genesis
                 {
                     if ((!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) >= Config.Item("Qaoe").GetValue<Slider>().Value))
                     {
-                        if (Combo && Config.Item("Qcombo").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaCombo").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health))
+                        if (Combo && Config.Item("Qcombo").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaCombo").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
                         {
                             Q.Cast();
                         }
-                        if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health))
+                        if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
                         {
                             Q.Cast();
                         }
@@ -559,7 +558,7 @@ namespace Jinx_Genesis
             else
                 Farm = false;
 
-            Q.Range = 680f + Player.BoundingRadius + 25f * Player.Spellbook.GetSpell(SpellSlot.Q).Level;
+            Q.Range = 685f + Player.BoundingRadius + 25f * Player.Spellbook.GetSpell(SpellSlot.Q).Level;
 
             QMANA = 10f;
             WMANA = W.Instance.ManaCost;
