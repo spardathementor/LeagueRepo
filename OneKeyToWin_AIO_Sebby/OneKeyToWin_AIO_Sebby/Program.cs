@@ -266,7 +266,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void PositionHelper()
         {
-            if (Player.ChampionName == "Draven" || !Config.Item("positioningAssistant").GetValue<bool>())
+            if (Player.ChampionName == "Draven" || !Config.Item("positioningAssistant").GetValue<bool>() || Config.Item("onlyUtility", true).GetValue<bool>())
                 return;
 
             if (Player.IsMelee)
@@ -304,7 +304,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 dodgeTime = Game.Time;
                 return;
-            }
+            }   
 
             Orbwalker.SetOrbwalkingPoint(new Vector3());
             if (OktwCommon.blockAttack == true)
