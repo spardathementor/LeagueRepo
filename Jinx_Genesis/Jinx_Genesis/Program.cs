@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
+using SharpDX;
 
 namespace Jinx_Genesis
 {
@@ -31,7 +32,9 @@ namespace Jinx_Genesis
         private static void Game_OnGameLoad(EventArgs args)
         {
             if (Player.ChampionName != ChampionName) return;
+
             LoadMenu();
+
             Q = new Spell(SpellSlot.Q, Player.AttackRange);
             W = new Spell(SpellSlot.W, 1500f);
             E = new Spell(SpellSlot.E, 900f);
@@ -51,41 +54,123 @@ namespace Jinx_Genesis
 
             Game.OnUpdate += Game_OnGameUpdate;
             Orbwalking.BeforeAttack += BeforeAttack;
-            Game.PrintChat("<font color=\"#ff00d8\">GENESIS</font>Jinx<font color=\"#000000\">by Sebby</font> - <font color=\"#00BFFF\">Loaded</font>");
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Drawing.OnDraw += Drawing_OnDraw;
+            Game.PrintChat("<font color=\"#00BFFF\">GENESIS </font>Jinx<font color=\"#000000\"> by Sebby </font> - <font color=\"#FFFFFF\">Loaded</font>");
+        }
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (Config.Item("qRange").GetValue<bool>())
+            {
+                if (FishBoneActive)
+                    Utility.DrawCircle(Player.Position, 590f + Player.BoundingRadius, System.Drawing.Color.Gray, 1, 1);
+                else
+                    Utility.DrawCircle(Player.Position, Q.Range - 40, System.Drawing.Color.Gray, 1, 1);
+            }
+            if (Config.Item("wRange").GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy").GetValue<bool>())
+                {
+                    if (W.IsReady())
+                        Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Gray, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Gray, 1, 1);
+            }
+            if (Config.Item("eRange").GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy").GetValue<bool>())
+                {
+                    if (E.IsReady())
+                        Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
+            }
         }
 
         private static void LoadMenu()
         {
-            Config = new Menu(ChampionName + " GENESIS", ChampionName, true);
+            Config = new Menu(ChampionName + " GENESIS", ChampionName + " GENESIS", true);
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
             Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
             Config.AddToMainMenu();
+
+            Config.SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range").SetValue(false));
+            Config.SubMenu("Draw").AddItem(new MenuItem("wRange", "W range").SetValue(false));
+            Config.SubMenu("Draw").AddItem(new MenuItem("eRange", "E range").SetValue(false));
+            Config.SubMenu("Draw").AddItem(new MenuItem("rRange", "R range").SetValue(false));
+            Config.SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells").SetValue(true));
+
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qcombo", "Combo Q").SetValue(true));
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qharass", "Harass Q").SetValue(true));
-            Config.SubMenu("Q Config").AddItem(new MenuItem("Qchange", "Q change mode FishBone -> MiniGun").SetValue(new StringList(new[] { "Real Time", "Before AA"}, 0)));
+            Config.SubMenu("Q Config").AddItem(new MenuItem("farmQout", "Farm Q out range AA minion").SetValue(true));
+            Config.SubMenu("Q Config").AddItem(new MenuItem("Qchange", "Q change mode FishBone -> MiniGun").SetValue(new StringList(new[] { "Real Time", "Before AA"}, 1)));
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qaoe", "Force FishBone if can hit x target").SetValue(new Slider(3, 5, 0)));
             Config.SubMenu("Q Config").AddItem(new MenuItem("QmanaIgnore", "Ignore mana if can kill in x AA").SetValue(new Slider(2, 10, 0)));
 
             Config.SubMenu("W Config").AddItem(new MenuItem("Wcombo", "Combo W").SetValue(true));
-            Config.SubMenu("W Config").AddItem(new MenuItem("Wharass", "Harass W").SetValue(true));
+            Config.SubMenu("W Config").AddItem(new MenuItem("Wharass", "W harass").SetValue(true));
+            Config.SubMenu("W Config").AddItem(new MenuItem("Wks", "W KS").SetValue(true));
             Config.SubMenu("W Config").AddItem(new MenuItem("Wts", "Harass mode").SetValue(new StringList(new[] { "Target selector", "All in range" }, 0)));
             Config.SubMenu("W Config").AddItem(new MenuItem("Wmode", "W mode").SetValue(new StringList(new[] { "Out range MiniGun", "Out range FishBone", "Custome range" }, 0)));
-            Config.SubMenu("W Config").AddItem(new MenuItem("Wcustome", "Custome range").SetValue(new Slider(600, 1500, 0)));
-
+            Config.SubMenu("W Config").AddItem(new MenuItem("Wcustome", "Custome minimum range").SetValue(new Slider(600, 1500, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu("W Config").SubMenu("Harass enemy:").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("LaneClearmode", "LaneClear").SetValue(true));
-            Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("Mixedmode", "Mixed").SetValue(true));
-            Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("LastHitmode", "LastHit").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Ecombo", "Combo E").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Etel", "E on enemy teleport").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Ecc", "E on CC enemy").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Eslow", "E on slow enemy").SetValue(true));
+            Config.SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode").SetValue(new StringList(new[] { "Dash end position", "Jinx position"}, 0)));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+            Config.SubMenu("R Config").AddItem(new MenuItem("Rks", "R KS").SetValue(true));
+            Config.SubMenu("R Config").AddItem(new MenuItem("Rmode", "R mode").SetValue(new StringList(new[] { "Out range MiniGun ", "Out range FishBone ", "Custome range " }, 0)));
+            Config.SubMenu("R Config").AddItem(new MenuItem("Rcustome", "Custome minimum range").SetValue(new Slider(1000, 1600, 0)));
+            Config.SubMenu("R Config").AddItem(new MenuItem("RcustomeMax", "Max range").SetValue(new Slider(3000, 10000, 0)));
+            Config.SubMenu("R Config").AddItem(new MenuItem("Raoe", "R if can hit x target and can kill").SetValue(new Slider(2, 5, 0)));
+            Config.SubMenu("R Config").SubMenu("OverKill protrection").AddItem(new MenuItem("Rover", "Don't R if allies near target in x range ").SetValue(new Slider(500, 1000, 0)));
+            Config.SubMenu("R Config").SubMenu("OverKill protrection").AddItem(new MenuItem("RoverAA", "Don't R if Jinx winding up").SetValue(true));
+            Config.SubMenu("R Config").SubMenu("OverKill protrection").AddItem(new MenuItem("RoverW", "Don't R if can W KS").SetValue(true));
+
+            //Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("LaneClearmode", "LaneClear").SetValue(true));
+            //Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("Mixedmode", "Mixed").SetValue(true));
+            //Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("LastHitmode", "LastHit").SetValue(true));
+
+            //Config.SubMenu("Mana Manager").AddItem(new MenuItem("ManaKs", "always safe mana to KS R or W").SetValue(true));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("QmanaCombo", "Q combo mana").SetValue(new Slider(20, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("QmanaHarass", "Q harass mana").SetValue(new Slider(40, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaCombo", "W combo mana").SetValue(new Slider(20, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaHarass", "W harass mana").SetValue(new Slider(40, 100, 0)));
+            Config.SubMenu("Mana Manager").AddItem(new MenuItem("EmanaCombo", "E mana").SetValue(new Slider(20, 100, 0)));
+
+            //Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1
+            //Config.Item("haras" + enemy.ChampionName).GetValue<bool>()
+            //Config.Item("QmanaCombo").GetValue<Slider>().Value
+        }
+
+        private static void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            if (Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value)
+                return;
+
+            if (E.IsReady())
+            {
+                var t = gapcloser.Sender;
+                if (t.IsValidTarget(E.Range) && Config.Item("EGCchampion" + t.ChampionName).GetValue<bool>())
+                {
+                    if(Config.Item("EmodeGC").GetValue<StringList>().SelectedIndex == 0)
+                        E.Cast(gapcloser.End);
+                    else
+                        E.Cast(Player.ServerPosition);
+                }
+            }
         }
 
         private static void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
@@ -112,10 +197,150 @@ namespace Jinx_Genesis
             else
                 Config.Item("Wcustome").Show(false);
 
+            if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 2)
+                Config.Item("Rcustome").Show(true);
+            else
+                Config.Item("Rcustome").Show(false);
+
             if (Q.IsReady())
                 Qlogic();
-            if (Q.IsReady())
+            if (W.IsReady())
                 Wlogic();
+            if (E.IsReady())
+                Elogic();
+            if (R.IsReady())
+                Rlogic();
+        }
+
+        private static void Rlogic()
+        {
+            if (Config.Item("Rks").GetValue<bool>())
+            {
+                bool cast = false;
+                R.Range = Config.Item("RcustomeMax").GetValue<Slider>().Value;
+
+                if (Config.Item("RoverAA").GetValue<bool>() && (!Orbwalking.CanAttack() || Player.IsWindingUp))
+                    return;
+
+                foreach (var target in Enemies.Where(target => target.IsValidTarget(R.Range) && ValidUlt(target) ))
+                {
+                    
+                    float predictedHealth = target.Health + target.HPRegenRate * 2;
+                    var Rdmg = R.GetDamage(target, 1);
+
+                    if (Rdmg > predictedHealth)
+                    {
+                        cast = true;
+                        PredictionOutput output = R.GetPrediction(target);
+                        Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
+                        direction.Normalize();
+
+                        foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget()))
+                        {
+                            if (enemy.SkinName == target.SkinName || !cast)
+                                continue;
+                            PredictionOutput prediction = R.GetPrediction(enemy);
+                            Vector3 predictedPosition = prediction.CastPosition;
+                            Vector3 v = output.CastPosition - Player.ServerPosition;
+                            Vector3 w = predictedPosition - Player.ServerPosition;
+                            double c1 = Vector3.Dot(w, v);
+                            double c2 = Vector3.Dot(v, v);
+                            double b = c1 / c2;
+                            Vector3 pb = Player.ServerPosition + ((float)b * v);
+                            float length = Vector3.Distance(predictedPosition, pb);
+                            if (length < (R.Width + 150 + enemy.BoundingRadius / 2) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
+                                cast = false;
+                        }
+
+                        if (cast)
+                        {
+
+                            if (target.CountEnemiesInRange(300) > Config.Item("Raoe").GetValue<Slider>().Value)
+                                R.Cast(target, true, true);
+                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 2> W.Instance.Cooldown))
+                                return;
+                            if (WValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
+                                R.Cast(target, true, true);
+                            
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool RValidRange(Obj_AI_Base t)
+        {
+            var range = GetRealDistance(t);
+
+            if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 0)
+            {
+                if (range > GetRealPowPowRange(t))
+                    return true;
+                else
+                    return false;
+
+            }
+            else if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 1)
+            {
+                if (range > Q.Range)
+                    return true;
+                else
+                    return false;
+            }
+            else if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 2)
+            {
+                if (range > Config.Item("Rcustome").GetValue<Slider>().Value && !Orbwalking.InAutoAttackRange(t))
+                    return true;
+                else
+                    return false;
+            }
+            else
+                return false;
+        }
+
+        private static void Elogic()
+        {
+            if (Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value)
+                return;
+
+            if (Config.Item("Ecc").GetValue<bool>())
+            {
+                foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(E.Range) ))
+                {
+                    if(!CanMove(enemy))
+                        E.Cast(enemy.Position);
+                    if(enemy.MoveSpeed < 250 && Config.Item("Eslow").GetValue<bool>())
+                        E.Cast(enemy);
+                    return;
+                }
+            }
+
+            if (Config.Item("Etel").GetValue<bool>())
+            {
+                foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Distance(Player.ServerPosition) < E.Range && Obj.Team != Player.Team && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
+                {
+                    E.Cast(Object.Position);
+                }
+            }
+
+            if (Combo && Player.IsMoving && Config.Item("Ecombo").GetValue<bool>())
+            {
+                var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget(E.Range) && E.GetPrediction(t).CastPosition.Distance(t.Position) > 200)
+                {
+                    if (Player.Position.Distance(t.ServerPosition) > Player.Position.Distance(t.Position))
+                    {
+                        if (t.Position.Distance(Player.ServerPosition) < t.Position.Distance(Player.Position))
+                            CastSpell(E, t);
+                    }
+                    else
+                    {
+                        if (t.Position.Distance(Player.ServerPosition) > t.Position.Distance(Player.Position))
+                            CastSpell(E, t);
+                    }
+                }
+            }
+
         }
 
         private static bool WValidRange(Obj_AI_Base t)
@@ -153,11 +378,15 @@ namespace Jinx_Genesis
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && WValidRange(t))
             {
-                if (Combo && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaCombo").GetValue<Slider>().Value)
+                if ( Config.Item("Wks").GetValue<bool>() && GetKsDamage(t,W) > t.Health && ValidUlt(t))
                 {
                     CastSpell(W, t);
                 }
-                else if (Farm && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaHarass").GetValue<Slider>().Value)
+                else if (Combo && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaCombo").GetValue<Slider>().Value)
+                {
+                    CastSpell(W, t);
+                }
+                else if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaHarass").GetValue<Slider>().Value)
                 {
                     if (Config.Item("Wts").GetValue<StringList>().SelectedIndex == 0)
                     {
@@ -199,7 +428,7 @@ namespace Jinx_Genesis
                         {
                             Q.Cast();
                         }
-                        if (Farm && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health))
+                        if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health))
                         {
                             Q.Cast();
                         }
@@ -211,8 +440,84 @@ namespace Jinx_Genesis
                     {
                         Q.Cast();
                     }
+                    else if (Farm && !Player.IsWindingUp && Config.Item("farmQout").GetValue<bool>() && Orbwalking.CanAttack())
+                    {
+                        foreach (var minion in MinionManager.GetMinions(Q.Range + 30).Where(
+                        minion => !Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && Q.Range < GetRealDistance(minion)))
+                        {
+                            Orbwalker.ForceTarget(minion);
+                            Q.Cast();
+                            return;
+                        }
+                    }
                 }
             }
+        }
+
+        public static float GetKsDamage(Obj_AI_Base t, Spell QWER)
+        {
+            var totalDmg = QWER.GetDamage(t);
+
+            if (Player.HasBuff("itemmagicshankcharge"))
+            {
+                if (Player.GetBuff("itemmagicshankcharge").Count == 100)
+                {
+                    totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
+                }
+            }
+
+            if (Player.HasBuff("summonerexhaust"))
+                totalDmg = totalDmg * 0.6f;
+
+            if (t.HasBuff("ferocioushowl"))
+                totalDmg = totalDmg * 0.7f;
+
+            if (t is Obj_AI_Hero)
+            {
+                var champion = (Obj_AI_Hero)t;
+                if (champion.ChampionName == "Blitzcrank" && !champion.HasBuff("BlitzcrankManaBarrierCD") && !champion.HasBuff("ManaBarrier"))
+                {
+                    totalDmg -= champion.Mana / 2f;
+                }
+            }
+
+            var extraHP = t.Health - HealthPrediction.GetHealthPrediction(t, 500);
+
+            totalDmg += extraHP;
+            totalDmg -= t.HPRegenRate;
+            totalDmg -= t.PercentLifeStealMod * 0.005f * t.FlatPhysicalDamageMod;
+
+            return totalDmg;
+        }
+
+        public static bool ValidUlt(Obj_AI_Base target)
+        {
+            if (target.HasBuffOfType(BuffType.PhysicalImmunity)
+                || target.HasBuffOfType(BuffType.SpellImmunity)
+                || target.IsZombie
+                || target.IsInvulnerable
+                || target.HasBuffOfType(BuffType.Invulnerability)
+                || target.HasBuffOfType(BuffType.SpellShield)
+                || target.HasBuff("deathdefiedbuff")
+                || target.HasBuff("Undying Rage")
+                || target.HasBuff("Chrono Shift")
+                )
+                return false;
+            else
+                return true;
+        }
+
+        private static bool CanMove(Obj_AI_Hero target)
+        {
+            if (target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
+                target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Knockback) ||
+                target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) ||
+                target.IsStunned || target.IsChannelingImportantSpell() || target.MoveSpeed < 50f)
+            {
+                return false;
+            }
+            else
+                return true;
         }
 
         private static void CastSpell(Spell QWER, Obj_AI_Base target)
@@ -254,7 +559,7 @@ namespace Jinx_Genesis
             else
                 Farm = false;
 
-            Q.Range = 670f + Player.BoundingRadius + 25f * Player.Spellbook.GetSpell(SpellSlot.Q).Level;
+            Q.Range = 680f + Player.BoundingRadius + 25f * Player.Spellbook.GetSpell(SpellSlot.Q).Level;
 
             QMANA = 10f;
             WMANA = W.Instance.ManaCost;
