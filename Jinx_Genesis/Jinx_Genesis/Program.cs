@@ -81,7 +81,10 @@ namespace Jinx_Genesis
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qchange", "Q change mode FishBone -> MiniGun").SetValue(new StringList(new[] { "Real Time", "Before AA"}, 1)));
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qaoe", "Force FishBone if can hit x target").SetValue(new Slider(3, 5, 0)));
             Config.SubMenu("Q Config").AddItem(new MenuItem("QmanaIgnore", "Ignore mana if can kill in x AA").SetValue(new Slider(2, 10, 0)));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu("Q Config").SubMenu("Harass Q enemy:").AddItem(new MenuItem("harasQ" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+             
             Config.SubMenu("W Config").AddItem(new MenuItem("Wcombo", "Combo W").SetValue(true));
             Config.SubMenu("W Config").AddItem(new MenuItem("Wharass", "W harass").SetValue(true));
             Config.SubMenu("W Config").AddItem(new MenuItem("Wks", "W KS").SetValue(true));
@@ -89,13 +92,14 @@ namespace Jinx_Genesis
             Config.SubMenu("W Config").AddItem(new MenuItem("Wmode", "W mode").SetValue(new StringList(new[] { "Out range MiniGun", "Out range FishBone", "Custome range" }, 0)));
             Config.SubMenu("W Config").AddItem(new MenuItem("Wcustome", "Custome minimum range").SetValue(new Slider(600, 1500, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu("W Config").SubMenu("Harass enemy:").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+                Config.SubMenu("W Config").SubMenu("Harass W enemy:").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu("E Config").AddItem(new MenuItem("Ecombo", "Combo E").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Etel", "E on enemy teleport").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Ecc", "E on CC").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Eslow", "E on slow").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Edash", "E on dash").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Eaoe", "E if can catch x enemies").SetValue(new Slider(3, 5, 0)));
             Config.SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode").SetValue(new StringList(new[] { "Dash end position", "Jinx position"}, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -121,6 +125,11 @@ namespace Jinx_Genesis
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaCombo", "W combo mana").SetValue(new Slider(20, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaHarass", "W harass mana").SetValue(new Slider(40, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("EmanaCombo", "E mana").SetValue(new Slider(20, 100, 0)));
+
+            Config.SubMenu("Prediction Config").AddItem(new MenuItem("Wpred", "W Hit Chance").SetValue(new StringList(new[] {"VeryHigh W", "High W"}, 0)));
+            Config.SubMenu("Prediction Config").AddItem(new MenuItem("Epred", "E Hit Chance").SetValue(new StringList(new[] { "VeryHigh E", "High E" }, 0)));
+            Config.SubMenu("Prediction Config").AddItem(new MenuItem("Rpred", "R Hit Chance").SetValue(new StringList(new[] { "VeryHigh R", "High R" }, 0)));
+            
 
             //Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1
             //Config.Item("haras" + enemy.ChampionName).GetValue<bool>()
@@ -172,16 +181,7 @@ namespace Jinx_Genesis
         private static void Game_OnGameUpdate(EventArgs args)
         {
             SetValues();
-            if (Config.Item("Wmode").GetValue<StringList>().SelectedIndex == 2)
-                Config.Item("Wcustome").Show(true);
-            else
-                Config.Item("Wcustome").Show(false);
-
-            if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 2)
-                Config.Item("Rcustome").Show(true);
-            else
-                Config.Item("Rcustome").Show(false);
-
+            
             if (Q.IsReady())
                 Qlogic();
             if (W.IsReady())
@@ -255,11 +255,11 @@ namespace Jinx_Genesis
                         {
 
                             if (target.CountEnemiesInRange(400) > Config.Item("Raoe").GetValue<Slider>().Value)
-                                R.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                                CastSpell(R, target);
                             if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 3> W.Instance.Cooldown))
                                 return;
                             if (WValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
-                                R.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                                CastSpell(R, target);
                         }
                     }
                 }
@@ -303,6 +303,9 @@ namespace Jinx_Genesis
 
             foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(E.Range) ))
             {
+
+                E.CastIfWillHit(enemy, Config.Item("Eaoe").GetValue<Slider>().Value);
+
                 if(Config.Item("Ecc").GetValue<bool>())
                 {
                     if (!CanMove(enemy))
@@ -429,7 +432,7 @@ namespace Jinx_Genesis
                         {
                             Q.Cast();
                         }
-                        if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
+                        if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harasQ" + t.ChampionName).GetValue<bool>() && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
                         {
                             Q.Cast();
                         }
@@ -458,14 +461,6 @@ namespace Jinx_Genesis
         public static float GetKsDamage(Obj_AI_Base t, Spell QWER)
         {
             var totalDmg = QWER.GetDamage(t);
-
-            if (Player.HasBuff("itemmagicshankcharge"))
-            {
-                if (Player.GetBuff("itemmagicshankcharge").Count == 100)
-                {
-                    totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
-                }
-            }
 
             if (Player.HasBuff("summonerexhaust"))
                 totalDmg = totalDmg * 0.6f;
@@ -523,7 +518,27 @@ namespace Jinx_Genesis
 
         private static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
-            QWER.Cast(target);
+            if(QWER.Slot == SpellSlot.W)
+            {
+                if (Config.Item("Wpred").GetValue<StringList>().SelectedIndex == 0)
+                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                else
+                    QWER.Cast(target);
+            }
+            if (QWER.Slot == SpellSlot.R)
+            {
+                if (Config.Item("Rpred").GetValue<StringList>().SelectedIndex == 0)
+                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                else
+                    QWER.Cast(target);
+            }
+            if (QWER.Slot == SpellSlot.E)
+            {
+                if (Config.Item("Epred").GetValue<StringList>().SelectedIndex == 0)
+                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                else
+                    QWER.Cast(target);
+            }
         }
 
         private static void FishBoneToMiniGun(Obj_AI_Base t)
@@ -545,6 +560,16 @@ namespace Jinx_Genesis
 
         private static void SetValues()
         {
+            if (Config.Item("Wmode").GetValue<StringList>().SelectedIndex == 2)
+                Config.Item("Wcustome").Show(true);
+            else
+                Config.Item("Wcustome").Show(false);
+
+            if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 2)
+                Config.Item("Rcustome").Show(true);
+            else
+                Config.Item("Rcustome").Show(false);
+
             if (Player.AttackRange > 525f)
                 FishBoneActive = true;
             else
