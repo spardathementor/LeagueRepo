@@ -36,7 +36,7 @@ namespace Jinx_Genesis
             LoadMenu();
 
             Q = new Spell(SpellSlot.Q, Player.AttackRange);
-            W = new Spell(SpellSlot.W, 1500f);
+            W = new Spell(SpellSlot.W, 1490f);
             E = new Spell(SpellSlot.E, 900f);
             R = new Spell(SpellSlot.R, 2500f);
 
