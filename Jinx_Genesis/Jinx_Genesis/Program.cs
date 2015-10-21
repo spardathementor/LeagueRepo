@@ -59,37 +59,6 @@ namespace Jinx_Genesis
             Game.PrintChat("<font color=\"#00BFFF\">GENESIS </font>Jinx<font color=\"#000000\"> by Sebby </font> - <font color=\"#FFFFFF\">Loaded</font>");
         }
 
-        private static void Drawing_OnDraw(EventArgs args)
-        {
-            if (Config.Item("qRange").GetValue<bool>())
-            {
-                if (FishBoneActive)
-                    Utility.DrawCircle(Player.Position, 590f + Player.BoundingRadius, System.Drawing.Color.Gray, 1, 1);
-                else
-                    Utility.DrawCircle(Player.Position, Q.Range - 40, System.Drawing.Color.Gray, 1, 1);
-            }
-            if (Config.Item("wRange").GetValue<bool>())
-            {
-                if (Config.Item("onlyRdy").GetValue<bool>())
-                {
-                    if (W.IsReady())
-                        Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Gray, 1, 1);
-                }
-                else
-                    Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Gray, 1, 1);
-            }
-            if (Config.Item("eRange").GetValue<bool>())
-            {
-                if (Config.Item("onlyRdy").GetValue<bool>())
-                {
-                    if (E.IsReady())
-                        Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
-                }
-                else
-                    Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
-            }
-        }
-
         private static void LoadMenu()
         {
             Config = new Menu(ChampionName + " GENESIS", ChampionName + " GENESIS", true);
@@ -124,13 +93,16 @@ namespace Jinx_Genesis
 
             Config.SubMenu("E Config").AddItem(new MenuItem("Ecombo", "Combo E").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Etel", "E on enemy teleport").SetValue(true));
-            Config.SubMenu("E Config").AddItem(new MenuItem("Ecc", "E on CC enemy").SetValue(true));
-            Config.SubMenu("E Config").AddItem(new MenuItem("Eslow", "E on slow enemy").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Ecc", "E on CC").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Eslow", "E on slow").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Edash", "E on dash").SetValue(true));
             Config.SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode").SetValue(new StringList(new[] { "Dash end position", "Jinx position"}, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu("R Config").AddItem(new MenuItem("Rks", "R KS").SetValue(true));
+            Config.SubMenu("R Config").SubMenu("Semi-manual cast R").AddItem(new MenuItem("useR", "Semi-manual cast R key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
+            Config.SubMenu("R Config").SubMenu("Semi-manual cast R").AddItem(new MenuItem("semiMode", "Semi-manual cast mode").SetValue(new StringList(new[] { "Low hp target", "AOE"}, 0)));
             Config.SubMenu("R Config").AddItem(new MenuItem("Rmode", "R mode").SetValue(new StringList(new[] { "Out range MiniGun ", "Out range FishBone ", "Custome range " }, 0)));
             Config.SubMenu("R Config").AddItem(new MenuItem("Rcustome", "Custome minimum range").SetValue(new Slider(1000, 1600, 0)));
             Config.SubMenu("R Config").AddItem(new MenuItem("RcustomeMax", "Max range").SetValue(new Slider(3000, 10000, 0)));
@@ -175,16 +147,24 @@ namespace Jinx_Genesis
 
         private static void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            if (!Q.IsReady() || !(args.Target is Obj_AI_Hero))
-                return;
-
-            if (Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1)
+            if (Q.IsReady() && FishBoneActive && args.Target is Obj_AI_Hero && Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1)
             {
                 Console.WriteLine(args.Target.Name);
                 var t = (Obj_AI_Hero)args.Target;
-                if (FishBoneActive && t.IsValidTarget())
+                if ( t.IsValidTarget())
                 {
                     FishBoneToMiniGun(t);
+                }
+            }
+
+            if (Farm && FishBoneActive && args.Target is Obj_AI_Minion)
+            {
+                var t = (Obj_AI_Minion)args.Target;
+                if (GetRealDistance(t) < GetRealPowPowRange(t))
+                {
+                    args.Process = false;
+                    if (Q.IsReady())
+                        Q.Cast();
                 }
             }
         }
@@ -214,10 +194,29 @@ namespace Jinx_Genesis
 
         private static void Rlogic()
         {
+            R.Range = Config.Item("RcustomeMax").GetValue<Slider>().Value;
+
+            if (Config.Item("useR", true).GetValue<KeyBind>().Active)
+            {
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
+                if (t.IsValidTarget())
+                {
+                    if(Config.Item("semiMode").GetValue<StringList>().SelectedIndex == 0)
+                    {
+                        R.Cast(t);
+                    }
+                    else
+                    {
+                        R.CastIfWillHit(t, 2);
+                        R.Cast(t, true, true);
+                    }
+                }   
+            }
+
             if (Config.Item("Rks").GetValue<bool>())
             {
                 bool cast = false;
-                R.Range = Config.Item("RcustomeMax").GetValue<Slider>().Value;
+                
 
                 if (Config.Item("RoverAA").GetValue<bool>() && (!Orbwalking.CanAttack() || Player.IsWindingUp))
                     return;
@@ -302,21 +301,25 @@ namespace Jinx_Genesis
             if (Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value)
                 return;
 
-            if (Config.Item("Ecc").GetValue<bool>())
+            foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(E.Range) ))
             {
-                foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(E.Range) ))
+                if(Config.Item("Ecc").GetValue<bool>())
                 {
-                    if(!CanMove(enemy))
+                    if (!CanMove(enemy))
                         E.Cast(enemy.Position);
-                    if(enemy.MoveSpeed < 250 && Config.Item("Eslow").GetValue<bool>())
-                        E.Cast(enemy);
-                    return;
+                    E.CastIfHitchanceEquals(enemy, HitChance.Immobile);
                 }
+
+                if(enemy.MoveSpeed < 250 && Config.Item("Eslow").GetValue<bool>())
+                    E.Cast(enemy);
+                if (Config.Item("Edash").GetValue<bool>())
+                    E.CastIfHitchanceEquals(enemy, HitChance.Dashing);
             }
+            
 
             if (Config.Item("Etel").GetValue<bool>())
             {
-                foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Distance(Player.ServerPosition) < E.Range && Obj.Team != Player.Team && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
+                foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.IsEnemy && Obj.Distance(Player.ServerPosition) < E.Range && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
                 {
                     E.Cast(Object.Position);
                 }
@@ -339,7 +342,6 @@ namespace Jinx_Genesis
                     }
                 }
             }
-
         }
 
         private static bool WValidRange(Obj_AI_Base t)
@@ -564,6 +566,37 @@ namespace Jinx_Genesis
             WMANA = W.Instance.ManaCost;
             EMANA = E.Instance.ManaCost;
             RMANA = R.Instance.ManaCost;
+        }
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (Config.Item("qRange").GetValue<bool>())
+            {
+                if (FishBoneActive)
+                    Utility.DrawCircle(Player.Position, 590f + Player.BoundingRadius, System.Drawing.Color.Gray, 1, 1);
+                else
+                    Utility.DrawCircle(Player.Position, Q.Range - 40, System.Drawing.Color.Gray, 1, 1);
+            }
+            if (Config.Item("wRange").GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy").GetValue<bool>())
+                {
+                    if (W.IsReady())
+                        Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Gray, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(Player.Position, W.Range, System.Drawing.Color.Gray, 1, 1);
+            }
+            if (Config.Item("eRange").GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy").GetValue<bool>())
+                {
+                    if (E.IsReady())
+                        Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(Player.Position, E.Range, System.Drawing.Color.Gray, 1, 1);
+            }
         }
     }
 }
