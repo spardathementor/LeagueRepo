@@ -196,7 +196,7 @@ namespace Jinx_Genesis
         {
             R.Range = Config.Item("RcustomeMax").GetValue<Slider>().Value;
 
-            if (Config.Item("useR", true).GetValue<KeyBind>().Active)
+            if (Config.Item("useR").GetValue<KeyBind>().Active)
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
