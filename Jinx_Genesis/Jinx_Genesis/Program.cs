@@ -255,11 +255,11 @@ namespace Jinx_Genesis
                         {
 
                             if (target.CountEnemiesInRange(400) > Config.Item("Raoe").GetValue<Slider>().Value)
-                                R.Cast(target, true, true);
+                                R.CastIfHitchanceEquals(target, HitChance.VeryHigh);
                             if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 3> W.Instance.Cooldown))
                                 return;
                             if (WValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
-                                R.Cast(target, true, true);
+                                R.CastIfHitchanceEquals(target, HitChance.VeryHigh);
                         }
                     }
                 }
