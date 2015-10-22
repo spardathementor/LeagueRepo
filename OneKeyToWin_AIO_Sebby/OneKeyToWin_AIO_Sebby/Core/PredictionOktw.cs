@@ -62,6 +62,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
         Walls
     }
 
+
+
     public class PredictionInput
     {
         private Vector3 _from;
@@ -344,7 +346,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             //Set hit chance
             if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
             {
-                result = WayPointAnalysis(result, input);
+                //result = WayPointAnalysis(result, input);
                 //Program.debug(input.Unit.BaseSkinName + result.Hitchance);
             }
             return result;
@@ -358,7 +360,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0)
+            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || UnitTracker.PathCalc(input.Unit))
             {
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
@@ -415,7 +417,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Unit.Path.Count() == 0 && input.Unit.Position == input.Unit.ServerPosition)
             {
-                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.4d)
+                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
                     result.Hitchance = HitChance.High;
                 else if (distanceFromToUnit > input.Range - fixRange)
                     result.Hitchance = HitChance.Medium;
@@ -550,9 +552,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 speed /= 1.5f;
             }
 
-            var result = GetPositionOnPath(input, input.Unit.GetWaypoints(), speed);
-
-            return result;
+            if (UnitTracker.PathCalc(input.Unit))
+            {
+                Program.debug(input.Unit.BaseSkinName);
+                return GetPositionOnPath(input, UnitTracker.GetPathWayCalc(input.Unit), speed);
+                
+            }
+            else
+                return GetPositionOnPath(input, input.Unit.GetWaypoints(), speed);
         }
 
         internal static double GetAngle(Vector3 from, Obj_AI_Base target)
@@ -1097,6 +1104,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
         }
     }
 
+    internal class PathInfo
+    {
+        public Vector2 Position { get; set; }
+        public float Time { get; set; }
+    }
+
     internal class Spells
     {
         public string name { get; set; }
@@ -1111,6 +1124,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public int StopMoveTick { get; set; }
         public int LastInvisableTick { get; set; }
         public int SpecialSpellFinishTick { get; set; }
+        public List<PathInfo> PathBank = new List<PathInfo>();
     }
 
     internal static class UnitTracker
@@ -1118,7 +1132,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public static List<UnitTrackerInfo> UnitTrackerInfoList = new List<UnitTrackerInfo>();
         private static List<Obj_AI_Hero> Champion = new List<Obj_AI_Hero>();
         private static List<Spells> spells = new List<Spells>();
-
+        private static List<PathInfo> PathBank = new List<PathInfo>();
         static UnitTracker()
         {
             spells.Add(new Spells() { name = "katarinar", duration = 1 }); //Katarinas R
@@ -1175,12 +1189,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private static void Obj_AI_Hero_OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
         {
             if (!(sender is Obj_AI_Hero)) { return; }
-            UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).NewPathTick = Utils.TickCount;
+
+            var info = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
+            info.NewPathTick = Utils.TickCount;
+            info.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
+
+            if (info.PathBank.Count > 3)
+                info.PathBank.Remove(info.PathBank.First());
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMinion  || !sender.IsValid<Obj_AI_Hero>())
+            if (sender.IsMinion || !sender.IsValid<Obj_AI_Hero>())
                 return;
 
             if (args.SData.IsAutoAttack())
@@ -1193,6 +1213,29 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).SpecialSpellFinishTick = Utils.TickCount + (int)(foundSpell.duration * 1000);
                 }
             }
+        }
+
+        public static bool PathCalc(Obj_AI_Base unit)
+        {
+            var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
+            if(TrackerUnit.PathBank.Count < 3)
+                return false;
+
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.5f && TrackerUnit.PathBank[2].Time + 0.2f < Game.Time)
+                return true;
+            else
+                return false;
+        }
+
+        public static List<Vector2> GetPathWayCalc(Obj_AI_Base unit)
+        {
+            var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
+            Vector2 sr;
+            sr.X = (TrackerUnit.PathBank[0].Position.X + TrackerUnit.PathBank[1].Position.X + TrackerUnit.PathBank[2].Position.X) / 3;
+            sr.Y = (TrackerUnit.PathBank[0].Position.Y + TrackerUnit.PathBank[1].Position.Y + TrackerUnit.PathBank[2].Position.Y) / 3;
+            List<Vector2> points = new List<Vector2>();
+            points.Add(sr);
+            return points;
         }
 
         public static double GetSpecialSpellEndTime(Obj_AI_Base unit)
