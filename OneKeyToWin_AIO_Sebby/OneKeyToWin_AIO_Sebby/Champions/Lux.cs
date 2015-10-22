@@ -65,7 +65,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rcc", "R fast KS combo", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Raoe", "R aoe", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("RaoeCount", "R x enemies in combo [0 == off]", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("hitchanceR", "Hit Chance R", true).SetValue(new Slider(2, 3, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space   
 
@@ -327,9 +327,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         }
 
                     }
-                    else if (Program.Combo && Config.Item("Raoe", true).GetValue<bool>())
+                    else if (Program.Combo && Config.Item("RaoeCount", true).GetValue<Slider>().Value > 0)
                     {
-                        R.CastIfWillHit(target, 3, true);
+                        R.CastIfWillHit(target, Config.Item("RaoeCount", true).GetValue<Slider>().Value);
                     }
                 }
             }
