@@ -158,9 +158,11 @@ namespace Jinx_Genesis
 
         private static void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            if (Q.IsReady() && FishBoneActive && args.Target is Obj_AI_Hero && Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1)
+            if (!FishBoneActive)
+                return;
+
+            if (Q.IsReady() && args.Target is Obj_AI_Hero && Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1)
             {
-                Console.WriteLine(args.Target.Name);
                 var t = (Obj_AI_Hero)args.Target;
                 if ( t.IsValidTarget())
                 {
@@ -168,7 +170,7 @@ namespace Jinx_Genesis
                 }
             }
 
-            if (Farm && FishBoneActive && args.Target is Obj_AI_Minion)
+            if (Farm && args.Target is Obj_AI_Minion)
             {
                 var t = (Obj_AI_Minion)args.Target;
                 if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && CountMinionsInRange(250, t.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
@@ -417,7 +419,7 @@ namespace Jinx_Genesis
             if (FishBoneActive)
             {
                 var orbT = Orbwalker.GetTarget();
-                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value)
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && orbT.IsValid<Obj_AI_Minion>())
                 {
                     
                 }
