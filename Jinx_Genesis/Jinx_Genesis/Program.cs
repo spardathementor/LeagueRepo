@@ -78,9 +78,10 @@ namespace Jinx_Genesis
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qcombo", "Combo Q").SetValue(true));
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qharass", "Harass Q").SetValue(true));
             Config.SubMenu("Q Config").AddItem(new MenuItem("farmQout", "Farm Q out range AA minion").SetValue(true));
+            Config.SubMenu("Q Config").AddItem(new MenuItem("Qlaneclear", "Lane clear x minions").SetValue(new Slider(4, 10, 2)));
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qchange", "Q change mode FishBone -> MiniGun").SetValue(new StringList(new[] { "Real Time", "Before AA"}, 1)));
             Config.SubMenu("Q Config").AddItem(new MenuItem("Qaoe", "Force FishBone if can hit x target").SetValue(new Slider(3, 5, 0)));
-            Config.SubMenu("Q Config").AddItem(new MenuItem("QmanaIgnore", "Ignore mana if can kill in x AA").SetValue(new Slider(2, 10, 0)));
+            Config.SubMenu("Q Config").AddItem(new MenuItem("QmanaIgnore", "Ignore mana if can kill in x AA").SetValue(new Slider(4, 10, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu("Q Config").SubMenu("Harass Q enemy:").AddItem(new MenuItem("harasQ" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
@@ -122,6 +123,7 @@ namespace Jinx_Genesis
             //Config.SubMenu("Mana Manager").AddItem(new MenuItem("ManaKs", "always safe mana to KS R or W").SetValue(true));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("QmanaCombo", "Q combo mana").SetValue(new Slider(20, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("QmanaHarass", "Q harass mana").SetValue(new Slider(40, 100, 0)));
+            Config.SubMenu("Mana Manager").AddItem(new MenuItem("QmanaLC", "Q lane clear mana").SetValue(new Slider(80, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaCombo", "W combo mana").SetValue(new Slider(20, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaHarass", "W harass mana").SetValue(new Slider(40, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("EmanaCombo", "E mana").SetValue(new Slider(20, 100, 0)));
@@ -169,7 +171,11 @@ namespace Jinx_Genesis
             if (Farm && FishBoneActive && args.Target is Obj_AI_Minion)
             {
                 var t = (Obj_AI_Minion)args.Target;
-                if (GetRealDistance(t) < GetRealPowPowRange(t))
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && CountMinionsInRange(250, t.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
+                {
+                    
+                }
+                else if (GetRealDistance(t) < GetRealPowPowRange(t))
                 {
                     args.Process = false;
                     if (Q.IsReady())
@@ -256,7 +262,7 @@ namespace Jinx_Genesis
 
                             if (target.CountEnemiesInRange(400) > Config.Item("Raoe").GetValue<Slider>().Value)
                                 CastSpell(R, target);
-                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 3> W.Instance.Cooldown))
+                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 4> W.Instance.Cooldown))
                                 return;
                             if (WValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
                                 CastSpell(R, target);
@@ -410,11 +416,16 @@ namespace Jinx_Genesis
         {
             if (FishBoneActive)
             {
-                if(Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 0 && Config.Item("Qcombo").GetValue<bool>() && Orbwalker.GetTarget() != null && Orbwalker.GetTarget() is Obj_AI_Hero)
+                var orbT = Orbwalker.GetTarget();
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value)
+                {
+                    
+                }
+                else if (Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 0 && orbT.IsValid<Obj_AI_Hero>())
                 {
                     var t = (Obj_AI_Hero)Orbwalker.GetTarget();
                     FishBoneToMiniGun(t);
-                }
+                }  
                 else
                 {
                     if (Farm && Config.Item("Qharass").GetValue<bool>())
@@ -454,8 +465,27 @@ namespace Jinx_Genesis
                             return;
                         }
                     }
+                    if(Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value)
+                    {
+                        var orbT = Orbwalker.GetTarget();
+                        if (orbT.IsValid<Obj_AI_Minion>() && CountMinionsInRange(250, orbT.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
+                        {
+                            Q.Cast();
+                        }
+                    }
                 }
             }
+        }
+
+        private static int CountMinionsInRange(float range, Vector3 pos)
+        {
+            var minions = MinionManager.GetMinions(pos, range);
+            int count = 0;
+            foreach (var minion in minions)
+            {
+                count++;
+            }
+            return count;
         }
 
         public static float GetKsDamage(Obj_AI_Base t, Spell QWER)
