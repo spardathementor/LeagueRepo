@@ -346,8 +346,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
             //Set hit chance
             if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
             {
-                //result = WayPointAnalysis(result, input);
-                //Program.debug(input.Unit.BaseSkinName + result.Hitchance);
+                result = WayPointAnalysis(result, input);
+                //.debug(input.Unit.BaseSkinName + result.Hitchance);
             }
             return result;
         }
@@ -552,7 +552,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 speed /= 1.5f;
             }
 
-            if (UnitTracker.PathCalc(input.Unit))
+            if (input.Unit.IsValid<Obj_AI_Hero>() && UnitTracker.PathCalc(input.Unit))
             {
                 Program.debug(input.Unit.BaseSkinName);
                 return GetPositionOnPath(input, UnitTracker.GetPathWayCalc(input.Unit), speed);
