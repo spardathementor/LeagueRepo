@@ -50,12 +50,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("minionE", "use E on ablazed minion", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if can hit x enemies", true).SetValue(new Slider(3, 0, 5)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R if can hit x enemies", true).SetValue(new Slider(3, 0, 5)));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
@@ -200,7 +200,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range, MinionTypes.All);
                 var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
-                if (farmPos.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
+                if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     W.Cast(farmPos.Position);
             }
         }
@@ -222,13 +222,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     E.CastOnUnit(t);
             }
-            else if (Config.Item("minionE", true).GetValue<bool>())
+            else 
             {
-                if ((Program.Combo && Player.Mana > RMANA + EMANA) || (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA))
+                if(Config.Item("minionE", true).GetValue<bool>())
                 {
-                    foreach (var minion in MinionManager.GetMinions(E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.CountEnemiesInRange(300) > 0 && minion.HasBuff("brandablaze")))
+                    if ((Program.Combo && Player.Mana > RMANA + EMANA) || (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA ))
                     {
-                        E.CastOnUnit(minion);
+                        foreach (var minion in MinionManager.GetMinions(E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.CountEnemiesInRange(300) > 0 && minion.HasBuff("brandablaze")))
+                        {
+                            E.CastOnUnit(minion);
+                        }
+                    }
+                    if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA)
+                    {
+                        foreach (var minion in MinionManager.GetMinions(E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.HasBuff("brandablaze") && CountMinionsInRange(400,minion.Position) >= Config.Item("LCminions", true).GetValue<Slider>().Value))
+                        {
+                            E.CastOnUnit(minion);
+                        }
                     }
                 }
             }
