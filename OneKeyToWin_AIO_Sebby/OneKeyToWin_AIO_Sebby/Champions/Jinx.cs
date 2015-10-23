@@ -177,7 +177,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            if (Program.Farm && (Game.Time - lag > 0.1) && !FishBoneActive  &&  Program.Farm && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
+            if (Program.Farm && (Game.Time - lag > 0.1) && !FishBoneActive  && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
             {
                 foreach (var minion in MinionManager.GetMinions(bonusRange() + 30).Where(
                 minion => !Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
@@ -214,26 +214,22 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-            if (Game.Time - QCastTime > 0.6 && Player.CountEnemiesInRange(350) == 0)
-            {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range + 200) && GetRealDistance(enemy) > bonusRange() + 100))
-                {
-                    var comboDmg = W.GetDamage(enemy);
-                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)    
-                    {
-                        comboDmg += R.GetDamage(enemy, 1);
-                    }
-                    if (comboDmg > enemy.Health)
-                    {
-                        Program.CastSpell(W, enemy);
-                        return;
-                    }
-                }
-            }
-
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && Player.CountEnemiesInRange(bonusRange()+50) == 0)
             {
+                if (Game.Time - QCastTime > 0.6)
+                {
+                    var comboDmg = W.GetDamage(t);
+                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
+                    {
+                        comboDmg += R.GetDamage(t, 1);
+                    }
+                    if (comboDmg > t.Health)
+                    {
+                        Program.CastSpell(W, t);
+                        return;
+                    }
+                }
                 if (Program.Combo && Player.Mana > RMANA + WMANA + 10 && GetRealDistance(t) > bonusRange() - 50)
                 {
                     Program.CastSpell(W, t);
@@ -263,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Config.Item("telE", true).GetValue<bool>())
                 {
-                    foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Distance(Player.ServerPosition) < E.Range && Obj.Team != Player.Team && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
+                    foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.IsEnemy && Obj.Distance(Player.ServerPosition) < E.Range && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
                     {
                         E.Cast(Object.Position);
                     }
