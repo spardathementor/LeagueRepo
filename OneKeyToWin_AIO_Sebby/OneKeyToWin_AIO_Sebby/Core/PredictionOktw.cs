@@ -392,14 +392,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (UnitTracker.PathCalc(input.Unit))
             {
-                if (distanceFromToWaypoint < input.Unit.Distance(input.From))
+
+                if (distanceFromToUnit < input.Range - fixRange)
                 {
-                    if (distanceFromToUnit < input.Range - fixRange)
-                    {
-                        result.Hitchance = HitChance.VeryHigh;
-                        return result;
-                    }
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
                 }
+
+                result.Hitchance = HitChance.High;
+                return result;
             }
 
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
