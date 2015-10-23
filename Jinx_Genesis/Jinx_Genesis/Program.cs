@@ -22,6 +22,13 @@ namespace Jinx_Genesis
         private static float QMANA, WMANA, EMANA ,RMANA;
         private static bool FishBoneActive= false, Combo = false, Farm = false;
 
+
+        private static string[] Spells =
+        {
+            "katarinar","drain","consume","absolutezero", "staticfield","reapthewhirlwind","jinxw","jinxr","shenstandunited","threshe","threshrpenta","threshq","meditate","caitlynpiltoverpeacemaker",
+            "cassiopeiapetrifyinggaze","ezrealtrueshotbarrage","galioidolofdurand","luxmalicecannon", "missfortunebullettime","infiniteduress","alzaharnethergrasp","lucianq","velkozr"
+        };
+
         private static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>();
 
         static void Main(string[] args)
@@ -56,9 +63,10 @@ namespace Jinx_Genesis
             Orbwalking.BeforeAttack += BeforeAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Game.PrintChat("<font color=\"#00BFFF\">GENESIS </font>Jinx<font color=\"#000000\"> by Sebby </font> - <font color=\"#FFFFFF\">Loaded</font>");
         }
-
+       
         private static void LoadMenu()
         {
             Config = new Menu(ChampionName + " GENESIS", ChampionName + " GENESIS", true);
@@ -100,6 +108,7 @@ namespace Jinx_Genesis
             Config.SubMenu("E Config").AddItem(new MenuItem("Ecc", "E on CC").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Eslow", "E on slow").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Edash", "E on dash").SetValue(true));
+            Config.SubMenu("E Config").AddItem(new MenuItem("Espell", "E on special spell detection").SetValue(true));
             Config.SubMenu("E Config").AddItem(new MenuItem("Eaoe", "E if can catch x enemies").SetValue(new Slider(3, 5, 0)));
             Config.SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode").SetValue(new StringList(new[] { "Dash end position", "Jinx position"}, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -183,6 +192,18 @@ namespace Jinx_Genesis
                     if (Q.IsReady())
                         Q.Cast();
                 }
+            }
+        }
+
+        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!E.IsReady() || sender.IsMinion || !sender.IsEnemy || !Config.Item("Espell").GetValue<bool>() || Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(E.Range) )
+                return;
+
+            var foundSpell = Spells.Find(x => args.SData.Name.ToLower() == x);
+            if (foundSpell != null)
+            {
+                E.Cast(sender.Position);
             }
         }
 
