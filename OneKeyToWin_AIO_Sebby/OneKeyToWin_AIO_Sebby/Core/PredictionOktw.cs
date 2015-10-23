@@ -62,8 +62,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
         Walls
     }
 
-
-
     public class PredictionInput
     {
         private Vector3 _from;
@@ -360,12 +358,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || UnitTracker.PathCalc(input.Unit))
+
+            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 )
             {
+
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
-            }
 
+            }
             result.Hitchance = HitChance.High;
 
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
@@ -374,6 +374,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
 
             float speedDelay = distanceFromToUnit / input.Speed;
+
+            
 
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 speedDelay = 0;
@@ -386,6 +388,19 @@ namespace OneKeyToWin_AIO_Sebby.Core
             double angleMove = 30 + (input.Radius / 10) - (input.Delay * 5);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 700f + backToFront;
+
+
+            if (UnitTracker.PathCalc(input.Unit))
+            {
+                if (distanceFromToWaypoint < input.Unit.Distance(input.From))
+                {
+                    if (distanceFromToUnit < input.Range - fixRange)
+                    {
+                        result.Hitchance = HitChance.VeryHigh;
+                        return result;
+                    }
+                }
+            }
 
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
