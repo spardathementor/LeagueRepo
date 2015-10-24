@@ -342,6 +342,7 @@ namespace Jinx_Genesis
                 foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(2000) && enemy.HasBuff("RocketGrab")))
                 {
                     E.Cast(blitz.Position);
+                    return;
                 }
             }
 
