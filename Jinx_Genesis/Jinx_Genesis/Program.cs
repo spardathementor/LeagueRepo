@@ -406,7 +406,7 @@ namespace Jinx_Genesis
             }
             else if (Config.Item("Wmode").GetValue<StringList>().SelectedIndex == 1)
             {
-                if (range > Q.Range)
+                if (range > Q.Range + 50)
                     return true;
                 else
                     return false;
