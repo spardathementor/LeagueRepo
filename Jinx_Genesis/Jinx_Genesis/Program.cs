@@ -419,7 +419,7 @@ namespace Jinx_Genesis
                 {
                     CastSpell(W, t);
                 }
-                else if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaHarass").GetValue<Slider>().Value)
+                else if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Wharass").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaHarass").GetValue<Slider>().Value)
                 {
                     if (Config.Item("Wts").GetValue<StringList>().SelectedIndex == 0)
                     {
