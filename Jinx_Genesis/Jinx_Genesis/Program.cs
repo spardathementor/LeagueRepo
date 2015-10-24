@@ -22,7 +22,6 @@ namespace Jinx_Genesis
         private static float QMANA, WMANA, EMANA ,RMANA;
         private static bool FishBoneActive= false, Combo = false, Farm = false;
 
-
         private static string[] Spells =
         {
             "katarinar","drain","consume","absolutezero", "staticfield","reapthewhirlwind","jinxw","jinxr","shenstandunited","threshe","threshrpenta","threshq","meditate","caitlynpiltoverpeacemaker",
@@ -140,7 +139,10 @@ namespace Jinx_Genesis
             Config.SubMenu("Prediction Config").AddItem(new MenuItem("Wpred", "W Hit Chance").SetValue(new StringList(new[] {"VeryHigh W", "High W"}, 0)));
             Config.SubMenu("Prediction Config").AddItem(new MenuItem("Epred", "E Hit Chance").SetValue(new StringList(new[] { "VeryHigh E", "High E" }, 0)));
             Config.SubMenu("Prediction Config").AddItem(new MenuItem("Rpred", "R Hit Chance").SetValue(new StringList(new[] { "VeryHigh R", "High R" }, 0)));
-            
+
+            Config.SubMenu("Harass key config").AddItem(new MenuItem("LaneClearHarass", "LaneClear Harass").SetValue(true));
+            Config.SubMenu("Harass key config").AddItem(new MenuItem("LastHitHarass", "LastHit Harass").SetValue(true));
+            Config.SubMenu("Harass key config").AddItem(new MenuItem("MixedHarass", "Mixed Harass").SetValue(true));
 
             //Config.Item("Qchange").GetValue<StringList>().SelectedIndex == 1
             //Config.Item("haras" + enemy.ChampionName).GetValue<bool>()
@@ -179,7 +181,7 @@ namespace Jinx_Genesis
                 }
             }
 
-            if (Farm && args.Target is Obj_AI_Minion)
+            if (!Combo && args.Target is Obj_AI_Minion)
             {
                 var t = (Obj_AI_Minion)args.Target;
                 if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && CountMinionsInRange(250, t.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
@@ -451,7 +453,7 @@ namespace Jinx_Genesis
                 }  
                 else
                 {
-                    if (Farm && Config.Item("Qharass").GetValue<bool>())
+                    if (!Combo && Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
                         Q.Cast();
                 }
             }
@@ -623,6 +625,7 @@ namespace Jinx_Genesis
             else
                 Config.Item("Rcustome").Show(false);
 
+
             if (Player.AttackRange > 525f)
                 FishBoneActive = true;
             else
@@ -633,7 +636,11 @@ namespace Jinx_Genesis
             else
                 Combo = false;
 
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+            if (
+                (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Config.Item("LaneClearHarass").GetValue<bool>()) ||
+                (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit && Config.Item("LaneClearHarass").GetValue<bool>()) || 
+                (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && Config.Item("MixedHarass").GetValue<bool>())
+               )
                 Farm = true;
             else
                 Farm = false;
