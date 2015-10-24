@@ -21,6 +21,7 @@ namespace Jinx_Genesis
         private static Spell Q, W, E, R;
         private static float QMANA, WMANA, EMANA ,RMANA;
         private static bool FishBoneActive= false, Combo = false, Farm = false;
+        private static Obj_AI_Hero blitz = null;
 
         private static string[] Spells =
         {
@@ -55,6 +56,10 @@ namespace Jinx_Genesis
                 if (hero.IsEnemy)
                 {
                     Enemies.Add(hero);
+                }
+                else if(hero.ChampionName.Equals("Blitzcrank"))
+                {
+                    blitz = hero;
                 }
             }
 
@@ -331,6 +336,14 @@ namespace Jinx_Genesis
         {
             if (Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value)
                 return;
+
+            if (blitz != null && blitz.Distance(Player.Position) < E.Range)
+            {
+                foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(2000) && enemy.HasBuff("RocketGrab")))
+                {
+                    E.Cast(blitz.Position);
+                }
+            }
 
             foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget(E.Range) ))
             {
