@@ -602,10 +602,9 @@ namespace Jinx_Genesis
 
             if(realDistance < GetRealPowPowRange(t) && t.CountEnemiesInRange(250) < Config.Item("Qaoe").GetValue<Slider>().Value)
             {
-                if (Combo && Config.Item("Qcombo").GetValue<bool>() && (Player.ManaPercent < Config.Item("QmanaCombo").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health))
+                if (Player.ManaPercent < Config.Item("QmanaCombo").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health)
                     Q.Cast();
-                else if (Farm && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent < Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value < t.Health))
-                    Q.Cast();
+
             }
         }
 
