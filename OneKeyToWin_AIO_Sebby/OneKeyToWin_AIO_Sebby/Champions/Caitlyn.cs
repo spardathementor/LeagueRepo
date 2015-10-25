@@ -60,11 +60,18 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W on hard CC", true).SetValue(true));  
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("telE", "Auto W teleport", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW", "Auto W bush", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").AddItem(new MenuItem("WmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position",  "My hero position" }, 0)));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("WGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasEQ", "Harass E + Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("useE", "Dash E HotKeySmartcast", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
-            
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position", "Cursor position", "Enemy position" }, 2)));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName,true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
 
@@ -72,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
 
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("AGC", "Anti Gapcloser E,W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("Eagc", "Anti Gapcloser E", true).SetValue(true));
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs args)
@@ -85,16 +92,26 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (Config.Item("AGC", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
+            if ( Player.Mana > RMANA + WMANA)
             {
-                var Target = (Obj_AI_Hero)gapcloser.Sender;
-                if (E.IsReady() && Target.IsValidTarget(E.Range) && Player.Position.Extend(Game.CursorPos, 400).CountEnemiesInRange(800) < 3)
-                    E.Cast(Target);
-                else if (W.IsReady() && Target.IsValidTarget(W.Range))
-                    W.Cast(gapcloser.End);
-                return;
+                var t = gapcloser.Sender;
+                if (E.IsReady() && t.IsValidTarget(E.Range) && Config.Item("EGCchampion" + t.ChampionName, true).GetValue<bool>())
+                {
+                    if (Config.Item("EmodeGC", true).GetValue<StringList>().SelectedIndex == 0)
+                        E.Cast(gapcloser.End);
+                    else if (Config.Item("EmodeGC", true).GetValue<StringList>().SelectedIndex == 1)
+                        E.Cast(Game.CursorPos);
+                    else
+                        E.Cast(t.ServerPosition);
+                }
+                else if (W.IsReady() && t.IsValidTarget(W.Range) && Config.Item("WGCchampion" + t.ChampionName, true).GetValue<bool>())
+                {
+                    if (Config.Item("WmodeGC", true).GetValue<StringList>().SelectedIndex == 0)
+                        E.Cast(gapcloser.End);
+                    else
+                        E.Cast(Player.ServerPosition);
+                }
             }
-            return;
         }
 
         private void Game_OnGameUpdate(EventArgs args)
