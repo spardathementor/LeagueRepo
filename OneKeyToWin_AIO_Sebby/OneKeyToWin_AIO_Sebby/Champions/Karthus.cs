@@ -58,23 +58,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
 
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rcc", "R fast KS combo", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("RaoeCount", "R x enemies in combo [0 == off]", true).SetValue(new Slider(3, 5, 0)));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("hitchanceR", "Hit Chance R", true).SetValue(new Slider(2, 3, 0)));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space   
-
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rjungle", "R Jungle stealer", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rred", "Red", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rblue", "Blue", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rally", "Ally stealer", true).SetValue(false));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQout", "Last hit Q minion out range AA", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
@@ -92,7 +83,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(0))
             {
                 SetMana();
-                //Jungle();
             }
             if (Program.LagFree(1) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
@@ -109,7 +99,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Config.Item("autoR", true).GetValue<bool>())
 
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.CountEnemiesInRange(Q.Range+ 300) == 0 && OktwCommon.ValidUlt(target)))
+                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.CountEnemiesInRange(Q.Range+ 300) == 0 && target.CountAlliesInRange(600) == 0 && OktwCommon.ValidUlt(target)))
                 {
                     float predictedHealth = target.Health + target.HPRegenRate * 5;
                     float Rdmg = OktwCommon.GetKsDamage(target, R);
@@ -130,26 +120,54 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
         }
+        private float GetQDamage(Obj_AI_Base t)
+        {
+            var minions = MinionManager.GetMinions(t.Position, Q.Width);
+
+            foreach (var minion in minions)
+            {
+                return Q.GetDamage(t, 1);
+            }
+
+            return Q.GetDamage(t);
+        }
 
         private void LogicQ()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && R.GetDamage(enemy) + Q.GetDamage(enemy) > enemy.Health))
-            {
-                Program.CastSpell(Q, enemy);
-                return;
-            }
-
-            var t = Orbwalker.GetTarget() as Obj_AI_Hero;
-            if (!t.IsValidTarget())
-                t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget() && Config.Item("Qon" + t.ChampionName).GetValue<bool>())
             {
+                if (Q.GetDamage(t) > t.Health)
+                    Program.CastSpell(Q, t);
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
                 if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     Program.CastSpell(Q, t);
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                     Program.CastSpell(Q, t);
+            }
+
+            if (!Program.None && !Program.Combo && Player.Mana > RMANA + QMANA * 2)
+            {
+                var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                if (Config.Item("farmQout", true).GetValue<bool>())
+                {
+                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && (!Orbwalker.InAutoAttackRange(minion) || Program.LaneClear) ))
+                    {
+                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 1200);
+                        if (hpPred < GetQDamage(minion) && hpPred > minion.FlatPhysicalDamageMod)
+                        {
+                            Q.Cast(minion);
+                            return;
+                        }
+                    }
+                }
+                if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>())
+                {
+                    var farmPos = Q.GetCircularFarmLocation(allMinions, Q.Width);
+                    if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                        Q.Cast(farmPos.Position);
+                }
             }
         }
 
@@ -176,6 +194,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
+            if (!Config.Item("autoE", true).GetValue<bool>() || Program.None)
+                return;
+
             if ( Player.HasBuff("KarthusDefile"))
             {
                 if (Player.ManaPercent < Config.Item("Emana", true).GetValue<Slider>().Value)
@@ -188,6 +209,28 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (Player.ManaPercent > Config.Item("Emana", true).GetValue<Slider>().Value && Player.CountEnemiesInRange(E.Range) > 0)
                 {
                     E.Cast();
+                }
+            }
+        }
+
+        private void Jungle()
+        {
+            if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
+            {
+                var mobs = MinionManager.GetMinions(Player.ServerPosition, 700, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                if (mobs.Count > 0)
+                {
+                    var mob = mobs[0];
+                    if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>())
+                    {
+                        Q.Cast(mob.ServerPosition);
+                        return;
+                    }
+                    if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
+                    {
+                        E.Cast(mob.ServerPosition);
+                        return;
+                    }
                 }
             }
         }
