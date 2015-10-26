@@ -1071,10 +1071,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 }
                                 else
                                 {
-                                    var bonus = 20;
-                                    if (minion.ServerPosition.To2D().Distance(input.From.To2D()) < input.Radius / 2)
-                                        bonus = 40;
-                                    if (minion.ServerPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <=
+                                    var bonus = 30;
+                                    if (minion.ServerPosition.To2D().Distance(input.From.To2D()) < input.Radius)
+                                        result.Add(minion);
+                                    else if (minion.ServerPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <=
                                         Math.Pow((input.Radius + bonus + minion.BoundingRadius), 2))
                                     {
                                         result.Add(minion);
@@ -1237,7 +1237,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if(TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f && TrackerUnit.PathBank[2].Time + 0.15f < Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position) )
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time )
                 return true;
             else
                 return false;
