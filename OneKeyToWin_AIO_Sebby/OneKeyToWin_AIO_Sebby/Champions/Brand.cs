@@ -259,6 +259,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var prepos = R.GetPrediction(t2).CastPosition;
                     var dmgR = R.GetDamage(t2);
 
+
+
                     if (t2.Health < dmgR * 3)
                     {
                         var totalDmg = dmgR;
@@ -295,6 +297,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                             totalDmg += BonusDmg(t2);
                             totalDmg += OktwCommon.GetEchoLudenDamage(t2);
+
+                            if (Items.HasItem(3155, t2))
+                            {
+                                totalDmg = totalDmg - 250;
+                            }
+
+                            if (Items.HasItem(3156, t2))
+                            {
+                                totalDmg = totalDmg - 400;
+                            }
 
                             if (totalDmg > t2.Health && Player.GetAutoAttackDamage(t2) * 2 < t2.Health)
                             {

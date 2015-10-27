@@ -285,6 +285,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     float predictedHealth = target.Health + target.HPRegenRate * 2;
                     float Rdmg = R.GetDamage(target);
 
+                    if (Items.HasItem(3155, target))
+                    {
+                        Rdmg = Rdmg - 250;
+                    }
+
+                    if (Items.HasItem(3156, target))
+                    {
+                        Rdmg = Rdmg - 400;
+                    }
+
                     if (target.HasBuff("luxilluminatingfraulein"))
                     {
                         Rdmg +=  (float)Player.CalcDamage(target, Damage.DamageType.Magical,10 + (8 * Player.Level) + 0.2 * Player.FlatMagicDamageMod);
