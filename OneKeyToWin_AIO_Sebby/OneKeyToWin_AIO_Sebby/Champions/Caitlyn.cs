@@ -122,9 +122,9 @@ namespace OneKeyToWin_AIO_Sebby
                 else if (W.IsReady() && t.IsValidTarget(W.Range) && Config.Item("WGCchampion" + t.ChampionName, true).GetValue<bool>())
                 {
                     if (Config.Item("WmodeGC", true).GetValue<StringList>().SelectedIndex == 0)
-                        E.Cast(gapcloser.End);
+                        W.Cast(gapcloser.End);
                     else
-                        E.Cast(Player.ServerPosition);
+                        W.Cast(Player.ServerPosition);
                 }
             }
         }
