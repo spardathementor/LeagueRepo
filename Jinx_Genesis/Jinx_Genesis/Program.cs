@@ -22,6 +22,7 @@ namespace Jinx_Genesis
         private static float QMANA, WMANA, EMANA ,RMANA;
         private static bool FishBoneActive= false, Combo = false, Farm = false;
         private static Obj_AI_Hero blitz = null;
+        private static float WCastTime = Game.Time;
 
         private static string[] Spells =
         {
@@ -96,7 +97,6 @@ namespace Jinx_Genesis
             Config.SubMenu("Q Config").AddItem(new MenuItem("QmanaIgnore", "Ignore mana if can kill in x AA").SetValue(new Slider(4, 10, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu("Q Config").SubMenu("Harass Q enemy:").AddItem(new MenuItem("harasQ" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-
              
             Config.SubMenu("W Config").AddItem(new MenuItem("Wcombo", "Combo W").SetValue(true));
             Config.SubMenu("W Config").AddItem(new MenuItem("Wharass", "W harass").SetValue(true));
@@ -204,7 +204,17 @@ namespace Jinx_Genesis
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!E.IsReady() || sender.IsMinion || !sender.IsEnemy || !Config.Item("Espell").GetValue<bool>() || Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(E.Range) )
+
+            if (sender.IsMinion)
+                return;
+
+            if (sender.IsMe)
+            {
+                if (args.SData.Name == "JinxWMissile")
+                    WCastTime = Game.Time;
+            }
+
+            if (!E.IsReady() || !sender.IsEnemy || !Config.Item("Espell").GetValue<bool>() || Player.ManaPercent < Config.Item("EmanaCombo").GetValue<Slider>().Value || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(E.Range) )
                 return;
 
             var foundSpell = Spells.Find(x => args.SData.Name.ToLower() == x);
@@ -217,7 +227,7 @@ namespace Jinx_Genesis
         private static void Game_OnGameUpdate(EventArgs args)
         {
             SetValues();
-            
+
             if (Q.IsReady())
                 Qlogic();
             if (W.IsReady())
@@ -289,12 +299,13 @@ namespace Jinx_Genesis
 
                         if (cast)
                         {
+                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range) && W.GetDamage(target) > target.Health && W.Instance.Cooldown - (W.Instance.CooldownExpires - Game.Time) < 1.1)
+                                return;
 
                             if (target.CountEnemiesInRange(400) > Config.Item("Raoe").GetValue<Slider>().Value)
                                 CastSpell(R, target);
-                            if (Config.Item("RoverW").GetValue<bool>() && target.IsValidTarget(W.Range-200) && W.GetDamage(target) > target.Health &&  (W.Instance.CooldownExpires - Game.Time <  2 || W.Instance.CooldownExpires - Game.Time + 4> W.Instance.Cooldown))
-                                return;
-                            if (WValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
+
+                            if (RValidRange(target) && target.CountAlliesInRange(Config.Item("Rover").GetValue<Slider>().Value) == 0)
                                 CastSpell(R, target);
                         }
                     }
