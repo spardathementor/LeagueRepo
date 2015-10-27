@@ -369,7 +369,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private int CountMinionsInRange(float range, Vector3 pos)
         {
-            var minions = MinionManager.GetMinions(pos, range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
+            var minions = MinionManager.GetMinions(pos, range);
             int count = 0;
             foreach (var minion in minions)
             {
