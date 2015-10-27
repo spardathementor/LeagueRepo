@@ -106,9 +106,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            if (Config.Item("autoR", true).GetValue<bool>())
+            if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(1500) == 0)
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.CountEnemiesInRange(Q.Range+ 300) == 0 && target.CountAlliesInRange(600) == 0 && OktwCommon.ValidUlt(target)))
+                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && target.CountAlliesInRange(600) == 0 && OktwCommon.ValidUlt(target)))
                 {
                     float predictedHealth = target.Health + target.HPRegenRate * 5;
                     float Rdmg = OktwCommon.GetKsDamage(target, R);
