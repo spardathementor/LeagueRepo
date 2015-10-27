@@ -186,7 +186,7 @@ namespace OneKeyToWin_AIO_Sebby
                 || target.HasBuff("deathdefiedbuff")
                 || target.HasBuff("Undying Rage")
                 || target.HasBuff("Chrono Shift")
-                || (target.HasBuff("kindrednodeathbuff"))
+                || target.HasBuff("kindrednodeathbuff")
                 )
                 return false;
             else
@@ -312,7 +312,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static int CountEnemyMinions(Obj_AI_Base target, float range)
         {
-            var allMinions = MinionManager.GetMinions(target.Position, range, MinionTypes.All);
+            var allMinions = MinionManager.GetMinions(target.Position, range);
             if (allMinions != null)
                 return allMinions.Count;
             else
