@@ -28,7 +28,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Q.SetSkillshot(0.25f, 110f, 870f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.6f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(2f, 400f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(2f, 420f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             LoadMenuOKTW();
 
@@ -306,7 +306,7 @@ namespace OneKeyToWin_AIO_Sebby
                         R.Cast();
 
                 }
-                else if (!Program.None &&(RMissile.Position.CountEnemiesInRange(450) == 0 || Player.Mana < EMANA + QMANA))
+                else if (!Program.None &&(RMissile.Position.CountEnemiesInRange(470) == 0 || Player.Mana < EMANA + QMANA))
                 {
                     R.Cast();
                 }
