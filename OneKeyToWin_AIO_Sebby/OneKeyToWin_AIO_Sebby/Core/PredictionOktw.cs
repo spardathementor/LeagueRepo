@@ -1208,7 +1208,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             var info = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
             info.NewPathTick = Utils.TickCount;
-            info.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
+            if(args.Path.Last() != sender.ServerPosition)
+                info.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
 
             if (info.PathBank.Count > 3)
                 info.PathBank.Remove(info.PathBank.First());
