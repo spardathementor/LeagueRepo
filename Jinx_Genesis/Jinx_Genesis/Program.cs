@@ -484,7 +484,7 @@ namespace Jinx_Genesis
             }
             else
             {
-                var t = TargetSelector.GetTarget(Q.Range + 60, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(Q.Range + 40, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
                 {
                     if ((!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) >= Config.Item("Qaoe").GetValue<Slider>().Value))
