@@ -455,6 +455,10 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
                         QWER.Cast(poutput2.CastPosition);
+                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= Core.HitChance.High)
+                    {
+                        QWER.Cast(poutput2.CastPosition);
+                    }
 
                 }
                 else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
