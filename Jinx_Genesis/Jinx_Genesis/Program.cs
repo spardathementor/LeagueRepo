@@ -125,9 +125,9 @@ namespace Jinx_Genesis
             Config.SubMenu("R Config").AddItem(new MenuItem("Rcustome", "Custome minimum range").SetValue(new Slider(1000, 1600, 0)));
             Config.SubMenu("R Config").AddItem(new MenuItem("RcustomeMax", "Max range").SetValue(new Slider(3000, 10000, 0)));
             Config.SubMenu("R Config").AddItem(new MenuItem("Raoe", "R if can hit x target and can kill").SetValue(new Slider(2, 5, 0)));
-            Config.SubMenu("R Config").SubMenu("OverKill protrection").AddItem(new MenuItem("Rover", "Don't R if allies near target in x range ").SetValue(new Slider(500, 1000, 0)));
-            Config.SubMenu("R Config").SubMenu("OverKill protrection").AddItem(new MenuItem("RoverAA", "Don't R if Jinx winding up").SetValue(true));
-            Config.SubMenu("R Config").SubMenu("OverKill protrection").AddItem(new MenuItem("RoverW", "Don't R if can W KS").SetValue(true));
+            Config.SubMenu("R Config").SubMenu("OverKill protection").AddItem(new MenuItem("Rover", "Don't R if allies near target in x range ").SetValue(new Slider(500, 1000, 0)));
+            Config.SubMenu("R Config").SubMenu("OverKill protection").AddItem(new MenuItem("RoverAA", "Don't R if Jinx winding up").SetValue(true));
+            Config.SubMenu("R Config").SubMenu("OverKill protection").AddItem(new MenuItem("RoverW", "Don't R if can W KS").SetValue(true));
 
             //Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("LaneClearmode", "LaneClear").SetValue(true));
             //Config.SubMenu("MISC").SubMenu("Use harass mode").AddItem(new MenuItem("Mixedmode", "Mixed").SetValue(true));
@@ -141,6 +141,7 @@ namespace Jinx_Genesis
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("WmanaHarass", "W harass mana").SetValue(new Slider(40, 100, 0)));
             Config.SubMenu("Mana Manager").AddItem(new MenuItem("EmanaCombo", "E mana").SetValue(new Slider(20, 100, 0)));
 
+            Config.SubMenu("Prediction Config").AddItem(new MenuItem("PredictionMODE", "Prediction MODE").SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION"}, 1)));
             Config.SubMenu("Prediction Config").AddItem(new MenuItem("Wpred", "W Hit Chance").SetValue(new StringList(new[] {"VeryHigh W", "High W"}, 0)));
             Config.SubMenu("Prediction Config").AddItem(new MenuItem("Epred", "E Hit Chance").SetValue(new StringList(new[] { "VeryHigh E", "High E" }, 0)));
             Config.SubMenu("Prediction Config").AddItem(new MenuItem("Rpred", "R Hit Chance").SetValue(new StringList(new[] { "VeryHigh R", "High R" }, 0)));
@@ -598,26 +599,95 @@ namespace Jinx_Genesis
 
         private static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
-            if(QWER.Slot == SpellSlot.W)
+            if (Config.Item("PredictionMODE").GetValue<StringList>().SelectedIndex == 0)
             {
-                if (Config.Item("Wpred").GetValue<StringList>().SelectedIndex == 0)
-                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
-                else
-                    QWER.Cast(target);
+                if (QWER.Slot == SpellSlot.W)
+                {
+                    if (Config.Item("Wpred").GetValue<StringList>().SelectedIndex == 0)
+                        QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                    else
+                        QWER.Cast(target);
+                }
+                if (QWER.Slot == SpellSlot.R)
+                {
+                    if (Config.Item("Rpred").GetValue<StringList>().SelectedIndex == 0)
+                        QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                    else
+                        QWER.Cast(target);
+                }
+                if (QWER.Slot == SpellSlot.E)
+                {
+                    if (Config.Item("Epred").GetValue<StringList>().SelectedIndex == 0)
+                        QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
+                    else
+                        QWER.Cast(target);
+                }
             }
-            if (QWER.Slot == SpellSlot.R)
+            else
             {
-                if (Config.Item("Rpred").GetValue<StringList>().SelectedIndex == 0)
-                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
-                else
-                    QWER.Cast(target);
-            }
-            if (QWER.Slot == SpellSlot.E)
-            {
-                if (Config.Item("Epred").GetValue<StringList>().SelectedIndex == 0)
-                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
-                else
-                    QWER.Cast(target);
+                Core.SkillshotType CoreType2 = Core.SkillshotType.SkillshotLine;
+                bool aoe2 = false;
+
+                if (QWER.Type == SkillshotType.SkillshotCircle)
+                {
+                    CoreType2 = Core.SkillshotType.SkillshotCircle;
+                    aoe2 = true;
+                }
+
+                var predInput2 = new Core.PredictionInput
+                {
+                    Aoe = aoe2,
+                    Collision = QWER.Collision,
+                    Speed = QWER.Speed,
+                    Delay = QWER.Delay,
+                    Range = QWER.Range,
+                    From = Player.ServerPosition,
+                    Radius = QWER.Width,
+                    Unit = target,
+                    Type = CoreType2
+                };
+
+                var poutput2 = Core.Prediction.GetPrediction(predInput2);
+
+                if (QWER.Slot == SpellSlot.W)
+                {
+                    if (Config.Item("Wpred").GetValue<StringList>().SelectedIndex == 0)
+                    {
+                        if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                            QWER.Cast(poutput2.CastPosition);
+                    }
+                    else
+                    {
+                        if (poutput2.Hitchance >= Core.HitChance.High)
+                            QWER.Cast(poutput2.CastPosition);
+                    }
+                }
+                if (QWER.Slot == SpellSlot.R)
+                {
+                    if (Config.Item("Rpred").GetValue<StringList>().SelectedIndex == 0)
+                    {
+                        if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                            QWER.Cast(poutput2.CastPosition);
+                    }
+                    else
+                    {
+                        if (poutput2.Hitchance >= Core.HitChance.High)
+                            QWER.Cast(poutput2.CastPosition);
+                    }
+                }
+                if (QWER.Slot == SpellSlot.E)
+                {
+                    if (Config.Item("Epred").GetValue<StringList>().SelectedIndex == 0)
+                    {
+                        if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                            QWER.Cast(poutput2.CastPosition);
+                    }
+                    else
+                    {
+                        if (poutput2.Hitchance >= Core.HitChance.High)
+                            QWER.Cast(poutput2.CastPosition);
+                    }
+                }
             }
         }
 
