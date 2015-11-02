@@ -464,8 +464,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
                     result.Hitchance = HitChance.Medium;
-                else if (input.Unit.Path.Count() == 0 && input.Unit.Position != input.Unit.ServerPosition)
-                    result.Hitchance = HitChance.Medium;
                 else if (input.Unit.Path.Count() > 0 && distanceUnitToWaypoint < backToFront)
                 {
                     result.Hitchance = HitChance.Medium;
