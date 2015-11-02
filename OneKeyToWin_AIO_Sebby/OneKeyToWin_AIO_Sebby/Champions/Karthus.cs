@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 520);
             R = new Spell(SpellSlot.R, 20000);
 
-            Q.SetSkillshot(1.1f, 160f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(1f, 150f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.5f, 50f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             R.DamageType = TargetSelector.DamageType.Magical;
@@ -211,13 +211,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
                 if (Config.Item("farmQout", true).GetValue<bool>())
                 {
-                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && !Orbwalker.InAutoAttackRange(minion)  ))
+                    foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range)   ))
                     {
-                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 1000);
-                        if (hpPred < GetQDamage(minion) * 0.9  && hpPred >minion.Health - hpPred)
+                        if (!Orbwalker.InAutoAttackRange(minion) || (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value) || (!minion.UnderTurret(true) && minion.UnderTurret()))
                         {
-                            Q.Cast(minion);
-                            return;
+                            var hpPred = HealthPrediction.GetHealthPrediction(minion, 1000);
+                            if (hpPred < GetQDamage(minion) * 0.9 && hpPred > minion.Health - hpPred * 2)
+                            {
+                                Q.Cast(minion);
+                                return;
+                            }
                         }
                     }
                 }
