@@ -213,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range)   ))
                     {
-                        if (!Orbwalker.InAutoAttackRange(minion) || (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value) || (!minion.UnderTurret(true) && minion.UnderTurret()))
+                        if (!Orbwalker.InAutoAttackRange(minion) || (Program.LaneClear && Config.Item("farmQ", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value) || (!minion.UnderTurret(true) && minion.UnderTurret()))
                         {
                             var hpPred = HealthPrediction.GetHealthPrediction(minion, 1000);
                             if (hpPred < GetQDamage(minion) * 0.9 && hpPred > minion.Health - hpPred * 2)
