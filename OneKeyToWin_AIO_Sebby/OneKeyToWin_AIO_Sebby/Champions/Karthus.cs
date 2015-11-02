@@ -49,10 +49,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("WGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("autoE", "Auto E if enemy in range", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("Emana", "E % minimum mana", true).SetValue(new Slider(20, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E if enemy in range", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Emana", "E % minimum mana", true).SetValue(new Slider(20, 100, 0)));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1500, 2000, 0)));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -66,6 +67,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoZombie", "Auto zombie mode COMBO / LANECLEAR", true).SetValue(true));
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
            // Drawing.OnEndScene += Drawing_OnEndScene;
@@ -90,6 +92,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void Game_OnGameUpdate(EventArgs args)
         {
 
+            if (Player.IsZombie)
+            {
+                if (Config.Item("autoZombie", true).GetValue<bool>())
+                {
+                    if (Player.CountEnemiesInRange(Q.Range) > 0)
+                        Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.Combo;
+                    else
+                        Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.LaneClear;
+                }
+            }
+            else
+            {
+                Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.None;
+            }
+
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -107,35 +124,55 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(1500) == 0)
+            if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(Config.Item("Renemy", true).GetValue<Slider>().Value) == 0)
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget() && target.Health < R.GetDamage(target) * 1.5 && target.CountAlliesInRange(600) == 0 && OktwCommon.ValidUlt(target)))
+                foreach (var target in Program.Enemies.Where(target => target.IsValid && !target.IsDead))
                 {
-                    float predictedHealth = target.Health + target.HPRegenRate * 5;
-                    float Rdmg = OktwCommon.GetKsDamage(target, R);
-
-                    if (Player.HasBuff("itemmagicshankcharge"))
+                    if (target.IsValidTarget())
                     {
-                        if (Player.GetBuff("itemmagicshankcharge").Count == 100)
+                        float predictedHealth = target.Health + target.HPRegenRate * 4;
+                        float Rdmg = OktwCommon.GetKsDamage(target, R);
+
+                        if (Player.HasBuff("itemmagicshankcharge"))
                         {
-                            Rdmg += (float)Player.CalcDamage(target, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
+                            if (Player.GetBuff("itemmagicshankcharge").Count == 100)
+                            {
+                                Rdmg += (float)Player.CalcDamage(target, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
+                            }
+                        }
+
+                        if (target.HealthPercent > 30)
+                        {
+                            if (Items.HasItem(3155, target))
+                            {
+                                Rdmg = Rdmg - 250;
+                            }
+
+                            if (Items.HasItem(3156, target))
+                            {
+                                Rdmg = Rdmg - 400;
+                            }
+                        }
+
+                        if (Rdmg > predictedHealth)
+                        {
+                            R.Cast();
+                            Program.debug("R normal");
                         }
                     }
-
-                    if (Items.HasItem(3155, target))
+                    else if(!target.IsVisible)
                     {
-                        Rdmg = Rdmg - 250;
-                    }
-
-                    if (Items.HasItem(3156, target))
-                    {
-                        Rdmg = Rdmg - 400;
-                    }
-
-                    if (Rdmg > predictedHealth)
-                    {
-                        R.Cast();
-                        Program.debug("R normal");
+                        var ChampionInfoOne = Core.OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == target.NetworkId);
+                        if (ChampionInfoOne != null )
+                        {
+                            var timeInvisible = Game.Time - ChampionInfoOne.LastVisableTime;
+                            if (timeInvisible > 3 && timeInvisible < 10)
+                            {
+                                float predictedHealth = target.Health + target.HPRegenRate * (4+ timeInvisible);
+                                if (R.GetDamage(target) > predictedHealth)
+                                    R.Cast();
+                            }   
+                        }
                     }
                 }
             }
@@ -256,7 +293,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Jungle()
         {
-            if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
+            if (Program.LaneClear && Player.Mana > RMANA + QMANA )
             {
                 var mobs = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
                 if (mobs.Count > 0)
