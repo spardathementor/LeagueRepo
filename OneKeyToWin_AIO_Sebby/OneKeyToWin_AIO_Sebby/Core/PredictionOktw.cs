@@ -462,7 +462,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (result.Hitchance != HitChance.Medium)
             {
-                if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
+
+                if ((input.Unit.Path.Count() > 0) != input.Unit.IsMoving)
+                    result.Hitchance = HitChance.Medium;
+                else if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
                     result.Hitchance = HitChance.Medium;
                 else if (input.Unit.Path.Count() > 0 && distanceUnitToWaypoint < backToFront)
                 {
@@ -1186,7 +1189,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 if (hero.IsVisible)
                 {
-                    if (hero.Path.Count() > 0)
+                    if (hero.Path.Count() > 0 || hero.Position != hero.ServerPosition || hero.IsMoving)
                         UnitTrackerInfoList.Find(x => x.NetworkId == hero.NetworkId).StopMoveTick = Utils.TickCount;
                 }
                 else
