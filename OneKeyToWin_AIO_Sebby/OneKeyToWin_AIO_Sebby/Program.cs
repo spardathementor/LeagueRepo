@@ -327,7 +327,7 @@ namespace OneKeyToWin_AIO_Sebby
                 args.Process = false;
             }
 
-            if (Config.Item("supportMode",true).GetValue<bool>() && (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit))
+            if (Config.Item("supportMode",true).GetValue<bool>() && (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
             {
                 if (((Obj_AI_Base)Orbwalker.GetTarget()).IsMinion) args.Process = false;
             }
