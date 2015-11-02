@@ -375,8 +375,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             float speedDelay = distanceFromToUnit / input.Speed;
 
-            
-
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 speedDelay = 0;
             else
@@ -448,9 +446,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.8 + (input.Radius * 0.001))
-                    result.Hitchance = HitChance.VeryHigh;
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.001))
+                if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.9 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
                 else
                     result.Hitchance = HitChance.Medium;
@@ -474,7 +470,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     result.Hitchance = HitChance.Medium;
                 }
-                else if (input.Unit.Path.Count() > 1)
+                else if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 1)
                     result.Hitchance = HitChance.Medium;
                 else
 
