@@ -410,7 +410,7 @@ namespace Jinx_Genesis
 
             if (Config.Item("Wmode").GetValue<StringList>().SelectedIndex == 0)
             {
-                if (range > GetRealPowPowRange(t))
+                if (range > GetRealPowPowRange(t) && Player.CountEnemiesInRange(GetRealPowPowRange(t)) == 0)
                     return true;
                 else
                     return false;
@@ -418,14 +418,14 @@ namespace Jinx_Genesis
             }
             else if (Config.Item("Wmode").GetValue<StringList>().SelectedIndex == 1)
             {
-                if (range > Q.Range + 50)
+                if (range > Q.Range + 50 && Player.CountEnemiesInRange(Q.Range + 50) == 0)
                     return true;
                 else
                     return false;
             }
             else if (Config.Item("Wmode").GetValue<StringList>().SelectedIndex == 2)
             {
-                if(range > Config.Item("Wcustome").GetValue<Slider>().Value && !Orbwalking.InAutoAttackRange(t))
+                if(range > Config.Item("Wcustome").GetValue<Slider>().Value && Player.CountEnemiesInRange(Config.Item("Wcustome").GetValue<Slider>().Value) == 0)
                     return true;
                 else
                     return false;
@@ -439,11 +439,12 @@ namespace Jinx_Genesis
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && WValidRange(t))
             {
-                if ( Config.Item("Wks").GetValue<bool>() && GetKsDamage(t,W) > t.Health && ValidUlt(t))
+                if (Config.Item("Wks").GetValue<bool>() && GetKsDamage(t, W) > t.Health && ValidUlt(t))
                 {
                     CastSpell(W, t);
                 }
-                else if (Combo && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaCombo").GetValue<Slider>().Value)
+
+                if (Combo && Config.Item("Wcombo").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaCombo").GetValue<Slider>().Value)
                 {
                     CastSpell(W, t);
                 }
@@ -460,6 +461,7 @@ namespace Jinx_Genesis
                             CastSpell(W, enemy);
                     }
                 }
+                
             }
         }
 
