@@ -129,7 +129,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValid && !target.IsDead))
                 {
-                    if (target.IsValidTarget() && Player.CountAlliesInRange(Config.Item("RenemyA", true).GetValue<Slider>().Value) == 0)
+                    if (target.IsValidTarget() && target.CountAlliesInRange(Config.Item("RenemyA", true).GetValue<Slider>().Value) == 0)
                     {
                         float predictedHealth = target.Health + target.HPRegenRate * 4;
                         float Rdmg = OktwCommon.GetKsDamage(target, R);
