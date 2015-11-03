@@ -53,6 +53,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Emana", "E % minimum mana", true).SetValue(new Slider(20, 100, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRzombie", "Auto R upon dying if can help team", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1500, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("RenemyA", "Don't R if ally in x range near target", true).SetValue(new Slider(800, 2000, 0)));
 
@@ -102,6 +103,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else
                         Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.LaneClear;
                 }
+                if (R.IsReady() && Config.Item("autoRzombie", true).GetValue<bool>())
+                {
+                    float timeDeadh = 8;
+                    timeDeadh = OktwCommon.GetPassiveTime(Player, "KarthusDeathDefiedBuff");
+                    Program.debug("Time " + timeDeadh);
+                    if (timeDeadh < 4)
+                    {
+                        foreach (var target in Program.Enemies.Where(target => target.IsValidTarget() && OktwCommon.ValidUlt(target)) )
+                        {
+                            var rDamage = R.GetDamage(target);
+                            if (target.Health < 2 * R.GetDamage(target) && target.CountAlliesInRange(800) > 0)
+                                R.Cast();
+                            if (target.Health + target.HPRegenRate * 5 <  R.GetDamage(target) )
+                                R.Cast();
+                        }
+                    }
+                }
             }
             else
             {
@@ -147,7 +165,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             }
                         }
 
-                        if (Rdmg > predictedHealth)
+                        if (Rdmg > predictedHealth && OktwCommon.ValidUlt(target))
                         {
                             R.Cast();
                             Program.debug("R normal");
