@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 520);
             R = new Spell(SpellSlot.R, 20000);
 
-            Q.SetSkillshot(1f, 150f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(1.02f, 150f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.5f, 50f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             R.DamageType = TargetSelector.DamageType.Magical;
@@ -113,9 +113,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         foreach (var target in Program.Enemies.Where(target => target.IsValidTarget() && OktwCommon.ValidUlt(target)) )
                         {
                             var rDamage = R.GetDamage(target);
-                            if (target.Health < 2 * R.GetDamage(target) && target.CountAlliesInRange(800) > 0)
+                            if (target.Health < 3 * rDamage && target.CountAlliesInRange(800) > 0)
                                 R.Cast();
-                            if (target.Health + target.HPRegenRate * 5 <  R.GetDamage(target) )
+                            if (target.Health < rDamage * 1.5 && target.Distance(Player.Position) < 900)
+                                R.Cast();
+                            if (target.Health + target.HPRegenRate * 5 < rDamage)
                                 R.Cast();
                         }
                     }
