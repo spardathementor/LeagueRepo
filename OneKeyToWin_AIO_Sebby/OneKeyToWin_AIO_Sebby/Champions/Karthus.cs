@@ -133,14 +133,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         float predictedHealth = target.Health + target.HPRegenRate * 4;
                         float Rdmg = OktwCommon.GetKsDamage(target, R);
 
-                        if (Player.HasBuff("itemmagicshankcharge"))
-                        {
-                            if (Player.GetBuff("itemmagicshankcharge").Count == 100)
-                            {
-                                Rdmg += (float)Player.CalcDamage(target, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
-                            }
-                        }
-
                         if (target.HealthPercent > 30)
                         {
                             if (Items.HasItem(3155, target))
