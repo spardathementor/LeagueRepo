@@ -495,7 +495,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 positionGang = positionGang + 100;
             }
 
-            if (!Config.Item("onlyUtility", true).GetValue<bool>())
+            if (Program.AIOmode != 2)
             {
                 DrawOrbwalkerRange();
                 DrawOrbwalkerTarget();
