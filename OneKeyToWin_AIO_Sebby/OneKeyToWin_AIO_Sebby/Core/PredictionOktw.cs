@@ -567,7 +567,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Unit.IsValid<Obj_AI_Hero>() && UnitTracker.PathCalc(input.Unit))
             {
-                Program.debug(input.Unit.BaseSkinName + Game.Time);
+                //Program.debug(input.Unit.BaseSkinName + Game.Time);
                 return GetPositionOnPath(input, UnitTracker.GetPathWayCalc(input.Unit), speed);
                 
             }
