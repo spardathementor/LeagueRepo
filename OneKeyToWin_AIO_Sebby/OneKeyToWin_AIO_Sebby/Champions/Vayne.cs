@@ -104,7 +104,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             var t = target as Obj_AI_Hero;
 
-            if (Q.IsReady() && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() && t.IsValidTarget() && (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")) && t.Position.Distance(dashPosition) < 600 && dashPosition.CountEnemiesInRange(800) < 3)
+            if (Q.IsReady() && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() && t.IsValidTarget() && (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
             {
                 Q.Cast(dashPosition, true);
                 Program.debug("" + t.Name + GetWStacks(t));
@@ -230,6 +230,7 @@ namespace OneKeyToWin_AIO_Sebby
                 && !Player.Position.Extend(dash, Q.Range - 100).IsWall()
                 && !Player.Position.Extend(dash, Q.Range - 200).IsWall()
                 && !Player.Position.Extend(dash, Q.Range - 300).IsWall()
+                && dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1
                 && (!dash.UnderTurret(true) || Program.Combo))
                 return true;
             else
