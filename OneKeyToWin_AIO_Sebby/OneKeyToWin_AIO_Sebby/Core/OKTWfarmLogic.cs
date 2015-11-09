@@ -34,35 +34,30 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private bool MinionOK(Obj_AI_Base minion , Obj_AI_Turret turret)
         {
             Orbwalking.Attack = false;
-            var turrentDmg = turret.GetAutoAttackDamage(minion) * 1.1;
+            var turrentDmg = turret.GetAutoAttackDamage(minion) * 0.8 ;
 
-            var hits = minion.Health / turrentDmg;
+            var hits = (int)(minion.Health / turrentDmg);
 
-            var playerDmg = Player.GetAutoAttackDamage(minion) * 1.1;
-            var minionHel = minion.Health * 0.9;
+            var playerDmg = Player.GetAutoAttackDamage(minion);
+            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 50);
             
             var hpAfter = minionHel % turrentDmg;
 
-            if (minionHel  < turrentDmg + playerDmg && minionHel > turrentDmg)
+            if ((hpAfter > playerDmg || hpAfter < 15))
             {
-                //Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
-                //Program.debug("OVER HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
-                return true;
-            }
-            if ((hpAfter > playerDmg || hpAfter < 5) && hits > 0 )
-            {
-                //Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
-                //Program.debug("HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
+                Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
+                Program.debug("HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
                 Orbwalker.ForceTarget(minion);
                 Orbwalking.Attack = true;
                 return false;
             }
             else
             {
-               // Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
-                //Program.debug("OK HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
+                Program.debug("else HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
                 return true;
-            }
+            } 
+            
+            return false;
 
         }
 
@@ -80,17 +75,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 var minions = MinionManager.GetMinions(turret.Position,900, MinionTypes.All);
 
-                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 400))
+                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 50))
                 {
+                    Orbwalker.ForceTarget(minionAgro);
                     Orbwalking.Attack = true;
+                    Program.debug(" Force AGRO ");
                     return;
                 }
                 
                 foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.UnderTurret(false) && Orbwalking.InAutoAttackRange(minion)))
                 {
-                    if (Player.GetAutoAttackDamage(minion) > HealthPrediction.LaneClearHealthPrediction(minion, 400))
+                    if (Player.GetAutoAttackDamage(minion) > HealthPrediction.LaneClearHealthPrediction(minion, 50))
                     {
+                        Orbwalker.ForceTarget(minion);
                         Orbwalking.Attack = true;
+                        Program.debug(" Force Minion ");
                         return;
                     }
                     Orbwalking.Attack = false;
@@ -99,17 +98,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var minions2 = minions.OrderBy(minion => turret.Distance(minion.Position));
                 int count = 0;
 
-                if ((Game.Time - minionTime > 1.1 && Game.Time - minionTime < 1.2) || (Game.Time - minionTime > 1.4))
+                if ((Game.Time - minionTime > 0.8 && Game.Time - minionTime < 1.0) || (Game.Time - minionTime > 1.4))
                 {
                     foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.UnderTurret(false) && Orbwalking.InAutoAttackRange(minion)))
                     {
-                        if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && MinionOK(minionAgro, turret))
+                        if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) )
                         {
-
+                            if(MinionOK(minionAgro, turret))
+                                count++;
                         }
-                        else if (MinionOK(minion, turret))
+                        if (MinionOK(minion, turret))
                         {
-                            //Program.debug("Minion OK");
                             count++;
                         }
                         else
@@ -117,7 +116,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                         if (count > 1)
                         {
-                            //Program.debug("2 minion OK");
+                            Program.debug("2 minion OK");
                             return;
                         }
                     }
