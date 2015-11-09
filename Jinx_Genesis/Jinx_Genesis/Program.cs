@@ -289,7 +289,7 @@ namespace Jinx_Genesis
 
                         foreach (var enemy in Enemies.Where(enemy => enemy.IsValidTarget()))
                         {
-                            if (enemy.SkinName == target.SkinName || !cast)
+                            if (enemy.NetworkId == target.NetworkId || !cast)
                                 continue;
                             PredictionOutput prediction = R.GetPrediction(enemy);
                             Vector3 predictedPosition = prediction.CastPosition;
