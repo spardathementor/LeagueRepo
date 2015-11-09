@@ -54,6 +54,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser & anti-meele").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser & anti-meele").AddItem(new MenuItem("RgapHP", " use gapcloser only under % hp", true).SetValue(new Slider(40, 100, 0)));
+
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("jungle", "Jungle Farm", true).SetValue(true));
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -61,6 +63,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Orbwalking.BeforeAttack += BeforeAttack;
             Orbwalking.AfterAttack += afterAttack;
             Interrupter2.OnInterruptableTarget +=Interrupter2_OnInterruptableTarget;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
         }
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
@@ -184,11 +187,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (Player.Distance(enemy.Position) < Player.Distance(bestEnemy.Position))
                     bestEnemy = enemy;
 
-                if (OktwCommon.GetKsDamage(enemy,R) + GetEDmg(enemy) > enemy.Health  && Config.Item("autoR", true).GetValue<bool>())
+                if (OktwCommon.GetKsDamage(enemy,R) + GetEDmg(enemy) > enemy.Health  && GetEDmg(enemy) < enemy.Health && Config.Item("autoR", true).GetValue<bool>())
                 {
                     R.Cast(enemy);
                     Program.debug("R ks");
-
                 }
                 if (Config.Item("turrentR", true).GetValue<bool>() && !Player.UnderTurret(false))
                 {
@@ -201,7 +203,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Program.debug("R turrent");
                     }
                 }
-                if (Player.Health < Player.MaxHealth * 0.3 && enemy.IsValidTarget(270) && enemy.IsMelee && Config.Item("GapCloser" + enemy.ChampionName).GetValue<bool>())
+                if (Player.HealthPercent < Config.Item("RgapHP", true).GetValue<Slider>().Value && enemy.IsValidTarget(270) && enemy.IsMelee && Config.Item("GapCloser" + enemy.ChampionName).GetValue<bool>())
                 {
                     R.Cast(enemy);
                     Program.debug("R Meele");
@@ -241,12 +243,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (R.IsReady())
+            if (R.IsReady() && Player.HealthPercent < Config.Item("RgapHP", true).GetValue<Slider>().Value)
             {
-                var Target = gapcloser.Sender;
-                if (Target.IsValidTarget(R.Range) && Config.Item("GapCloser" + Target.ChampionName).GetValue<bool>())
+                var t = gapcloser.Sender;
+                if (t.IsValidTarget(R.Range) && Config.Item("GapCloser" + t.ChampionName).GetValue<bool>())
                 {
-                    R.Cast(Target);
+                    R.Cast(t);
                 }
             }
         }
