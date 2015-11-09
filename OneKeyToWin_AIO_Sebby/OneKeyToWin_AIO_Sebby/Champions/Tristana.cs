@@ -184,7 +184,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (Player.Distance(enemy.Position) < Player.Distance(bestEnemy.Position))
                     bestEnemy = enemy;
 
-                if (R.GetDamage(enemy) + GetEDmg(enemy) > enemy.Health + enemy.HPRegenRate && Config.Item("autoR", true).GetValue<bool>())
+                if (OktwCommon.GetKsDamage(enemy,R) + GetEDmg(enemy) > enemy.Health  && Config.Item("autoR", true).GetValue<bool>())
                 {
                     R.Cast(enemy);
                     Program.debug("R ks");
