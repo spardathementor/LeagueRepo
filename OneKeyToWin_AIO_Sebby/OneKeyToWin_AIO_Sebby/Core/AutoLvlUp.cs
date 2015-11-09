@@ -40,7 +40,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if (Config.Item("AutoLvl").GetValue<bool>())
+            if (Config.Item("AutoLvl").GetValue<bool>() && ObjectManager.Player.Level < 4)
             {
                 if ((lvl2 == lvl3 || lvl2 == lvl4 || lvl3 == lvl4) && (int)Game.Time % 2 == 0)
                 {
