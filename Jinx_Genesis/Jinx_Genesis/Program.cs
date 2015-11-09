@@ -272,7 +272,13 @@ namespace Jinx_Genesis
                 {
                     
                     float predictedHealth = target.Health + target.HPRegenRate * 2;
+
                     var Rdmg = R.GetDamage(target, 1);
+                    if(Player.Distance(target.Position) < 1500)
+                    {
+
+                        Rdmg = R.GetDamage(target) * (Player.Distance(target.Position) / 150);
+                    }
 
                     if (Rdmg > predictedHealth)
                     {
