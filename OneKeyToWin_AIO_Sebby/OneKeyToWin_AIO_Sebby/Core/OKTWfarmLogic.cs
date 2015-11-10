@@ -46,7 +46,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var hits = (int)(minion.Health / turrentDmg);
 
             var playerDmg = Player.GetAutoAttackDamage(minion);
-            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 200);
+            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 100);
             
             var hpAfter = minionHel % turrentDmg;
 
