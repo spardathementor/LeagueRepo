@@ -277,7 +277,8 @@ namespace Jinx_Genesis
                     if(Player.Distance(target.Position) < 1500)
                     {
 
-                        Rdmg = R.GetDamage(target) * (Player.Distance(target.Position) / 150);
+                        //Rdmg = R.GetDamage(target) * (Player.Distance(target.Position) / 150);
+                        //Console.WriteLine("Rdmg " + Rdmg);
                     }
 
                     if (Rdmg > predictedHealth)
