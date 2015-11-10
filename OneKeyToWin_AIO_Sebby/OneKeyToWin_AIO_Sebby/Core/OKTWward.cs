@@ -134,6 +134,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     return;
                 }
 
+                if (timer > 1 && timer < 3 && Player.ChampionName == "Karhus" && Q.IsReady() && Player.CountEnemiesInRange(900) == 0)
+                {
+                    if (need.PredictedPos.Distance(Player.Position) < 900)
+                    {
+                        Q.Cast(need.PredictedPos);
+                        return;
+                    }
+                }
+
+
                 if (timer > 1 && timer < 3 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 3000)
