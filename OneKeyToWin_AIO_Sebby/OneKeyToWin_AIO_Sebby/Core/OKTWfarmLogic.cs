@@ -41,16 +41,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             Orbwalking.Attack = false;
             
-            var turrentDmg = 210 + turret.FlatPhysicalDamageMod;
+            var turrentDmg = turret.GetAutoAttackDamage(minion);
             
             var hits = (int)(minion.Health / turrentDmg);
 
             var playerDmg = Player.GetAutoAttackDamage(minion);
-            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 100);
+            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 200);
             
             var hpAfter = minionHel % turrentDmg;
 
-            if ((hpAfter > playerDmg ) && (hits>0 || minionAgro!=minion))
+            if ((hpAfter > playerDmg) && (hits>0 || minionAgro!=minion))
             {
                 Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
                 Program.debug("HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
@@ -79,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 //Program.debug(" turretDmgQQQQQ " + (int)turret.FlatPhysicalDamageMod);
                 var minions = MinionManager.GetMinions(turret.Position,900, MinionTypes.All);
 
-                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 70))
+                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 90))
                 {
                     Orbwalker.ForceTarget(minionAgro);
                     Orbwalking.Attack = true;
@@ -102,7 +102,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var minions2 = minions.OrderBy(minion => turret.Distance(minion.Position));
                 int count = 0;
 
-                if ((Game.Time - minionTime > 0.8 && Game.Time - minionTime < 1.0) || (Game.Time - minionTime > 1.4))
+                if ((Game.Time - minionTime > 0.7 && Game.Time - minionTime < 1) || (Game.Time - minionTime > 1.4))
                 {
                     foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.UnderTurret(false) && Orbwalking.InAutoAttackRange(minion)))
                     {
@@ -118,7 +118,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         else
                             return;
 
-                        if (count > 1)
+                        if (count > 2)
                         {
                             Program.debug("2 minion OK");
                             return;
