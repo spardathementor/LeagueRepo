@@ -20,12 +20,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             Game.OnUpdate +=Game_OnUpdate;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-            Obj_AI_Base.OnDamage += Obj_AI_Base_OnDamage;
-        }
-
-        private void Obj_AI_Base_OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
-        {
-            //Program.debug("Damage "+args.Damage);
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
