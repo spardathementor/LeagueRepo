@@ -248,7 +248,10 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.AddItem(new MenuItem("aiomodes", "!!! PRESS F5 TO RELOAD MODE !!!" ));
             //new Core.OKTWtargetSelector().LoadOKTW();
-            new Core.OKTWfarmLogic().LoadOKTW();
+            if (AIOmode != 2)
+            {
+                new Core.OKTWfarmLogic().LoadOKTW();
+            }
             //new AfkMode().LoadOKTW();
             Config.AddToMainMenu();
             Game.OnUpdate += OnUpdate;
