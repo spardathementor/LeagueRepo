@@ -359,7 +359,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
 
 
-            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 )
+            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0)
             {
 
                 result.Hitchance = HitChance.VeryHigh;
@@ -375,6 +375,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             float speedDelay = distanceFromToUnit / input.Speed;
 
+
+
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 speedDelay = 0;
             else
@@ -382,7 +384,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
-            float fixRange = moveArea * 0.6f;
+            float fixRange = moveArea * 0.7f;
             double angleMove = 30 + (input.Radius / 10) - (input.Delay * 5);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 700f + backToFront;
@@ -446,7 +448,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
-                if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.9 + (input.Radius * 0.001))
+                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.8 + (input.Radius * 0.001))
+                    result.Hitchance = HitChance.VeryHigh;
+                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
                 else
                     result.Hitchance = HitChance.Medium;
@@ -462,16 +466,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (result.Hitchance != HitChance.Medium)
             {
-
-                if ((input.Unit.Path.Count() > 0) != input.Unit.IsMoving)
+                if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
                     result.Hitchance = HitChance.Medium;
-                else if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
+                else if (input.Unit.Path.Count() == 0 && input.Unit.Position != input.Unit.ServerPosition)
                     result.Hitchance = HitChance.Medium;
                 else if (input.Unit.Path.Count() > 0 && distanceUnitToWaypoint < backToFront)
                 {
                     result.Hitchance = HitChance.Medium;
                 }
-                else if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 1)
+                else if (input.Unit.Path.Count() > 1)
                     result.Hitchance = HitChance.Medium;
                 else
 
@@ -567,9 +570,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Unit.IsValid<Obj_AI_Hero>() && UnitTracker.PathCalc(input.Unit))
             {
-                //Program.debug(input.Unit.BaseSkinName + Game.Time);
+                Program.debug(input.Unit.BaseSkinName + Game.Time);
                 return GetPositionOnPath(input, UnitTracker.GetPathWayCalc(input.Unit), speed);
-                
+
             }
             else
                 return GetPositionOnPath(input, input.Unit.GetWaypoints(), speed);
@@ -1189,7 +1192,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 if (hero.IsVisible)
                 {
-                    if (hero.Path.Count() > 0 || hero.Position != hero.ServerPosition || hero.IsMoving)
+                    if (hero.Path.Count() > 0)
                         UnitTrackerInfoList.Find(x => x.NetworkId == hero.NetworkId).StopMoveTick = Utils.TickCount;
                 }
                 else
@@ -1201,11 +1204,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private static void Obj_AI_Hero_OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
         {
-            if (sender.IsMinion || !(sender is Obj_AI_Hero)) return; 
+            if (sender.IsMinion || !(sender is Obj_AI_Hero)) return;
 
             var info = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
             info.NewPathTick = Utils.TickCount;
-            if(args.Path.Last() != sender.ServerPosition)
+            if (args.Path.Last() != sender.ServerPosition)
                 info.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
 
             if (info.PathBank.Count > 3)
@@ -1231,7 +1234,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public static bool PathCalc(Obj_AI_Base unit)
         {
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
-            if(TrackerUnit.PathBank.Count < 3)
+            if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
             if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.45f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
