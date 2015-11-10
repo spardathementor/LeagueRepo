@@ -46,7 +46,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var hits = (int)(minion.Health / turrentDmg);
 
             var playerDmg = Player.GetAutoAttackDamage(minion);
-            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 100);
+            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 500);
             
             var hpAfter = minionHel % turrentDmg;
 
@@ -102,7 +102,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var minions2 = minions.OrderBy(minion => turret.Distance(minion.Position));
                 int count = 0;
 
-                if ((Game.Time - minionTime > 0.7 && Game.Time - minionTime < 1) || (Game.Time - minionTime > 1.4))
+                if ( (Game.Time - minionTime > 1))
                 {
                     foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.UnderTurret(false) && Orbwalking.InAutoAttackRange(minion)))
                     {
