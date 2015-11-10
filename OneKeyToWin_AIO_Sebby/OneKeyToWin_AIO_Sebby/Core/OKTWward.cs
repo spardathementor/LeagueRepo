@@ -127,13 +127,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 if (need == null || need.PredictedPos == null)
                     return;
 
-                if (Player.ChampionName == "Quinn" && W.IsReady() && Game.Time - need.LastVisableTime > 0.5 && Game.Time - need.LastVisableTime < 4 && need.PredictedPos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
+                var timer = Game.Time - need.LastVisableTime;
+
+                if (timer > 0.5 && timer < 4 && Player.ChampionName == "Quinn" && W.IsReady()  && need.PredictedPos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
                 {
                     W.Cast();
                     return;
                 }
 
-                if (Player.ChampionName == "Ashe" && E.IsReady() && Player.Spellbook.GetSpell(SpellSlot.E).Ammo > 1 && Player.CountEnemiesInRange(800) == 0 && Game.Time - need.LastVisableTime > 3 && Game.Time - need.LastVisableTime < 1 && Config.Item("autoE", true).GetValue<bool>())
+                if (timer > 3 && timer < 1 && Player.ChampionName == "Ashe" && E.IsReady() && Player.Spellbook.GetSpell(SpellSlot.E).Ammo > 1 && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 3000)
                     {
@@ -142,7 +144,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                 }
 
-                if (Player.ChampionName == "MissFortune" && E.IsReady() && Game.Time - need.LastVisableTime > 0.5 && Game.Time - need.LastVisableTime < 2 && Program.Combo && Player.Mana > 200f)
+                if (timer > 0.5 && timer < 2 && Player.ChampionName == "MissFortune" && E.IsReady() &&  Program.Combo && Player.Mana > 200f)
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 800)
                     {
@@ -151,7 +153,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                 }
 
-                if (Player.ChampionName == "Caitlyn" && W.IsReady() && Game.Time - need.LastVisableTime < 2 && Player.Mana > 200f && !Player.IsWindingUp && Config.Item("bushW", true).GetValue<bool>())
+                if (timer < 2 && !Player.IsWindingUp && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f &&  Config.Item("bushW", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 800)
                     {
@@ -160,7 +162,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                 }
 
-                if (Game.Time - need.LastVisableTime < 4)
+                if (timer < 4)
                 {
                     if (Config.Item("AutoWardCombo").GetValue<bool>() && Program.AIOmode != 2 && !Program.Combo)
                         return;
