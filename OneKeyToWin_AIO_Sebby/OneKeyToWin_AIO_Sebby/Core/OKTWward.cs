@@ -67,7 +67,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             GameObject.OnCreate +=GameObject_OnCreate;
             GameObject.OnDelete += GameObject_OnDelete;
-
         }
 
         private void Game_OnUpdate(EventArgs args)
@@ -135,7 +134,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     return;
                 }
 
-                if (timer > 3 && timer < 1 && Player.ChampionName == "Ashe" && E.IsReady() && Player.Spellbook.GetSpell(SpellSlot.E).Ammo > 1 && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
+                if (timer > 1 && timer < 3 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 3000)
                     {
