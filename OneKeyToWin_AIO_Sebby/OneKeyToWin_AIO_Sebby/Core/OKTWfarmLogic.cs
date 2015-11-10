@@ -20,6 +20,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             Game.OnUpdate +=Game_OnUpdate;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Obj_AI_Base.OnDamage += Obj_AI_Base_OnDamage;
+        }
+
+        private void Obj_AI_Base_OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            //Program.debug("Damage "+args.Damage);
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -34,16 +40,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private bool MinionOK(Obj_AI_Base minion , Obj_AI_Turret turret)
         {
             Orbwalking.Attack = false;
-            var turrentDmg = turret.GetAutoAttackDamage(minion) * 0.8 ;
-
+            
+            var turrentDmg = 210 + turret.FlatPhysicalDamageMod;
+            
             var hits = (int)(minion.Health / turrentDmg);
 
             var playerDmg = Player.GetAutoAttackDamage(minion);
-            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 50);
+            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 100);
             
             var hpAfter = minionHel % turrentDmg;
 
-            if ((hpAfter > playerDmg || hpAfter < 15))
+            if ((hpAfter > playerDmg ) && (hits>0 || minionAgro!=minion))
             {
                 Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
                 Program.debug("HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
@@ -56,9 +63,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 Program.debug("else HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
                 return true;
             } 
-            
-            return false;
-
         }
 
         private void Game_OnUpdate(EventArgs args)
@@ -72,10 +76,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             foreach (var turret in ObjectManager.Get<Obj_AI_Turret>().Where(turret => turret.IsAlly && Player.Distance(turret.Position)<1000))
             {
-
+                //Program.debug(" turretDmgQQQQQ " + (int)turret.FlatPhysicalDamageMod);
                 var minions = MinionManager.GetMinions(turret.Position,900, MinionTypes.All);
 
-                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 50))
+                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 70))
                 {
                     Orbwalker.ForceTarget(minionAgro);
                     Orbwalking.Attack = true;
