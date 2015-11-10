@@ -78,10 +78,10 @@ namespace OneKeyToWin_AIO_Sebby
                         Player.IssueOrder(GameObjectOrder.MoveTo, t.ServerPosition);
                 }
             }
-            if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp)
+            if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
 
-            if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp)
+            if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
 
             if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp)
@@ -166,7 +166,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(Q, t);
                     else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA * 2 + EMANA)
                         Program.CastSpell(Q, t);
-                    else if ((Program.Farm && ObjectManager.Player.Mana > RMANA + EMANA + QMANA * 2 + WMANA) && !ObjectManager.Player.UnderTurret(true))
+                    else if ((Program.Farm && ObjectManager.Player.Mana > RMANA + EMANA + QMANA * 2 + WMANA) && Config.Item("HarrasQ", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true))
                         Program.CastSpell(Q, t);
                     else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + QMANA + EMANA)
                     {
@@ -333,8 +333,13 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LoadMenuOKTW()
         {
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("HarrasE", "Harras E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("HarrasE", "Harass E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
+
 
             Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("harasW", "Haras W on max range", true).SetValue(true));
