@@ -38,44 +38,10 @@ namespace OneKeyToWin_AIO_Sebby
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell +=Spellbook_OnCastSpell;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-            Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
-            Spellbook.OnStopCast += SpellbookOnStopCast;
-        }
-
-        private void SpellbookOnStopCast(Spellbook sender, SpellbookStopCastEventArgs args)
-        {
-            if (sender.Owner.IsMe)
-            {
-                if(args.StopAnimation && args.DestroyMissile)
-                    LastAATick = 0;
-            }
-        }
-
-        private void Obj_AI_Base_OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (sender.IsMe)
-            {
-                if (!args.SData.IsAutoAttack())
-                {
-                    if (Utils.GameTimeTickCount + Game.Ping / 2 + 25 >= LastAATick + Player.AttackDelay * 1000)
-                    {
-                        //Program.debug("Can attack: " + Orbwalking.CanAttack());
-                        Orbwalking.ResetAutoAttackTimer();
-                    }
-                }
-            }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe)
-            {
-                if (args.SData.IsAutoAttack())
-                {
-                    //Program.debug(Utils.GameTimeTickCount + " AA detection " + args.SData.Name);
-                    LastAATick = Utils.GameTimeTickCount - Game.Ping / 2;
-                }
-            }
 
             if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || !sender.IsValid<Obj_AI_Hero>() || Player.Distance(sender.ServerPosition) > 2000)
                 return;
