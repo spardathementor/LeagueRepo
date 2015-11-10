@@ -56,8 +56,8 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += Game_OnGameUpdate;
             Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_SpellMissile.OnCreate += SpellMissile_OnCreateOld;
-            Obj_SpellMissile.OnDelete += Obj_SpellMissile_OnDelete;
+            GameObject.OnCreate += SpellMissile_OnCreateOld;
+            GameObject.OnDelete += Obj_SpellMissile_OnDelete;
         }
 
         private void Obj_SpellMissile_OnDelete(GameObject sender, EventArgs args)
@@ -86,17 +86,27 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (args.Target == null || !sender.IsEnemy || !args.Target.IsMe || !Config.Item("autoR", true).GetValue<bool>() || R.IsReady() )
+            if ( !sender.IsEnemy || R.IsReady() || !Config.Item("autoR", true).GetValue<bool>())
                 return;
-            var dmg = sender.GetSpellDamage(Player, args.SData.Name);
-            double HpLeft = Player.Health - dmg;
-            double HpPercentage = (dmg * 100) / Player.Health;
-            if (Player.Health - dmg < dmg)
-            {
-                if (HpPercentage >= Config.Item("Rdmg", true).GetValue<Slider>().Value)
-                    R.Cast();
 
-                //Game.PrintChat("" + HpPercentage);
+            double dmg = 0;
+
+            if (args.Target != null && args.Target.IsMe)
+            {
+                dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
+            }
+            else
+            {
+                var castArea = Player.Distance(args.End) * (args.End - Player.ServerPosition).Normalized() + Player.ServerPosition;
+                if (castArea.Distance(Player.ServerPosition) < Player.BoundingRadius / 2)
+                {
+                    dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
+                }
+            }
+
+            if (Player.Health - dmg < (Player.CountEnemiesInRange(600) * Player.Level * 20) + (Player.Level * 20))
+            {
+                R.Cast();
             }
         }
 
@@ -122,17 +132,20 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoR", true).GetValue<bool>())
             {
-                foreach (var t in Program.Enemies.Where(t =>RMissile != null && RMissile.IsValid && t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < 350 && RMissile.Position.Distance(t.ServerPosition) < 350))
+                if (RMissile != null && RMissile.IsValid)
                 {
-                    var comboDmg = R.GetDamage(t) + GetWdmg(t) + Q.GetDamage(t) * 2 + E.GetDamage(t);
+                    foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < 350 && RMissile.Position.Distance(t.ServerPosition) < 350))
+                    {
+                        var comboDmg = R.GetDamage(t) + GetWdmg(t) + Q.GetDamage(t) * 2 + E.GetDamage(t);
 
-                    if (t.Health < comboDmg)
-                        R.Cast();
-                    Program.debug("ks");
-                    if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
-                        R.Cast();
+                        if (t.Health < comboDmg)
+                            R.Cast();
+                        Program.debug("ks");
+                        if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
+                            R.Cast();
+                    }
+
                 }
-
                 if (Player.Health < Player.CountEnemiesInRange(600) * Player.Level * 15)
                 {
                     R.Cast();
@@ -253,7 +266,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Q1.Cast(enemy, true);
                 }
             }
-            else if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && ObjectManager.Player.Mana > RMANA + QMANA + WMANA)
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)
             {
 
                 var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q1.Range, MinionTypes.All);
