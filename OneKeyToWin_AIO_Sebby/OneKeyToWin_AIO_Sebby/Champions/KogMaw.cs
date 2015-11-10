@@ -64,6 +64,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             attackNow = false;
         }
+
         private void Game_OnUpdate(EventArgs args)
         {
             if (Program.LagFree(0))
@@ -113,24 +114,22 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (R.GetDamage(target) > target.Health)
                         Program.CastSpell(R, target);
-                    else if (Program.Combo && Rdmg * 2 > target.Health && ObjectManager.Player.Mana > RMANA * 3)
+                    else if (Program.Combo && Rdmg * 2 > target.Health && Player.Mana > RMANA * 3)
                         Program.CastSpell(R, target);
-                    else if (GetRStacks() < comboStack + 2 && ObjectManager.Player.Mana > RMANA * 3)
+                    else if (GetRStacks() < comboStack + 2 && Player.Mana > RMANA * 3)
                     {
-                        foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget(R.Range)))
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range)))
                         {
                             if (!OktwCommon.CanMove(enemy))
                                 R.Cast(enemy, true);
-                            else
-                                R.CastIfHitchanceEquals(enemy, HitChance.Immobile, true);
                         }
                     }
 
-                    if (target.HasBuffOfType(BuffType.Slow) && Config.Item("Rslow", true).GetValue<bool>() && GetRStacks() < comboStack + 1 && ObjectManager.Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    if (target.HasBuffOfType(BuffType.Slow) && Config.Item("Rslow", true).GetValue<bool>() && GetRStacks() < comboStack + 1 && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
-                    else if (Program.Combo && GetRStacks() < comboStack && ObjectManager.Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    else if (Program.Combo && GetRStacks() < comboStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
-                    else if (Program.Farm && GetRStacks() < harasStack && ObjectManager.Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    else if (Program.Farm && GetRStacks() < harasStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
                 }
             }
@@ -170,15 +169,9 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(Q, t);
                     else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + QMANA + EMANA)
                     {
-                        foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget(Q.Range)))
-                        {
-                            if (enemy.HasBuffOfType(BuffType.Stun) || enemy.HasBuffOfType(BuffType.Snare) ||
-                             enemy.HasBuffOfType(BuffType.Charm) || enemy.HasBuffOfType(BuffType.Fear) ||
-                             enemy.HasBuffOfType(BuffType.Taunt) || enemy.HasBuffOfType(BuffType.Slow) || enemy.HasBuff("Recall"))
-                            {
-                                Q.Cast(enemy, true);
-                            }
-                        }
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                             Q.Cast(enemy, true);
+
                     }
                 }
             }
