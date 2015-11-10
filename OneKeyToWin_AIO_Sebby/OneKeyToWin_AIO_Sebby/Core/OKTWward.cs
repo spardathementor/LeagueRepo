@@ -73,29 +73,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
-            /*
-            foreach (var sender in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.IsEnemy && Obj.MaxHealth<6 && (Obj.Name == "SightWard" || Obj.Name == "VisionWard") ))
-            {
-                if (!HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100) && (sender.Name.ToLower() == "visionward" || sender.Name.ToLower() == "sightward"))
-                {
-                    foreach (var obj in HiddenObjList)
-                    {
-                        if (obj.pos.Distance(sender.Position) < 400)
-                        {
-                            if (obj.type == 0)
-                            {
-                                HiddenObjList.Remove(obj);
-                                return;
-                            }
-                        }
-                    }
-                    if (sender.MaxHealth == 3)
-                        HiddenObjList.Add(new HiddenObj() { type = 1, pos = sender.Position, endTime = Game.Time + sender.Mana });
-                    if (sender.MaxHealth == 5)
-                        HiddenObjList.Add(new HiddenObj() { type = 2, pos = sender.Position, endTime = float.MaxValue });
-                }
-            }
-            */
+
             foreach (var obj in HiddenObjList)
             {
                 if (obj.endTime < Game.Time)
@@ -219,7 +197,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (!sender.IsEnemy || sender.IsAlly )
                 return;
-
 
             if (sender.Type == GameObjectType.MissileClient && (sender is MissileClient))
             {
