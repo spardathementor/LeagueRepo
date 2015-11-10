@@ -40,7 +40,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var hits = (int)(minion.Health / turrentDmg);
 
             var playerDmg = Player.GetAutoAttackDamage(minion);
-            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 500);
+            var minionHel = HealthPrediction.LaneClearHealthPrediction(minion, 300);
             
             var hpAfter = minionHel % turrentDmg;
 
@@ -73,7 +73,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 //Program.debug(" turretDmgQQQQQ " + (int)turret.FlatPhysicalDamageMod);
                 var minions = MinionManager.GetMinions(turret.Position,900, MinionTypes.All);
 
-                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 90))
+                if (minionAgro.IsValidTarget() && Orbwalking.InAutoAttackRange(minionAgro) && Player.GetAutoAttackDamage(minionAgro) > HealthPrediction.GetHealthPrediction(minionAgro, 70))
                 {
                     Orbwalker.ForceTarget(minionAgro);
                     Orbwalking.Attack = true;
@@ -96,7 +96,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var minions2 = minions.OrderBy(minion => turret.Distance(minion.Position));
                 int count = 0;
 
-                if ( (Game.Time - minionTime > 1))
+                if ( (Game.Time - minionTime > 1.2))
                 {
                     foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.UnderTurret(false) && Orbwalking.InAutoAttackRange(minion)))
                     {
