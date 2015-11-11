@@ -139,14 +139,14 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoW", true).GetValue<bool>())
             {
-                W.Range = 650 + 110 + 20 * ObjectManager.Player.Spellbook.GetSpell(SpellSlot.W).Level;
-                if (ObjectManager.Player.CountEnemiesInRange(W.Range) > 0 && Sheen())
+                W.Range = 650 + 60 + 30 * Player.Spellbook.GetSpell(SpellSlot.W).Level;
+                if (Player.CountEnemiesInRange(W.Range) > 0 && Sheen())
                 {
                     if (Program.Combo)
                         W.Cast();
                     else if (Program.Farm && Config.Item("harasW", true).GetValue<bool>())
                         W.Cast();
-                    else if (Program.Farm && ObjectManager.Player.CountEnemiesInRange(ObjectManager.Player.AttackRange) > 0)
+                    else if (Program.Farm && Player.CountEnemiesInRange(ObjectManager.Player.AttackRange) > 0)
                         W.Cast();
                 }
             }
