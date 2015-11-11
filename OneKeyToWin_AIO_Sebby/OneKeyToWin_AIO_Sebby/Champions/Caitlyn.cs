@@ -35,10 +35,10 @@ namespace OneKeyToWin_AIO_Sebby
             R = new Spell(SpellSlot.R, 3000f);
 
 
-            Q.SetSkillshot(0.65f, 90f, 2200f, false, SkillshotType.SkillshotLine);
-            Qc.SetSkillshot(0.65f, 90f, 2200f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
+            Qc.SetSkillshot(0.65f, 60f, 2200f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(1.5f, 1f, 1750f, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 80f, 1600f, true, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 70f, 1600f, true, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.7f, 200f, 1500f, false, SkillshotType.SkillshotCircle);
 
             LoadMenuOKTW();
@@ -61,7 +61,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ2", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Reduce Q use", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W on hard CC", true).SetValue(true));  
@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby
                 LogicE();
             if (Program.LagFree(2) && W.IsReady())
                 LogicW();
-            if (Program.LagFree(3) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
+            if (Program.LagFree(3) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ2", true).GetValue<bool>())
                 LogicQ();
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Game.Time - QCastTime > 1)
                 LogicR();
