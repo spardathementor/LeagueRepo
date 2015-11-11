@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby
             Q = new Spell(SpellSlot.Q, 655f);
             Q1 = new Spell(SpellSlot.Q, 1100f);
             W = new Spell(SpellSlot.W);
-            E = new Spell(SpellSlot.E, 800f);
+            E = new Spell(SpellSlot.E, 1000f);
             R = new Spell(SpellSlot.R, 1350f);
 
             Q1.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
@@ -255,7 +255,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget(R.Range))
             {
-                var rDmg = R.GetDamage(t) + (W.GetDamage(t) * 4);
+                var rDmg = R.GetDamage(t) * new double[] { 1.5, 1.75,2 }[R.Level];
 
                 if (Player.CountEnemiesInRange(700) == 0 && t.CountAlliesInRange(400) == 0 && OktwCommon.ValidUlt(t))
                 {
