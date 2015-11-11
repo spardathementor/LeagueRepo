@@ -33,7 +33,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private bool MinionOK(Obj_AI_Base minion , Obj_AI_Turret turret)
         {
-            Orbwalking.Attack = false;
             
             var turrentDmg = turret.GetAutoAttackDamage(minion);
             
@@ -87,7 +86,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         Orbwalker.ForceTarget(minion);
                         Orbwalking.Attack = true;
-                        Program.debug(" Force Minion ");
+                        //Program.debug(" Force Minion ");
                         return;
                     }
                     Orbwalking.Attack = false;
@@ -114,7 +113,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                         if (count > 2)
                         {
-                            Program.debug("2 minion OK");
+                            //Program.debug("2 minion OK");
                             return;
                         }
                     }
