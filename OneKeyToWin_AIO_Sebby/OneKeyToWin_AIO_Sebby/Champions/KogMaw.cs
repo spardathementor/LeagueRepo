@@ -163,11 +163,11 @@ namespace OneKeyToWin_AIO_Sebby
                     var eDmg = E.GetDamage(t);
                     if (t.IsValidTarget(W.Range) && qDmg + eDmg > t.Health)
                         Program.CastSpell(Q, t);
-                    else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA * 2 + EMANA)
+                    else if (Program.Combo && Player.Mana > RMANA + QMANA * 2 + EMANA)
                         Program.CastSpell(Q, t);
-                    else if ((Program.Farm && ObjectManager.Player.Mana > RMANA + EMANA + QMANA * 2 + WMANA) && Config.Item("HarrasQ", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true))
+                    else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA * 2 + WMANA) && Config.Item("harrasQ", true).GetValue<bool>() && !Player.UnderTurret(true))
                         Program.CastSpell(Q, t);
-                    else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + QMANA + EMANA)
+                    else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                              Q.Cast(enemy, true);
