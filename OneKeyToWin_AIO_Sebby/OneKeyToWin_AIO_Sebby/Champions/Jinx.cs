@@ -368,7 +368,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private float bonusRange() { return 670f + Player.BoundingRadius + 25 * Player.Spellbook.GetSpell(SpellSlot.Q).Level; }
 
-        private bool FishBoneActive { get { return Player.AttackRange > 525f; } }
+        private bool FishBoneActive { get { return Player.HasBuff("JinxQ"); } }
 
         private float GetRealPowPowRange(GameObject target)
         {

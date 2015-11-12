@@ -729,7 +729,7 @@ namespace Jinx_Genesis
                 Config.Item("Rcustome").Show(false);
 
 
-            if (Player.AttackRange > 525f)
+            if (Player.HasBuff("JinxQ"))
                 FishBoneActive = true;
             else
                 FishBoneActive = false;
