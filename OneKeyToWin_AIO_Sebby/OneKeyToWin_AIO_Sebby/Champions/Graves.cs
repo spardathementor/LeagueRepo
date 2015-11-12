@@ -239,7 +239,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-            if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo1"))
+            if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo2"))
             {
                 var dash = Player.Position.Extend(Game.CursorPos, E.Range);
                 if (dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1)
