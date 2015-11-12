@@ -346,7 +346,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static void JunglerTimer()
         {
-            if (Config.Item("timer").GetValue<bool>() && jungler != null && jungler.IsValid)
+            if (AIOmode != 1 && Config.Item("timer").GetValue<bool>() && jungler != null && jungler.IsValid)
             {
                 foreach (var enemy in Enemies.Where(enemy => enemy.IsValid))
                 {
@@ -543,7 +543,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!SPredictionLoad && (int)Game.Time % 2 == 0 && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
                 drawText("PRESS F5 TO LOAD SPREDICTION", Player.Position, System.Drawing.Color.Yellow, -300);
 
-            if (Config.Item("disableDraws").GetValue<bool>())
+            if (AIOmode == 1 || Config.Item("disableDraws").GetValue<bool>())
                 return;
 
             if (Game.Time - dodgeTime < 0.01 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>())
@@ -563,7 +563,7 @@ namespace OneKeyToWin_AIO_Sebby
                 drawText("Aiming " + DrawSpellPos.Hitchance, Player.Position.Extend(DrawSpellPos.CastPosition, 400), System.Drawing.Color.Gray);
             }
             
-            if (Config.Item("timer").GetValue<bool>() && jungler != null)
+            if (AIOmode != 1 && Config.Item("timer").GetValue<bool>() && jungler != null)
             {
                 if (jungler == Player)
                     drawText("Jungler not detected", Player.Position, System.Drawing.Color.Yellow, 100);
