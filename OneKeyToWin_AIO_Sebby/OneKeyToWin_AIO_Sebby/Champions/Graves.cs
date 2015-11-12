@@ -71,6 +71,8 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("QWlogic", "Use Q and W only if don't have ammo", true).SetValue(false));
         }
 
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
@@ -128,10 +130,13 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
-            if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
-                LogicQ();
-            if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp && Config.Item("autoW", true).GetValue<bool>())
-                LogicW();
+            if (!Config.Item("QWlogic", true).GetValue<bool>() || !Player.HasBuff("gravesbasicattackammo1"))
+            {
+                if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
+                    LogicQ();
+                if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp && Config.Item("autoW", true).GetValue<bool>())
+                    LogicW();
+            }
             if (Program.LagFree(4) && R.IsReady() && !Player.IsWindingUp && Config.Item("autoR", true).GetValue<bool>())
                 LogicR();
         }
@@ -234,7 +239,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-            if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo1") && !Player.HasBuff("gravesbasicattackammo2"))
+            if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo1"))
             {
                 var dash = Player.Position.Extend(Game.CursorPos, E.Range);
                 if (dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1)
