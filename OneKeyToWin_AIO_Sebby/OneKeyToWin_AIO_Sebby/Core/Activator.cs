@@ -34,6 +34,9 @@ namespace OneKeyToWin_AIO_Sebby
             ManaPotion = new Items.Item(2004, 0),
             Flask = new Items.Item(2041, 0),
             Biscuit = new Items.Item(2010, 0),
+            Refillable = new Items.Item(2031, 0),
+            Hunter = new Items.Item(2032, 0),
+            Corrupting = new Items.Item(2033, 0),
             //attack
             Botrk = new Items.Item(3153, 550f),
             Cutlass = new Items.Item(3144, 550f),
@@ -604,6 +607,28 @@ namespace OneKeyToWin_AIO_Sebby
                 if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlask"))
                     return;
 
+                if (Hunter.IsReady())
+                {
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                        Hunter.Cast();
+                    else if (Player.Health < Player.MaxHealth * 0.6)
+                        Hunter.Cast();
+                    else if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200 && !Player.HasBuff("FlaskOfCrystalWater"))
+                        Hunter.Cast();
+                    return;
+                }
+
+                if (Corrupting.IsReady())
+                {
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                        Corrupting.Cast();
+                    else if (Player.Health < Player.MaxHealth * 0.6)
+                        Corrupting.Cast();
+                    else if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200 && !Player.HasBuff("FlaskOfCrystalWater"))
+                        Corrupting.Cast();
+                    return;
+                }
+
                 if (Flask.IsReady())
                 {
                     if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
@@ -612,6 +637,15 @@ namespace OneKeyToWin_AIO_Sebby
                         Flask.Cast();
                     else if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200 && !Player.HasBuff("FlaskOfCrystalWater"))
                         Flask.Cast();
+                    return;
+                }
+
+                if (Refillable.IsReady())
+                {
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                        Refillable.Cast();
+                    else if (Player.Health < Player.MaxHealth * 0.6)
+                        Refillable.Cast();
                     return;
                 }
 
