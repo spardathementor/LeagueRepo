@@ -255,7 +255,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
 
                 float predictedHealth = target.Health + target.HPRegenRate ;
-                double Rdmg = Program.GetRealDmg(R,target) + (R.GetDamage(target) * target.CountAlliesInRange(400) * 0.2);
+                double Rdmg = OktwCommon.GetKsDamage(target,R);
                 var collisionTarget = target;
                 cast = true;
                 PredictionOutput output = R.GetPrediction(target);
