@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -75,24 +75,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!unit.IsMe || !Program.Combo)
-                return;
             Jungle();
-
-            if (!E.IsReady() || !Program.Combo)
-                return;
-
-            var dashPosition = Player.Position.Extend(Game.CursorPos, E.Range);
-            if (!DashCheck(dashPosition))
-                return;
-
-            var t = target as Obj_AI_Hero;
-
-            if (E.IsReady()  && Config.Item("autoE", true).GetValue<bool>())
-            {
-                E.Cast(dashPosition, true);
- 
-            }
+            
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -119,7 +103,7 @@ namespace OneKeyToWin_AIO_Sebby
         private void Game_OnGameUpdate(EventArgs args)
         {
             
-            if (Config.Item("useR", true).GetValue<KeyBind>().Active && R.IsReady())
+                if (Config.Item("useR", true).GetValue<KeyBind>().Active && R.IsReady())
             {
                 var t = TargetSelector.GetTarget(1800, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
@@ -237,7 +221,7 @@ namespace OneKeyToWin_AIO_Sebby
                         W.Cast(t, true, true);
                     else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA + WMANA && ObjectManager.Player.CountEnemiesInRange(300) > 0)
                         W.Cast(t, true, true);
-                    else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA + WMANA && t.CountEnemiesInRange(250) > 1)
+                    else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA && t.CountEnemiesInRange(250) > 1)
                         W.Cast(t, true, true);
                     else if (ObjectManager.Player.Mana > RMANA + WMANA + QMANA + EMANA)
                     {
@@ -250,7 +234,12 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-           
+            if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo1") && !Player.HasBuff("gravesbasicattackammo2"))
+            {
+                var dash = Player.Position.Extend(Game.CursorPos, E.Range);
+                if (dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1)
+                    E.Cast(dash);
+            }
         }
 
         private void LogicR()
@@ -315,20 +304,6 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 
             }
-        }
-
-        private bool DashCheck(Vector3 dash)
-        {
-            if (
-                !Player.Position.Extend(dash, E.Range).IsWall()
-                && !Player.Position.Extend(dash, E.Range - 100).IsWall()
-                && !Player.Position.Extend(dash, E.Range - 200).IsWall()
-                && !Player.Position.Extend(dash, E.Range - 300).IsWall()
-                && dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1
-                && (!dash.UnderTurret(true) || Program.Combo))
-                return true;
-            else
-                return false;
         }
 
         private void SetMana()
