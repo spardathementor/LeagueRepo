@@ -30,7 +30,7 @@ namespace OneKeyToWin_AIO_Sebby
             Q1.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
             E.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.25f, 200f, 2000f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.25f, 100f, 2000f, false, SkillshotType.SkillshotCircle);
 
             LoadMenuOKTW();
 
@@ -255,7 +255,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget(R.Range))
             {
-                var rDmg = R.GetDamage(t) * new double[] { 1.5, 1.25, 1.5 }[R.Level];
+                var rDmg = R.GetDamage(t) * new double[] { 1, 1.25, 1.5 }[R.Level];
 
                 if (Player.CountEnemiesInRange(600) == 0 && t.CountAlliesInRange(400) == 0 && OktwCommon.ValidUlt(t))
                 {
