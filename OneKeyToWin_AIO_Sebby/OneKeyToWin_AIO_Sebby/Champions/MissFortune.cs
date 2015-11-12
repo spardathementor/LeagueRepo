@@ -255,9 +255,9 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget(R.Range))
             {
-                var rDmg = R.GetDamage(t) * new double[] { 1.5, 1.75,2 }[R.Level];
+                var rDmg = R.GetDamage(t) * new double[] { 1.5, 1.25, 1.5 }[R.Level];
 
-                if (Player.CountEnemiesInRange(700) == 0 && t.CountAlliesInRange(400) == 0 && OktwCommon.ValidUlt(t))
+                if (Player.CountEnemiesInRange(600) == 0 && t.CountAlliesInRange(400) == 0 && OktwCommon.ValidUlt(t))
                 {
                     var tDis = Player.Distance(t.ServerPosition);
                     if (rDmg * 7 > t.Health && tDis < 800)
@@ -298,7 +298,7 @@ namespace OneKeyToWin_AIO_Sebby
                     RCastTime = Game.Time;
                     return;
                 }
-                else if (rDmg * 8 > t.Health && !OktwCommon.CanMove(t) && Player.CountEnemiesInRange(600) == 0)
+                else if (rDmg * 8 > t.Health && !OktwCommon.CanMove(t) && Player.CountEnemiesInRange(400) == 0)
                 {
                     R.Cast(t, true, true);
                     RCastTime = Game.Time;
