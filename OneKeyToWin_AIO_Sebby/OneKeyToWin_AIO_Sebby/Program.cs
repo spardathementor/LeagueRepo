@@ -48,7 +48,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("2", "DONATE: kaczor.sebastian@gmail.com"));
             #endregion
 
-            Config.AddItem(new MenuItem("AIOmode", "(Press F5 after the change) AIO mode:", true).SetValue(new StringList(new[] { "Utility and champion", "Only Champion", "Only Utility" }, 0)));
+            Config.AddItem(new MenuItem("AIOmode", "AIO mode (F5)", true).SetValue(new StringList(new[] { "Utility and champion", "Only Champion", "Only Utility" }, 0)));
 
             AIOmode = Config.Item("AIOmode", true).GetValue<StringList>().SelectedIndex;
 
