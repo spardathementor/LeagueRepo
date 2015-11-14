@@ -86,7 +86,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
 
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("Eagc", "Anti Gapcloser E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("ForceAA", "Force AA trap enemy", true).SetValue(true));
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -132,6 +132,12 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Orbwalking.CanAttack() && !Program.None)
+            {
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(1300) && enemy.HasBuff("caitlynyordletrapinternal")))
+                    Player.IssueOrder(GameObjectOrder.AttackUnit, enemy);
+            }
+
 
             if (Config.Item("useR", true).GetValue<KeyBind>().Active && R.IsReady())
             {
@@ -164,7 +170,7 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.CountEnemiesInRange(500) == 1 && target.CountAlliesInRange(500) == 0))
             {
 
-                if (OktwCommon.GetKsDamage(target, R) > target.Health && GetRealDistance(target) > bonusRange() + 400 + target.BoundingRadius )
+                if (OktwCommon.GetKsDamage(target, R) > target.Health && GetRealDistance(target) > bonusRange() + 100 + target.BoundingRadius )
                 {
                     cast = true;
                     PredictionOutput output = R.GetPrediction(target);
@@ -198,7 +204,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Player.Mana > RMANA + WMANA)
             {
                 if (Config.Item("autoW", true).GetValue<bool>())
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && !enemy.HasBuff("caitlynyordletrapinternal")))
                         W.Cast(enemy.Position, true);
                 
                 if (Config.Item("telE", true).GetValue<bool>())
