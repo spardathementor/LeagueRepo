@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby
             
             if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp)
                 LogicE();
-            if (Program.LagFree(2) && W.IsReady())
+            if (Program.LagFree(2) && W.IsReady() && !Player.IsWindingUp)
                 LogicW();
             if (Program.LagFree(3) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ2", true).GetValue<bool>())
                 LogicQ();
