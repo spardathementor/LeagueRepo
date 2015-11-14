@@ -74,6 +74,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasEQ", "Harass E + Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EQks", "Ks E + Q + AA", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("useE", "Dash E HotKeySmartcast", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position", "Cursor position", "Enemy position" }, 2)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -219,26 +220,26 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget(Q.Range))
             {
-
-                float predictedHealth = t.Health + t.HPRegenRate * 2;
                 double Qdmg = Q.GetDamage(t);
 
-                if (GetRealDistance(t) > bonusRange() + 150 && Qdmg > predictedHealth && Player.CountEnemiesInRange(400) == 0)
+                if (GetRealDistance(t) > bonusRange() + 150 && Qdmg > t.Health && Player.CountEnemiesInRange(400) == 0)
                 {
                     Program.CastSpell(Q, t);
                     Program.debug("Q KS");
                 }
                 else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA + EMANA + 10 && Player.CountEnemiesInRange(bonusRange() + 100 + t.BoundingRadius) == 0 && !Config.Item("autoQ", true).GetValue<bool>())
                     Program.CastSpell(Q, t);
-                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA && Player.CountEnemiesInRange(bonusRange()) == 0 && OktwCommon.CanHarras())
+                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && (!OktwCommon.CanMove(enemy) ||  enemy.HasBuff("caitlynyordletrapinternal"))))
                         Q.Cast(enemy, true);
-
-                    if (t.HasBuffOfType(BuffType.Slow))
-                        Q.Cast(t);
-                    else if (Player.Mana > Player.MaxMana * 0.8)
-                        Program.CastSpell(Q, t);
+                    if (Player.CountEnemiesInRange(bonusRange()) == 0 && Player.CountEnemiesInRange(bonusRange()) == 0 && OktwCommon.CanHarras())
+                    {
+                        if (t.HasBuffOfType(BuffType.Slow))
+                            Q.Cast(t);
+                        else if (Player.Mana > Player.MaxMana * 0.8)
+                            Program.CastSpell(Q, t);
+                    }
                 }
 
                 if ((Program.Combo || Program.Farm) && Player.CountEnemiesInRange(bonusRange() + 100) == 0 && Player.Mana > RMANA + EMANA + WMANA + QMANA && OktwCommon.CanHarras())
@@ -264,25 +265,25 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     var positionT = Player.ServerPosition - (t.Position - Player.ServerPosition);
 
-                    if (Q.IsReady() && OktwCommon.IsFaced(t) && Player.Distance(t.Position) < 700 && Player.Position.Extend(positionT, 400).CountEnemiesInRange(700) < 3)
+                    if (Q.IsReady() && OktwCommon.IsFaced(t) && Player.Position.Extend(positionT, 400).CountEnemiesInRange(700) < 3)
                     {
                         var eDmg = E.GetDamage(t);
                         var qDmg = Q.GetDamage(t);
-                        if (qDmg + eDmg > t.Health && Player.Mana > EMANA + QMANA )
+                        if (Config.Item("EQks", true).GetValue<bool>() && qDmg + eDmg + Player.GetAutoAttackDamage(t) > t.Health && Player.Mana > EMANA + QMANA  )
                         {
                             Program.CastSpell(E, t);
                             Program.debug("E + Q FINISH");
                         }
-                        else if (Program.Farm && Config.Item("harrasEQ", true).GetValue<bool>() && Player.Mana > EMANA + QMANA + RMANA && Player.Distance(t.Position) > 500)
+                        else if ((Program.Farm || Program.Combo) && Config.Item("harrasEQ", true).GetValue<bool>() && Player.Mana > EMANA + QMANA + RMANA)
                         {
                             Program.CastSpell(E, t);
                             Program.debug("E + Q Harras");
                         }
                     }
 
-                    if (Player.Mana > RMANA + EMANA )
+                    if (Player.Mana > RMANA + EMANA && Player.Health < Player.MaxHealth * 0.3)
                     {
-                        if (GetRealDistance(t) < 500 && Player.Health < Player.MaxHealth * 0.3)
+                        if (GetRealDistance(t) < 500 )
                             E.Cast(t, true);
                         if (Player.CountEnemiesInRange(250) > 0)
                             E.Cast(t, true);
