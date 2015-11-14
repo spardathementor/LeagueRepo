@@ -31,14 +31,12 @@ namespace OneKeyToWin_AIO_Sebby
             E.SetSkillshot(0.25f, 120f, 1400f, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(1.2f, 120f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
-
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("HarrasE", "Harass E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
-
 
             Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("harasW", "Haras W on max range", true).SetValue(true));
@@ -71,7 +69,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (Config.Item("AGC", true).GetValue<bool>() && E.IsReady() && ObjectManager.Player.Mana > RMANA + EMANA)
+            if (Config.Item("AGC", true).GetValue<bool>() && E.IsReady() && Player.Mana > RMANA + EMANA)
             {
                 var Target = (Obj_AI_Hero)gapcloser.Sender;
                 if (Target.IsValidTarget(E.Range))
@@ -99,14 +97,14 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LagFree(0))
             {
-                R.Range = 800 + 300 * ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Level;
-                W.Range = 760 +  20 * ObjectManager.Player.Spellbook.GetSpell(SpellSlot.W).Level;
+                R.Range = 800 + 300 * Player.Spellbook.GetSpell(SpellSlot.R).Level;
+                W.Range = 650 + 30 * Player.Spellbook.GetSpell(SpellSlot.W).Level;
                 SetMana();
                 if (Player.IsZombie && Program.Combo)
                 {
                     var t = TargetSelector.GetTarget(800, TargetSelector.DamageType.Physical);
                     if (t.IsValidTarget())
-                        Player.IssueOrder(GameObjectOrder.MoveTo, t.ServerPosition);
+                        Orbwalker.SetOrbwalkingPoint(t.ServerPosition);
                 }
             }
             if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp && Config.Item("autoE", true).GetValue<bool>())
@@ -127,39 +125,44 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoR", true).GetValue<bool>() && Sheen())
             {
-                R.Range = 800 + 300 * ObjectManager.Player.Spellbook.GetSpell(SpellSlot.R).Level;
                 var target = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-                if (target.IsValidTarget(R.Range)&& target.HealthPercent < Config.Item("RmaxHp", true).GetValue<Slider>().Value && OktwCommon.ValidUlt(target))
+
+                if (target.IsValidTarget(R.Range) && target.HealthPercent < Config.Item("RmaxHp", true).GetValue<Slider>().Value && OktwCommon.ValidUlt(target))
                 {
+                    
+
                     if (Config.Item("Raa", true).GetValue<bool>() && Orbwalking.InAutoAttackRange(target))
                         return;
 
-                    double Rdmg = R.GetDamage(target) + (R.GetDamage(target) * target.CountAlliesInRange(500));
-                    // Overkill protection
-                    if (target.Health < R.GetDamage(target) * target.CountAlliesInRange(500) * 0.2)
-                        Rdmg = 0;
-
                     var harasStack = Config.Item("harasStack", true).GetValue<Slider>().Value;
                     var comboStack = Config.Item("comboStack", true).GetValue<Slider>().Value;
+                    var countR = GetRStacks();
+                    var Rdmg = R.GetDamage(target);
+
+                    if (target.HealthPercent < 50 && target.HealthPercent > 25)
+                        Rdmg = Rdmg * 2;
+                    else if (target.HealthPercent < 25)
+                        Rdmg = Rdmg * 3;
+
+                    Rdmg = Rdmg + target.CountAlliesInRange(500) * Rdmg;
 
                     if (R.GetDamage(target) > target.Health)
                         Program.CastSpell(R, target);
                     else if (Program.Combo && Rdmg * 2 > target.Health && Player.Mana > RMANA * 3)
                         Program.CastSpell(R, target);
-                    else if (GetRStacks() < comboStack + 2 && Player.Mana > RMANA * 3)
+                    else if (countR < comboStack + 2 && Player.Mana > RMANA * 3)
                     {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range)))
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && !OktwCommon.CanMove(enemy)))
                         {
-                            if (!OktwCommon.CanMove(enemy))
                                 R.Cast(enemy, true);
                         }
                     }
 
-                    if (target.HasBuffOfType(BuffType.Slow) && Config.Item("Rslow", true).GetValue<bool>() && GetRStacks() < comboStack + 1 && Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    if (target.HasBuffOfType(BuffType.Slow) && Config.Item("Rslow", true).GetValue<bool>() && countR < comboStack + 1 && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
-                    else if (Program.Combo && GetRStacks() < comboStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    else if (Program.Combo && countR < comboStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
-                    else if (Program.Farm && GetRStacks() < harasStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    else if (Program.Farm && countR < harasStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
                 }
             }
@@ -169,14 +172,13 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoW", true).GetValue<bool>())
             {
-                W.Range = 650 + 60 + 30 * Player.Spellbook.GetSpell(SpellSlot.W).Level;
                 if (Player.CountEnemiesInRange(W.Range) > 0 && Sheen())
                 {
                     if (Program.Combo)
                         W.Cast();
                     else if (Program.Farm && Config.Item("harasW", true).GetValue<bool>())
                         W.Cast();
-                    else if (Program.Farm && Player.CountEnemiesInRange(ObjectManager.Player.AttackRange) > 0)
+                    else if (Program.Farm && Player.CountEnemiesInRange(Player.AttackRange) > 0)
                         W.Cast();
                 }
             }
@@ -211,7 +213,6 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if ( Sheen())
             {
-                //W.Cast(ObjectManager.Player);
                 var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
                 {
@@ -246,7 +247,6 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (target.IsValidTarget() && Config.Item("AApriority", true).GetValue<bool>() && target is Obj_AI_Hero && !attackNow)
             {
-                
                 return false;
             }
             else
@@ -353,6 +353,5 @@ namespace OneKeyToWin_AIO_Sebby
                     Utility.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.Gray, 1, 1);
             }
         }
-
     }
 }
