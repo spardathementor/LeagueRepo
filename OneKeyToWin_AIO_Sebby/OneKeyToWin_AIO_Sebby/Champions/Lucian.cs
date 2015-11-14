@@ -337,17 +337,6 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private double NumShots()
-        {
-            double num = 7.5;
-            if (R.Level == 1)
-                num += 7.5 * Player.AttackSpeedMod * 0.5;
-            else if (R.Level == 2)
-                num += 9 * Player.AttackSpeedMod * 0.5;
-            else if (R.Level == 3)
-                num += 10.5 * Player.AttackSpeedMod * 0.5;
-            return num ;
-        }
 
         private bool SpellLock
         {
