@@ -31,12 +31,12 @@ namespace OneKeyToWin_AIO_Sebby
             Q = new Spell(SpellSlot.Q, 1250f);
             Qc = new Spell(SpellSlot.Q, 1100f);
             W = new Spell(SpellSlot.W, 800f);
-            E = new Spell(SpellSlot.E, 980f);
+            E = new Spell(SpellSlot.E, 650f);
             R = new Spell(SpellSlot.R, 3000f);
 
 
-            Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
-            Qc.SetSkillshot(0.65f, 60f, 2200f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.65f, 40f, 2200f, false, SkillshotType.SkillshotLine);
+            Qc.SetSkillshot(0.65f, 40f, 2200f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(1.5f, 1f, 1750f, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 70f, 1600f, true, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.7f, 200f, 1500f, false, SkillshotType.SkillshotCircle);
@@ -135,13 +135,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Orbwalking.CanAttack() && !Program.None)
-            {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(1300) && enemy.HasBuff("caitlynyordletrapinternal")))
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, enemy);
-            }
-
-
             if (Config.Item("useR", true).GetValue<KeyBind>().Active && R.IsReady())
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
@@ -164,6 +157,12 @@ namespace OneKeyToWin_AIO_Sebby
                 LogicQ();
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Game.Time - QCastTime > 1)
                 LogicR();
+
+            if (Orbwalking.CanAttack() && !Program.None)
+            {
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(1300) && enemy.HasBuff("caitlynyordletrapinternal")))
+                    Player.IssueOrder(GameObjectOrder.AttackUnit, enemy);
+            }
         }
 
         private void LogicR()
