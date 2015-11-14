@@ -227,24 +227,19 @@ namespace OneKeyToWin_AIO_Sebby
                     Program.CastSpell(Q, t);
                     Program.debug("Q KS");
                 }
-                else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA + EMANA + 10 && Player.CountEnemiesInRange(bonusRange() + 100 + t.BoundingRadius) == 0 && !Config.Item("autoQ", true).GetValue<bool>())
+                else if (Program.Combo && Player.Mana > RMANA + QMANA + EMANA + 10 && Player.CountEnemiesInRange(bonusRange() + 100 + t.BoundingRadius) == 0 && !Config.Item("autoQ", true).GetValue<bool>())
                     Program.CastSpell(Q, t);
-                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA)
+                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA && Player.CountEnemiesInRange(400) == 0)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && (!OktwCommon.CanMove(enemy) ||  enemy.HasBuff("caitlynyordletrapinternal"))))
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && (!OktwCommon.CanMove(enemy) || enemy.HasBuff("caitlynyordletrapinternal"))))
                         Q.Cast(enemy, true);
-                    if (Player.CountEnemiesInRange(bonusRange()) == 0 && Player.CountEnemiesInRange(bonusRange()) == 0 && OktwCommon.CanHarras())
+                    if (Player.CountEnemiesInRange(bonusRange()) == 0 && OktwCommon.CanHarras())
                     {
                         if (t.HasBuffOfType(BuffType.Slow))
                             Q.Cast(t);
-                        else if (Player.Mana > Player.MaxMana * 0.8)
-                            Program.CastSpell(Q, t);
-                    }
-                }
 
-                if ((Program.Combo || Program.Farm) && Player.CountEnemiesInRange(bonusRange() + 100) == 0 && Player.Mana > RMANA + EMANA + WMANA + QMANA && OktwCommon.CanHarras())
-                {
-                    Q.CastIfWillHit(t, 2, true);
+                        Q.CastIfWillHit(t, 2, true);
+                    }
                 }
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
