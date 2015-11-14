@@ -80,6 +80,8 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName,true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcol", "R collision width [400]", true).SetValue(new Slider(400, 1000, 1)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rrange", "R minimum range [1000]", true).SetValue(new Slider(1000, 1500, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
@@ -167,10 +169,9 @@ namespace OneKeyToWin_AIO_Sebby
         {
             bool cast = false;
 
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.CountEnemiesInRange(500) == 1 && target.CountAlliesInRange(500) == 0))
+            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.Distance(target.Position) > Config.Item("Rrange", true).GetValue<Slider>().Value && target.CountEnemiesInRange(Config.Item("Rcol", true).GetValue<Slider>().Value) == 1 && target.CountAlliesInRange(500) == 0 && OktwCommon.ValidUlt(target) ))
             {
-
-                if (OktwCommon.GetKsDamage(target, R) > target.Health && GetRealDistance(target) > bonusRange() + 100 + target.BoundingRadius )
+                if (OktwCommon.GetKsDamage(target, R) > target.Health )
                 {
                     cast = true;
                     PredictionOutput output = R.GetPrediction(target);
@@ -190,7 +191,7 @@ namespace OneKeyToWin_AIO_Sebby
                         double b = c1 / c2;
                         Vector3 pb = Player.ServerPosition + ((float)b * v);
                         float length = Vector3.Distance(predictedPosition, pb);
-                        if (length < (400 + enemy.BoundingRadius) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
+                        if (length < (Config.Item("Rcol", true).GetValue<Slider>().Value + enemy.BoundingRadius) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
                             cast = false;
                     }
                     if (cast)
