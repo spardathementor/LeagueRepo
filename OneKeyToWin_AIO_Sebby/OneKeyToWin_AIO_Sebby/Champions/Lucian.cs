@@ -51,6 +51,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("nktdE", "NoKeyToDash", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("slowE", "Auto SlowBuff E", true).SetValue(true));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gapcloser").SubMenu("Use on:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -72,15 +75,14 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if ( E.IsReady() && ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(400) < 3)
+            if ( E.IsReady() && Player.Position.Extend(Game.CursorPos, 400).CountEnemiesInRange(400) < 2)
             {
-                var Target = (Obj_AI_Hero)gapcloser.Sender;
-                if (Target.IsValidTarget(E.Range))
+                var t = gapcloser.Sender;
+                if (t.IsValidTarget(E.Range) && Config.Item("EGCchampion" + t.ChampionName, true).GetValue<bool>())
                 {
-                    E.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range), true);
+                    E.Cast(Game.CursorPos);
                 }
             }
-            return;
         }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
