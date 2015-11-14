@@ -156,7 +156,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+            var orbT = Orbwalker.GetTarget();
+
+            Obj_AI_Hero t = null;
+
+            if (orbT != null && orbT is Obj_AI_Hero)
+                t = (Obj_AI_Hero)orbT;
+
             if (t.IsValidTarget())
             {
                 if (E.GetDamage(t) > t.Health)
