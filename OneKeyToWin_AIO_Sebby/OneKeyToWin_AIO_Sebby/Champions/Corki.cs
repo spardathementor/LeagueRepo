@@ -35,7 +35,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("nktdE", "NoKeyToDash", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harassQ", "Q harass", true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harassE", "E harass", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rammo", "Minimum R ammo harass", true).SetValue(new Slider(3, 6, 0)));
@@ -43,7 +47,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+                Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("RammoLC", "Minimum R ammo Lane clear", true).SetValue(new Slider(3, 6, 0)));
@@ -65,15 +69,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-
-            if (E.IsReady() && Sheen() && args.Target.IsValid<Obj_AI_Hero>() && Config.Item("autoE", true).GetValue<bool>())
+            if (E.IsReady() && Sheen() && args.Target.IsValid<Obj_AI_Hero>())
             {
-                
-                if (Program.Combo && Player.Mana > EMANA + RMANA)
-                {
+
+                if(Program.Combo && Config.Item("autoE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA)
                     E.Cast(args.Target.Position);
-                    Program.debug("ss");
-                }
+                if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA + QMANA)
+                    E.Cast(args.Target.Position);
+
                 if (!Q.IsReady() && !R.IsReady() && args.Target.Health < Player.FlatPhysicalDamageMod * 2)
                     E.Cast();
             }
@@ -187,15 +190,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(Q, t);
                 else if (rDmg + 2 * qDmg > t.Health && Player.Mana > QMANA + RMANA * 2)
                     Program.CastSpell(Q, t);
-                else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA)
+                else if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && ObjectManager.Player.Mana > RMANA + EMANA + WMANA + RMANA)
+                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("harras" + enemy.ChampionName).GetValue<bool>()))
                         Program.CastSpell(Q, enemy);
                 }
 
-                if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + WMANA + EMANA)
+                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true, true);
@@ -225,12 +228,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if ( Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
                 {
-                    var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
-                    var Wfarm = Q.GetCircularFarmLocation(minions, Q.Width);
-                    var rfarm = R.GetCircularFarmLocation(minions, 100);
+                    var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
 
                     if (R.IsReady() && Config.Item("farmR", true).GetValue<bool>() && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("RammoLC", true).GetValue<Slider>().Value)
                     {
+                        var rfarm = R.GetCircularFarmLocation(minions, 100);
                         if (rfarm.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                         {
                             R.Cast(rfarm.Position);
@@ -239,10 +241,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                     if (Q.IsReady() && Config.Item("farmQ", true).GetValue<bool>())
                     {
-                        var Rfarm = Q.GetCircularFarmLocation(minions, 100);
-                        if (Wfarm.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                        var qfarm = Q.GetCircularFarmLocation(minions, Q.Width);
+                        if (qfarm.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                         {
-                            Q.Cast(Rfarm.Position);
+                            Q.Cast(qfarm.Position);
                             return;
                         }
                     }
