@@ -309,9 +309,11 @@ namespace OneKeyToWin_AIO_Sebby
         private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
 
-            if (Config.Item("comboDisableMode", true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && 2 * Player.GetAutoAttackDamage((Obj_AI_Base)args.Target) < args.Target.Health)
+            if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>() && !Player.HasBuff("sheen") )
             {
-                args.Process = false;
+                var t = (Obj_AI_Base)args.Target;
+                if(!t.HasBuff("luxilluminatingfraulein") && 2 * Player.GetAutoAttackDamage(t) < args.Target.Health)
+                    args.Process = false;
             }
 
             if (OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) && !Player.IsMelee && Config.Item("collAA", true).GetValue<bool>())
