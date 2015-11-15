@@ -27,7 +27,7 @@ namespace OneKeyToWin_AIO_Sebby
             W = new Spell(SpellSlot.W, 2100);
             R = new Spell(SpellSlot.R, 550);
 
-            Q.SetSkillshot(0.25f, 80f, 1550, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 90f, 1550, true, SkillshotType.SkillshotLine);
             E.SetTargetted(0.25f, 2000f);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -44,6 +44,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("Int", "Interrupter E", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R in shop", true).SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
@@ -59,7 +60,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
 
-            if (Program.LagFree(4) && R.IsReady())
+            if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
                 LogicR();
         }
 
@@ -92,7 +93,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicR()
         {
-            
+            if (Player.InFountain() && R.Instance.Name == "QuinnR")
+            {
+                R.Cast();
+            }
         }
 
         private void LogicQ()
