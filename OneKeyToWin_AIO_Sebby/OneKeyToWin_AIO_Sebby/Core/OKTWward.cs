@@ -106,7 +106,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 var timer = Game.Time - need.LastVisableTime;
 
-                if (timer > 0.5 && timer < 4 && Player.ChampionName == "Quinn" && W.IsReady()  && need.PredictedPos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
+                if (timer > 0.5 && timer < 4 && Player.ChampionName == "Quinn" && W.IsReady()  && need.LastVisablePos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
                 {
                     W.Cast();
                     return;
@@ -142,7 +142,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (timer < 2 && !Player.IsWindingUp && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f &&  Config.Item("bushW", true).GetValue<bool>())
                 {
-                    if (need.PredictedPos.Distance(Player.Position) < 800)
+                    if (need.PredictedPos.Distance(Player.Position) < 800 && need.LastVisablePos.Distance(Player.Position) < 800)
                     {
                         W.Cast(need.PredictedPos);
                         return;
