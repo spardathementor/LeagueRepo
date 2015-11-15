@@ -22,12 +22,12 @@ namespace OneKeyToWin_AIO_Sebby
         }
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 980);
+            Q = new Spell(SpellSlot.Q, 1000);
             E = new Spell(SpellSlot.E, 700);
             W = new Spell(SpellSlot.W, 2100);
             R = new Spell(SpellSlot.R, 550);
 
-            Q.SetSkillshot(0.30f, 80f, 1250, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 80f, 1550, true, SkillshotType.SkillshotLine);
             E.SetTargetted(0.25f, 2000f);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
