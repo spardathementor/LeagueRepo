@@ -106,7 +106,6 @@ namespace OneKeyToWin_AIO_Sebby
                 if (args.SData.Name == "LucianW" || args.SData.Name == "LucianE" || args.SData.Name == "LucianQ")
                 {
                     passRdy = true;
-                    Utility.DelayAction.Add(450, Orbwalking.ResetAutoAttackTimer);
                 }
                 else
                     passRdy = false;
