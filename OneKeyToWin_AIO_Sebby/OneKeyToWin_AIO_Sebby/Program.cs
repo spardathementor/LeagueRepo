@@ -316,7 +316,7 @@ namespace OneKeyToWin_AIO_Sebby
                     args.Process = false;
             }
 
-            if (OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) && !Player.IsMelee && Config.Item("collAA", true).GetValue<bool>())
+            if (!Player.IsMelee && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) &&  Config.Item("collAA", true).GetValue<bool>())
             {
                 args.Process = false;
             }
