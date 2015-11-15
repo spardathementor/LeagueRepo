@@ -114,7 +114,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (timer > 1 && timer < 3 && Player.ChampionName == "Karhus" && Q.IsReady() && Player.CountEnemiesInRange(900) == 0)
                 {
-                    if (need.PredictedPos.Distance(Player.Position) < 900)
+                    if (need.PredictedPos.Distance(Player.Position) < 900 && need.LastVisablePos.Distance(Player.Position) < 900)
                     {
                         Q.Cast(need.PredictedPos);
                         return;
@@ -124,7 +124,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (timer > 1 && timer < 3 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
                 {
-                    if (need.PredictedPos.Distance(Player.Position) < 3000)
+                    if (need.PredictedPos.Distance(Player.Position) < 2000 && need.LastVisablePos.Distance(Player.Position) < 2000)
                     {
                         E.Cast(ObjectManager.Player.Position.Extend(need.PredictedPos, 5000));
                         return;
@@ -133,7 +133,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (timer > 0.5 && timer < 2 && Player.ChampionName == "MissFortune" && E.IsReady() &&  Program.Combo && Player.Mana > 200f)
                 {
-                    if (need.PredictedPos.Distance(Player.Position) < 800)
+                    if (need.PredictedPos.Distance(Player.Position) < 800 && need.LastVisablePos.Distance(Player.Position) < 800)
                     {
                         E.Cast(ObjectManager.Player.Position.Extend(need.PredictedPos, 800));
                         return;
