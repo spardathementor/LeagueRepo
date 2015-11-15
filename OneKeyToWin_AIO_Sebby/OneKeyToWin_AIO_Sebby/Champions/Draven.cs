@@ -53,14 +53,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("autoE2", "Harras E if can hit 2 targets", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rdmg", "KS damage calculation", true).SetValue(new StringList(new[] { "X 1", "X 2" }, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("comboR", "Auto R in combo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rcc", "R cc", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Raoe", "R aoe combo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("hitchanceR", "VeryHighHitChanceR", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
-            Obj_SpellMissile.OnCreate += SpellMissile_OnCreateOld;
-            Obj_SpellMissile.OnDelete += Obj_SpellMissile_OnDelete;
+            GameObject.OnCreate += SpellMissile_OnCreateOld;
+            GameObject.OnDelete += Obj_SpellMissile_OnDelete;
             Orbwalking.BeforeAttack += BeforeAttack;
             GameObject.OnCreate += GameObjectOnOnCreate;
             GameObject.OnDelete += GameObjectOnOnDelete;
@@ -90,6 +91,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (!sender.IsValid<MissileClient>())
                 return;
+
             MissileClient missile = (MissileClient)sender;
 
             if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && missile.SData.Name == "DravenR")
@@ -254,8 +256,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     float predictedHealth = target.Health;
                     double Rdmg = CalculateR(target) ;
-                    if (Rdmg * 2 > predictedHealth )
+
+                    if (Rdmg * 2 > predictedHealth && Config.Item("Rdmg", true).GetValue<StringList>().SelectedIndex == 1)
                         Rdmg = Rdmg + getRdmg(target);
+
                     var qDmg = Q.GetDamage(target);
                     var eDmg = E.GetDamage(target);
                     if (Rdmg > predictedHealth && !Orbwalking.InAutoAttackRange(target))
@@ -263,15 +267,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         castR(target);
                         Program.debug("R normal");
                     }
-                    else if (Program.Combo && Config.Item("comboR", true).GetValue<bool>() && Orbwalking.InAutoAttackRange(target) && Rdmg * 2 > predictedHealth)
+                    else if (Program.Combo && Config.Item("comboR", true).GetValue<bool>() && Orbwalking.InAutoAttackRange(target) && Rdmg * 2 + Player.GetAutoAttackDamage(target) > predictedHealth)
                     {
                         castR(target);
                         Program.debug("R normal");
                     }
-                    else if (!OktwCommon.CanMove(target) && Config.Item("Rcc", true).GetValue<bool>() &&
-                        target.IsValidTarget( E.Range) && Rdmg * 2 > predictedHealth)
+                    else if (Config.Item("Rcc", true).GetValue<bool>() && Rdmg * 2 > predictedHealth && !OktwCommon.CanMove(target) &&  target.IsValidTarget( E.Range))
                     {
-                        R.CastIfWillHit(target, 2, true);
+                        R.Cast(target);
                         Program.debug("R normal");
                     }
                     else if (Program.Combo && Config.Item("Raoe", true).GetValue<bool>())
