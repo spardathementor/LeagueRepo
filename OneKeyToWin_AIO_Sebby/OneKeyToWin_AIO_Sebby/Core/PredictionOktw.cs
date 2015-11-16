@@ -403,12 +403,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
-            {
-                fixRange = moveArea * (0.2f + input.Delay);
-                backToFront = moveArea;
-            }
-
             if (input.Type == SkillshotType.SkillshotCircle)
             {
                 fixRange -= input.Radius / 2;
@@ -426,7 +420,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         result.Hitchance = HitChance.VeryHigh;
                     }
-                    else if (UnitTracker.GetLastNewPathTime(input.Unit) > 0.1d)
+                    else
                         result.Hitchance = HitChance.High;
                 }
             }
@@ -1237,7 +1231,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.45f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.40f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
             {
                 return true;
             }
