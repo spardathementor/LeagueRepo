@@ -264,7 +264,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (ft)
             {
                 //Increase the delay due to the latency and server tick:
-                input.Delay += Game.Ping / 2000f + 0.07f;
+                input.Delay += Game.Ping / 2000f + 0.08f;
 
                 if (input.Aoe)
                 {
@@ -359,7 +359,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            Program.debug("PRED: FOR CHAMPION " + input.Unit.BaseSkinName);
+            //Program.debug("PRED: FOR CHAMPION " + input.Unit.BaseSkinName);
 
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
@@ -389,8 +389,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.7f;
             double angleMove = 30 + (input.Radius / 10) - (input.Delay * 5);
-            float backToFront = moveArea * 1.5f;
-            float pathMinLen = 800f + backToFront;
+            float pathMinLen = 800f + moveArea;
+
+            if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+            {
+                pathMinLen = 700f;
+            }
 
             // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
 
@@ -418,6 +422,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 Program.debug("PRED: NEW VISABLE");
                 result.Hitchance = HitChance.High;
+                return result;
+            }
+
+            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
+            {
+                Program.debug("PRED: FIX RANGE");
+                result.Hitchance = HitChance.Medium;
                 return result;
             }
 
@@ -449,14 +462,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
-
-            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
-            {
-                Program.debug("PRED: FIX RANGE");
-                result.Hitchance = HitChance.Medium;
-                return result;
-            }
 
             // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
