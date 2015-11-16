@@ -394,11 +394,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float fixRange = moveArea * 0.5f;
             double angleMove = 30 + (input.Radius / 10) - (totalDelay * 2);
             float backToFront = moveArea * 1.5f;
-            float pathMinLen = 600f + backToFront;
+            float pathMinLen = 1000f ;
 
             if(UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
-                pathMinLen = 600f;
+                pathMinLen = 700f + backToFront;
                 angleMove += 3;
                 result.Hitchance = HitChance.High;
             }
@@ -434,7 +434,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 400 || distanceFromToWaypoint < 300 || input.Unit.MoveSpeed < 200f)
+            if (distanceFromToUnit < 300 || distanceFromToWaypoint < 200)
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -453,7 +453,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > distanceFromToUnit && GetAngle(input.From, input.Unit) < angleMove + 5)
+            if (distanceFromToWaypoint > distanceFromToUnit && GetAngle(input.From, input.Unit) < angleMove + 2)
             {
                 Program.debug("PRED: RUN IN LANE DETECTION");
                 result.Hitchance = HitChance.VeryHigh;
@@ -464,7 +464,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
             {
-                Program.debug("PRED: FIX RANGE");
+                //debug("PRED: FIX RANGE");
                 result.Hitchance = HitChance.Medium;
                 return result;
             }
@@ -480,7 +480,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 else
                     result.Hitchance = HitChance.Medium;
 
-                //Program.debug("PRED: AUTO ATTACK DETECTION");
+                Program.debug("PRED: AUTO ATTACK DETECTION");
                 return result;
             }
 
@@ -502,7 +502,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     else
                         result.Hitchance = HitChance.VeryHigh;
 
-                    //Program.debug("PRED: STOP LOGIC");
+                    Program.debug("PRED: STOP LOGIC");
                     return result;
                 }
             }
