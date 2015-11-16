@@ -352,12 +352,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         internal static PredictionOutput WayPointAnalysis(PredictionOutput result, PredictionInput input)
         {
+
             if (!input.Unit.IsValid<Obj_AI_Hero>())
             {
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
 
+            Program.debug("PRED: FOR CHAMPION " + input.Unit.BaseSkinName);
+
+            // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0)
             {
@@ -366,7 +370,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
 
             }
-            result.Hitchance = HitChance.High;
+
+            // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
 
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
@@ -374,8 +379,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
 
             float speedDelay = distanceFromToUnit / input.Speed;
-
-
 
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 speedDelay = 0;
@@ -387,12 +390,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float fixRange = moveArea * 0.7f;
             double angleMove = 30 + (input.Radius / 10) - (input.Delay * 5);
             float backToFront = moveArea * 1.5f;
-            float pathMinLen = 700f + backToFront;
+            float pathMinLen = 800f + backToFront;
 
+            // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.PathCalc(input.Unit))
             {
-
+                Program.debug("PRED: SPAM CLICK");
                 if (distanceFromToUnit < input.Range - fixRange)
                 {
                     result.Hitchance = HitChance.VeryHigh;
@@ -408,37 +412,53 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 fixRange -= input.Radius / 2;
             }
 
-            if (distanceUnitToWaypoint > pathMinLen)
+            // NEW VISABLE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (UnitTracker.GetLastVisableTime(input.Unit) < 0.08d)
             {
-                result.Hitchance = HitChance.VeryHigh;
-            }
-            else if (input.Type == SkillshotType.SkillshotLine)
-            {
-                if (input.Unit.Path.Count() > 0)
-                {
-                    if (GetAngle(input.From, input.Unit) < angleMove)
-                    {
-                        result.Hitchance = HitChance.VeryHigh;
-                    }
-                    else
-                        result.Hitchance = HitChance.High;
-                }
+                Program.debug("PRED: NEW VISABLE");
+                result.Hitchance = HitChance.High;
+                return result;
             }
 
-            if (input.Unit.Path.Count() == 0 && input.Unit.Position == input.Unit.ServerPosition)
+            // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToUnit < 400 || distanceFromToWaypoint < 300 || input.Unit.MoveSpeed < 200f)
             {
-                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
-                    result.Hitchance = HitChance.High;
-                else if (distanceFromToUnit > input.Range - fixRange)
-                    result.Hitchance = HitChance.Medium;
-                else
-                    result.Hitchance = HitChance.VeryHigh;
+                Program.debug("PRED: SPECIAL CASES");
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+
             }
-            else if (distanceFromToWaypoint <= input.Unit.Distance(input.From))
+
+            // LONG CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceUnitToWaypoint > pathMinLen)
             {
-                if (distanceFromToUnit > input.Range - fixRange)
-                    result.Hitchance = HitChance.Medium;
+                Program.debug("PRED: LONG CLICK DETECTION");
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
             }
+
+            // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToWaypoint > distanceFromToUnit && GetAngle(input.From, input.Unit) < angleMove)
+            {
+                Program.debug("PRED: RUN IN LANE DETECTION");
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+            }
+
+            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
+            {
+                Program.debug("PRED: FIX RANGE");
+                result.Hitchance = HitChance.Medium;
+                return result;
+            }
+
+            // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
@@ -448,41 +468,60 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     result.Hitchance = HitChance.VeryHigh;
                 else
                     result.Hitchance = HitChance.Medium;
+
+                Program.debug("PRED: AUTO ATTACK DETECTION");
+                return result;
             }
+
+            // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
+
+            else
+            {
+                if(input.Unit.IsWindingUp)
+                {
+                    result.Hitchance = HitChance.Medium;
+                    return result;
+                }
+                else if (input.Unit.Path.Count() == 0 && !input.Unit.IsMoving)
+                {
+                    if (distanceFromToUnit > input.Range - fixRange)
+                        result.Hitchance = HitChance.Medium;
+                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.8d)
+                        result.Hitchance = HitChance.High;
+                    else
+                        result.Hitchance = HitChance.VeryHigh;
+
+                    Program.debug("PRED: STOP LOGIC");
+                    return result;
+                }
+            }
+
+            // ANGLE HIT CHANCE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 0 && input.Unit.IsMoving)
+            {
+                if (GetAngle(input.From, input.Unit) < angleMove)
+                {
+                    Program.debug("PRED: ANGLE HIT CHANCE");
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+
+                }
+            }
+
+            // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
 
             if (input.Type == SkillshotType.SkillshotCircle)
             {
-                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
-                    result.Hitchance = HitChance.VeryHigh;
-                else if (distanceFromToUnit < input.Range - fixRange)
-                    result.Hitchance = HitChance.VeryHigh;
-            }
-
-            if (result.Hitchance != HitChance.Medium)
-            {
-                if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
-                    result.Hitchance = HitChance.Medium;
-                else if (input.Unit.Path.Count() == 0 && input.Unit.Position != input.Unit.ServerPosition)
-                    result.Hitchance = HitChance.Medium;
-                else if (input.Unit.Path.Count() > 0 && distanceUnitToWaypoint < backToFront)
+                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d && distanceFromToUnit < input.Range - fixRange)
                 {
-                    result.Hitchance = HitChance.Medium;
-                }
-                else if (input.Unit.Path.Count() > 1)
-                    result.Hitchance = HitChance.Medium;
-                else
-
-                if (UnitTracker.GetLastVisableTime(input.Unit) < 0.05d)
-                {
-                    result.Hitchance = HitChance.Medium;
+                    Program.debug("PRED: CIRCLE NEW PATH");
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
                 }
             }
-            if (distanceFromToWaypoint > input.Unit.Distance(input.From) && GetAngle(input.From, input.Unit) > angleMove)
-                result.Hitchance = HitChance.VeryHigh;
-
-            if (input.Unit.Distance(input.From) < 400 || distanceFromToWaypoint < 300 || input.Unit.MoveSpeed < 200f)
-                result.Hitchance = HitChance.VeryHigh;
-
+            //Program.debug("PRED: NO DETECTION");
+            result.Hitchance = HitChance.Medium;
             return result;
         }
 
@@ -564,7 +603,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Unit.IsValid<Obj_AI_Hero>() && UnitTracker.PathCalc(input.Unit))
             {
-                Program.debug(input.Unit.BaseSkinName + Game.Time);
+                
                 return GetPositionOnPath(input, UnitTracker.GetPathWayCalc(input.Unit), speed);
 
             }
