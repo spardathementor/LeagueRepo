@@ -135,7 +135,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 3 && enemy.Health > enemy.Level * 2))
                 {
                     var dmgCombo = Player.GetAutoAttackDamage(enemy) + W.GetDamage(enemy) + GetEDmg(enemy);
-                    if (dmgCombo > enemy.Health)
+                    if (dmgCombo > enemy.Health && GetEDmg(enemy) < enemy.Health)
                         Program.CastSpell(W, enemy);
                     else if (R.IsReady() && R.GetDamage(enemy) + dmgCombo > enemy.Health && Player.Mana > RMANA + WMANA)
                         Program.CastSpell(W, enemy);
