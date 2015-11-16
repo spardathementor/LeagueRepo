@@ -332,6 +332,13 @@ namespace Jinx_Genesis.Core
                 }
             }
 
+            //Set hit chance
+            if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
+            {
+                result = WayPointAnalysis(result, input);
+                //.debug(input.Unit.BaseSkinName + result.Hitchance);
+            }
+
             //Check for collision
             if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
             {
@@ -341,23 +348,22 @@ namespace Jinx_Genesis.Core
                 result.Hitchance = result.CollisionObjects.Count > 0 ? HitChance.Collision : result.Hitchance;
             }
 
-            //Set hit chance
-            if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
-            {
-                result = WayPointAnalysis(result, input);
-                //.debug(input.Unit.BaseSkinName + result.Hitchance);
-            }
+
             return result;
         }
 
         internal static PredictionOutput WayPointAnalysis(PredictionOutput result, PredictionInput input)
         {
-            if (!input.Unit.IsValid<Obj_AI_Hero>())
+
+            if (!input.Unit.IsValid<Obj_AI_Hero>() || input.Radius == 1)
             {
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
 
+            //Program.debug("PRED: FOR CHAMPION " + input.Unit.BaseSkinName);
+
+            // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0)
             {
@@ -366,7 +372,10 @@ namespace Jinx_Genesis.Core
                 return result;
 
             }
-            result.Hitchance = HitChance.High;
+
+            // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
+
+            result.Hitchance = HitChance.Medium;
 
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
@@ -375,8 +384,6 @@ namespace Jinx_Genesis.Core
 
             float speedDelay = distanceFromToUnit / input.Speed;
 
-
-
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 speedDelay = 0;
             else
@@ -384,15 +391,27 @@ namespace Jinx_Genesis.Core
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
-            float fixRange = moveArea * 0.7f;
-            double angleMove = 30 + (input.Radius / 10) - (input.Delay * 5);
+            float fixRange = moveArea * 0.5f;
+            double angleMove = 30 + (input.Radius / 10) - (totalDelay * 2);
             float backToFront = moveArea * 1.5f;
-            float pathMinLen = 700f + backToFront;
+            float pathMinLen = 1000f;
 
+            if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+            {
+                pathMinLen = 700f + backToFront;
+                angleMove += 3;
+                result.Hitchance = HitChance.High;
+            }
+
+            if (input.Type == SkillshotType.SkillshotCircle)
+            {
+                fixRange -= input.Radius / 2;
+            }
+
+            // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.PathCalc(input.Unit))
             {
-
                 if (distanceFromToUnit < input.Range - fixRange)
                 {
                     result.Hitchance = HitChance.VeryHigh;
@@ -403,91 +422,109 @@ namespace Jinx_Genesis.Core
                 return result;
             }
 
-            if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+            // NEW VISABLE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (UnitTracker.GetLastVisableTime(input.Unit) < 0.08d)
             {
-                fixRange = moveArea * (0.2f + input.Delay);
-                backToFront = moveArea;
+                result.Hitchance = HitChance.Medium;
+                return result;
             }
 
-            if (input.Type == SkillshotType.SkillshotCircle)
+            // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToUnit < 300 || distanceFromToWaypoint < 200)
             {
-                fixRange -= input.Radius / 2;
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+
             }
+
+            // LONG CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
             if (distanceUnitToWaypoint > pathMinLen)
             {
+
                 result.Hitchance = HitChance.VeryHigh;
-            }
-            else if (input.Type == SkillshotType.SkillshotLine)
-            {
-                if (input.Unit.Path.Count() > 0)
-                {
-                    if (GetAngle(input.From, input.Unit) < angleMove)
-                    {
-                        result.Hitchance = HitChance.VeryHigh;
-                    }
-                    else if (UnitTracker.GetLastNewPathTime(input.Unit) > 0.1d)
-                        result.Hitchance = HitChance.High;
-                }
+                return result;
             }
 
-            if (input.Unit.Path.Count() == 0 && input.Unit.Position == input.Unit.ServerPosition)
+            // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToWaypoint > distanceFromToUnit && GetAngle(input.From, input.Unit) < angleMove + 2)
             {
-                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
-                    result.Hitchance = HitChance.High;
-                else if (distanceFromToUnit > input.Range - fixRange)
-                    result.Hitchance = HitChance.Medium;
-                else
-                    result.Hitchance = HitChance.VeryHigh;
+
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
             }
-            else if (distanceFromToWaypoint <= input.Unit.Distance(input.From))
+
+            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
             {
-                if (distanceFromToUnit > input.Range - fixRange)
-                    result.Hitchance = HitChance.Medium;
+                //debug("PRED: FIX RANGE");
+                result.Hitchance = HitChance.Medium;
+                return result;
             }
+
+            // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.8 + (input.Radius * 0.001))
+                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 1 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.001))
+                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.8 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
                 else
                     result.Hitchance = HitChance.Medium;
+
+                return result;
             }
+
+            // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
+
+            else
+            {
+                if (input.Unit.IsWindingUp)
+                {
+                    result.Hitchance = HitChance.Medium;
+                    return result;
+                }
+                else if (input.Unit.Path.Count() == 0 && !input.Unit.IsMoving)
+                {
+                    if (distanceFromToUnit > input.Range - fixRange)
+                        result.Hitchance = HitChance.Medium;
+                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.8d)
+                        result.Hitchance = HitChance.High;
+                    else
+                        result.Hitchance = HitChance.VeryHigh;
+
+                    return result;
+                }
+            }
+
+            // ANGLE HIT CHANCE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 0 && input.Unit.IsMoving)
+            {
+                if (GetAngle(input.From, input.Unit) < angleMove)
+                {
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+
+                }
+            }
+
+            // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
 
             if (input.Type == SkillshotType.SkillshotCircle)
             {
-                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
-                    result.Hitchance = HitChance.VeryHigh;
-                else if (distanceFromToUnit < input.Range - fixRange)
-                    result.Hitchance = HitChance.VeryHigh;
-            }
-
-            if (result.Hitchance != HitChance.Medium)
-            {
-                if (input.Unit.IsWindingUp && UnitTracker.GetLastAutoAttackTime(input.Unit) > 0.1d)
-                    result.Hitchance = HitChance.Medium;
-                else if (input.Unit.Path.Count() == 0 && input.Unit.Position != input.Unit.ServerPosition)
-                    result.Hitchance = HitChance.Medium;
-                else if (input.Unit.Path.Count() > 0 && distanceUnitToWaypoint < backToFront)
+                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d && distanceFromToUnit < input.Range - fixRange && distanceUnitToWaypoint > fixRange)
                 {
-                    result.Hitchance = HitChance.Medium;
-                }
-                else if (input.Unit.Path.Count() > 1)
-                    result.Hitchance = HitChance.Medium;
-                else
-
-                if (UnitTracker.GetLastVisableTime(input.Unit) < 0.05d)
-                {
-                    result.Hitchance = HitChance.Medium;
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
                 }
             }
-            if (distanceFromToWaypoint > input.Unit.Distance(input.From) && GetAngle(input.From, input.Unit) > angleMove)
-                result.Hitchance = HitChance.VeryHigh;
-
-            if (input.Unit.Distance(input.From) < 400 || distanceFromToWaypoint < 300 || input.Unit.MoveSpeed < 200f)
-                result.Hitchance = HitChance.VeryHigh;
+            //Program.debug("PRED: NO DETECTION");
 
             return result;
         }
@@ -570,6 +607,7 @@ namespace Jinx_Genesis.Core
 
             if (input.Unit.IsValid<Obj_AI_Hero>() && UnitTracker.PathCalc(input.Unit))
             {
+
                 return GetPositionOnPath(input, UnitTracker.GetPathWayCalc(input.Unit), speed);
 
             }
@@ -1236,7 +1274,7 @@ namespace Jinx_Genesis.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.45f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.40f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
             {
                 return true;
             }
