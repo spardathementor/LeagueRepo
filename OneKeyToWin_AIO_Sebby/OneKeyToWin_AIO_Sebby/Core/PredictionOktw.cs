@@ -365,7 +365,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
-            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0)
+            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall"))
             {
 
                 result.Hitchance = HitChance.VeryHigh;
@@ -477,7 +477,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.8 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
                 else
-                    result.Hitchance = HitChance.Medium;
+                    result.Hitchance = HitChance.High;
 
                 Program.debug("PRED: AUTO ATTACK DETECTION");
                 return result;
@@ -489,7 +489,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 if(input.Unit.IsWindingUp)
                 {
-                    result.Hitchance = HitChance.Medium;
+                    result.Hitchance = HitChance.High;
                     return result;
                 }
                 else if (input.Unit.Path.Count() == 0 && !input.Unit.IsMoving)
