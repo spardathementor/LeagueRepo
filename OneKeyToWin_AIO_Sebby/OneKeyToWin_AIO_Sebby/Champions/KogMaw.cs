@@ -137,13 +137,8 @@ namespace OneKeyToWin_AIO_Sebby
                     var harasStack = Config.Item("harasStack", true).GetValue<Slider>().Value;
                     var comboStack = Config.Item("comboStack", true).GetValue<Slider>().Value;
                     var countR = GetRStacks();
+
                     var Rdmg = R.GetDamage(target);
-
-                    if (target.HealthPercent < 50 && target.HealthPercent > 25)
-                        Rdmg = Rdmg * 2;
-                    else if (target.HealthPercent < 25)
-                        Rdmg = Rdmg * 3;
-
                     Rdmg = Rdmg + target.CountAlliesInRange(500) * Rdmg;
 
                     if (R.GetDamage(target) > target.Health)
