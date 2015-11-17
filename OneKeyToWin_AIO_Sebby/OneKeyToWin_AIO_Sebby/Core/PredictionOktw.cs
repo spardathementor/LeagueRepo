@@ -453,7 +453,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > distanceFromToUnit && GetAngle(input.From, input.Unit) < angleMove + 2)
+            if (distanceFromToWaypoint > distanceFromToUnit + fixRange && GetAngle(input.From, input.Unit) < angleMove)
             {
                 Program.debug("PRED: RUN IN LANE DETECTION");
                 result.Hitchance = HitChance.VeryHigh;
