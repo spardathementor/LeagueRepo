@@ -95,6 +95,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (!W.IsReady() || !sender.IsEnemy || !Config.Item("autoW", true).GetValue<bool>()  || !sender.IsValidTarget(1500) )
                 return;
+
             double value = 20 + (Player.Level * 20) + (0.4 * Player.FlatMagicDamageMod);
 
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 200))
@@ -142,11 +143,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && !t.HasBuff("ThreshQ") && OktwCommon.CanMove(t))
             {
-                foreach (var buff in t.Buffs)
-                {
-                    Program.debug("" + buff.Name);
-                        
-                }
                 var revertPosition = t.ServerPosition;
                 if (Program.Combo)
                 {
@@ -162,7 +158,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && enemy.HasBuff("ThreshQ")))
+            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range + 300) && enemy.HasBuff("ThreshQ")))
             {
                 if (Program.Combo)
                 {
@@ -177,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             }
                         }
                     }
-                    if (OktwCommon.GetPassiveTime(enemy, "ThreshQ") < 0.3)
+                    if (OktwCommon.GetPassiveTime(enemy, "ThreshQ") < 0.3 + (Game.Ping /2))
                         Q.Cast();
                 }
                 return;
