@@ -102,32 +102,34 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (args.Slot == SpellSlot.R )
             {
-                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+                var t = TargetSelector.GetTarget(R.Range-20, TargetSelector.DamageType.Magical);
 
-                if (E.IsReady() && t.IsValidTarget() && Player.Mana > RMANA + EMANA)
+                if (t.IsValidTarget())
                 {
-                    E.CastOnUnit(t);
-                    args.Process = false;
-                    return;
-                }
+                    if (E.IsReady() && Player.Mana > RMANA + EMANA)
+                    {
+                        E.CastOnUnit(t);
+                        args.Process = false;
+                        return;
+                    }
 
-                if (W.IsReady() && t.IsValidTarget() && Player.Mana > RMANA + WMANA)
-                {
-                    W.Cast(t.ServerPosition);
-                    args.Process = false;
-                    return;
-                }
+                    if (W.IsReady() && Player.Mana > RMANA + WMANA)
+                    {
+                        W.Cast(t);
+                        args.Process = false;
+                        return;
+                    }
 
-                if (Q.IsReady() && t.IsValidTarget() &&  Player.Mana > RMANA + QMANA)
-                {
-                    Qr.Cast(t);
-                    args.Process = false;
-                    return;
-                }
+                    if (Q.IsReady() && Player.Mana > RMANA + QMANA)
+                    {
+                        Qr.Cast(t);
+                        args.Process = false;
+                        return;
+                    }
 
-                if(R.IsReady() && t.IsValidTarget())
-                    Utility.DelayAction.Add(50, () => Rtime = Game.Time);
-                
+                    if (R.IsReady())
+                        Utility.DelayAction.Add(50, () => Rtime = Game.Time);
+                }
             }
         }
 
