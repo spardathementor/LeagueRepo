@@ -604,7 +604,7 @@ namespace OneKeyToWin_AIO_Sebby
                         ManaPotion.Cast();
                 }
 
-                if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlask"))
+                if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlask") || Player.HasBuff("ItemCrystalFlaskJungle") || Player.HasBuff("ItemDarkCrystalFlask"))
                     return;
 
                 if (Hunter.IsReady())
