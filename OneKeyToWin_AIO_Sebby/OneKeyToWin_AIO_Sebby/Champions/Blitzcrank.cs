@@ -26,12 +26,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 950);
+            Q = new Spell(SpellSlot.Q, 975);
             W = new Spell(SpellSlot.W, 200);
             E = new Spell(SpellSlot.E, 475);
             R = new Spell(SpellSlot.R, 600);
 
-            Q.SetSkillshot(0.25f, 70f, 1800f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 85f, 1800f, true, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
