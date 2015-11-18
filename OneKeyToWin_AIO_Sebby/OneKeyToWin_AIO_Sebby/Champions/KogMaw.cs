@@ -100,12 +100,7 @@ namespace OneKeyToWin_AIO_Sebby
                 R.Range = 800 + 300 * Player.Spellbook.GetSpell(SpellSlot.R).Level;
                 W.Range = 650 + 30 * Player.Spellbook.GetSpell(SpellSlot.W).Level;
                 SetMana();
-                if (Player.IsZombie && Program.Combo)
-                {
-                    var t = TargetSelector.GetTarget(800, TargetSelector.DamageType.Physical);
-                    if (t.IsValidTarget())
-                        Orbwalker.SetOrbwalkingPoint(t.ServerPosition);
-                }
+
             }
             if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
