@@ -29,10 +29,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q = new Spell(SpellSlot.Q, 1075);
             W = new Spell(SpellSlot.W, 950);
             E = new Spell(SpellSlot.E, 450);
-            R = new Spell(SpellSlot.R, 430);
+            R = new Spell(SpellSlot.R, 420);
 
             Q.SetSkillshot(0.5f, 80, 1900f, true, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 100, float.MaxValue, false, SkillshotType.SkillshotLine);  
+            E.SetSkillshot(0.25f, 50, float.MaxValue, false, SkillshotType.SkillshotLine);  
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts1", "ON - only one target"));
@@ -42,7 +42,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("maxGrab", "Max range grab", true).SetValue(new Slider((int)Q.Range, 125, (int)Q.Range)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("Q option").SubMenu("Grab").AddItem(new MenuItem("grab" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("GapQ", "OnEnemyGapcloser Q")).SetValue(true);
+            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("GapQ", "OnEnemyGapcloser Q",true)).SetValue(true);
 
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW3", "Auto W shield big dmg", true).SetValue(true));
@@ -63,6 +63,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw when skill rdy", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("AACombo", "Disable AA if can use E", true).SetValue(true));
+
 
             Game.OnUpdate += Game_OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
@@ -128,6 +131,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Program.Combo && Config.Item("AACombo", true).GetValue<bool>())
+            {
+                if (!E.IsReady())
+                    Orbwalking.Attack = true;
+
+                else
+                    Orbwalking.Attack = false;
+            }
+            else
+                Orbwalking.Attack = true;
+
+
             if (Program.LagFree(1) && Q.IsReady())
                 LogicQ();
             if (Program.LagFree(2) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
