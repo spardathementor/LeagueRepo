@@ -392,7 +392,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 11) - (totalDelay * 2);
+            double angleMove = 30 + (input.Radius / 11) - (totalDelay * 3);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 1000f ;
 
@@ -454,7 +454,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (distanceFromToWaypoint > distanceFromToUnit + fixRange && GetAngle(input.From, input.Unit) < angleMove)
             {
-                Program.debug("PRED: RUN IN LANE DETECTION");
+                Program.debug(GetAngle(input.From, input.Unit) +  " PRED: RUN IN LANE DETECTION " + angleMove);
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
