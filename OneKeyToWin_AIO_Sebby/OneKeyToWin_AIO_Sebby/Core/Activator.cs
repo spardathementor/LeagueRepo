@@ -245,7 +245,7 @@ namespace OneKeyToWin_AIO_Sebby
                         TryCast(() => Player.Spellbook.CastSpell(barrier, Player));
                     else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
                         TryCast(() => Player.Spellbook.CastSpell(barrier, Player));
-                    else if (ally.Health - dmg < ally.Level * 10)
+                    else if (ally.Health - dmg < ally.Level * 15)
                         TryCast(() => Seraph.Cast());
                 }
 
@@ -254,9 +254,9 @@ namespace OneKeyToWin_AIO_Sebby
                     var value = Player.Mana * 0.2 + 150;
                     if (dmg > value && Player.HealthPercent < 50)
                         TryCast(() => Seraph.Cast());
-                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 10)
+                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
                         TryCast(() => Seraph.Cast());
-                    else if (ally.Health - dmg < ally.Level * 10)
+                    else if (ally.Health - dmg < ally.Level * 15)
                         TryCast(() => Seraph.Cast());
                 }
                 
@@ -264,11 +264,11 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (dmg > Player.Level * 30)
                         TryCast(() => Zhonya.Cast());
-                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 10)
+                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
                     {
                         TryCast(() => Zhonya.Cast());
                     }
-                    else if (ally.Health - dmg < ally.Level * 10)
+                    else if (ally.Health - dmg < ally.Level * 15)
                     {
                         TryCast(() => Zhonya.Cast()); 
                     }
