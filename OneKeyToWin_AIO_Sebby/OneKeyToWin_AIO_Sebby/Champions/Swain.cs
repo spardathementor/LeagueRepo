@@ -33,7 +33,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             W.SetSkillshot(1.30f, 240f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
@@ -374,27 +373,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else
                     Utility.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.Gray, 1, 1);
-            }
-            if (Config.Item("noti", true).GetValue<bool>())
-            {
-                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
-
-                if (t.IsValidTarget() && R.IsReady())
-                {
-                    var rDamage = R.GetDamage(t);
-                    if (rDamage > t.Health)
-                    {
-                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "Ult can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                        drawLine(t.Position, Player.Position, 10, System.Drawing.Color.Yellow);
-                    }
-                }
-
-                var tw = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
-                if (tw.IsValidTarget())
-                {
-                    if (Q.GetDamage(tw) > tw.Health)
-                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.4f, System.Drawing.Color.Red, "Q can kill: " + t.ChampionName + " have: " + t.Health + "hp");
-                }
             }
         }
     }
