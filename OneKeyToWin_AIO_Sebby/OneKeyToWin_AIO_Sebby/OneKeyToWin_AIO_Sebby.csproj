@@ -76,6 +76,7 @@
     <Compile Include="Champions\Malzahar.cs" />
     <Compile Include="Champions\Morgana.cs" />
     <Compile Include="Champions\Jayce.cs" />
+    <Compile Include="Champions\Swain.cs" />
     <Compile Include="Champions\Thresh.cs" />
     <Compile Include="Champions\Tristana.cs" />
     <Compile Include="Champions\Twitch.cs" />

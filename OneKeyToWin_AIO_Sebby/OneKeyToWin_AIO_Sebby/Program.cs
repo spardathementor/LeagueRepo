@@ -211,6 +211,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Karthus":
                         new Champions.Karthus().LoadOKTW();
                         break;
+                    case "Swain":
+                        new Champions.Swain().LoadOKTW();
+                        break;
                 }
             }
 
