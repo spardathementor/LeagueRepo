@@ -23,8 +23,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             W = new Spell(SpellSlot.W, 900);
             E = new Spell(SpellSlot.E, 620);
             R = new Spell(SpellSlot.R, 620);
-            
-            W.SetSkillshot(0.25f, 100, 1225, false, SkillshotType.SkillshotCircle);
+
+            W.SetSkillshot(0.35f, 250f, 1400f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -123,10 +123,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(1))
             {
 
-                var lvl = 7 * Player.Level;
+                var lvl = 7 * (Player.Level - 1);
 
-                E.Range = 600 + lvl;
-                R.Range = 600 + lvl;
+                E.Range = 620 + lvl;
+                R.Range = 620 + lvl;
 
                 SetMana();
                 Jungle();
@@ -134,7 +134,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if ((Program.LagFree(4) || Program.LagFree(2)) && R.IsReady() )
                 LogicR();
-            if (Program.LagFree(3) && W.IsReady())
+            if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp)
                 LogicW();
         }
         private void LogicW()
@@ -205,7 +205,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
 
-                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(600) > 0 && enemy.CountAlliesInRange(400) == 0)
+                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(500) > 0 && enemy.CountAlliesInRange(400) == 0)
                 {
                     Program.debug("R ally");
 
