@@ -27,8 +27,8 @@ namespace OneKeyToWin_AIO_Sebby
             Q1 = new Spell(SpellSlot.Q, 1100f);
             W = new Spell(SpellSlot.W, 1200);
             E = new Spell(SpellSlot.E, 475f);
-            R = new Spell(SpellSlot.R, 1400f);
-            R1 = new Spell(SpellSlot.R, 1400f);
+            R = new Spell(SpellSlot.R, 1200f);
+            R1 = new Spell(SpellSlot.R, 1200f);
 
             Q1.SetSkillshot(0.40f, 10f, float.MaxValue, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
@@ -235,20 +235,20 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget(R.Range) && t.CountAlliesInRange(500) == 0 && OktwCommon.ValidUlt(t) && !Orbwalking.InAutoAttackRange(t))
             {
-                var rDmg = R.GetDamage(t,1) * (15 + 5 * R.Level);
+                var rDmg = R.GetDamage(t,1) * (10 + 5 * R.Level);
 
                 var tDis = Player.Distance(t.ServerPosition);
-                if (rDmg * 0.8 > t.Health && tDis < 800 && !Q.IsReady())
+                if (rDmg * 0.8 > t.Health && tDis < 700 && !Q.IsReady())
                     R.Cast(t, true, true);
-                else if (rDmg * 0.7 > t.Health && tDis < 900)
+                else if (rDmg * 0.7 > t.Health && tDis < 800)
                     R.Cast(t, true, true);
-                else if (rDmg * 0.6 > t.Health && tDis < 1000)
+                else if (rDmg * 0.6 > t.Health && tDis < 900)
                     R.Cast(t, true, true);
-                else if (rDmg * 0.5 > t.Health && tDis < 1100)
+                else if (rDmg * 0.5 > t.Health && tDis < 1000)
                     R.Cast(t, true, true);
-                else if (rDmg * 0.4 > t.Health && tDis < 1200)
+                else if (rDmg * 0.4 > t.Health && tDis < 1100)
                     R.Cast(t, true, true);
-                else if (rDmg * 0.3 > t.Health && tDis < 1300)
+                else if (rDmg * 0.3 > t.Health && tDis < 1200)
                     R.Cast(t, true, true);
                 return;
             }
