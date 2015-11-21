@@ -134,7 +134,14 @@ namespace OneKeyToWin_AIO_Sebby
             // DEF
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("Randuin", "Randuin").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("FaceOfTheMountain", "FaceOfTheMountain").SetValue(true));
-            Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("Zhonya", "Zhonya").SetValue(true));
+            Config.SubMenu("Activator OKTW©").SubMenu("Defensives").SubMenu("Zhonya").AddItem(new MenuItem("Zhonya", "Zhonya").SetValue(true));
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            {
+                var spell = enemy.Spellbook.Spells[3];
+                    Config.SubMenu("Activator OKTW©").SubMenu("Defensives").SubMenu("Zhonya").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spellZ" + spell.SData.Name, spell.Name).SetValue(spell.SData.TargettingType == SpellDataTargetType.Unit));
+            }
+
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("Seraph", "Seraph").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("Solari", "Solari").SetValue(true));
             // CLEANSERS 
@@ -262,15 +269,26 @@ namespace OneKeyToWin_AIO_Sebby
                 
                 if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
                 {
-                    if (dmg > Player.Level * 30)
+                    if (Config.Item("spellZ" + args.SData.Name) != null && Config.Item("spellZ" + args.SData.Name).GetValue<bool>())
+                    {
+                        Zhonya.Cast();
                         TryCast(() => Zhonya.Cast());
+                    }
+
+                    if (dmg > Player.Level * 30)
+                    {
+                        Zhonya.Cast();
+                        TryCast(() => Zhonya.Cast());
+                    }
                     else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
                     {
+                        Zhonya.Cast();
                         TryCast(() => Zhonya.Cast());
                     }
                     else if (ally.Health - dmg < ally.Level * 15)
                     {
-                        TryCast(() => Zhonya.Cast()); 
+                        Zhonya.Cast();
+                        TryCast(() => Zhonya.Cast());
                     }
                 }
             }
