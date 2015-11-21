@@ -141,7 +141,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Config.Item("Wks", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
             {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 3 && enemy.Health > enemy.Level * 2))
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 2 && enemy.CountAlliesInRange(400) == 0  && enemy.Health > enemy.Level * 2))
                 {
                     var playerAaDmg = Player.GetAutoAttackDamage(enemy);
                     var dmgCombo = playerAaDmg + W.GetDamage(enemy) + GetEDmg(enemy);
@@ -205,7 +205,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
 
-                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(500) > 0 && enemy.CountAlliesInRange(400) == 0)
+                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(500) > 0 && enemy.CountAlliesInRange(350) == 0)
                 {
                     Program.debug("R ally");
 
