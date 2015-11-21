@@ -139,7 +139,7 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
             {
                 var spell = enemy.Spellbook.Spells[3];
-                    Config.SubMenu("Activator OKTW©").SubMenu("Defensives").SubMenu("Zhonya").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spellZ" + spell.SData.Name, spell.Name).SetValue(spell.SData.TargettingType == SpellDataTargetType.Unit));
+                    Config.SubMenu("Activator OKTW©").SubMenu("Defensives").SubMenu("Zhonya").AddItem(new MenuItem("spellZ" + spell.SData.Name, enemy.ChampionName + ": "+spell.Name).SetValue(spell.SData.TargettingType == SpellDataTargetType.Unit));
             }
 
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("Seraph", "Seraph").SetValue(true));
