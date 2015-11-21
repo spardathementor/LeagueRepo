@@ -201,7 +201,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 
                 var prepos = Prediction.GetPrediction(enemy, 0.4f);
-                var finalPosition = prepos.CastPosition.Extend(prepos.CastPosition, -pushDistance);
+                var finalPosition = Player.ServerPosition.Extend(prepos.CastPosition, pushDistance);
 
                 if (Config.Item("turrentR", true).GetValue<bool>())
                 {
