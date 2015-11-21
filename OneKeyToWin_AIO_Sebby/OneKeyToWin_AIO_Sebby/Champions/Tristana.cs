@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (Config.Item("Eafter", true).GetValue<bool>())
                     return;
 
-                if (Program.Combo && Player.Mana > RMANA + EMANA + WMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
+                if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
                     E.Cast(t);
                 else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA)
                 {
@@ -214,6 +214,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(600) > 0)
                 {
+                    Program.debug("R ally");
+
                     R.Cast(enemy);
                 }
 
@@ -301,7 +303,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             EMANA = E.Instance.ManaCost;
 
             if (!R.IsReady())
-                RMANA = WMANA - Player.PARRegenRate * W.Instance.Cooldown;
+                RMANA = EMANA - Player.PARRegenRate * E.Instance.Cooldown;
             else
                 RMANA = R.Instance.ManaCost;
         }
