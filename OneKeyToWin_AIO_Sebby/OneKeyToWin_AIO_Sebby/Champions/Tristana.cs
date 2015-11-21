@@ -56,10 +56,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser & anti-meele").AddItem(new MenuItem("RgapHP", " use gapcloser only under % hp", true).SetValue(new Slider(40, 100, 0)));
 
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("jungle", "Jungle Farm", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungle", "Jungle Farm", true).SetValue(true));
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_AI_Base.OnLevelUp += Obj_AI_Base_OnLevelUp;
             Orbwalking.BeforeAttack += BeforeAttack;
             Orbwalking.AfterAttack += afterAttack;
             Interrupter2.OnInterruptableTarget +=Interrupter2_OnInterruptableTarget;
@@ -68,38 +69,40 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            Obj_AI_Hero t;
             if (target is Obj_AI_Hero)
-                t = (Obj_AI_Hero)target;
-            else
-                return;
-
-            if (t.IsValid)
             {
-                if (Program.Combo)
-                    Q.Cast();
-                else if (Program.Farm && Config.Item("harasQ", true).GetValue<bool>())
-                    Q.Cast();
-
-                if (E.IsReady() && Config.Item("Eafter", true).GetValue<bool>())
+                var t = (Obj_AI_Hero)target;
+                if (t.IsValidTarget())
                 {
-                    if (E.GetDamage(t) > t.Health)
-                        E.Cast(t);
-                    else if (E.GetDamage(t) + R.GetDamage(t) > t.Health && Player.Mana > RMANA + EMANA)
-                        E.Cast(t);
-                    else if (Program.Combo && Player.Mana > RMANA + EMANA + WMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
-                        E.Cast(t);
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA)
-                    {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && Config.Item("harras" + enemy.ChampionName).GetValue<bool>()))
-                            E.Cast(t);
-                    }
+                    if (Program.Combo)
+                        Q.Cast();
+                    else if (Program.Farm && Config.Item("harasQ", true).GetValue<bool>())
+                        Q.Cast();
                 }
             }
+            else if (target is Obj_AI_Minion && Program.LaneClear && Config.Item("farmQ", true).GetValue<bool>() && OktwCommon.CountEnemyMinions(Player, 700) > 2)
+                Q.Cast();
         }
 
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
+            if (args.Target is Obj_AI_Hero)
+            {
+                var t = (Obj_AI_Hero)args.Target;
+
+                if (t.IsValidTarget())
+                {
+                    if (E.GetDamage(t) > t.Health)
+                        E.Cast(t);
+                    else if (R.IsReady() && E.GetDamage(t) + R.GetDamage(t) > t.Health && Player.Mana > RMANA + EMANA)
+                        E.Cast(t);
+                    else if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
+                        E.Cast(t);
+                    else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("harras" + t.ChampionName).GetValue<bool>())
+                        E.Cast(t);
+                }
+            }
+
             if (Config.Item("focusE", true).GetValue<bool>())
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(900) && target.HasBuff("tristanaechargesound")))
@@ -112,21 +115,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnUpdate(EventArgs args)
         {
-            if (W.IsReady())
+            if (W.IsReady() && Config.Item("smartW", true).GetValue<KeyBind>().Active)
             {
-                if (Config.Item("smartW", true).GetValue<KeyBind>().Active)
-                    W.Cast(Player.Position.Extend(Game.CursorPos, W.Range), true);
+                W.Cast(Game.CursorPos);
             }
+
             if (Program.LagFree(1))
             {
+
+                var lvl = 7 * Player.Level;
+
+                E.Range = 600 + lvl;
+                R.Range = 600 + lvl;
+
                 SetMana();
                 Jungle();
             }
-            if (Program.LagFree(2) && E.IsReady())
-                LogicE();
-            if (Program.LagFree(3) && R.IsReady() )
+
+            if ((Program.LagFree(4) || Program.LagFree(2)) && R.IsReady() )
                 LogicR();
-            if (Program.LagFree(4) && W.IsReady())
+            if (Program.LagFree(3) && W.IsReady())
                 LogicW();
         }
         private void LogicW()
@@ -135,18 +143,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 3 && enemy.Health > enemy.Level * 2))
                 {
-                    var dmgCombo = Player.GetAutoAttackDamage(enemy) + W.GetDamage(enemy) + GetEDmg(enemy);
-
+                    var playerAaDmg = Player.GetAutoAttackDamage(enemy);
+                    var dmgCombo = playerAaDmg + W.GetDamage(enemy) + GetEDmg(enemy);
+                    
                     if (dmgCombo > enemy.Health)
                     {
                         if (Orbwalking.InAutoAttackRange(enemy))
                         {
-                            if (Player.GetAutoAttackDamage(enemy) + GetEDmg(enemy) < HealthPrediction.GetHealthPrediction(enemy,700))
+                            if (playerAaDmg * 2 + GetEDmg(enemy) < HealthPrediction.GetHealthPrediction(enemy,700))
                                 Program.CastSpell(W, enemy);
                         }
                         else
                         {
-                            if (GetEDmg(enemy) < HealthPrediction.GetHealthPrediction(enemy, 700))
+                            if (playerAaDmg + GetEDmg(enemy) < HealthPrediction.GetHealthPrediction(enemy, 700))
                                 Program.CastSpell(W, enemy);
                         }
                     }
@@ -166,34 +175,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void LogicE()
-        {
-            var orbT = Orbwalker.GetTarget();
-
-            Obj_AI_Hero t = null;
-
-            if (orbT != null && orbT is Obj_AI_Hero)
-                t = (Obj_AI_Hero)orbT;
-
-            if (t.IsValidTarget())
-            {
-                if (E.GetDamage(t) > t.Health)
-                    E.Cast(t);
-                if (E.GetDamage(t) + R.GetDamage(t) > t.Health && Player.Mana > RMANA + EMANA)
-                    E.Cast(t);
-
-                if (Config.Item("Eafter", true).GetValue<bool>())
-                    return;
-
-                if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
-                    E.Cast(t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA)
-                {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && Config.Item("harras" + enemy.ChampionName).GetValue<bool>()))
-                        E.Cast(t);
-                }
-            } 
-        }
 
         private void LogicR()
         {
@@ -224,7 +205,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
 
-                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(600) > 0)
+                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(600) > 0 && enemy.CountAlliesInRange(400) == 0)
                 {
                     Program.debug("R ally");
 
@@ -289,14 +270,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var buffCount = OktwCommon.GetBuffCount(target, "tristanaecharge");
             dmg += (dmg * 0.3f * (buffCount - 1));
             return dmg - (target.HPRegenRate * 4);
-        }
-
-        private void Obj_AI_Base_OnLevelUp(Obj_AI_Base sender, EventArgs args)
-        {
-            var lvl = (7 * (Player.Level - 1));
-            Q.Range = 605 + lvl;
-            E.Range = 635 + lvl;
-            R.Range = 635 + lvl;
         }
 
         private void SetMana()
