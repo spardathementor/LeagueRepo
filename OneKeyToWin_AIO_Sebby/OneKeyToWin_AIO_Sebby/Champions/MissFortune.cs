@@ -27,7 +27,7 @@ namespace OneKeyToWin_AIO_Sebby
             E = new Spell(SpellSlot.E, 1000f);
             R = new Spell(SpellSlot.R, 1350f);
 
-            Q1.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 10f, 2000f, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
             E.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.25f, 100f, 2000f, false, SkillshotType.SkillshotCircle);
@@ -206,12 +206,14 @@ namespace OneKeyToWin_AIO_Sebby
                 if (orbT != null && orbT is Obj_AI_Hero)
                     t2 = (Obj_AI_Hero)orbT;
 
-                if (t2.IsValidTarget() && t2.NetworkId == LastAttackId && t2.Health > Player.GetAutoAttackDamage(t2) * 2)
+                if (t2.IsValidTarget() && t2.NetworkId == LastAttackId)
                 {
-                    foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget() && Orbwalking.InAutoAttackRange(enemy) && enemy.NetworkId != LastAttackId))
-                    {
-                        Orbwalker.ForceTarget(enemy);
-                    }
+                    var ta = ObjectManager.Get<Obj_AI_Hero>().Where(enemy => 
+                        enemy.IsValidTarget() && Orbwalking.InAutoAttackRange(enemy) 
+                            && (enemy.NetworkId != LastAttackId || enemy.Health < Player.GetAutoAttackDamage(enemy) * 2) ).FirstOrDefault();
+
+                    if (ta!=null)
+                        Orbwalker.ForceTarget(ta);
                 }
             }
 
@@ -248,6 +250,11 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (t1.IsValidTarget(Q1.Range) && Config.Item("harasQ", true).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 50)
             {
+                var minions = MinionManager.GetMinions(Player.ServerPosition, Q1.Range);
+
+                if (minions.Exists(x => x.IsMoving))
+                    return;
+
                 var poutput = Q1.GetPrediction(t1);
                 var col = poutput.CollisionObjects;
                 if (col.Count() == 0)
@@ -256,9 +263,10 @@ namespace OneKeyToWin_AIO_Sebby
                 var minionQ = col.Last();
                 if (minionQ.IsValidTarget(Q.Range))
                 {
-                    if (Config.Item("killQ", true).GetValue<bool>() && Q.GetDamage(minionQ) > minionQ.Health - minionQ.GetAutoAttackDamage(minionQ) * 2)
+                    if (Config.Item("killQ", true).GetValue<bool>() && Q.GetDamage(minionQ) < minionQ.Health)
                         return;
-                    if (minionQ.Distance(Player.Position) > 400 && minionQ.Distance(poutput.CastPosition) < 380 && minionQ.Distance(t1.Position) < 380 && minionQ.Distance(poutput.CastPosition) > 150)
+
+                    if (minionQ.Distance(Player.Position) > 400 && minionQ.Distance(poutput.CastPosition) < 380 && minionQ.Distance(t1.Position) < 380 && minionQ.Distance(t1.Position) > 150)
                     {
                         if (Q.GetDamage(t1) + Player.GetAutoAttackDamage(t1) > t1.Health)
                             Q.Cast(col.Last());
@@ -298,9 +306,9 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget(R.Range) && OktwCommon.ValidUlt(t))
             {
-                var rDmg = R.GetDamage(t) * new double[] { 1, 1.25, 1.5 }[R.Level];
+                var rDmg = R.GetDamage(t) * new double[] { 0.75, 1, 1.25 }[R.Level];
 
-                if (Player.CountEnemiesInRange(600) == 0 && t.CountAlliesInRange(400) == 0)
+                if (Player.CountEnemiesInRange(700) == 0 && t.CountAlliesInRange(400) == 0)
                 {
                     var tDis = Player.Distance(t.ServerPosition);
                     if (rDmg * 7 > t.Health && tDis < 800)
@@ -335,7 +343,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     return;
                 }
-                else if (rDmg * 8 > t.Health && t.CountEnemiesInRange(300) > 2 && Player.CountEnemiesInRange(700) == 0)
+                if (rDmg * 8 > t.Health && t.CountEnemiesInRange(300) > 2 && Player.CountEnemiesInRange(700) == 0)
                 {
                     R.Cast(t, true, true);
                     RCastTime = Game.Time;
