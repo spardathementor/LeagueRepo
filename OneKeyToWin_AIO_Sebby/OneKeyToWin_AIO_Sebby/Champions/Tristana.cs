@@ -47,6 +47,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS (E+R calculation)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("turrentR", "Try R under turrent", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("allyR", "Try R under ally", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("OnInterruptableSpell", "OnInterruptableSpell", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "OneKeyToCast R closest person", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
@@ -185,6 +186,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             Obj_AI_Hero bestEnemy = null;
+            float pushDistance = 400 + (R.Level * 200);
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && OktwCommon.ValidUlt(enemy)))
             {
                 if (bestEnemy == null)
@@ -197,17 +199,24 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(enemy);
                     Program.debug("R ks");
                 }
-                if (Config.Item("turrentR", true).GetValue<bool>() && !Player.UnderTurret(false))
+                
+                var prepos = Prediction.GetPrediction(enemy, 0.4f);
+                var finalPosition = prepos.CastPosition.Extend(prepos.CastPosition, -pushDistance);
+
+                if (Config.Item("turrentR", true).GetValue<bool>())
                 {
-                    float pushDistance = 400 + (R.Level * 200);
-                    var prepos = Prediction.GetPrediction(enemy, 0.25f);
-                    var finalPosition = prepos.CastPosition.Extend(prepos.CastPosition, -pushDistance);
-                    if (!finalPosition.UnderTurret(true) && finalPosition.UnderTurret(false))
+                    if (!finalPosition.UnderTurret(true) && finalPosition.UnderTurret(false) && !Player.UnderTurret(false))
                     {
                         R.Cast(enemy);
                         Program.debug("R turrent");
                     }
                 }
+
+                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(600) > 0)
+                {
+                    R.Cast(enemy);
+                }
+
                 if (Player.HealthPercent < Config.Item("RgapHP", true).GetValue<Slider>().Value && enemy.IsValidTarget(270) && enemy.IsMelee && Config.Item("GapCloser" + enemy.ChampionName).GetValue<bool>())
                 {
                     R.Cast(enemy);
