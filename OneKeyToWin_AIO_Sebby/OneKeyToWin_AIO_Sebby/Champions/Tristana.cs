@@ -205,7 +205,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
 
-                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(500) > 0 && enemy.CountAlliesInRange(350) == 0)
+                if (Config.Item("allyR", true).GetValue<bool>() && finalPosition.CountAlliesInRange(500) > 1 && enemy.CountAlliesInRange(350) == 0)
                 {
                     Program.debug("R ally");
 
