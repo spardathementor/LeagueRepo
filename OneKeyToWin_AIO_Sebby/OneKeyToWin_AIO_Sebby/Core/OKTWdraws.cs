@@ -8,6 +8,7 @@ using LeagueSharp.Common;
 using SharpDX;
 using SharpDX.Direct3D9;
 
+
 namespace OneKeyToWin_AIO_Sebby.Core
 {
     class OKTWdraws
@@ -17,10 +18,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public Spell Q, W, E, R, DrawSpell;
         public static Font Tahoma13, Tahoma13B, TextBold;
-        private float spellFarmTimer = 0;
+        private float spellFarmTimer = 0, IntroTimer = Game.Time;
+        private Render.Sprite Intro;
+
 
         public void LoadOKTW()
         {
+            Intro = new Render.Sprite(LoadImg("intro"), new Vector2((Drawing.Width/2) - 500, (Drawing.Height/2)- 350));
+
+            Intro.Add(0);
+            Intro.OnDraw();
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "Disable Utility draws").SetValue(false));
             //Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableChampion", "Disable AIO champion (utility mode only) need F5").SetValue(false));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Draw AAcirlce OKTW© style").AddItem(new MenuItem("OrbDraw", "Draw AAcirlce OKTW© style").SetValue(false));
@@ -181,6 +188,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Drawing.DrawLine(wts1[0], wts1[1], wts2[0], wts2[1], bold, color);
         }
 
+
+        private static System.Drawing.Bitmap LoadImg(string imgName)
+        {
+            var bitmap = Resource1.ResourceManager.GetObject(imgName) as System.Drawing.Bitmap;
+            if (bitmap == null)
+            {
+                Console.WriteLine(imgName + ".png not found.");
+            }
+            return bitmap;
+        }
+
         private void Drawing_OnEndScene(EventArgs args)
         {
             if (Config.Item("showWards").GetValue<bool>())
@@ -211,6 +229,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnDraw(EventArgs args)
         {
+            if (Game.Time - IntroTimer > 7)
+                Intro.Remove();
+
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
             if (Config.Item("showWards").GetValue<bool>())
