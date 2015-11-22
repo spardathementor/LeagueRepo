@@ -472,9 +472,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 1 + (input.Radius * 0.001))
+                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.6 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.8 + (input.Radius * 0.001))
+                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.7 + (input.Radius * 0.001))
                     result.Hitchance = HitChance.VeryHigh;
                 else
                     result.Hitchance = HitChance.High;
