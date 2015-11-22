@@ -95,22 +95,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (E.GetDamage(t) > t.Health)
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        Utility.DelayAction.Add(100, () => E.Cast(t));
                     }
                     else if (R.IsReady() && E.GetDamage(t) + R.GetDamage(t) > t.Health && Player.Mana > RMANA + EMANA)
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        Utility.DelayAction.Add(100, () => E.Cast(t));
                     }
                     else if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        Utility.DelayAction.Add(100, () => E.Cast(t));
                     }
                     else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("harras" + t.ChampionName).GetValue<bool>())
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        Utility.DelayAction.Add(100, () => E.Cast(t));
                     }
                 }
             }
