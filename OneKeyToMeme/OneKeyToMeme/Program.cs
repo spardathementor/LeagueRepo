@@ -36,7 +36,7 @@ namespace OneKeyToMeme
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            Co = new Render.Sprite(LoadImg("Co"), new Vector2(100, 100));
+            Co = new Render.Sprite(LoadImg("intro"), new Vector2(100, 100));
             Co.Add(0);
             
 
