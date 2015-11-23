@@ -188,7 +188,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             }
                         }
                     }
-                    if (OktwCommon.GetPassiveTime(enemy, "ThreshQ") < 0.3 + (Game.Ping /2))
+                    
+                    if (OktwCommon.GetPassiveTime(enemy, "ThreshQ") < 0.4)
                         Q.Cast();
                 }
                 return;
