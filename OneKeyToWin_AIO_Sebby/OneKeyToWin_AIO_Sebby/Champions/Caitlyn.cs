@@ -31,13 +31,13 @@ namespace OneKeyToWin_AIO_Sebby
             Q = new Spell(SpellSlot.Q, 1250f);
             Qc = new Spell(SpellSlot.Q, 1100f);
             W = new Spell(SpellSlot.W, 800f);
-            E = new Spell(SpellSlot.E, 650f);
+            E = new Spell(SpellSlot.E, 700f);
             R = new Spell(SpellSlot.R, 3000f);
 
 
             Q.SetSkillshot(0.65f, 40f, 2200f, false, SkillshotType.SkillshotLine);
             Qc.SetSkillshot(0.65f, 40f, 2200f, true, SkillshotType.SkillshotLine);
-            W.SetSkillshot(1.5f, 1f, 1750f, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(1.5f, 20f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 70f, 1600f, true, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.7f, 200f, 1500f, false, SkillshotType.SkillshotCircle);
 
@@ -259,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     var positionT = Player.ServerPosition - (t.Position - Player.ServerPosition);
 
-                    if (Q.IsReady() && OktwCommon.IsFaced(t) && Player.Position.Extend(positionT, 400).CountEnemiesInRange(700) < 3)
+                    if (Q.IsReady() && Player.Position.Extend(positionT, 400).CountEnemiesInRange(700) < 3)
                     {
                         var eDmg = E.GetDamage(t);
                         var qDmg = Q.GetDamage(t);
