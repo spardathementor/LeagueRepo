@@ -104,7 +104,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             var t = target as Obj_AI_Hero;
 
-            if (Q.IsReady() && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() && t.IsValidTarget() && (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
+            if (Q.IsReady() && t.IsValidTarget() && dashPosition.Distance(t.Position) < 500 && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
             {
                 Q.Cast(dashPosition, true);
                 Program.debug("" + t.Name + GetWStacks(t));
@@ -166,13 +166,13 @@ namespace OneKeyToWin_AIO_Sebby
                     E.Cast(ksTarget);
             }
 
-            if (Program.LagFree(1) && Q.IsReady())
+            if (Program.LagFree(1) && Q.IsReady() && DashCheck(dashPosition))
             {
-                if (Config.Item("autoQR", true).GetValue<bool>() && Player.HasBuff("vayneinquisition") && DashCheck(dashPosition) && Player.CountEnemiesInRange(1500) > 0 && Player.CountEnemiesInRange(670) != 1)
+                if (Config.Item("autoQR", true).GetValue<bool>() && Player.HasBuff("vayneinquisition")  && Player.CountEnemiesInRange(1500) > 0 && Player.CountEnemiesInRange(670) != 1)
                 {
                     Q.Cast(dashPosition, true);
                 }
-                if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && !Config.Item("Qonly", true).GetValue<bool>() && DashCheck(dashPosition) )
+                if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && !Config.Item("Qonly", true).GetValue<bool>())
                 {
                     var t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
 
@@ -230,7 +230,7 @@ namespace OneKeyToWin_AIO_Sebby
                 && !Player.Position.Extend(dash, Q.Range - 100).IsWall()
                 && !Player.Position.Extend(dash, Q.Range - 200).IsWall()
                 && !Player.Position.Extend(dash, Q.Range - 300).IsWall()
-                && dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1
+                && dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(600) < 2 && dash.CountEnemiesInRange(300) < 1
                 && (!dash.UnderTurret(true) || Program.Combo))
                 return true;
             else
