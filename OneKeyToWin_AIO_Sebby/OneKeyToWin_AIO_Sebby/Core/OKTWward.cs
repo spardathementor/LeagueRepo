@@ -36,6 +36,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             WardN = new Items.Item(2044, 600f),
             TrinketN = new Items.Item(3340, 600f),
             SightStone = new Items.Item(2049, 600f),
+            EOTOasis = new Items.Item(2302, 600f),
+            EOTEquinox = new Items.Item(2303, 600f),
+            EOTWatchers = new Items.Item(2301, 600f),
             FarsightOrb = new Items.Item(3342, 4000f),
             ScryingOrb = new Items.Item(3363, 3500f);
 
@@ -173,6 +176,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 WardN.Cast(need.PredictedPos);
                                 need.LastVisableTime = Game.Time - 5;
                             }
+                            else if (EOTOasis.IsReady())
+                            {
+                                EOTOasis.Cast(need.PredictedPos);
+                                need.LastVisableTime = Game.Time - 5;
+                            }
+                            else if (EOTEquinox.IsReady())
+                            {
+                                EOTEquinox.Cast(need.PredictedPos);
+                                need.LastVisableTime = Game.Time - 5;
+                            }
+                            else if (EOTWatchers.IsReady())
+                            {
+                                EOTWatchers.Cast(need.PredictedPos);
+                                need.LastVisableTime = Game.Time - 5;
+                            }
                         }
 
                         if (need.PredictedPos.Distance(Player.Position) < 1400 && Config.Item("AutoWardBlue").GetValue<bool>())
@@ -204,8 +222,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 
                 if ( !missile.SpellCaster.IsVisible)
                 {
-                    if (missile.SData.Name == "itemplacementmissile" && !HiddenObjList.Exists(x => missile.StartPosition.Extend(missile.EndPosition, 500).Distance(x.pos) < 500))
-                        AddWard(missile.SData.Name.ToLower(), missile.StartPosition.Extend(missile.EndPosition, 500));
 
                     if ((missile.SData.Name == "BantamTrapShort" || missile.SData.Name == "BantamTrapBounceSpell") && !HiddenObjList.Exists(x => missile.EndPosition == x.pos))
                         AddWard("teemorcast", missile.EndPosition);
@@ -325,10 +341,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             switch (name)
             {
-                //OnCreateOBJ
-                case "itemplacementmissile":
-                    HiddenObjList.Add(new HiddenObj() { type = 0, pos = posCast, endTime = Game.Time + 180 });
-                    break;
                 //PINKS
                 case "visionward":
                     HiddenObjList.Add(new HiddenObj() { type = 2, pos = posCast, endTime = float.MaxValue });
