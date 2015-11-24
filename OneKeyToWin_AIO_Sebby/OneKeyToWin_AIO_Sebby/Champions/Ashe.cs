@@ -208,9 +208,9 @@ namespace OneKeyToWin_AIO_Sebby
                     W.Cast(t,true);
                 }
                 else if (Program.Combo && ObjectManager.Player.Mana > RMANA + WMANA)
-                    Program.CastSpell(W, t);
+                    W.Cast(t, true, true);
                 else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
-                    Program.CastSpell(W, t);
+                    W.Cast(t, true, true);
                 else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
