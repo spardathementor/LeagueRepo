@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby
             Q = new Spell(SpellSlot.Q, 1250f);
             Qc = new Spell(SpellSlot.Q, 1100f);
             W = new Spell(SpellSlot.W, 800f);
-            E = new Spell(SpellSlot.E, 700f);
+            E = new Spell(SpellSlot.E, 750f);
             R = new Spell(SpellSlot.R, 3000f);
 
 
