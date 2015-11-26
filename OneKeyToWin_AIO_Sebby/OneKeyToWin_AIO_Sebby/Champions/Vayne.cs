@@ -58,15 +58,17 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("GapCloser").SubMenu("Use on").AddItem(new MenuItem("gap" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("visibleR", "Unvisable block AA ", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoQR", "Auto Q when R active ", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("E config").SubMenu("Use E ").AddItem(new MenuItem("stun" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("useE", "OneKeyToCast E closest person", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("Eks", "E KS", true).SetValue(true));
+
+
+            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("visibleR", "Unvisable block AA ", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoQR", "Auto Q when R active ", true).SetValue(true));
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -77,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             if (E.IsReady() && Config.Item("gapE", true).GetValue<bool>() )
                 E.Cast(target);
-            if ((!E.IsReady() || !Config.Item("gapE", true).GetValue<bool>()) && Q.IsReady() && Config.Item("gapQ", true).GetValue<bool>() )
+            if (Q.IsReady() && (!E.IsReady() || !Config.Item("gapE", true).GetValue<bool>()) && DashCheck(Player.Position.Extend(Game.CursorPos, Q.Range)) && Config.Item("gapQ", true).GetValue<bool>() )
                 Q.Cast();
             return;
         }
@@ -96,7 +98,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!unit.IsMe)
+            if (!Q.IsReady())
                 return;
             var dashPosition = Player.Position.Extend(Game.CursorPos, Q.Range);
             if (!DashCheck(dashPosition))
@@ -104,12 +106,12 @@ namespace OneKeyToWin_AIO_Sebby
 
             var t = target as Obj_AI_Hero;
 
-            if (Q.IsReady() && t.IsValidTarget() && dashPosition.Distance(t.Position) < 500 && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
+            if (t.IsValidTarget() && dashPosition.Distance(t.Position) < 500 && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
             {
                 Q.Cast(dashPosition, true);
                 Program.debug("" + t.Name + GetWStacks(t));
             }
-            else if (Q.IsReady() && Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
+            else if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
             {
                 var minions = MinionManager.GetMinions(dashPosition, Player.AttackRange, MinionTypes.All);
                 
@@ -143,11 +145,11 @@ namespace OneKeyToWin_AIO_Sebby
                 var ksTarget = Player;
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && target.Path.Count() < 2 ))
                 {
-                    if (CondemnCheck(Player.Position, target) && Config.Item("stun" + target.ChampionName).GetValue<bool>() )
+                    if (CondemnCheck(Player.ServerPosition, target) && Config.Item("stun" + target.ChampionName).GetValue<bool>() )
                         E.Cast(target);
                     else if (Q.IsReady() && DashCheck(dashPosition) && Config.Item("QE", true).GetValue<bool>() && CondemnCheck(dashPosition, target))
                     {
-                        Q.Cast(dashPosition, true);
+                        Q.Cast(dashPosition);
                         Program.debug("Q + E");
                     }
 
@@ -178,7 +180,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (t.IsValidTarget() && !Orbwalking.InAutoAttackRange(t) && t.Position.Distance(Game.CursorPos) < t.Position.Distance(Player.Position) && dashPosition.CountEnemiesInRange(800) < 3 && !OktwCommon.IsFaced(t))
                     {
-                        Q.Cast(dashPosition, true);
+                        Q.Cast(dashPosition);
                     }
                 }
             }
@@ -239,36 +241,40 @@ namespace OneKeyToWin_AIO_Sebby
 
         private bool CondemnCheck(Vector3 fromPosition, Obj_AI_Hero target)
         {
-
             var prepos = E.GetPrediction(target);
 
-            if ((int)prepos.Hitchance < 5)
-                return false;
+            float pushDistance = 450;
 
-            float pushDistance;
-            if (Player.Position == fromPosition)
-                pushDistance = 490;
-            else
+            if (Player.Position != fromPosition)
                 pushDistance = 400 ;
 
-            bool cast = true;
-            var finalPosition2 = prepos.CastPosition.Extend(fromPosition, -300);
-            var points2 = CirclePoint(10, 70, finalPosition2);
+            int radius = 120;
+            var start2 = target.ServerPosition;
+            var end2 = prepos.CastPosition.Extend(fromPosition, -pushDistance);
 
-            if (!finalPosition2.IsWall())
-                cast = false;
+            Vector2 start = start2.To2D();
+            Vector2 end = end2.To2D();
+            var dir = (end - start).Normalized();
+            var pDir = dir.Perpendicular();
 
-            if (cast)
-                return cast;
+            var rightEndPos = end + pDir * radius;
+            var leftEndPos = end - pDir * radius;
 
-            var finalPosition = prepos.CastPosition.Extend(fromPosition, -pushDistance);
-            var points = CirclePoint(8, 90, finalPosition);
 
-            cast = true;
-            foreach (var point in points.Where(point => !point.IsWall()))
-                cast = false;
+            var rEndPos = new Vector3(rightEndPos.X, rightEndPos.Y, ObjectManager.Player.Position.Z);
+            var lEndPos = new Vector3(leftEndPos.X, leftEndPos.Y, ObjectManager.Player.Position.Z);
 
-            return cast;
+
+            var step = start2.Distance(rEndPos) / 10;
+            for (var i = 0; i < 10; i++)
+            {
+                var pr = start2.Extend(rEndPos, step * i);
+                var pl = start2.Extend(lEndPos, step * i);
+                if (pr.IsWall() && pl.IsWall())
+                    return true;
+            }
+
+            return false;
         }
 
         private int GetWStacks(Obj_AI_Base target)
