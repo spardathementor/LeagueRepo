@@ -536,12 +536,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (Config.Item("OrbDraw").GetValue<bool>())
             {
+                var aaRange = ObjectManager.Player.AttackRange + ObjectManager.Player.BoundingRadius * 2;
                 if (Player.HealthPercent > 60)
-                    Utility.DrawCircle(ObjectManager.Player.Position, Player.AttackRange + ObjectManager.Player.BoundingRadius * 2, System.Drawing.Color.GreenYellow, 1, 1);
+                    Utility.DrawCircle(ObjectManager.Player.Position, aaRange, System.Drawing.Color.GreenYellow, 1, 1);
                 else if (Player.HealthPercent > 30)
-                    Utility.DrawCircle(ObjectManager.Player.Position, ObjectManager.Player.AttackRange + ObjectManager.Player.BoundingRadius * 2, System.Drawing.Color.Orange, 1, 1);
+                    Utility.DrawCircle(ObjectManager.Player.Position, aaRange, System.Drawing.Color.Orange, 1, 1);
                 else
-                    Utility.DrawCircle(ObjectManager.Player.Position, ObjectManager.Player.AttackRange + ObjectManager.Player.BoundingRadius * 2, System.Drawing.Color.Red, 1, 1);
+                    Utility.DrawCircle(ObjectManager.Player.Position, aaRange, System.Drawing.Color.Red, 1, 1);
             }
         }
 
