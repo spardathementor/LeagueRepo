@@ -167,11 +167,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            var extraHP = t.Health - HealthPrediction.GetHealthPrediction(t, 500);
-
-            totalDmg += extraHP;
             totalDmg -= t.HPRegenRate;
-            totalDmg -= t.PercentLifeStealMod * 0.005f * t.FlatPhysicalDamageMod;
 
             return totalDmg;
         }
