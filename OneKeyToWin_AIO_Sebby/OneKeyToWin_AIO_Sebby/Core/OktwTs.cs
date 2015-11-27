@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // FAST KILL //////////////////////////
             Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("extraFocus", "One Focus To Win").SetValue(Player.IsMelee));
-            Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("extraRang", "Extra Focus Range").SetValue(new Slider(400, 0, 600)));
+            Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("extraRang", "Extra Focus Range").SetValue(new Slider(300, 0, 600)));
             Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("extraTime", "Time out focus time (ms)").SetValue(new Slider(2000, 0, 4000)));
             Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("drawFocus", "Draw notification").SetValue(true));
 
@@ -108,7 +108,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(aaRange)))
                     {
-                        if (enemy.Health / Player.GetAutoAttackDamage(enemy) < forceFocusEnemy.Health / Player.GetAutoAttackDamage(forceFocusEnemy))
+                        if (enemy.Health / Player.GetAutoAttackDamage(enemy) + 1 < forceFocusEnemy.Health / Player.GetAutoAttackDamage(forceFocusEnemy))
                         {
                             forceFocusEnemy = enemy;
                         }
