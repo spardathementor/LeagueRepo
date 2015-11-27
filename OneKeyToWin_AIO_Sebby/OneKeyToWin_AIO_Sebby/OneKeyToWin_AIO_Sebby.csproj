@@ -100,6 +100,7 @@
     <Compile Include="Core\OKTWdraws.cs" />
     <Compile Include="Core\OKTWfarmLogic.cs" />
     <Compile Include="Core\OKTWlab.cs" />
+    <Compile Include="Core\OktwTs.cs" />
     <Compile Include="Core\OKTWward.cs" />
     <Compile Include="Core\OKTWtracker.cs" />
     <Compile Include="Core\PredictionOktw.cs" />

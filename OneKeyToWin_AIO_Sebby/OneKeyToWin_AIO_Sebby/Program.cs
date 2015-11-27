@@ -52,12 +52,13 @@ namespace OneKeyToWin_AIO_Sebby
 
             AIOmode = Config.Item("AIOmode", true).GetValue<StringList>().SelectedIndex;
 
-            var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
-            TargetSelector.AddToMenu(targetSelectorMenu);
-            Config.AddSubMenu(targetSelectorMenu);
+            //var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
+            //TargetSelector.AddToMenu(targetSelectorMenu);
+            //Config.AddSubMenu(targetSelectorMenu);
 
             if (AIOmode != 2)
             {
+                new Core.OktwTs().LoadOKTW();
                 Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
                 Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
             }
@@ -247,7 +248,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             new OktwCommon().LoadOKTW();
             new Core.OKTWtracker().LoadOKTW();
-           
+            
+
 
             Config.AddItem(new MenuItem("aiomodes", "!!! PRESS F5 TO RELOAD MODE !!!" ));
             //new Core.OKTWtargetSelector().LoadOKTW();

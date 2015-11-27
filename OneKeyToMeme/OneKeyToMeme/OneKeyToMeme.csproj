@@ -83,6 +83,48 @@
   <ItemGroup>
     <None Include="Resources\kaczorek.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\test.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\co.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\dlaczego.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\fap.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\images.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\mamcienaoku.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\milord.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\niemożliwe.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\notbad.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\poker.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\tajniak.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zamyslony.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\zastanawia.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\intro.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
