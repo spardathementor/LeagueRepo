@@ -58,7 +58,10 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (AIOmode != 2)
             {
-                new Core.OktwTs().LoadOKTW();
+                if (Player.ChampionName != "MissFortune")
+                {
+                    new Core.OktwTs().LoadOKTW();
+                }
                 Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
                 Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
             }
