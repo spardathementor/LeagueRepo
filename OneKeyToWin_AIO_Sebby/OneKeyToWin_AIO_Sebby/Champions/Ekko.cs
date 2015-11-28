@@ -54,7 +54,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if enemies in range", true).SetValue(new Slider(3, 0, 5)));
 
             Game.OnUpdate += Game_OnGameUpdate;
-            Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
+            GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
             GameObject.OnCreate += SpellMissile_OnCreateOld;
             GameObject.OnDelete += Obj_SpellMissile_OnDelete;
@@ -134,6 +134,9 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (RMissile != null && RMissile.IsValid)
                 {
+                    if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
+                        R.Cast();
+
                     foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < 350 && RMissile.Position.Distance(t.ServerPosition) < 350))
                     {
                         var comboDmg = R.GetDamage(t) + GetWdmg(t) + Q.GetDamage(t) * 2 + E.GetDamage(t);
@@ -141,8 +144,7 @@ namespace OneKeyToWin_AIO_Sebby
                         if (t.Health < comboDmg)
                             R.Cast();
                         Program.debug("ks");
-                        if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
-                            R.Cast();
+                        
                     }
 
                 }
