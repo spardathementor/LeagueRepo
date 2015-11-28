@@ -160,7 +160,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         E.Cast();
                     float buffTime = OktwCommon.GetPassiveTime(enemy, "twitchdeadlyvenom");
                 
-                    if (!Orbwalking.InAutoAttackRange(enemy) && (Player.Distance(enemy.ServerPosition) > 1000 || buffTime < 1) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
+                    if (!Orbwalking.InAutoAttackRange(enemy) && (Player.ServerPosition.Distance(enemy.ServerPosition) > 950 || buffTime < 1) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
                         E.Cast();
                 }
             }
