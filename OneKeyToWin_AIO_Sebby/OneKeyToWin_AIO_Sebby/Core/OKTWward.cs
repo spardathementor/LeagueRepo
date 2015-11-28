@@ -109,13 +109,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 var timer = Game.Time - need.LastVisableTime;
 
-                if (timer > 0.5 && timer < 4 && Player.ChampionName == "Quinn" && W.IsReady()  && need.LastVisablePos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
+                if (timer > 0.5 && timer < 4 && Program.Combo && Player.ChampionName == "Quinn" && W.IsReady()  && need.LastVisablePos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
                 {
                     W.Cast();
                     return;
                 }
 
-                if (timer > 1 && timer < 3 && Player.ChampionName == "Karhus" && Q.IsReady() && Player.CountEnemiesInRange(900) == 0)
+                if (timer > 1 && timer < 3 && Program.Combo && Player.ChampionName == "Karhus" && Q.IsReady() && Player.CountEnemiesInRange(900) == 0)
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 900 && need.LastVisablePos.Distance(Player.Position) < 900)
                     {
@@ -125,7 +125,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
 
 
-                if (timer > 1 && timer < 3 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
+                if (timer > 1 && timer < 3 && Program.Combo && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
                 {
                     if (need.PredictedPos.Distance(Player.Position) < 2000 && need.LastVisablePos.Distance(Player.Position) < 2000)
                     {
