@@ -139,7 +139,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 List<Vector2> waypoints = enemy.GetWaypoints();
 
-                if (Player.Distance(waypoints.Last<Vector2>().To3D()) < 600)
+                if (Player.Distance(waypoints.Last().To3D()) < 600)
                     count++;
             }
 
@@ -158,7 +158,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     int buffsNum = OktwCommon.GetBuffCount(enemy, "twitchdeadlyvenom");
                     if (Config.Item("5e", true).GetValue<bool>() && buffsNum == 6)
                         E.Cast();
-                    if (!Orbwalking.InAutoAttackRange(enemy) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
+                    if (!Orbwalking.InAutoAttackRange(enemy) && Player.Distance(enemy.ServerPosition) > 1000 && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
                         E.Cast();
                 }
             }
