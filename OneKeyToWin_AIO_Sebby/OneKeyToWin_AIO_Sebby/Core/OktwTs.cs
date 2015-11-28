@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         public void LoadOKTW()
         {
-            Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("TsAa", "Auto-attack MODE:").SetValue(new StringList(new[] { "Fast kill", "Priority" }, 0)));
+            Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("TsAa", "Auto-attack MODE:").SetValue(new StringList(new[] { "Fast kill", "Priority", "Common TS" }, 0)));
 
             // FAST KILL //////////////////////////
             Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("extraFocus", "One Focus To Win").SetValue(Player.IsMelee));
@@ -44,6 +44,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnDraw(EventArgs args)
         {
+            if (Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 2)
+            {
+                return;
+            }
             if (DrawInfo.IsValidTarget() && (int)(Game.Time * 10) % 2 == 0 && Config.Item("drawFocus").GetValue<bool>())
             {
                 Utility.DrawCircle(Player.Position, Player.AttackRange + Player.BoundingRadius + Config.Item("extraRang").GetValue<Slider>().Value, System.Drawing.Color.Gray, 1, 1);
@@ -74,6 +78,19 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 Config.Item("extraRang").Show(!priority && Config.Item("extraFocus").GetValue<bool>());
                 Config.Item("extraTime").Show(!priority && Config.Item("extraFocus").GetValue<bool>());
                 Config.Item("drawFocus").Show(!priority && Config.Item("extraFocus").GetValue<bool>());
+
+                if(Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 2)
+                {
+                    foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                    {
+                        Config.Item("TsAaPriority" + enemy.ChampionName).Show(false);
+
+                    }
+                    Config.Item("extraFocus").Show(false);
+                    Config.Item("extraRang").Show(false);
+                    Config.Item("extraTime").Show(false);
+                    Config.Item("drawFocus").Show(false);
+                }
             }
         }
 
@@ -127,6 +144,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnUpdate(EventArgs args)
         {
+            if (Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 2)
+            {
+                return;
+            }
+
             var orbT = Orbwalker.GetTarget();
            
             if (orbT.IsValidTarget() &&  orbT is Obj_AI_Hero)
