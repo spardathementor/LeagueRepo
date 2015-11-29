@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         public void LoadOKTW()
         {
-            Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("TsAa", "Auto-attack MODE:").SetValue(new StringList(new[] { "Fast kill", "Priority", "Common TS" }, 0)));
+            Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("TsAa", "Auto-attack MODE:").SetValue(new StringList(new[] { "Fast kill", "Priority", "Common TS" }, 2)));
 
             // FAST KILL //////////////////////////
             Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("extraFocus", "One Focus To Win").SetValue(Player.IsMelee));
