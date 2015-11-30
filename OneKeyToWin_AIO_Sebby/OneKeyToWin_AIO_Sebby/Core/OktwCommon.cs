@@ -219,7 +219,7 @@ namespace OneKeyToWin_AIO_Sebby
             return false;
         }
 
-        public static float GetKsDamage(Obj_AI_Base t, Spell QWER)
+        public static float GetKsDamage(Obj_AI_Hero t, Spell QWER)
         {
             var totalDmg = QWER.GetDamage(t);
 
@@ -237,17 +237,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (t.HasBuff("ferocioushowl"))
                 totalDmg = totalDmg * 0.7f;
 
-            if (t is Obj_AI_Hero)
+            if (t.ChampionName == "Blitzcrank" && !t.HasBuff("BlitzcrankManaBarrierCD") && !t.HasBuff("ManaBarrier"))
             {
-                var champion = (Obj_AI_Hero)t;
-                if (champion.ChampionName == "Blitzcrank" && !champion.HasBuff("BlitzcrankManaBarrierCD") && !champion.HasBuff("ManaBarrier"))
-                {
-                    totalDmg -= champion.Mana / 2f;
-                }
+                totalDmg -= t.Mana / 2f;
             }
 
             totalDmg -= t.HPRegenRate;
-
+            totalDmg += (float)GetIncomingDamage(t);
             return totalDmg;
         }
 
