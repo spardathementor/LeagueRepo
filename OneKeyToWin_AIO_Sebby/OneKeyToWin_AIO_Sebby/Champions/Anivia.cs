@@ -284,7 +284,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else
             {
-                if (Program.LaneClear)
+                if (Program.LaneClear && Config.Item("farmR", true).GetValue<bool>())
                 {
                     var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
                     var mobs = MinionManager.GetMinions(RMissile.Position, R.Width, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
@@ -297,7 +297,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else if (allMinions.Count > 0)
                     {
-                        if (allMinions.Count < 2 || Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value || !Config.Item("farmR", true).GetValue<bool>())
+                        if (allMinions.Count < 2 || Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value)
                             R.Cast();
                         else if (Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value)
                             R.Cast();
