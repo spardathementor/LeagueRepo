@@ -164,7 +164,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast();
 
                 }
-                else if (!Program.None && (Player.Position.CountEnemiesInRange(R.Range + 400) == 0 || Player.Mana < EMANA + QMANA))
+                else if ((Player.Position.CountEnemiesInRange(R.Range + 400) == 0 || Player.Mana < EMANA) && ((Program.Farm && Config.Item("farmR", true).GetValue<bool>()) || Program.None)  )
                 {
                     R.Cast();
                 }
