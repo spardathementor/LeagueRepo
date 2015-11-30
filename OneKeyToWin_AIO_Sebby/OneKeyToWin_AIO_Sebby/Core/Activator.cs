@@ -228,44 +228,46 @@ namespace OneKeyToWin_AIO_Sebby
             if (Player.HealthPercent < 40 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
             {
                 double dmg = OktwCommon.GetIncomingDamage(Player, 1);
-
-                if (CanUse(barrier) && Config.Item("Barrier").GetValue<bool>())
+                if (dmg > 0)
                 {
-                    var value = 95 + Player.Level * 20;
-                    if (dmg > value && Player.HealthPercent < 50)
-                        Player.Spellbook.CastSpell(barrier, Player);
-                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
-                        Player.Spellbook.CastSpell(barrier, Player);
-                    else if (Player.Health - dmg < Player.Level * 15)
-                        Seraph.Cast();
-                }
-
-                if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
-                {
-                    var value = Player.Mana * 0.2 + 150;
-                    if (dmg > value && Player.HealthPercent < 50)
-                        Seraph.Cast();
-                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
-                        Seraph.Cast();
-                    else if (Player.Health - dmg < Player.Level * 15)
-                        Seraph.Cast();
-                }
-
-                if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
-                {
-                    if (dmg > Player.Level * 30)
+                    if (CanUse(barrier) && Config.Item("Barrier").GetValue<bool>())
                     {
-                        Zhonya.Cast();
+                        var value = 95 + Player.Level * 20;
+                        if (dmg > value && Player.HealthPercent < 50)
+                            Player.Spellbook.CastSpell(barrier, Player);
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                            Player.Spellbook.CastSpell(barrier, Player);
+                        else if (Player.Health - dmg < Player.Level * 15)
+                            Seraph.Cast();
                     }
-                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
-                    {
-                        Zhonya.Cast();
 
+                    if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
+                    {
+                        var value = Player.Mana * 0.2 + 150;
+                        if (dmg > value && Player.HealthPercent < 50)
+                            Seraph.Cast();
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                            Seraph.Cast();
+                        else if (Player.Health - dmg < Player.Level * 15)
+                            Seraph.Cast();
                     }
-                    else if (Player.Health - dmg < Player.Level * 15)
-                    {
-                        Zhonya.Cast();
 
+                    if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
+                    {
+                        if (dmg > Player.Level * 30)
+                        {
+                            Zhonya.Cast();
+                        }
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                        {
+                            Zhonya.Cast();
+
+                        }
+                        else if (Player.Health - dmg < Player.Level * 15)
+                        {
+                            Zhonya.Cast();
+
+                        }
                     }
                 }
             }
@@ -277,7 +279,8 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 40 && Player.Distance(ally.ServerPosition) < 700))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-
+                if (dmg == 0)
+                    continue;
 
                 if (CanUse(heal) && Config.Item("Heal").GetValue<bool>())
                 {

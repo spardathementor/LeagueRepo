@@ -75,8 +75,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void OnUpdate(EventArgs args)
         {
-            if(GetIncomingDamage(Player, 2)> 0)
-            Program.debug("Incoming: " + GetIncomingDamage(Player,2));
             if(Program.LagFree(4))
                 IncomingDamageList.RemoveAll(damage => Game.Time - 2 < damage.Time);
         }
