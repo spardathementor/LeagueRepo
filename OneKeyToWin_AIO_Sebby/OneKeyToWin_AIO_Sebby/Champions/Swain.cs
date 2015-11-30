@@ -142,7 +142,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if(Ractive)
             {
-                if (Program.LaneClear)
+                if (Program.LaneClear && Config.Item("farmR", true).GetValue<bool>())
                 {
                     var allMinions = MinionManager.GetMinions(Player.Position, R.Range);
                     var mobs = MinionManager.GetMinions(Player.Position, R.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
@@ -155,7 +155,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                     else if (allMinions.Count > 0)
                     {
-                        if (allMinions.Count < 2 || Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value || !Config.Item("farmR", true).GetValue<bool>())
+                        if (allMinions.Count < 2 || Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value )
                             R.Cast();
                         else if (Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value)
                             R.Cast();
@@ -164,7 +164,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast();
 
                 }
-                else if (Program.None || (Player.Position.CountEnemiesInRange(R.Range + 400) == 0 && Program.Farm))
+                else if (!Program.None && (Player.Position.CountEnemiesInRange(R.Range + 400) == 0 || Player.Mana < EMANA + QMANA))
                 {
                     R.Cast();
                 }
