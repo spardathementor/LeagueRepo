@@ -12,6 +12,7 @@ using SharpDX;
 
 namespace OneKeyToWin_AIO_Sebby
 {
+
     class Activator
     {
         private Menu Config = Program.Config;
@@ -56,6 +57,8 @@ namespace OneKeyToWin_AIO_Sebby
         
         public void LoadOKTW()
         {
+            
+
             heal = Player.GetSpellSlot("summonerheal");
             barrier = Player.GetSpellSlot("summonerbarrier");
             ignite = Player.GetSpellSlot("summonerdot");
@@ -181,33 +184,100 @@ namespace OneKeyToWin_AIO_Sebby
             if (!sender.IsEnemy)
                 return;
 
-            if (!Solari.IsReady() && !FaceOfTheMountain.IsReady() && !Seraph.IsReady() && !Zhonya.IsReady() && !CanUse(barrier) && !CanUse(heal) && !CanUse(exhaust))
+            if (!Zhonya.IsReady() && !CanUse(exhaust))
                 return;
             
             if (sender.Distance(Player.Position) > 1600)
                 return;
 
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 51 && Player.Distance(ally.ServerPosition) < 700))
+            if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
             {
-                double dmg = 0;
-                if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
+                if (Config.Item("spellZ" + args.SData.Name) != null && Config.Item("spellZ" + args.SData.Name).GetValue<bool>())
                 {
-                    dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                    Zhonya.Cast();
+
                 }
-                else
+            }
+
+            if (CanUse(exhaust) && Config.Item("Exhaust").GetValue<bool>())
+            {
+                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 51 && Player.Distance(ally.ServerPosition) < 700))
                 {
-                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
-                    if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
+                    double dmg = 0;
+                    if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
+                    {
                         dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                    }
                     else
-                        continue;
+                    {
+                        var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
+                        if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
+                            dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                        else
+                            continue;
+                    }
+
+                    if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 40)
+                        Player.Spellbook.CastSpell(exhaust, sender);
+                }
+            }
+        }
+
+        private void Survival()
+        {
+            if (Player.HealthPercent < 40 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
+            {
+                double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+
+                if (CanUse(barrier) && Config.Item("Barrier").GetValue<bool>())
+                {
+                    var value = 95 + Player.Level * 20;
+                    if (dmg > value && Player.HealthPercent < 50)
+                        Player.Spellbook.CastSpell(barrier, Player);
+                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                        Player.Spellbook.CastSpell(barrier, Player);
+                    else if (Player.Health - dmg < Player.Level * 15)
+                        Seraph.Cast();
                 }
 
-                if (CanUse(exhaust) && Config.Item("Exhaust").GetValue<bool>() )
+                if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
                 {
-                    if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 40)
-                        TryCast(() => Player.Spellbook.CastSpell(exhaust, sender));
+                    var value = Player.Mana * 0.2 + 150;
+                    if (dmg > value && Player.HealthPercent < 50)
+                        Seraph.Cast();
+                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                        Seraph.Cast();
+                    else if (Player.Health - dmg < Player.Level * 15)
+                        Seraph.Cast();
                 }
+
+                if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
+                {
+                    if (dmg > Player.Level * 30)
+                    {
+                        Zhonya.Cast();
+                    }
+                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                    {
+                        Zhonya.Cast();
+
+                    }
+                    else if (Player.Health - dmg < Player.Level * 15)
+                    {
+                        Zhonya.Cast();
+
+                    }
+                }
+            }
+
+
+            if (!Solari.IsReady() && !FaceOfTheMountain.IsReady() && !CanUse(heal) )
+                return;
+
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 40 && Player.Distance(ally.ServerPosition) < 700))
+            {
+                double dmg = OktwCommon.GetIncomingDamage(ally, 1);
+
 
                 if (CanUse(heal) && Config.Item("Heal").GetValue<bool>())
                 {
@@ -215,9 +285,9 @@ namespace OneKeyToWin_AIO_Sebby
                         return;
 
                     if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 10)
-                        TryCast(() => Player.Spellbook.CastSpell(heal, ally));
+                        Player.Spellbook.CastSpell(heal, ally);
                     else if (ally.Health - dmg < ally.Level * 10)
-                        TryCast(() => Player.Spellbook.CastSpell(heal, ally));
+                       Player.Spellbook.CastSpell(heal, ally);
                 }
 
                 if (Config.Item("Solari").GetValue<bool>() && Solari.IsReady() && Player.Distance(ally.ServerPosition) < Solari.Range)
@@ -233,74 +303,17 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Config.Item("FaceOfTheMountain").GetValue<bool>() && FaceOfTheMountain.IsReady() && Player.Distance(ally.ServerPosition) < FaceOfTheMountain.Range)
                 {
-                    var value = 0.1 *  Player.MaxHealth ;
+                    var value = 0.1 * Player.MaxHealth;
                     if (dmg > value && Player.HealthPercent < 50)
-                        TryCast(() => FaceOfTheMountain.Cast(ally));
+                        FaceOfTheMountain.Cast(ally);
                     else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
-                        TryCast(() => FaceOfTheMountain.Cast(ally));
+                        FaceOfTheMountain.Cast(ally);
                     else if (ally.Health - dmg < ally.Level * 10)
-                        TryCast(() => FaceOfTheMountain.Cast(ally));
-                }
-
-                if (!ally.IsMe)
-                    continue;
-
-                if (CanUse(barrier) && Config.Item("Barrier").GetValue<bool>() )
-                {
-                    var value = 95 + Player.Level * 20;
-                    if (dmg > value && Player.HealthPercent < 50)
-                        TryCast(() => Player.Spellbook.CastSpell(barrier, Player));
-                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
-                        TryCast(() => Player.Spellbook.CastSpell(barrier, Player));
-                    else if (ally.Health - dmg < ally.Level * 15)
-                        TryCast(() => Seraph.Cast());
-                }
-
-                if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
-                {
-                    var value = Player.Mana * 0.2 + 150;
-                    if (dmg > value && Player.HealthPercent < 50)
-                        TryCast(() => Seraph.Cast());
-                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
-                        TryCast(() => Seraph.Cast());
-                    else if (ally.Health - dmg < ally.Level * 15)
-                        TryCast(() => Seraph.Cast());
-                }
-                
-                if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
-                {
-                    if (Config.Item("spellZ" + args.SData.Name) != null && Config.Item("spellZ" + args.SData.Name).GetValue<bool>())
-                    {
-                        Zhonya.Cast();
-                        TryCast(() => Zhonya.Cast());
-                    }
-
-                    if (dmg > Player.Level * 30)
-                    {
-                        Zhonya.Cast();
-                        TryCast(() => Zhonya.Cast());
-                    }
-                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
-                    {
-                        Zhonya.Cast();
-                        TryCast(() => Zhonya.Cast());
-                    }
-                    else if (ally.Health - dmg < ally.Level * 15)
-                    {
-                        Zhonya.Cast();
-                        TryCast(() => Zhonya.Cast());
-                    }
+                        FaceOfTheMountain.Cast(ally);
                 }
             }
         }
 
-        private void TryCast(Utility.DelayAction.Callback cast)
-        {
-            Utility.DelayAction.Add(0, cast);
-            Utility.DelayAction.Add(100, cast);
-            Utility.DelayAction.Add(200, cast);
-            Utility.DelayAction.Add(300, cast);
-        }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
@@ -335,6 +348,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Cleansers();
             Smite();
+            Survival();
 
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;

@@ -21,6 +21,15 @@ namespace OneKeyToWin_AIO_Sebby
         }
     }
 
+    class UnitIncomingDamage
+    {
+        public int TargetNetworkId { get; set; }
+        public float Time { get; set; }
+        public double Damage { get; set; }
+        public bool Skillshot { get; set; }
+    }
+
+
     class OktwCommon
     {
         private static int LastAATick = Utils.GameTimeTickCount;
@@ -33,15 +42,87 @@ namespace OneKeyToWin_AIO_Sebby
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private static List<Obj_AI_Base> minions;
         private static YasuoWall yasuoWall = new YasuoWall();
+
+        private static List<UnitIncomingDamage> IncomingDamageList = new List<UnitIncomingDamage>();
+        private static List<Obj_AI_Hero> ChampionList = new List<Obj_AI_Hero>();
+
+
         public void LoadOKTW()
         {
+
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
+            {
+                ChampionList.Add(hero);
+            }
+
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell +=Spellbook_OnCastSpell;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Game.OnUpdate += OnUpdate;
+            Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
         }
+
+        private void Obj_AI_Base_OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (args.Target != null && !sender.IsMelee)
+            {
+                if (args.Target is Obj_AI_Hero && args.Target.Team != sender.Team)
+                {
+                    IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
+                }
+            }
+        }
+
+        private void OnUpdate(EventArgs args)
+        {
+            if(GetIncomingDamage(Player, 2)> 0)
+            Program.debug("Incoming: " + GetIncomingDamage(Player,2));
+            if(Program.LagFree(4))
+                IncomingDamageList.RemoveAll(damage => Game.Time - 2 < damage.Time);
+        }
+
+        public static double GetIncomingDamage(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true )
+        {
+            double totalDamage = 0;
+
+            foreach (var damage in IncomingDamageList.Where(damage => damage.TargetNetworkId == target.NetworkId && Game.Time - time < damage.Time ))
+            {
+                if(skillshots)
+                {
+                        totalDamage += damage.Damage;
+                }
+                else
+                {
+                    if (!damage.Skillshot)
+                        totalDamage += damage.Damage;
+                }
+            }
+
+            return totalDamage;
+        }
+
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
+            /////////////////  HP prediction
+            if (args.Target != null && sender.IsMelee)
+            {
+                if (args.Target is Obj_AI_Hero && args.Target.Team != sender.Team)
+                {
+                    IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
+                }
+            }
+            else
+            {
+                foreach (var champion in ChampionList.Where(champion => champion.IsValid && !champion.IsDead && champion.Team != sender.Team && champion.Distance(sender) < 2000))
+                {
+                    var castArea = champion.Distance(args.End) * (args.End - champion.ServerPosition).Normalized() + champion.ServerPosition;
+                    if (castArea.Distance(champion.ServerPosition) < champion.BoundingRadius / 2)
+                        IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
+                }
+            }
+
+            //////////////////////////
 
             if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || !sender.IsValid<Obj_AI_Hero>() || Player.Distance(sender.ServerPosition) > 2000)
                 return;
