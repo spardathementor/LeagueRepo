@@ -58,6 +58,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (AIOmode != 2)
             {
+
                 if (Player.ChampionName != "MissFortune")
                 {
                     new Core.OktwTs().LoadOKTW();
@@ -100,8 +101,6 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
             Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistantDraw", "Show notification").SetValue(true));
 
-
-            Config.Item("manaDisable", true).SetValue(false);
             Config.Item("supportMode", true).SetValue(false);
 
             #region LOAD CHAMPIONS
