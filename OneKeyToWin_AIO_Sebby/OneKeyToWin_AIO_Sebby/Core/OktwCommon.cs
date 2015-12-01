@@ -66,7 +66,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (args.Target != null && !sender.IsMelee)
             {
-                if (args.Target is Obj_AI_Hero && args.Target.Team != sender.Team)
+                if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team)
                 {
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
@@ -105,7 +105,7 @@ namespace OneKeyToWin_AIO_Sebby
             /////////////////  HP prediction
             if (args.Target != null && sender.IsMelee)
             {
-                if (args.Target is Obj_AI_Hero && args.Target.Team != sender.Team)
+                if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team)
                 {
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
