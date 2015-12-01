@@ -30,7 +30,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("comboQ", "Q count", true).SetValue(new Slider(5, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harasQ", "Harass Q", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
@@ -53,7 +52,7 @@ namespace OneKeyToWin_AIO_Sebby
             E = new Spell(SpellSlot.E, 2500);
             R = new Spell(SpellSlot.R, 3000f);
 
-            W.SetSkillshot(0.25f, 60f , 1200f, true, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.25f, 40f , 1500f, true, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.25f, 299f, 1400f, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.25f, 130f, 1600f, false, SkillshotType.SkillshotLine);
             LoadMenuOKTW();
@@ -101,7 +100,6 @@ namespace OneKeyToWin_AIO_Sebby
                         R.Cast(t, true, true);
                 }
             }
-            GetQStacks();
             if (Program.LagFree(1))
             {
                 SetMana();
@@ -168,25 +166,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (Orbwalker.GetTarget() == null)
                 return;
             var target = Orbwalker.GetTarget();
-            if (GetQStacks() >= Config.Item("comboQ", true).GetValue<Slider>().Value && target.IsValid && target is Obj_AI_Hero)
+            if (target.IsValid && target is Obj_AI_Hero)
             {
                 if (Program.Combo && (Player.Mana > RMANA + QMANA || target.Health <  5 * Player.GetAutoAttackDamage(Player)))
                     Q.Cast();
                 else if (Program.Farm && (Player.Mana > RMANA + QMANA + WMANA) && Config.Item("harasQ", true).GetValue<bool>())
                     Q.Cast();
             }
-        }
-
-        private int GetQStacks()
-        {
-            foreach (var buff in Player.Buffs)
-            {
-                if (buff.Name == "asheqcastready")
-                    return buff.Count;
-                else if (buff.Name == "AsheQ")
-                    return buff.Count;
-            }
-            return 0;
         }
 
         private void LogicW()
@@ -202,8 +188,8 @@ namespace OneKeyToWin_AIO_Sebby
                 if (t.IsDead || col > 0 || t.Path.Count() > 1 || (int)poutput.Hitchance < 5)
                     return;
 
-                var wDmg = W.GetDamage(t);
-                if (wDmg > t.Health)
+                
+                if (OktwCommon.GetKsDamage(t, W) > t.Health)
                 {
                     W.Cast(t,true);
                 }
