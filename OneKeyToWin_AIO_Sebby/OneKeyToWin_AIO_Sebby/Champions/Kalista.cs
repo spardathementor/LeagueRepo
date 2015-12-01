@@ -223,7 +223,7 @@ namespace OneKeyToWin_AIO_Sebby
                         cast = false;
                 }
 
-                var qDmg = Q.GetDamage(t) + Player.GetAutoAttackDamage(t);
+                var qDmg = OktwCommon.GetKsDamage(t, Q) + Player.GetAutoAttackDamage(t);
                 var eDmg = GetEdmg(t);
 
                 if (qDmg > t.Health && eDmg < t.Health && Player.Mana > QMANA + EMANA)

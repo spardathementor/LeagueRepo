@@ -164,7 +164,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t1 = TargetSelector.GetTarget(Q1.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget(Q.Range))
             {
-                if (Q.GetDamage(t) + AaDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, Q) + AaDamage(t) > t.Health)
                     Q.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Q.Cast(t);
@@ -207,7 +207,7 @@ namespace OneKeyToWin_AIO_Sebby
                     W.Collision=true;
 
                 var qDmg = Q.GetDamage(t);
-                var wDmg = W.GetDamage(t);
+                var wDmg = OktwCommon.GetKsDamage(t, W);
                 if (Orbwalking.InAutoAttackRange(t))
                 {
                     qDmg += (float)AaDamage(t);

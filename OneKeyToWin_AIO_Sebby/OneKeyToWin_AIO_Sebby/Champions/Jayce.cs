@@ -275,7 +275,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
-                var qDmg = Qtype.GetDamage(t);
+                var qDmg = OktwCommon.GetKsDamage(t, Qtype);
 
                 if (CanUseQE())
                 {
@@ -315,7 +315,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
-                var qDmg = E2.GetDamage(t);
+                var qDmg = OktwCommon.GetKsDamage(t, E2);
                 if (qDmg > t.Health)
                     E2.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
@@ -329,7 +329,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
-                if (Q2.GetDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, Q2) > t.Health)
                     Q2.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Q2.Cast(t);
@@ -347,7 +347,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(E2.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                if (E2.GetDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, E2) > t.Health)
                     E2.Cast(t);
                 else if (Program.Combo && !Config.Item("autoEks", true).GetValue<bool>() && !Player.HasBuff("jaycehyperchargevfx"))
                     E2.Cast(t);

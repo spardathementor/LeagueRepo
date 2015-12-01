@@ -214,7 +214,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget())
             {
-                var qDmg = Q.GetDamage(t);
+                var qDmg = OktwCommon.GetKsDamage(t, Q);
                 var wDmg = W.GetDamage(t);
                 if (qDmg > t.Health)
                     Program.CastSpell(Q, t);
@@ -258,7 +258,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (t.IsValidTarget())
             {
                 var qDmg = Q.GetDamage(t);
-                var wDmg = W.GetDamage(t);
+                var wDmg = OktwCommon.GetKsDamage(t, W);
                 if (wDmg > t.Health)
                 {
                     Program.CastSpell(W, t);

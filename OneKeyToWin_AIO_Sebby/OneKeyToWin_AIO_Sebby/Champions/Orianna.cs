@@ -224,7 +224,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Config.Item("Rks", true).GetValue<bool>())
                 {
-                    var comboDmg = R.GetDamage(t);
+                    var comboDmg = OktwCommon.GetKsDamage(t, R);
 
                     if (t.IsValidTarget(Q.Range))
                         comboDmg += Q.GetDamage(t);

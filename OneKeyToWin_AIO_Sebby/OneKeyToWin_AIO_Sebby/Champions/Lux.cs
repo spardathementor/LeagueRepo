@@ -254,7 +254,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (!Config.Item("autoEcc", true).GetValue<bool>())
                     {
-                        if (E.GetDamage(t) > t.Health)
+                        if (OktwCommon.GetKsDamage(t, E) > t.Health)
                             Program.CastSpell(E, t);
                         else if (Program.Combo && Player.Mana > RMANA + EMANA)
                             Program.CastSpell(E, t);
@@ -283,7 +283,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && target.CountAlliesInRange(600) < 2 && OktwCommon.ValidUlt(target)))
                 {
                     float predictedHealth = target.Health + target.HPRegenRate * 2;
-                    float Rdmg = R.GetDamage(target);
+                    float Rdmg = OktwCommon.GetKsDamage(target, R);
 
                     if (Items.HasItem(3155, target))
                     {

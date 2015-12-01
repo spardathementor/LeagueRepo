@@ -209,7 +209,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget() && Config.Item("Qon" + t.ChampionName).GetValue<bool>())
             {
-                if (Q.GetDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Program.CastSpell(Q, t);
                 if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                     Program.CastSpell(Q, t);

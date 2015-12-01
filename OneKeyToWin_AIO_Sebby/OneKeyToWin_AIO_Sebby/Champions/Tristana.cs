@@ -156,7 +156,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 2 && enemy.CountAlliesInRange(400) == 0  && enemy.Health > enemy.Level * 2))
                 {
                     var playerAaDmg = Player.GetAutoAttackDamage(enemy);
-                    var dmgCombo = playerAaDmg + W.GetDamage(enemy) + GetEDmg(enemy);
+                    var dmgCombo = playerAaDmg + OktwCommon.GetKsDamage(enemy, W) + GetEDmg(enemy);
                     
                     if (dmgCombo > enemy.Health)
                     {

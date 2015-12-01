@@ -219,7 +219,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Game.Time - QCastTime > 0.6)
                 {
-                    var comboDmg = W.GetDamage(t);
+                    var comboDmg = OktwCommon.GetKsDamage(t, W);
                     if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
                     {
                         comboDmg += R.GetDamage(t, 1);

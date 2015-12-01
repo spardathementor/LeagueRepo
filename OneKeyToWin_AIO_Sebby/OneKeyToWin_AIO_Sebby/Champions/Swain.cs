@@ -242,7 +242,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (t.Health < Q.GetDamage(t) + W.GetDamage(t))
+                if (t.Health < OktwCommon.GetKsDamage(t, Q) + E.GetDamage(t))
                     Q.CastOnUnit(t);
                 if (!Config.Item("Quse" + t.ChampionName, true).GetValue<bool>())
                     return;
@@ -259,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (t.IsValidTarget())
             {
 
-                if (t.Health < E.GetDamage(t) + W.GetDamage(t))
+                if (t.Health < E.GetDamage(t) + OktwCommon.GetKsDamage(t, Q))
                     E.CastOnUnit(t);
                 if (!Config.Item("Euse" + t.ChampionName, true).GetValue<bool>())
                     return;

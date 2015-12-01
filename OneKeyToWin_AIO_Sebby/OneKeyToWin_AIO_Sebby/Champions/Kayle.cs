@@ -109,7 +109,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
-                if (Q.GetDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Q.Cast(t);
                 else if (Program.Combo && ObjectManager.Player.Mana > WMANA + QMANA)
                     Q.Cast(t);

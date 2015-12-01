@@ -181,7 +181,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
                 {
-                    var qDmg = Q.GetDamage(t);
+                    var qDmg = OktwCommon.GetKsDamage(t, Q);
                     var eDmg = E.GetDamage(t);
                     if (t.IsValidTarget(W.Range) && qDmg + eDmg > t.Health)
                         Program.CastSpell(Q, t);
@@ -207,7 +207,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (t.IsValidTarget())
                 {
                     var qDmg = Q.GetDamage(t);
-                    var eDmg = E.GetDamage(t);
+                    var eDmg = OktwCommon.GetKsDamage(t, E);
                     if (eDmg > t.Health)
                         Program.CastSpell(E, t);
                     else if (eDmg + qDmg > t.Health && Q.IsReady())

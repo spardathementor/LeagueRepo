@@ -239,9 +239,10 @@ namespace OneKeyToWin_AIO_Sebby
             var t1 = TargetSelector.GetTarget(Q1.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget(Q.Range) && Player.Distance(t.ServerPosition) > 500)
             {
-                if (Q.GetDamage(t) + Player.GetAutoAttackDamage(t) > t.Health)
+                var qDmg = OktwCommon.GetKsDamage(t, Q);
+                if (qDmg + Player.GetAutoAttackDamage(t) > t.Health)
                     Q.Cast(t);
-                else if (Q.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health)
+                else if (qDmg + Player.GetAutoAttackDamage(t) * 3 > t.Health)
                     Q.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                     Q.Cast(t);

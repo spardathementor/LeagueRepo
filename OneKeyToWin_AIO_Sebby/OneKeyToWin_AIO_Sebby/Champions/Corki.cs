@@ -175,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                var qDmg = Q.GetDamage(t);
+                var qDmg = OktwCommon.GetKsDamage(t, Q);
                 var rDmg = R.GetDamage(t);
                 if (qDmg > t.Health)
                     Q.Cast(t);

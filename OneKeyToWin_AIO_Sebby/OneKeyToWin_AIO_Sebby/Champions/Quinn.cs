@@ -104,7 +104,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget(Q.Range))
             {
-                if (Q.GetDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Program.CastSpell(Q, t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
@@ -120,7 +120,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if ( t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW"))
             {
-                if (E.GetDamage(t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, E) > t.Health)
                     E.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + EMANA)
                     E.Cast(t);

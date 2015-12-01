@@ -168,14 +168,15 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                if (Program.GetRealDmg(Q, t) > t.Health)
+                var qDmg = OktwCommon.GetKsDamage(t, Q);
+                if (qDmg > t.Health)
                 {
                     Q.Cast(t, true);
                     OverKill = Game.Time;
                     Program.debug("Q ks");
                 }
 
-                else if (Program.GetRealDmg(Q, t) + Program.GetRealDmg(R, t) > t.Health && R.IsReady())
+                else if (qDmg + Program.GetRealDmg(R, t) > t.Health && R.IsReady())
                 {
                     Program.CastSpell(Q, t);
                     if (Config.Item("fastR", true).GetValue<bool>() && Program.GetRealDmg(Q, t) < t.Health)
@@ -211,7 +212,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (Program.GetRealDmg(W, t) > t.Health)
+                if (OktwCommon.GetKsDamage(t, W) > t.Health)
                 {
                     W.Cast(t, true, true);
                     return;
