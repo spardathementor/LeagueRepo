@@ -64,17 +64,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_SpellMissile.OnCreate += SpellMissile_OnCreateOld;
-            Obj_SpellMissile.OnDelete += Obj_SpellMissile_OnDelete;
+            GameObject.OnCreate += SpellMissile_OnCreateOld;
+            GameObject.OnDelete += Obj_SpellMissile_OnDelete;
         }
 
         private void Obj_SpellMissile_OnDelete(GameObject sender, EventArgs args)
         {
-            if (!sender.IsValid<MissileClient>())
+            if (sender.IsEnemy || sender.Type != GameObjectType.MissileClient || !sender.IsValid<MissileClient>())
                 return;
+
             MissileClient missile = (MissileClient)sender;
 
-            if (missile.IsValid && missile.IsAlly && missile.SData.Name != null)
+            if ( missile.SData.Name != null)
             {
                 if(missile.SData.Name == "AhriOrbReturn")
                     QMissile = null;
@@ -85,12 +86,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void SpellMissile_OnCreateOld(GameObject sender, EventArgs args)
         {
-            if (!sender.IsValid<MissileClient>())
+            if (sender.IsEnemy || sender.Type != GameObjectType.MissileClient || !sender.IsValid<MissileClient>())
                 return;
 
             MissileClient missile = (MissileClient)sender;
 
-            if (missile.IsValid && missile.IsAlly && missile.SData.Name != null )
+            if (missile.SData.Name != null )
             {
                 if (missile.SData.Name == "AhriOrbMissile" || missile.SData.Name == "AhriOrbReturn")
                 {
@@ -136,6 +137,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && Program.Combo)
                 LogicR();
         }
+
+        private void fallow(GameObject missile, Obj_AI_Base target)
+        {
+
+
+        }
+
 
         private void LogicR()
         {
