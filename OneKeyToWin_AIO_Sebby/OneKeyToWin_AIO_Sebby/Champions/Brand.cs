@@ -133,8 +133,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (t.IsValidTarget())
             {
                 var qDmg = Q.GetDamage(t) + BonusDmg(t) + OktwCommon.GetEchoLudenDamage(t);
-                var wDmg = W.GetDamage(t);
-
+                
                 if (qDmg > t.Health)
                     Program.CastSpell(Q, t);
 
@@ -178,7 +177,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (t.IsValidTarget())
             {
                 var qDmg = Q.GetDamage(t);
-                var wDmg = W.GetDamage(t) + BonusDmg(t) + OktwCommon.GetEchoLudenDamage(t);
+                var wDmg = OktwCommon.GetKsDamage(t, W) + BonusDmg(t);
                 if (wDmg > t.Health)
                 {
                     Program.CastSpell(W, t);
