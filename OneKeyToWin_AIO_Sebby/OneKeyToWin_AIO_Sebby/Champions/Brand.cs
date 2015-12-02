@@ -18,7 +18,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 980);
+            Q = new Spell(SpellSlot.Q, 1000);
             W = new Spell(SpellSlot.W, 940);
             E = new Spell(SpellSlot.E, 625);
             R = new Spell(SpellSlot.R, 750);
