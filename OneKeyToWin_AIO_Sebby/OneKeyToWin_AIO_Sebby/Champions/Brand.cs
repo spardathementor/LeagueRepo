@@ -23,7 +23,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 625);
             R = new Spell(SpellSlot.R, 750);
 
-            Q.SetSkillshot(0.25f, 50f, 1600f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 60f, 1600f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(1.15f, 230f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetTargetted(0.25f, 2000f);
 
@@ -398,7 +398,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             EMANA = E.Instance.ManaCost;
 
             if (!R.IsReady())
-                RMANA = WMANA - Player.PARRegenRate * W.Instance.Cooldown;
+                RMANA = QMANA - Player.PARRegenRate * Q.Instance.Cooldown;
             else
                 RMANA = R.Instance.ManaCost;
         }
