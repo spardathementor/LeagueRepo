@@ -181,19 +181,27 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsEnemy)
+            if (!sender.IsEnemy || sender.Type != GameObjectType.obj_AI_Hero)
                 return;
 
-            if (!Zhonya.IsReady() && !CanUse(exhaust))
-                return;
             
             if (sender.Distance(Player.Position) > 1600)
                 return;
 
-            if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
+            if (Zhonya.IsReady()  && Config.Item("Zhonya").GetValue<bool>())
             {
                 if (Config.Item("spellZ" + args.SData.Name) != null && Config.Item("spellZ" + args.SData.Name).GetValue<bool>())
                 {
+                    if (args.Target != null && args.Target.NetworkId == Player.NetworkId)
+                    {
+                        Zhonya.Cast();
+                    }
+                    else
+                    {
+                        var castArea = Player.Distance(args.End) * (args.End - Player.ServerPosition).Normalized() + Player.ServerPosition;
+                        if (castArea.Distance(Player.ServerPosition) < Player.BoundingRadius / 2)
+                            Zhonya.Cast();
+                    }
                     Zhonya.Cast();
 
                 }
