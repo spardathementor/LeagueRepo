@@ -62,17 +62,6 @@ namespace OneKeyToWin_AIO_Sebby
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
         }
 
-        private void Obj_AI_Base_OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (args.Target != null && !sender.IsMelee)
-            {
-                if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team)
-                {
-                    IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
-                }
-            }
-        }
-
         private void OnUpdate(EventArgs args)
         {
             if(Program.LagFree(4))
@@ -99,18 +88,29 @@ namespace OneKeyToWin_AIO_Sebby
             return totalDamage;
         }
 
-
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        private void Obj_AI_Base_OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            /////////////////  HP prediction
-            if (args.Target != null && sender.IsMelee)
+            if (args.Target != null)
             {
-                if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team)
+                if (args.Target.Type == GameObjectType.obj_AI_Hero && !sender.IsMelee && args.Target.Team != sender.Team)
                 {
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }
-            else
+        }
+
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            /////////////////  HP prediction
+            if (args.Target != null )
+            {
+                if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team && sender.IsMelee)
+                {
+                    
+                    IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
+                }
+            }
+            else 
             {
                 foreach (var champion in ChampionList.Where(champion => champion.IsValid && !champion.IsDead && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                 {
@@ -122,7 +122,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             //////////////////////////
 
-            if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || !sender.IsValid<Obj_AI_Hero>() || Player.Distance(sender.ServerPosition) > 2000)
+            if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || args.Target.Type != GameObjectType.obj_AI_Hero || Player.Distance(sender.ServerPosition) > 2000)
                 return;
 
             if (args.SData.Name == "YasuoWMovingWall")
