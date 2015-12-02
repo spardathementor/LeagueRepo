@@ -122,7 +122,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             //////////////////////////
 
-            if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || args.Target.Type != GameObjectType.obj_AI_Hero || Player.Distance(sender.ServerPosition) > 2000)
+            if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || sender.Type != GameObjectType.obj_AI_Hero || Player.Distance(sender.ServerPosition) > 2000)
                 return;
 
             if (args.SData.Name == "YasuoWMovingWall")
