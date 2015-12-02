@@ -256,22 +256,22 @@ namespace OneKeyToWin_AIO_Sebby
                             Seraph.Cast();
                         else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
                             Seraph.Cast();
-                        else if (Player.Health - dmg < Player.Level * 15)
+                        else if (Player.Health - dmg < Player.Level * 5)
                             Seraph.Cast();
                     }
 
                     if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
                     {
-                        if (dmg > Player.Level * 30)
+                        if (dmg > Player.Level * 40)
                         {
                             Zhonya.Cast();
                         }
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 10)
                         {
                             Zhonya.Cast();
 
                         }
-                        else if (Player.Health - dmg < Player.Level * 15)
+                        else if (Player.Health - dmg < Player.Level * 5)
                         {
                             Zhonya.Cast();
 
