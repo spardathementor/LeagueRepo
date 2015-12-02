@@ -144,14 +144,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnUpdate(EventArgs args)
         {
-            if (Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 2 || !Orbwalking.CanAttack())
+            if (Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 2 || !Orbwalking.CanAttack() || !Program.Combo)
             {
                 return;
             }
 
             var orbT = Orbwalker.GetTarget();
            
-            if (orbT.IsValidTarget() &&  orbT.Type == GameObjectType.obj_AI_Hero)
+            if (orbT!= null &&  orbT.Type == GameObjectType.obj_AI_Hero)
             {
                 var bestTarget = (Obj_AI_Hero)orbT;
                 var hitToBestTarget = bestTarget.Health / Player.GetAutoAttackDamage(bestTarget);
