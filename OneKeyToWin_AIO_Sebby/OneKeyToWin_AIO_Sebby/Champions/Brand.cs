@@ -165,7 +165,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (t.HasBuff("brandablaze"))
                 return true;
-            else if (E.Instance.CooldownExpires - Game.Time + 1 >= Q.Instance.Cooldown && W.Instance.CooldownExpires - Game.Time >= Q.Instance.Cooldown)
+            else if (E.Instance.CooldownExpires - Game.Time + 2 >= Q.Instance.Cooldown && W.Instance.CooldownExpires - Game.Time + 2 >= Q.Instance.Cooldown)
                 return true;
             else
                 return false;
