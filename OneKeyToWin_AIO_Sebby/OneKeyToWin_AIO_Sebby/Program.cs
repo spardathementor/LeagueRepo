@@ -319,7 +319,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>() && !Player.HasBuff("sheen") )
             {
                 var t = (Obj_AI_Base)args.Target;
-                if(!t.HasBuff("luxilluminatingfraulein") && 2 * Player.GetAutoAttackDamage(t) < args.Target.Health)
+                if(!t.HasBuff("luxilluminatingfraulein") && 4 * Player.GetAutoAttackDamage(t) < args.Target.Health)
                     args.Process = false;
             }
 
