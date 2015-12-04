@@ -202,8 +202,6 @@ namespace OneKeyToWin_AIO_Sebby
                         if (castArea.Distance(Player.ServerPosition) < Player.BoundingRadius / 2)
                             Zhonya.Cast();
                     }
-                    Zhonya.Cast();
-
                 }
             }
 
