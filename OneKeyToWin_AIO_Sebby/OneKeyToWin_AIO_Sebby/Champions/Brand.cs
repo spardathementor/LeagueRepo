@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -307,14 +304,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                                 totalDmg = totalDmg - 400;
                             }
 
-                            if (totalDmg > t2.Health && Player.GetAutoAttackDamage(t2) * 2 < t2.Health)
+                            if (totalDmg > t2.Health - OktwCommon.GetIncomingDamage(t2) && Player.GetAutoAttackDamage(t2) * 2 < t2.Health)
                             {
 
                                 R.CastOnUnit(t2);
                             }
 
                         }
-                        else if (t2.Health < dmgR * 2 + BonusDmg(t2))
+                        else if (t2.Health - OktwCommon.GetIncomingDamage(t2) < dmgR * 2 + BonusDmg(t2))
                         {
                             if (Player.CountEnemiesInRange(R.Range) > 0)
                             {
