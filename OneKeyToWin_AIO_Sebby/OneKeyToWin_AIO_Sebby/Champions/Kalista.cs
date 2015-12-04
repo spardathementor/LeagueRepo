@@ -223,7 +223,7 @@ namespace OneKeyToWin_AIO_Sebby
                         cast = false;
                 }
 
-                var qDmg = OktwCommon.GetKsDamage(t, Q) + Player.GetAutoAttackDamage(t);
+                var qDmg = OktwCommon.GetKsDamage(t, Q)  + Player.GetAutoAttackDamage(t);
                 var eDmg = GetEdmg(t);
 
                 if (qDmg > t.Health && eDmg < t.Health && Player.Mana > QMANA + EMANA)
@@ -329,7 +329,7 @@ namespace OneKeyToWin_AIO_Sebby
                     CastE();
 
                 }
-                if (GetEStacks(target) >= countE && (GetPassiveTime(target) < 0.5 || Player.CountEnemiesInRange(750) == 0) && Player.Mana > RMANA + EMANA)
+                if (GetEStacks(target) >= countE && (GetPassiveTime(target) < 1 || Player.CountEnemiesInRange(700) == 0) && Player.Mana > RMANA + EMANA)
                 {
                     CastE();
                 }
