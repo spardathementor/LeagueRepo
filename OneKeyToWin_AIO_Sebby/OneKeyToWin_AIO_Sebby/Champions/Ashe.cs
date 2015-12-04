@@ -123,7 +123,7 @@ namespace OneKeyToWin_AIO_Sebby
                         R.Cast(target);
                     if (target.CountEnemiesInRange(250) > 2 && Config.Item("autoRaoe", true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
                         Program.CastSpell(R, target);
-                    if (OktwCommon.GetKsDamage(target, R) > target.Health && target.CountAlliesInRange(600) == 0 && target.Distance(Player.Position) > 1000)
+                    if (OktwCommon.GetKsDamage(target, R) > target.Health - OktwCommon.GetIncomingDamage(target) && target.CountAlliesInRange(600) == 0 && target.Distance(Player.Position) > 1000)
                     {
                         cast = true;
                         PredictionOutput output = R.GetPrediction(target);
