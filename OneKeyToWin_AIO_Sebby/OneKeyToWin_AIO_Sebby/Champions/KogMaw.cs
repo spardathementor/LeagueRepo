@@ -136,7 +136,7 @@ namespace OneKeyToWin_AIO_Sebby
                     var Rdmg = R.GetDamage(target);
                     Rdmg = Rdmg + target.CountAlliesInRange(500) * Rdmg;
 
-                    if (R.GetDamage(target) > target.Health)
+                    if (R.GetDamage(target) > target.Health - OktwCommon.GetIncomingDamage(target))
                         Program.CastSpell(R, target);
                     else if (Program.Combo && Rdmg * 2 > target.Health && Player.Mana > RMANA * 3)
                         Program.CastSpell(R, target);

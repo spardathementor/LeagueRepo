@@ -326,7 +326,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if ( Player.Mana > RMANA + QMANA)
                     totalComboDamage += Q.GetDamage(t);
 
-                if (totalComboDamage > t.Health && OktwCommon.ValidUlt(t))
+                if (totalComboDamage > t.Health - OktwCommon.GetIncomingDamage(t) && OktwCommon.ValidUlt(t))
                 {
                     R.CastOnUnit(t);
                 }

@@ -254,7 +254,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.CountAlliesInRange(500) == 0))
                 {
-                    float predictedHealth = target.Health;
+                    float predictedHealth = target.Health - (float)OktwCommon.GetIncomingDamage(target);
                     double Rdmg = CalculateR(target) ;
 
                     if (Rdmg * 2 > predictedHealth && Config.Item("Rdmg", true).GetValue<StringList>().SelectedIndex == 1)
