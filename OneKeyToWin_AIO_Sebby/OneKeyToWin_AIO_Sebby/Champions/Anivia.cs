@@ -220,7 +220,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (ObjectManager.Player.Level < 7)
                     rCd = 10;
                 //debug("Q " + qCd + "R " + rCd + "E now " + E.Instance.Cooldown);
-                var eDmg = E.GetDamage(t);
+                var eDmg = OktwCommon.GetKsDamage(t, E);
 
                 if (eDmg > t.Health)
                     E.Cast(t, true);
