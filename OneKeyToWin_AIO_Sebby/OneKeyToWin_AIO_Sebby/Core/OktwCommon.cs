@@ -76,7 +76,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if(skillshots)
                 {
-                        totalDamage += damage.Damage;
+                    totalDamage += damage.Damage;
                 }
                 else
                 {

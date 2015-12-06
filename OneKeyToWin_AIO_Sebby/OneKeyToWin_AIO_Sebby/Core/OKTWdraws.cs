@@ -234,11 +234,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnDraw(EventArgs args)
         {
+            if (Config.Item("disableDraws").GetValue<bool>())
+                return;
+
             if (Game.Time - IntroTimer > 7)
                 Intro.Remove();
 
-            if (Config.Item("disableDraws").GetValue<bool>())
-                return;
             if (Config.Item("showWards").GetValue<bool>())
             {
                 var circleSize = 60;

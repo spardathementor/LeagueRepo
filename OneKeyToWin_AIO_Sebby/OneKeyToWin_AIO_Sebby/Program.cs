@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby
         public static float JungleTime, DrawSpellTime=0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
-        public static Obj_SpawnPoint enemySpawn;
+        public static Obj_SpawnPoint enemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy);
         public static Core.PredictionOutput DrawSpellPos;
         public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>() , Allies = new List<Obj_AI_Hero>();
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -366,8 +366,8 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (jungler.IsDead)
                 {
-                    enemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy);
-                    timer = (int)(enemySpawn.Position.Distance(ObjectManager.Player.Position) / 370);
+                    
+                    timer = (int)(enemySpawn.Position.Distance(Player.Position) / 370);
                 }
                 else if (jungler.IsVisible && jungler.IsValid)
                 {
@@ -560,11 +560,10 @@ namespace OneKeyToWin_AIO_Sebby
             if (AIOmode == 1 || Config.Item("disableDraws").GetValue<bool>())
                 return;
 
-            if (Game.Time - dodgeTime < 0.01 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>())
+            if (Game.Time - dodgeTime < 0.01 && (int)(Game.Time * 10) % 2 == 0 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>())
             {
                 Render.Circle.DrawCircle(Player.Position, dodgeRange, System.Drawing.Color.DimGray, 1);
-                if((int)(Game.Time * 10) % 2 == 0)
-                    drawText("Anti-Melle Positioning Assistant" , Player.Position, System.Drawing.Color.Gray);
+                drawText("Anti-Melle Positioning Assistant" , Player.Position, System.Drawing.Color.Gray);
             }
 
             if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1  )
