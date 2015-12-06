@@ -54,38 +54,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
 
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (!R.IsReady() || !sender.IsEnemy || sender.IsMinion || !sender.IsValidTarget(1600) || !Config.Item("autoR", true).GetValue<bool>())
-                return;
-
-            foreach (var ally in Program.Allies.Where(ally => Config.Item("Rally" + ally.ChampionName).GetValue<bool>() && ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < R.Range))
-            {
-                double dmg = 0;
-                if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
-                {
-                    dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
-                }
-                else
-                {
-                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
-                    if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
-                        dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
-                    else
-                        continue;
-                }
-                if(dmg > Player.Level * 30)
-                    R.Cast(ally);
-                else if (ally.Health - dmg < ally.CountEnemiesInRange(900) * ally.Level * 20)
-                    R.Cast(ally);
-                else if (ally.Health - dmg <  ally.Level * 5)
-                    R.Cast(ally);
-            }
-        }
-        
         private void Game_OnGameUpdate(EventArgs args)
         {
             if (Program.LagFree(1))
@@ -94,6 +64,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Jungle();
             }
 
+            if (Program.LagFree(1) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                LogicR();
+
             if (Program.LagFree(2) && W.IsReady() && !Player.IsWindingUp && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
             
@@ -101,6 +74,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicE();
             if (Program.LagFree(4) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
+        }
+
+        private void LogicR()
+        {
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>() ))
+            {
+                int sensitivity = 20;
+                double dmg = OktwCommon.GetIncomingDamage(ally);
+                int nearEnemys = ally.CountEnemiesInRange(900) ;
+
+                nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;
+
+                if (dmg > 100 + Player.Level * sensitivity)
+                    R.Cast(ally);
+                else if (ally.Health - dmg < nearEnemys * ally.Level * sensitivity)
+                    R.Cast(ally);
+            }
         }
 
         private void LogicQ()
