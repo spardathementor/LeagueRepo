@@ -510,7 +510,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 0 && input.Unit.IsMoving)
             {
-                if (GetAngle(input.From, input.Unit) < angleMove)
+                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > moveArea )
                 {
                     Program.debug("PRED: ANGLE HIT CHANCE");
                     result.Hitchance = HitChance.VeryHigh;
