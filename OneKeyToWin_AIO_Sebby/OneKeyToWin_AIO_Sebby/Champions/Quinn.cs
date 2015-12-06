@@ -46,6 +46,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R in shop", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
+
             Game.OnUpdate += Game_OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -63,7 +66,31 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
                 LogicR();
         }
+        private void Jungle()
+        {
+            if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
+            {
+                var mobs = MinionManager.GetMinions(Player.ServerPosition, 700, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                if (mobs.Count > 0)
+                {
+                    var mob = mobs[0];
+                    if (mob.HasBuff("QuinnW"))
+                        return;
 
+                    if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>())
+                    {
+                        Q.Cast(mob.ServerPosition);
+                        return;
+                    }
+
+                    if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
+                    {
+                        E.CastOnUnit(mob);
+                        return;
+                    }
+                }
+            }
+        }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
@@ -77,6 +104,8 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             if(Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
+
+            Jungle();
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
