@@ -57,8 +57,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
             foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team == Player.Team))
             {
-                Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("skillshot" + ally.ChampionName, "skillshot", true).SetValue(true));
-                Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("targeted" + ally.ChampionName, "targeted", true).SetValue(true));
+                Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("damage" + ally.ChampionName, "Damage incoming", true).SetValue(true));
                 Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("HardCC" + ally.ChampionName, "Hard CC", true).SetValue(true));
                 Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("Poison" + ally.ChampionName, "Poison", true).SetValue(true));
             }
@@ -103,43 +102,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (sender.IsMe && args.SData.Name == "LuxLightStrikeKugel")
             {
-                Program.debug(args.SData.Name);
                 Epos = args.End;
             }
 
-            if (!W.IsReady() || !sender.IsEnemy || Player.Distance(sender.ServerPosition) > 2000)
-                return;
             
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid  && Player.Distance(ally.ServerPosition) < W.Range))
-            {
-                double dmg = 0;
-
-                if (Config.Item("targeted" + ally.ChampionName, true).GetValue<bool>() && args.Target != null && args.Target.NetworkId == ally.NetworkId)
-                {
-                    
-                    dmg = sender.GetSpellDamage(Player, args.SData.Name);
-                }
-                else if (Config.Item("skillshot" + ally.ChampionName, true).GetValue<bool>())
-                {
-                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
-                    if (castArea.Distance(ally.ServerPosition) > ally.BoundingRadius / 2)
-                        continue;
-                    dmg = sender.GetSpellDamage(Player, args.SData.Name);
-                }
-
-                if (dmg > 0)
-                {
-                    double HpLeft = ally.Health - dmg;
-
-                    double HpPercentage = (dmg * 100) / ally.Health;
-                    double shieldValue = 65 + W.Level * 25 + 0.35 * Player.FlatMagicDamageMod;
-
-                    if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
-                        W.Cast(W.GetPrediction(ally).CastPosition);
-                    else if (dmg > shieldValue)
-                        W.Cast(W.GetPrediction(ally).CastPosition);
-                }
-            }   
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -176,21 +142,37 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicR();
             if (Program.LagFree(4) && W.IsReady())
                 LogicW();
-
         }
 
         private void LogicW()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.Distance(Player.Position) < W.Range))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead  && Config.Item("damage" + ally.ChampionName, true).GetValue<bool>() && Player.ServerPosition.Distance(ally.ServerPosition) < W.Range))
             {
-                if (Config.Item("HardCC" + ally.ChampionName,true).GetValue<bool>() && HardCC(ally))
+                int sensitivity = 20;
+                double dmg = OktwCommon.GetIncomingDamage(ally);
+                int nearEnemys = ally.CountEnemiesInRange(900);
+                double HpPercentage = (dmg * 100) / ally.Health;
+                double shieldValue = 65 + W.Level * 25 + 0.35 * Player.FlatMagicDamageMod;
+
+                if (Config.Item("HardCC" + ally.ChampionName, true).GetValue<bool>() && nearEnemys > 0 && HardCC(ally))
                 {
                     W.CastOnUnit(ally);
                 }
                 else if (Config.Item("Poison" + ally.ChampionName, true).GetValue<bool>() && ally.HasBuffOfType(BuffType.Poison))
                 {
-                    W.CastOnUnit(ally);
+                    W.Cast(W.GetPrediction(ally).CastPosition);
                 }
+
+                nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;
+
+                if (dmg > shieldValue)
+                    W.Cast(W.GetPrediction(ally).CastPosition);
+                else if (dmg > 100 + Player.Level * sensitivity)
+                    W.Cast(W.GetPrediction(ally).CastPosition);
+                else if (ally.Health - dmg < nearEnemys * ally.Level * sensitivity)
+                    W.Cast(W.GetPrediction(ally).CastPosition);
+                else if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
+                    W.Cast(W.GetPrediction(ally).CastPosition);
             }
         }
 
