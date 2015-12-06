@@ -43,6 +43,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             #region MENU ABOUT OKTW
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("debug", "Debug").SetValue(false));
+            Config.SubMenu("About OKTW©").AddItem(new MenuItem("debugChat", "Debug Chat").SetValue(false));
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("0", "OneKeyToWin© by Sebby"));
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("1", "visit joduska.me"));
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("2", "DONATE: kaczor.sebastian@gmail.com"));
@@ -544,6 +545,10 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("debug").GetValue<bool>())
             {
                 Console.WriteLine(msg);
+            }
+            if (Config.Item("debugChat").GetValue<bool>())
+            {
+                Game.PrintChat(msg);
             }
         }
 

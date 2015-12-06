@@ -45,15 +45,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if ((hpAfter > playerDmg) && hpAfter > 5 && (hits>0 || minionAgro!=minion))
             {
-                Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
-                Program.debug("HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
+                //Program.debug(" minion HP " + (int)minionHel + " turretDmg " + (int)turrentDmg);
+               // Program.debug("HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
                 Orbwalker.ForceTarget(minion);
                 Orbwalking.Attack = true;
                 return false;
             }
             else
             {
-                Program.debug("else HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
+                //Program.debug("else HPAfter " + hpAfter + " MyDamage " + (int)Player.GetAutoAttackDamage(minion) + " HITS " + (int)hits + " tur " + turrentDmg);
                 return true;
             } 
         }
@@ -76,7 +76,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     Orbwalker.ForceTarget(minionAgro);
                     Orbwalking.Attack = true;
-                    Program.debug(" Force AGRO ");
+                    //Program.debug(" Force AGRO ");
                     return;
                 }
                 
