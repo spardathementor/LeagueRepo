@@ -147,7 +147,7 @@ namespace OneKeyToWin_AIO_Sebby
         private void LogicE()
         {
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-            if ( t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW"))
+            if ( t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW") && t.CountEnemiesInRange(800) <3)
             {
                 if (OktwCommon.GetKsDamage(t, E) > t.Health)
                     E.Cast(t);
