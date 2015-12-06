@@ -510,7 +510,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 0 && input.Unit.IsMoving)
             {
-                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > moveArea )
+                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > fixRange)
                 {
                     Program.debug("PRED: ANGLE HIT CHANCE");
                     result.Hitchance = HitChance.VeryHigh;
@@ -523,7 +523,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Type == SkillshotType.SkillshotCircle)
             {
-                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d && distanceUnitToWaypoint > moveArea && distanceFromToUnit < input.Range - fixRange && distanceUnitToWaypoint > fixRange) 
+                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d && distanceUnitToWaypoint > fixRange && distanceFromToUnit < input.Range - fixRange && distanceUnitToWaypoint > fixRange) 
                 {
                     Program.debug("PRED: CIRCLE NEW PATH");
                     result.Hitchance = HitChance.VeryHigh;
