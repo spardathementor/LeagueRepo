@@ -22,12 +22,12 @@ namespace OneKeyToWin_AIO_Sebby
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 655f);
-            Q1 = new Spell(SpellSlot.Q, 1100f);
+            Q1 = new Spell(SpellSlot.Q, 1200f);
             W = new Spell(SpellSlot.W);
             E = new Spell(SpellSlot.E, 1000f);
             R = new Spell(SpellSlot.R, 1350f);
 
-            Q1.SetSkillshot(0.25f, 10f, 2000f, true, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 100f, 2000f, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
             E.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.25f, 100f, 2000f, false, SkillshotType.SkillshotCircle);
@@ -51,6 +51,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("forceBlockMove", "Force block player", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("disableBlock", "Disable R key", true).SetValue(new KeyBind("R".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("newTarget", "Try change focus after attack ", true).SetValue(true));
 
@@ -101,13 +102,6 @@ namespace OneKeyToWin_AIO_Sebby
             if (!unit.IsMe)
                 return;
             LastAttackId = target.NetworkId;
-            if (Player.IsChannelingImportantSpell() || Game.Time - RCastTime < 0.2)
-            {
-                Orbwalking.Attack = false;
-                Orbwalking.Move = false;
-                Program.debug("cast R");
-                return;
-            }
 
             if (!(target is Obj_AI_Hero))
                 return;
@@ -160,7 +154,17 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Player.IsChannelingImportantSpell() || Game.Time - RCastTime < 0.3)
+            if (Config.Item("disableBlock", true).GetValue<KeyBind>().Active)
+            {
+                Orbwalking.Attack = true;
+                Orbwalking.Move = true;
+                OktwCommon.blockSpells = false;
+                OktwCommon.blockAttack = false;
+                OktwCommon.blockMove = false;
+                OktwCommon.blockAttack = false;
+                return;
+            }
+            else if (Player.IsChannelingImportantSpell() || Game.Time - RCastTime < 0.3)
             {
                 if (Config.Item("forceBlockMove", true).GetValue<bool>())
                 {
