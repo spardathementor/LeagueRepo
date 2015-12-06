@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby
             W = new Spell(SpellSlot.E, 670);
             R = new Spell(SpellSlot.R, 3000);
 
-            E.SetTargetted(0.25f, 3000f);
+            E.SetTargetted(0.25f, 2200f);
 
             LoadMenuOKTW();
 
@@ -243,7 +243,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             var prepos = E.GetPrediction(target);
 
-            float pushDistance = 450;
+            float pushDistance = 500;
 
             if (Player.Position != fromPosition)
                 pushDistance = 400 ;
