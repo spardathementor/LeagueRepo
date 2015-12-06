@@ -40,7 +40,6 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += Game_OnGameUpdate;
             Orbwalking.BeforeAttack += BeforeAttack;
             //Orbwalking.AfterAttack += afterAttack;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter.OnPossibleToInterrupt += OnInterruptableSpell;
         }
@@ -98,24 +97,6 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (args.Target == null || !sender.IsEnemy || !args.Target.IsMe || !Config.Item("autoW", true).GetValue<bool>() || W.IsReady() || Player.Mana > RMANA + WMANA)
-                return;
-            var dmg = sender.GetSpellDamage(Player, args.SData.Name);
-            double HpLeft = Player.Health - dmg;
-            double HpPercentage = (dmg * 100) / Player.Health;
-            double shieldValue = 20 + W.Level * 40 + 0.08 * Player.MaxMana + 0.8 * Player.FlatMagicDamageMod;
-            if (Player.Health - dmg < dmg)
-            {
-                if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
-                    W.Cast();
-                else if (dmg > shieldValue)
-                    W.Cast();
-                //Game.PrintChat("" + HpPercentage);
-            }
-        }
-
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
             if (FarmId != args.Target.NetworkId)
@@ -150,14 +131,38 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(1) && !Player.IsWindingUp && E.IsReady())
                 LogicE();
 
-            if (Program.LagFree(2) && !Player.IsWindingUp && Q.IsReady())
-                LogicQ();
+            if (Program.LagFree(2) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
+                LogicW();
 
             if (Program.LagFree(3) && !Player.IsWindingUp && Q.IsReady())
+            {
+                LogicQ();
                 LogicQ2();
+            }
 
             if (Program.LagFree(4) && !Player.IsWindingUp && R.IsReady())
                 LogicR();
+        }
+
+        private void LogicW()
+        {
+            if (Player.Mana > RMANA + WMANA)
+            {
+                int sensitivity = 20;
+                double dmg = OktwCommon.GetIncomingDamage(Player);
+                int nearEnemys = Player.CountEnemiesInRange(900);
+                double shieldValue = 20 + W.Level * 40 + 0.08 * Player.MaxMana + 0.8 * Player.FlatMagicDamageMod;
+                double HpPercentage = (dmg * 100) / Player.Health;
+
+                nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;
+
+                if (dmg > shieldValue)
+                    W.Cast();
+                else if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
+                    W.Cast();
+                else if (Player.Health - dmg < nearEnemys * Player.Level * sensitivity)
+                    R.Cast(Player);
+            }
         }
 
         private void LogicQ2()
