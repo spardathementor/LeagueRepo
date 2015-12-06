@@ -78,7 +78,8 @@ namespace OneKeyToWin_AIO_Sebby
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             Jungle();
-            
+            if ( E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
+                LogicE();
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -128,8 +129,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 SetMana();
             }
-            if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp && Config.Item("autoE", true).GetValue<bool>())
-                LogicE();
+            
             if (!Config.Item("QWlogic", true).GetValue<bool>() || !Player.HasBuff("gravesbasicattackammo1"))
             {
                 if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
