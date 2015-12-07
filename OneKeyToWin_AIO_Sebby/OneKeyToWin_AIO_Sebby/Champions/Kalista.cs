@@ -291,9 +291,9 @@ namespace OneKeyToWin_AIO_Sebby
             int outRange = 0;
             var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range - 50);
 
-            if (!Player.IsDashing() && !Player.IsWindingUp)
+            if (!Player.IsDashing())
             {
-                foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range )))
+                foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range ) && minion.HasBuff("kalistaexpungemarker")))
                 {
                     if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate)
                     {
@@ -317,7 +317,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && OktwCommon.ValidUlt(target)))
+            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && target.HasBuff("kalistaexpungemarker") && OktwCommon.ValidUlt(target)))
             {
                 var eDmg = GetEdmg(target);
                 if (target.Health < eDmg)
