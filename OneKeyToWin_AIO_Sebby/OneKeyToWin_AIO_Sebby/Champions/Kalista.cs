@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby
             E = new Spell(SpellSlot.E, 1000);
             R = new Spell(SpellSlot.R, 1500f);
 
-            Q.SetSkillshot(0.25f, 40f, 1200f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0f, 40f, 2400f, true, SkillshotType.SkillshotLine);
             Q2.SetSkillshot(0.25f, 40f, 1200f, false, SkillshotType.SkillshotLine);
 
             LoadMenuOKTW();
@@ -192,7 +192,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (E.IsReady())
             {
-                LogicE();
+                if(!Player.IsDashing())
+                    LogicE();
                 JungleE();
             }
 
@@ -289,33 +290,33 @@ namespace OneKeyToWin_AIO_Sebby
             bool eBigMinion = Config.Item("minionE", true).GetValue<bool>();
             int count = 0;
             int outRange = 0;
+
+
             var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range - 50);
 
-            if (!Player.IsDashing())
+            foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range ) && minion.HasBuff("kalistaexpungemarker")))
             {
-                foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range ) && minion.HasBuff("kalistaexpungemarker")))
+                if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate)
                 {
-                    if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate)
+                    if (GetPassiveTime(minion) > 0.5 && HealthPrediction.GetHealthPrediction(minion, 500, 250) > Player.GetAutoAttackDamage(minion))
                     {
-                        if (GetPassiveTime(minion) > 0.5 && HealthPrediction.GetHealthPrediction(minion, 500, 250) > Player.GetAutoAttackDamage(minion))
+                        count++;
+                        if (!Orbwalking.InAutoAttackRange(minion))
                         {
-                            count++;
-                            if (!Orbwalking.InAutoAttackRange(minion))
+                            outRange++;
+                        }
+                        if (eBigMinion)
+                        {
+                            var minionName = minion.BaseSkinName.ToLower();
+                            if (minionName.Contains("siege") || minionName.Contains("super"))
                             {
                                 outRange++;
-                            }
-                            if (eBigMinion)
-                            {
-                                var minionName = minion.BaseSkinName.ToLower();
-                                if (minionName.Contains("siege") || minionName.Contains("super"))
-                                {
-                                    outRange++;
-                                }
                             }
                         }
                     }
                 }
             }
+            
 
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && target.HasBuff("kalistaexpungemarker") && OktwCommon.ValidUlt(target)))
             {
