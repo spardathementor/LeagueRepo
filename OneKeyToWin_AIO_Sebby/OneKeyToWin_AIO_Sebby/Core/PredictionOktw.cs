@@ -392,7 +392,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 13) - (totalDelay * 2);
+            double angleMove = 30 + (input.Radius / 10) - (totalDelay * 3);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 1000f ;
 
@@ -512,7 +512,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > fixRange)
                 {
-                    Program.debug("PRED: ANGLE HIT CHANCE");
+                    Program.debug("PRED: ANGLE HIT CHANCE " + angleMove + " < " + GetAngle(input.From, input.Unit));
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
 
