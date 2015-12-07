@@ -86,8 +86,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
 
-            if (Config.Item("autoBuy").GetValue<bool>() && Player.InFountain() && !ScryingOrb.IsOwned() && Player.Level > 5)
-                ObjectManager.Player.BuyItem(ItemId.Scrying_Orb_Trinket);
+            if (Config.Item("autoBuy").GetValue<bool>() && Player.InFountain() && !ScryingOrb.IsOwned() && Player.Level >= 9)
+                ObjectManager.Player.BuyItem(ItemId.Farsight_Orb_Trinket);
 
             if(rengar && Player.HasBuff("rengarralertsound"))
                 CastVisionWards(Player.ServerPosition);
