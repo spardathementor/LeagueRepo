@@ -248,7 +248,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Player.Position != fromPosition)
                 pushDistance = 400 ;
 
-            int radius = 120;
+            int radius = 100;
             var start2 = target.ServerPosition;
             var end2 = prepos.CastPosition.Extend(fromPosition, -pushDistance);
 
