@@ -21,7 +21,7 @@ namespace OneKeyToWin_AIO_Sebby
         public int Muramana = 3042;
         public int Manamune = 3004;
         private int [] SmiteDamage = { 390, 410, 430, 450, 480, 510, 540, 570, 600, 640, 680, 720, 760, 800, 850, 900, 950, 1000};
-        private SpellSlot heal, barrier, ignite, exhaust, flash, smite;
+        private SpellSlot heal, barrier, ignite, exhaust, flash, smite , teleport;
 
         public static Items.Item
 
@@ -57,8 +57,8 @@ namespace OneKeyToWin_AIO_Sebby
         
         public void LoadOKTW()
         {
-            
 
+            teleport = Player.GetSpellSlot("SummonerTeleport");
             heal = Player.GetSpellSlot("summonerheal");
             barrier = Player.GetSpellSlot("summonerbarrier");
             ignite = Player.GetSpellSlot("summonerdot");
@@ -231,7 +231,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Survival()
         {
-            if (Player.HealthPercent < 40 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
+            if (Player.HealthPercent < 50 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
             {
                 double dmg = OktwCommon.GetIncomingDamage(Player, 1);
                 if (dmg > 0)
@@ -241,9 +241,9 @@ namespace OneKeyToWin_AIO_Sebby
                         var value = 95 + Player.Level * 20;
                         if (dmg > value && Player.HealthPercent < 50)
                             Player.Spellbook.CastSpell(barrier, Player);
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
                             Player.Spellbook.CastSpell(barrier, Player);
-                        else if (Player.Health - dmg < Player.Level * 15)
+                        else if (Player.Health - dmg < Player.Level * 10)
                             Seraph.Cast();
                     }
 
@@ -252,9 +252,9 @@ namespace OneKeyToWin_AIO_Sebby
                         var value = Player.Mana * 0.2 + 150;
                         if (dmg > value && Player.HealthPercent < 50)
                             Seraph.Cast();
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 15)
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
                             Seraph.Cast();
-                        else if (Player.Health - dmg < Player.Level * 5)
+                        else if (Player.Health - dmg < Player.Level * 10)
                             Seraph.Cast();
                     }
 
@@ -264,12 +264,12 @@ namespace OneKeyToWin_AIO_Sebby
                         {
                             Zhonya.Cast();
                         }
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 10)
+                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
                         {
                             Zhonya.Cast();
 
                         }
-                        else if (Player.Health - dmg < Player.Level * 5)
+                        else if (Player.Health - dmg < Player.Level * 10)
                         {
                             Zhonya.Cast();
 
@@ -357,19 +357,43 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Cleansers();
             Smite();
-            Survival();
+
+            if(Program.LagFree(0) || Program.LagFree(2) || Program.LagFree(3))
+                Survival();
 
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
 
             if (Config.Item("pots").GetValue<bool>())
                 PotionManagement();
-
+            
             Ignite();
+            //Teleport();
             Exhaust();
             Offensive();
             Defensive();
             ZhonyaCast();
+        }
+
+        private void Teleport()
+        {
+            if (CanUse(teleport) && !Player.HasBuff("teleport"))
+            {
+                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead  && ally.CountEnemiesInRange(1000) > 0 ))
+                {
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValid && !enemy.IsDead))
+                    {
+                        var distanceEA = enemy.Distance(ally);
+                        if (distanceEA < 1000)
+                        {
+                            foreach (var obj in ObjectManager.Get<Obj_AI_Minion>().Where(obj => obj.IsAlly &&  distanceEA < obj.Position.Distance(ally.Position)))
+                            {
+                                Player.Spellbook.CastSpell(teleport, obj);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void Smite()
@@ -430,7 +454,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var enemy = TargetSelector.GetTarget(600, TargetSelector.DamageType.True);
                 if (enemy.IsValidTarget())
                 {
-                    var IgnDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
+                    var IgnDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) + OktwCommon.GetIncomingDamage(enemy);
                     if (enemy.Health <= IgnDmg && Player.Distance(enemy.ServerPosition) > 500 && enemy.CountAlliesInRange(500) < 2)
                         Player.Spellbook.CastSpell(ignite, enemy);
 
