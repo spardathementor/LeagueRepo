@@ -161,7 +161,6 @@ namespace OneKeyToWin_AIO_Sebby
                 OktwCommon.blockSpells = false;
                 OktwCommon.blockAttack = false;
                 OktwCommon.blockMove = false;
-                OktwCommon.blockAttack = false;
                 return;
             }
             else if (Player.IsChannelingImportantSpell() || Game.Time - RCastTime < 0.3)
