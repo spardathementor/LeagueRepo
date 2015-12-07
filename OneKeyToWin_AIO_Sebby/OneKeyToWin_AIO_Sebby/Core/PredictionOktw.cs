@@ -392,9 +392,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 10) - (totalDelay * 3);
+            double angleMove = 30 + (input.Radius / 13) - (totalDelay * 2);
             float backToFront = moveArea * 1.5f;
-            float pathMinLen = 800f;
+            float pathMinLen = 700f;
 
             if(UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
@@ -510,9 +510,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 0 && input.Unit.IsMoving)
             {
-                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > fixRange)
+                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > moveArea * 0.6)
                 {
-                    Program.debug("PRED: ANGLE HIT CHANCE " + angleMove + " < " + GetAngle(input.From, input.Unit));
+                    Program.debug("PRED: ANGLE HIT CHANCE " + angleMove + " > " + GetAngle(input.From, input.Unit));
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
 
