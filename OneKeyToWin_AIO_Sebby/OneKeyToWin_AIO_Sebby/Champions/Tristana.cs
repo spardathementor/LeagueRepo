@@ -86,7 +86,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            if (E.IsReady() && args.Target is Obj_AI_Hero && )
+            if (E.IsReady() && args.Target is Obj_AI_Hero )
             {
                 var t = (Obj_AI_Hero)args.Target;
 
