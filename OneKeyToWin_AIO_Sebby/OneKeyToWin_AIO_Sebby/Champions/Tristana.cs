@@ -86,7 +86,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            if (E.IsReady() && args.Target is Obj_AI_Hero && !Player.HasBuff("itemstatikshankcharge"))
+            if (E.IsReady() && args.Target is Obj_AI_Hero && )
             {
                 var t = (Obj_AI_Hero)args.Target;
 
@@ -95,22 +95,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (E.GetDamage(t) > t.Health)
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        if(!Player.HasBuff("itemstatikshankcharge"))
+                            args.Process = false;
                     }
                     else if (R.IsReady() && E.GetDamage(t) + R.GetDamage(t) > t.Health && Player.Mana > RMANA + EMANA)
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        if (!Player.HasBuff("itemstatikshankcharge"))
+                            args.Process = false;
                     }
                     else if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("useEon" + t.ChampionName).GetValue<bool>())
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        if (!Player.HasBuff("itemstatikshankcharge"))
+                            args.Process = false;
                     }
                     else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("harras" + t.ChampionName).GetValue<bool>())
                     {
                         E.Cast(t);
-                        args.Process = false;
+                        if (!Player.HasBuff("itemstatikshankcharge"))
+                            args.Process = false;
                     }
                 }
             }
