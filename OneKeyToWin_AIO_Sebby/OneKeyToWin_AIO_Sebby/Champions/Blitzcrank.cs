@@ -187,7 +187,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             bool rKs = Config.Item("rKs", true).GetValue<bool>();
             bool afterGrab = Config.Item("afterGrab", true).GetValue<bool>();
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && target.HasBuff("rocketgrab2")))
+            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range)))
             {
                 if (rKs && R.GetDamage(target) > target.Health)
                     R.Cast();
