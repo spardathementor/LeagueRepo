@@ -126,11 +126,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else if (Player.Mana > RMANA + QMANA && buffCount == 0)
                         Q.Cast();
                 }
-                if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>()  )
+                if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>() )
                 {
-                    if (buffCount + axeList.Count == 0 && Player.Mana > RMANA + QMANA + EMANA + WMANA)
+                    if (buffCount + axeList.Count == 0 && Player.Mana > RMANA + EMANA + WMANA)
                         Q.Cast();
-                    else if (Player.Mana > Player.MaxMana * 0.95 && buffCount == 0)
+                    else if (Player.ManaPercent > 70 && buffCount == 0)
                         Q.Cast();
                 }
             }
