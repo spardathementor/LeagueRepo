@@ -166,25 +166,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (Orbwalker.GetTarget() == null)
                 return;
             var target = Orbwalker.GetTarget();
-            if (target.IsValid && target is Obj_AI_Hero && GetQStacks() == 5)
+            if (target.IsValid && target is Obj_AI_Hero)
             {
                 if (Program.Combo && (Player.Mana > RMANA + QMANA || target.Health <  5 * Player.GetAutoAttackDamage(Player)))
                     Q.Cast();
                 else if (Program.Farm && (Player.Mana > RMANA + QMANA + WMANA) && Config.Item("harasQ", true).GetValue<bool>())
                     Q.Cast();
             }
-        }
-
-        private int GetQStacks()
-        {
-            foreach (var buff in Player.Buffs)
-            {
-                if (buff.Name == "asheqcastready")
-                    return buff.Count;
-                else if (buff.Name == "AsheQ")
-                    return buff.Count;
-            }
-            return 0;
         }
 
         private void LogicW()
