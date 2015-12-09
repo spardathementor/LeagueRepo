@@ -157,8 +157,8 @@ namespace OneKeyToWin_AIO_Sebby
                 LogicQ();
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Game.Time - QCastTime > 1)
                 LogicR();
-
-            if (Orbwalking.CanAttack() && !Program.None)
+            return;
+            if (Orbwalking.CanAttack() && !Program.None && Player.HasBuff("CaitlynHeadshotRangeCheck"))
             {
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(1300) && enemy.HasBuff("caitlynyordletrapinternal")))
                     Player.IssueOrder(GameObjectOrder.AttackUnit, enemy);
