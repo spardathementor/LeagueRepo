@@ -243,7 +243,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             var prepos = E.GetPrediction(target);
 
-            float pushDistance = 500;
+            float pushDistance = 510;
 
             if (Player.Position != fromPosition)
                 pushDistance = 400 ;
