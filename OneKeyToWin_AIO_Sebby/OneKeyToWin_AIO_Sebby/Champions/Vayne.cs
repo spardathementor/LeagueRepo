@@ -243,12 +243,12 @@ namespace OneKeyToWin_AIO_Sebby
         {
             var prepos = E.GetPrediction(target);
 
-            float pushDistance = 510;
+            float pushDistance = 460;
 
-            if (Player.Position != fromPosition)
+            if (Player.ServerPosition != fromPosition)
                 pushDistance = 400 ;
 
-            int radius = 100;
+            int radius = 120;
             var start2 = target.ServerPosition;
             var end2 = prepos.CastPosition.Extend(fromPosition, -pushDistance);
 
