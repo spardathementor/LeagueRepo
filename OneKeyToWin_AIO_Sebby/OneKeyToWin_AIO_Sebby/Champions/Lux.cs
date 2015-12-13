@@ -140,7 +140,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicE();
             if (Program.LagFree(3) && R.IsReady())
                 LogicR();
-            if (Program.LagFree(4) && W.IsReady())
+            if (Program.LagFree(4) && W.IsReady() && !Player.IsRecalling())
                 LogicW();
         }
 
