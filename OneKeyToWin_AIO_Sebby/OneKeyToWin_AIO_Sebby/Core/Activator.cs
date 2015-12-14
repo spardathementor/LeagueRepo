@@ -357,7 +357,9 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Cleansers();
             Smite();
-            Survival();
+
+            if(Program.LagFree(0) || Program.LagFree(2))
+                Survival();
 
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
