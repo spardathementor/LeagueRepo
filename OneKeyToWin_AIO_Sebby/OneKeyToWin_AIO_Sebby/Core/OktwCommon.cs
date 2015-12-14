@@ -33,6 +33,8 @@ namespace OneKeyToWin_AIO_Sebby
     class OktwCommon
     {
         private static int LastAATick = Utils.GameTimeTickCount;
+        public static bool YasuoInGame = false;
+
         public static bool 
             blockMove = false,
             blockAttack = false,
@@ -53,6 +55,8 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
             {
                 ChampionList.Add(hero);
+                if (hero.IsEnemy && hero.ChampionName == "Yasuo")
+                    YasuoInGame = true;
             }
 
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
@@ -64,8 +68,11 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void OnUpdate(EventArgs args)
         {
-            if(Program.LagFree(4))
-                IncomingDamageList.RemoveAll(damage => Game.Time - 2 < damage.Time);
+            if (Program.LagFree(4))
+            {
+                float time = Game.Time - 2;
+                IncomingDamageList.RemoveAll(damage => time < damage.Time);
+            }
         }
 
         public static double GetIncomingDamage(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true )
@@ -121,6 +128,9 @@ namespace OneKeyToWin_AIO_Sebby
             }
 
             //////////////////////////
+
+            if (!YasuoInGame)
+                return;
 
             if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || sender.Type != GameObjectType.obj_AI_Hero || Player.Distance(sender.ServerPosition) > 2000)
                 return;
