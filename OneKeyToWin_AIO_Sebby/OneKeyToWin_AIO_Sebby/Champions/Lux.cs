@@ -148,8 +148,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead  && Config.Item("damage" + ally.ChampionName, true).GetValue<bool>() && Player.ServerPosition.Distance(ally.ServerPosition) < W.Range))
             {
-                int sensitivity = 20;
                 double dmg = OktwCommon.GetIncomingDamage(ally);
+
+                if (dmg == 0)
+                    continue;
+
+                int sensitivity = 20;
                 int nearEnemys = ally.CountEnemiesInRange(900);
                 double HpPercentage = (dmg * 100) / ally.Health;
                 double shieldValue = 65 + W.Level * 25 + 0.35 * Player.FlatMagicDamageMod;
