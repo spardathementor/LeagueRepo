@@ -328,7 +328,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (!Youmuus.IsReady() || !Config.Item("YoumuusR").GetValue<bool>())
                 return;
-            if (args.Slot == SpellSlot.R && (Player.ChampionName == "Twitch" || Player.ChampionName == "Lucian"))
+            if (args.Slot == SpellSlot.R && (Player.ChampionName == "Twitch"))
             {
                 Youmuus.Cast();
             }
@@ -357,9 +357,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Cleansers();
             Smite();
-
-            if(Program.LagFree(0) || Program.LagFree(2) || Program.LagFree(3))
-                Survival();
+            Survival();
 
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
