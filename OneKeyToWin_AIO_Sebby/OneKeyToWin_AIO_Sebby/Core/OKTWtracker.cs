@@ -83,7 +83,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnUpdate(EventArgs args)
         {
-            if (!Program.LagFree(3))
+            if (!Program.LagFree(4))
                 return;
 
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValid))
