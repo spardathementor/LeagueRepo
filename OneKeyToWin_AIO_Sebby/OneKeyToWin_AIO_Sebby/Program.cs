@@ -256,7 +256,7 @@ namespace OneKeyToWin_AIO_Sebby
             //new Core.OKTWtargetSelector().LoadOKTW();
             if (AIOmode != 2)
             {
-                new Core.OKTWfarmLogic().LoadOKTW();
+                //new Core.OKTWfarmLogic().LoadOKTW();
             }
             //new AfkMode().LoadOKTW();
             Config.AddToMainMenu();
