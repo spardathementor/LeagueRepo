@@ -251,8 +251,6 @@ namespace OneKeyToWin_AIO_Sebby
 
             new OktwCommon().LoadOKTW();
             new Core.OKTWtracker().LoadOKTW();
-            
-
 
             Config.AddItem(new MenuItem("aiomodes", "!!! PRESS F5 TO RELOAD MODE !!!" ));
             //new Core.OKTWtargetSelector().LoadOKTW();
