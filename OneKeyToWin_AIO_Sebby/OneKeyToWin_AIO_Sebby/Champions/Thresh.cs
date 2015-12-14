@@ -32,6 +32,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 420);
 
             Q.SetSkillshot(0.5f, 70, 1900f, true, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.2f, 10, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 50, float.MaxValue, false, SkillshotType.SkillshotLine);  
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
@@ -45,6 +46,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("GapQ", "OnEnemyGapcloser Q",true)).SetValue(true);
 
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW3", "Auto W shield big dmg", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW2", "Auto W if Q succesfull", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("wCount", "Auto W if x enemies near ally", true).SetValue(new Slider(2, 0, 5)));
@@ -96,37 +98,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!W.IsReady() || !sender.IsEnemy || !Config.Item("autoW", true).GetValue<bool>()  || !sender.IsValidTarget(1500) )
-                return;
-
-            double value = 20 + (Player.Level * 20) + (0.4 * Player.FlatMagicDamageMod);
-
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 200))
-            {
-                double dmg = 0;
-                if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
-                {
-                    dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
-                }
-                else
-                {
-                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
-                    if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
-                        dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
-                    else
-                        continue;
-                }
-
-                if ( dmg > 0)
-                {
-                    if (dmg > value && Config.Item("autoW3", true).GetValue<bool>())
-                        CastW(ally.Position);
-                    else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
-                        CastW(ally.Position);
-                    else if (ally.Health - dmg < ally.Level * 10)
-                        CastW(ally.Position);
-                }
-            }
+           
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -246,11 +218,36 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally) < W.Range + 500))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally) < W.Range ))
             {
-                var prePos = Prediction.GetPrediction(ally, 1f).CastPosition;
-                if (ally.CountEnemiesInRange(800) >= Config.Item("wCount", true).GetValue<Slider>().Value && Config.Item("wCount", true).GetValue<Slider>().Value > 0)
-                    CastW(prePos);
+
+                int nearEnemys = ally.CountEnemiesInRange(900);
+
+                if (nearEnemys >= Config.Item("wCount", true).GetValue<Slider>().Value && Config.Item("wCount", true).GetValue<Slider>().Value > 0)
+                    CastW(W.GetPrediction(ally).CastPosition);
+
+                if (Config.Item("autoW", true).GetValue<bool>())
+                {
+                    double dmg = OktwCommon.GetIncomingDamage(ally);
+                    if (dmg == 0)
+                        continue;
+
+                    int sensitivity = 20;
+
+                    double HpPercentage = (dmg * 100) / ally.Health;
+                    double shieldValue = 20 + (Player.Level * 20) + (0.4 * Player.FlatMagicDamageMod);
+
+                    nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;
+
+                    if (dmg > shieldValue && Config.Item("autoW3", true).GetValue<bool>())
+                        W.Cast(W.GetPrediction(ally).CastPosition);
+                    else if (dmg > 100 + Player.Level * sensitivity)
+                        W.Cast(W.GetPrediction(ally).CastPosition);
+                    else if (ally.Health - dmg < nearEnemys * ally.Level * sensitivity)
+                        W.Cast(W.GetPrediction(ally).CastPosition);
+                    else if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
+                        W.Cast(W.GetPrediction(ally).CastPosition);
+                }
             }
         }
 
