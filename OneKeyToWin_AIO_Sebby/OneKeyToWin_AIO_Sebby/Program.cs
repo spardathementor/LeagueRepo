@@ -218,6 +218,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Swain":
                         new Champions.Swain().LoadOKTW();
                         break;
+                    case "TwistedFate":
+                        new Champions.TwistedFate().LoadOKTW();
+                        break;
                 }
             }
 
