@@ -61,6 +61,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return;
             if (lvl2 == lvl3 || lvl2 == lvl4 || lvl3 == lvl4)
                 return;
+
+            Utility.DelayAction.Add(900, () => Up(lvl1));
+            Utility.DelayAction.Add(1000, () => Up(lvl2));
+            Utility.DelayAction.Add(1100, () => Up(lvl3));
+            Utility.DelayAction.Add(1200, () => Up(lvl4));
+            return;
             Up(lvl1);
             Up(lvl2);
             Up(lvl3);
