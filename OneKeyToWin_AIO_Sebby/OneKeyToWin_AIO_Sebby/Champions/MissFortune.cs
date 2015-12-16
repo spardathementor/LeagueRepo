@@ -347,13 +347,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     return;
                 }
-                if (rDmg * 8 > t.Health && t.CountEnemiesInRange(300) > 2 && Player.CountEnemiesInRange(700) == 0)
-                {
-                    R.Cast(t, true, true);
-                    RCastTime = Game.Time;
-                    return;
-                }
-                else if (rDmg * 8 > t.Health && rDmg * 2 < t.Health && Player.CountEnemiesInRange(300) == 0 && !OktwCommon.CanMove(t))
+                if (rDmg * 8 > t.Health - OktwCommon.GetIncomingDamage(t) && rDmg * 2 < t.Health && Player.CountEnemiesInRange(300) == 0 && !OktwCommon.CanMove(t))
                 {
                     R.Cast(t, true, true);
                     RCastTime = Game.Time;
