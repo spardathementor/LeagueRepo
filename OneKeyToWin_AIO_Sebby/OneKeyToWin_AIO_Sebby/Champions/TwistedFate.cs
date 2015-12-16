@@ -26,9 +26,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q = new Spell(SpellSlot.Q, 1000);
             E = new Spell(SpellSlot.E, 700);
             W = new Spell(SpellSlot.W, 1200);
-            R = new Spell(SpellSlot.R, 550);
+            R = new Spell(SpellSlot.R, 5500);
 
             Q.SetSkillshot(0.25f, 40f, 1000, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(1.5f, 40f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetTargetted(0.25f, 2000f);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -44,11 +45,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("AGC", "AntiGapcloser E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("Int", "Interrupter E", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R in shop", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1000, 2000, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("RenemyA", "Don't R if ally in x range near target", true).SetValue(new Slider(800, 2000, 0)));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 0)));
@@ -67,8 +66,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 temp = null;
                 cardok = false;
             }
-            if(Q.IsReady() && !W.IsReady())
+
+            if(Q.IsReady())
                 LogicQ();
+            if (R.IsReady() && W.IsReady())
+                LogicR();
+            //Program.debug("" + (W.Instance.CooldownExpires - Game.Time));
+        }
+
+        private void LogicR()
+        {
+            if (Player.CountEnemiesInRange(Config.Item("Renemy", true).GetValue<Slider>().Value) == 0)
+            {
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget() && t.Distance(Player.Position) > Q.Range && t.CountAlliesInRange(Config.Item("RenemyA", true).GetValue<Slider>().Value) == 0)
+                {
+                    if (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health)
+                        R.Cast(t);
+
+                }
+            }
         }
 
         private void LogicQ()
@@ -76,15 +93,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-
-                if (Q.GetDamage(t) * 2 + OktwCommon.GetEchoLudenDamage(t) > t.Health)
-                    Q.Cast(t, true);
-                else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA)
+                if (OktwCommon.GetKsDamage(t, Q)> t.Health && !Orbwalking.InAutoAttackRange(t))
                     Program.CastSpell(Q, t);
 
-                
                 if (Player.Mana > RMANA + QMANA)
                 {
+                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && W.Instance.CooldownExpires - Game.Time - 3 > W.Instance.Cooldown )
+                    {
+                        if (Program.Combo)
+                            Program.CastSpell(Q, t);
+                        if (Program.Farm && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                            Program.CastSpell(Q, t);
+                    }
+
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true);
                 }
@@ -101,11 +122,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicW()
         {
             var wName = W.Instance.Name;
-            var t = TargetSelector.GetTarget(1200, TargetSelector.DamageType.Magical);
+            var t = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
 
             if (wName == "PickACard")
             {
-                if (t.IsValidTarget() && Program.Combo)
+                if(R.IsReady() && Player.HasBuff("destiny_marker"))
+                    W.Cast();
+                else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
                 else if (Player.ManaPercent < 95 && Program.Farm)
                     W.Cast();
@@ -119,23 +142,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if(cardok)
                 {
-                    if(Program.Farm || Player.Mana < RMANA + QMANA)
+                    if (R.IsReady() && Player.HasBuff("destiny_marker"))
+                    {
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                    else if (Player.CountEnemiesInRange(700) > 0)
+                    {
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                    else if (Program.Farm || Player.Mana < RMANA + QMANA)
                     {
                         if (wName == "bluecardlock")
                             W.Cast();
                     }
                     else if (t.IsValidTarget())
                     {
-                        if(t.CountEnemiesInRange(150) > 1)
-                        {
-                            if (wName == "redcardlock")
-                                W.Cast();
-                        }
-                        else
-                        {
-                            if (wName == "goldcardlock")
-                                W.Cast();
-                        }
+                        if (wName == "goldcardlock")
+                            W.Cast();
                     }
                 }
             }
