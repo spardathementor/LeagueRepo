@@ -342,13 +342,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
             //Check for collision
             if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
             {
-                var positions = new List<Vector3> { result.CastPosition, result.UnitPosition };
+                var positions = new List<Vector3> { result.CastPosition};
 
                 result.CollisionObjects = Collision.GetCollision(positions, input);
                 result.Hitchance = result.CollisionObjects.Count > 0 ? HitChance.Collision : result.Hitchance;
             }
-
-
             return result;
         }
 
@@ -1069,21 +1067,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
     public static class Collision
     {
-        private static int _wallCastT;
-        private static Vector2 _yasuoWallCastedPos;
-
         static Collision()
         {
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Hero_OnProcessSpellCast;
-        }
 
-        private static void Obj_AI_Hero_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if (sender.IsValid && sender.Team != ObjectManager.Player.Team && args.SData.Name == "YasuoWMovingWall")
-            {
-                _wallCastT = Utils.TickCount;
-                _yasuoWallCastedPos = sender.ServerPosition.To2D();
-            }
         }
 
         /// <summary>
@@ -1103,22 +1089,20 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                             minion.IsValidTarget(Math.Min(input.Range + input.Radius + 100, 2000), true, input.From)))
                             {
                                 input.Unit = minion;
-                                if (minion.Path.Count() > 0)
-                                {
-                                    var minionPrediction = Prediction.GetPrediction(input, true, false);
 
-                                    if (minionPrediction.CastPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + 20 + minion.Path.Count() * minion.BoundingRadius), 2))
-                                    {
-                                        result.Add(minion);
-                                    }
-                                }
+                                if (minion.ServerPosition.To2D().Distance(input.From.To2D()) < input.Radius)
+                                    result.Add(minion);
                                 else
                                 {
-                                    var bonus = 30;
-                                    if (minion.ServerPosition.To2D().Distance(input.From.To2D()) < input.Radius)
-                                        result.Add(minion);
-                                    else if (minion.ServerPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <=
-                                        Math.Pow((input.Radius + bonus + minion.BoundingRadius), 2))
+                                    var minionPos = minion.ServerPosition;
+                                    int bonusRadius = 20;
+                                    if (minion.IsMoving)
+                                    {
+                                        minionPos = Prediction.GetPrediction(input, false, false).CastPosition;
+                                        bonusRadius = 100;
+                                    }
+
+                                    if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
                                     {
                                         result.Add(minion);
                                     }
