@@ -184,17 +184,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Drawing.DrawLine(wts1[0], wts1[1], wts2[0], wts2[1], bold, color);
         }
 
-
-        private static System.Drawing.Bitmap LoadImg(string imgName)
-        {
-            var bitmap = Resource1.ResourceManager.GetObject(imgName) as System.Drawing.Bitmap;
-            if (bitmap == null)
-            {
-                Console.WriteLine(imgName + ".png not found.");
-            }
-            return bitmap;
-        }
-
         private void Drawing_OnEndScene(EventArgs args)
         {
             if (Config.Item("showWards").GetValue<bool>())
