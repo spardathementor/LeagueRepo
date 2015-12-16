@@ -145,20 +145,20 @@ namespace OneKeyToWin_AIO_Sebby
         }
 
         public static bool CanHarras()
-        {            if ( Player.IsWindingUp)
+        {
+            if ( Player.IsWindingUp)
                 return false;
             //if (!Program.Farm)
               //  return true;
             minions = MinionManager.GetMinions(Player.Position, Player.AttackRange+300, MinionTypes.All);
             //public static List<Obj_AI_Base> GetMinions(Vector3 from, float range, MinionTypes type = MinionTypes.All, MinionTeam team = MinionTeam.Enemy, MinionOrderTypes order = MinionOrderTypes.Health);
-            var minionsAlly = MinionManager.GetMinions(Player.Position, Player.AttackRange + 200, MinionTypes.All, MinionTeam.Ally);
 
             if (minions == null || minions.Count == 0)
                 return true;
 
-            var minion = minions.First(minion2 => minion2.IsValidTarget());
+            var minion = minions.Exists(minion2 => minion2.IsValidTarget() && minion2.Health < Player.GetAutoAttackDamage(minion2) + 3 * minion2.GetAutoAttackDamage(minion2));
 
-            if (minion.Health < Player.GetAutoAttackDamage(minion) + minionsAlly.Count * minion.GetAutoAttackDamage(minion))
+            if (minion)
                 return false;
             else
                 return true;
