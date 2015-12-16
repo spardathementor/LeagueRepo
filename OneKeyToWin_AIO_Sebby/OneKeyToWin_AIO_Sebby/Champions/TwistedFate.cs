@@ -83,7 +83,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget() && t.Distance(Player.Position) > Q.Range && t.CountAlliesInRange(Config.Item("RenemyA", true).GetValue<Slider>().Value) == 0)
                 {
-                    if (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health)
+                    if (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health && t.CountEnemiesInRange(1000) < 3)
                         R.Cast(t);
 
                 }
@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero)
+                    else if (Player.CountEnemiesInRange(700) > 0 || ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
                     {
                         if (wName == "goldcardlock")
                             W.Cast();
@@ -166,7 +166,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "bluecardlock")
                             W.Cast();
                     } 
-                    else if (t.IsValidTarget())
+                    else 
                     {
                         if (wName == "goldcardlock")
                             W.Cast();
