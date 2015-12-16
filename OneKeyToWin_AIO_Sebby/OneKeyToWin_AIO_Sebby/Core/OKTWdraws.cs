@@ -19,19 +19,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public Spell Q, W, E, R, DrawSpell;
         public static Font Tahoma13, Tahoma13B, TextBold;
         private float spellFarmTimer = 0, IntroTimer = Game.Time;
-        private Render.Sprite Intro;
 
 
         public void LoadOKTW()
         {
-            Config.SubMenu("About OKTW©").AddItem(new MenuItem("logo", "Intro logo OKTW").SetValue(true));
-
-            if (Config.Item("logo").GetValue<bool>())
-            {
-                Intro = new Render.Sprite(LoadImg("intro"), new Vector2((Drawing.Width / 2) - 500, (Drawing.Height / 2) - 350));
-                Intro.Add(0);
-                Intro.OnDraw();
-            }
 
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "Disable Utility draws").SetValue(false));
             //Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableChampion", "Disable AIO champion (utility mode only) need F5").SetValue(false));
@@ -234,8 +225,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnDraw(EventArgs args)
         {
-            if (Game.Time - IntroTimer > 7)
-                Intro.Remove();
 
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
