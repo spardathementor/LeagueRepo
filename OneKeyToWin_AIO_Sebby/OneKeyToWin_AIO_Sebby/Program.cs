@@ -318,21 +318,21 @@ namespace OneKeyToWin_AIO_Sebby
         private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
 
-            if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>() && !Player.HasBuff("sheen") )
+            if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>()  && args.Target.Type == GameObjectType.obj_AI_Hero )
             {
-                var t = (Obj_AI_Base)args.Target;
-                if(!t.HasBuff("luxilluminatingfraulein") && 4 * Player.GetAutoAttackDamage(t) < args.Target.Health)
+                var t = (Obj_AI_Hero)args.Target;
+                if( 4 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen"))
                     args.Process = false;
             }
 
-            if (!Player.IsMelee && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) &&  Config.Item("collAA", true).GetValue<bool>())
+            if (!Player.IsMelee && OktwCommon.YasuoInGame && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) &&  Config.Item("collAA", true).GetValue<bool>())
             {
                 args.Process = false;
             }
 
-            if (Config.Item("supportMode",true).GetValue<bool>() && (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed))
+            if (Config.Item("supportMode",true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
             {
-                if (((Obj_AI_Base)Orbwalker.GetTarget()).IsMinion) args.Process = false;
+                if (args.Target.Type == GameObjectType.obj_AI_Minion) args.Process = false;
             }
         }
 
