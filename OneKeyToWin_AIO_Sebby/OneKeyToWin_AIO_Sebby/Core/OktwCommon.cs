@@ -156,7 +156,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (minions == null || minions.Count == 0)
                 return true;
 
-            var minion = minions.Exists(minion2 => minion2.IsValidTarget() && minion2.Health < Player.GetAutoAttackDamage(minion2) + 3 * minion2.GetAutoAttackDamage(minion2));
+            var minion = minions.Exists(minion2 => minion2.IsValidTarget() && minion2.Health < Player.GetAutoAttackDamage(minion2) + 2 * minion2.GetAutoAttackDamage(minion2));
 
             if (minion)
                 return false;
