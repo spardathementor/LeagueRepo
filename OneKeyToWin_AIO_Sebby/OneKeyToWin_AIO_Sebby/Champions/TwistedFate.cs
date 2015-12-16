@@ -126,7 +126,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (wName == "PickACard")
             {
-                if(R.IsReady() && Player.HasBuff("destiny_marker"))
+                if(R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
@@ -142,7 +142,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if(cardok)
                 {
-                    if (R.IsReady() && Player.HasBuff("destiny_marker"))
+                    if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
                         if (wName == "goldcardlock")
                             W.Cast();
