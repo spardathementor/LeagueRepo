@@ -34,8 +34,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRangeMini", "R range minimap", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
@@ -47,6 +46,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1000, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("RenemyA", "Don't R if ally in x range near target", true).SetValue(new Slider(800, 2000, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("turetR", "Don't R under turret ", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
@@ -54,6 +54,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
 
             Game.OnUpdate += Game_OnGameUpdate;
+            Drawing.OnEndScene += Drawing_OnEndScene;
+
 
         }
 
@@ -130,7 +132,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
-                else if (Player.ManaPercent < 95 && Program.Farm)
+                else if ( Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion)
+                    W.Cast();
+                else if (Program.Farm && Player.CountEnemiesInRange(700) > 0)
                     W.Cast();
             }
             else
@@ -147,16 +151,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Player.CountEnemiesInRange(700) > 0)
+                    else if (Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero)
                     {
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Program.Farm || Player.Mana < RMANA + QMANA)
+                    else if (Player.ManaPercent > 90 && Program.LaneClear)
+                    {
+                        if (wName == "redcardlock")
+                            W.Cast();
+                    }
+                    else if ((Player.ManaPercent < 90 && Program.Farm) || Player.Mana < RMANA + QMANA)
                     {
                         if (wName == "bluecardlock")
                             W.Cast();
-                    }
+                    } 
                     else if (t.IsValidTarget())
                     {
                         if (wName == "goldcardlock")
@@ -164,6 +173,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
             }
+        }
+
+        private void Drawing_OnEndScene(EventArgs args)
+        {
+
+            if (Config.Item("rRangeMini", true).GetValue<bool>())
+            {
+                if (R.IsReady())
+                    Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
+            }
+            else
+                Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
+
+
         }
     }
 }
