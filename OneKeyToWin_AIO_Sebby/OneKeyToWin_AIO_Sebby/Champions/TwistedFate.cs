@@ -39,15 +39,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasE", "Harass E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGC", "AntiGapcloser E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Int", "Interrupter E", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space 
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1000, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("RenemyA", "Don't R if ally in x range near target", true).SetValue(new Slider(800, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("turetR", "Don't R under turret ", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space   
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
@@ -72,15 +73,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if(Q.IsReady())
                 LogicQ();
-            if (R.IsReady() && W.IsReady())
-                LogicR();
-
-            if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
+                
+            if (R.IsReady())
             {
-                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget())
+                if(W.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                    LogicR();
+
+                if (Config.Item("useR", true).GetValue<KeyBind>().Active)
                 {
-                    R.Cast(t);
+                    if (Player.HasBuff("destiny_marker"))
+                    {
+                        var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+                        if (t.IsValidTarget())
+                        {
+                            R.Cast(t);
+                        }
+                    }
+                    else
+                    {
+                        R.Cast();
+                    }
                 }
             }
                 //Program.debug("" + (W.Instance.CooldownExpires - Game.Time));
@@ -96,8 +108,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health && t.CountEnemiesInRange(1000) < 3)
                     {
                         var rPos = R.GetPrediction(t).CastPosition;
-                        if(!rPos.UnderTurret(true))
+                        if (Config.Item("turetR", true).GetValue<bool>())
+                        {
+                            if (!rPos.UnderTurret(true))
+                                R.Cast(rPos);
+                        }
+                        else
+                        {
                             R.Cast(rPos);
+                        }
                     }
                 }
             }
@@ -113,7 +132,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Player.Mana > RMANA + QMANA)
                 {
-                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && (W.Instance.CooldownExpires - Game.Time  > 1 || Player.CountEnemiesInRange(800) == 0))
+                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && (W.Instance.CooldownExpires - Game.Time  > 2 || Player.CountEnemiesInRange(900) == 0))
                     {
                         if (Program.Combo)
                             Program.CastSpell(Q, t);
@@ -213,7 +232,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else
                     Utility.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
             }
-            Utility.DrawCircle(Player.Position, 800, System.Drawing.Color.Cyan, 1, 1);
+
             if (R.IsReady() && Player.HasBuff("destiny_marker"))
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
