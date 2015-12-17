@@ -43,9 +43,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasE", "Harass E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGC", "AntiGapcloser E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Int", "Interrupter E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass Yellow low range", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("farmBlue", "Farm Blue / Red card", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
@@ -74,7 +73,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 cardok = false;
             }
 
-            if(Q.IsReady())
+            if(Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
                 
             if (R.IsReady())
@@ -139,7 +138,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (Program.Combo)
                             Program.CastSpell(Q, t);
-                        if (Program.Farm && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                        if (Program.Farm && !Player.UnderTurret(true) && OktwCommon.CanHarras() && Config.Item("harasW", true).GetValue<bool>())
                             Program.CastSpell(Q, t);
                     }
 
@@ -167,9 +166,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
-                else if ( Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion)
+                else if ( Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion && Config.Item("farmBlue", true).GetValue<bool>())
                     W.Cast();
-                else if (Program.Farm && Player.CountEnemiesInRange(700) > 0)
+                else if (Program.Farm && Player.CountEnemiesInRange(700) > 0 && Config.Item("harasW", true).GetValue<bool>())
                     W.Cast();
             }
             else
