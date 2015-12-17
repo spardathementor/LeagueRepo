@@ -17,6 +17,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private string temp = null;
         private bool cardok = true;
+        private int FindCard = 0;
         public Obj_AI_Hero Player
         {
             get { return ObjectManager.Player; }
@@ -35,6 +36,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRangeMini", "R range minimap", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("cardInfo", "Show card info", true).SetValue(true));
+            
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
@@ -166,7 +169,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if ( Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion)
                     W.Cast();
-                else if (Program.Farm && Player.CountEnemiesInRange(800) > 0)
+                else if (Program.Farm && Player.CountEnemiesInRange(700) > 0)
                     W.Cast();
             }
             else
@@ -180,26 +183,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
+                        FindCard = 1;
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Player.CountEnemiesInRange(800) > 0 || ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
+                    else if (Player.CountEnemiesInRange(700) > 0 || ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
                     {
+                        FindCard = 1;
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
                     else if (Player.ManaPercent > 90 && Program.LaneClear)
                     {
+                        FindCard = 3;
                         if (wName == "redcardlock")
                             W.Cast();
                     }
                     else if ((Player.ManaPercent < 90 && Program.Farm) || Player.Mana < RMANA + QMANA)
                     {
+                        FindCard = 2;
                         if (wName == "bluecardlock")
                             W.Cast();
                     } 
                     else 
                     {
+                        FindCard = 1;
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
@@ -220,6 +228,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
 
         }
+
+        public static void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
+        {
+            var wts = Drawing.WorldToScreen(Hero);
+            Drawing.DrawText(wts[0] - (msg.Length) * 5, wts[1] + weight, color, msg);
+        }
+
         private void Drawing_OnDraw(EventArgs args)
         {
             if (Config.Item("qRange", true).GetValue<bool>())
@@ -232,6 +247,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else
                     Utility.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
             }
+
+            if(Config.Item("cardInfo", true).GetValue<bool>() && W.Instance.Name != "PickACard")
+            {
+                if(FindCard == 1)
+                    drawText("SEEK YELLOW" , Player.Position, System.Drawing.Color.Yellow, -70);
+                if (FindCard == 2)
+                    drawText("SEEK BLUE ", Player.Position, System.Drawing.Color.Aqua, -70);
+                if (FindCard == 3)
+                    drawText("SEEK RED ", Player.Position, System.Drawing.Color.OrangeRed, -70);
+
+            }
+
 
             if (R.IsReady() && Player.HasBuff("destiny_marker"))
             {
