@@ -32,6 +32,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 Intro.OnDraw();
             }
 
+            Utility.DelayAction.Add(7000, () => Intro.Remove());
+
+
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "Disable Utility draws").SetValue(false));
             //Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableChampion", "Disable AIO champion (utility mode only) need F5").SetValue(false));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Draw AAcirlce OKTW© style").AddItem(new MenuItem("OrbDraw", "Draw AAcirlce OKTW© style").SetValue(false));
@@ -232,8 +235,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnDraw(EventArgs args)
         {
-            if (Game.Time - IntroTimer > 7)
-                Intro.Remove();
+           
 
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
