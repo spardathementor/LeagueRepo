@@ -220,27 +220,22 @@ namespace OneKeyToWin_AIO_Sebby
         public static float GetKsDamage(Obj_AI_Hero t, Spell QWER)
         {
             var totalDmg = QWER.GetDamage(t);
+            totalDmg -= t.HPRegenRate;
 
-            if (Player.HasBuff("itemmagicshankcharge"))
+            if (totalDmg > t.Health)
             {
-                if (Player.GetBuff("itemmagicshankcharge").Count == 100)
+                if (Player.HasBuff("summonerexhaust"))
+                    totalDmg = totalDmg * 0.6f;
+
+                if (t.HasBuff("ferocioushowl"))
+                    totalDmg = totalDmg * 0.7f;
+
+                if (t.ChampionName == "Blitzcrank" && !t.HasBuff("BlitzcrankManaBarrierCD") && !t.HasBuff("ManaBarrier"))
                 {
-                    totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 100 + 0.1 * Player.FlatMagicDamageMod);
+                    totalDmg -= t.Mana / 2f;
                 }
             }
 
-            if (Player.HasBuff("summonerexhaust"))
-                totalDmg = totalDmg * 0.6f;
-
-            if (t.HasBuff("ferocioushowl"))
-                totalDmg = totalDmg * 0.7f;
-
-            if (t.ChampionName == "Blitzcrank" && !t.HasBuff("BlitzcrankManaBarrierCD") && !t.HasBuff("ManaBarrier"))
-            {
-                totalDmg -= t.Mana / 2f;
-            }
-
-            totalDmg -= t.HPRegenRate;
             totalDmg += (float)GetIncomingDamage(t);
             return totalDmg;
         }
@@ -253,10 +248,6 @@ namespace OneKeyToWin_AIO_Sebby
                 || target.IsInvulnerable
                 || target.HasBuffOfType(BuffType.Invulnerability)
                 || target.HasBuffOfType(BuffType.SpellShield)
-                || target.HasBuff("deathdefiedbuff")
-                || target.HasBuff("Undying Rage")
-                || target.HasBuff("Chrono Shift")
-                || target.HasBuff("kindrednodeathbuff")
                 )
                 return false;
             else
