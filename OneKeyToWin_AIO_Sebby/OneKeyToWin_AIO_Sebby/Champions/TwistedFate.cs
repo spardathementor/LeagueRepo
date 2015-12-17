@@ -23,13 +23,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         }
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 1000);
+            Q = new Spell(SpellSlot.Q, 1400);
             E = new Spell(SpellSlot.E, 700);
             W = new Spell(SpellSlot.W, 1200);
             R = new Spell(SpellSlot.R, 5500);
 
             Q.SetSkillshot(0.25f, 40f, 1000, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(1.5f, 40f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(1f, 40f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetTargetted(0.25f, 2000f);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -39,14 +39,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("harrasE", "Harass E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("AGC", "AntiGapcloser E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("Int", "Interrupter E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasE", "Harass E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGC", "AntiGapcloser E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Int", "Interrupter E", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1000, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("RenemyA", "Don't R if ally in x range near target", true).SetValue(new Slider(800, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("turetR", "Don't R under turret ", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space   
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
@@ -55,7 +56,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnEndScene += Drawing_OnEndScene;
-
+            Drawing.OnDraw += Drawing_OnDraw;
 
         }
 
@@ -73,7 +74,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicQ();
             if (R.IsReady() && W.IsReady())
                 LogicR();
-            //Program.debug("" + (W.Instance.CooldownExpires - Game.Time));
+
+            if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
+            {
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget())
+                {
+                    R.Cast(t);
+                }
+            }
+                //Program.debug("" + (W.Instance.CooldownExpires - Game.Time));
         }
 
         private void LogicR()
@@ -84,8 +94,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (t.IsValidTarget() && t.Distance(Player.Position) > Q.Range && t.CountAlliesInRange(Config.Item("RenemyA", true).GetValue<Slider>().Value) == 0)
                 {
                     if (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health && t.CountEnemiesInRange(1000) < 3)
-                        R.Cast(t);
-
+                    {
+                        var rPos = R.GetPrediction(t).CastPosition;
+                        if(!rPos.UnderTurret(true))
+                            R.Cast(rPos);
+                    }
                 }
             }
         }
@@ -134,7 +147,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if ( Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion)
                     W.Cast();
-                else if (Program.Farm && Player.CountEnemiesInRange(700) > 0)
+                else if (Program.Farm && Player.CountEnemiesInRange(800) > 0)
                     W.Cast();
             }
             else
@@ -151,7 +164,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Player.CountEnemiesInRange(700) > 0 || ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
+                    else if (Player.CountEnemiesInRange(800) > 0 || ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
                     {
                         if (wName == "goldcardlock")
                             W.Cast();
@@ -187,6 +200,28 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
 
 
+        }
+        private void Drawing_OnDraw(EventArgs args)
+        {
+            if (Config.Item("qRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (Q.IsReady())
+                        Utility.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
+            }
+            Utility.DrawCircle(Player.Position, 800, System.Drawing.Color.Cyan, 1, 1);
+            if (R.IsReady() && Player.HasBuff("destiny_marker"))
+            {
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget() )
+                {
+                    Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "AUTO R TARGET: " + t.ChampionName + " Heal " + t.Health + " My damage: " + (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3));
+                }
+            }
         }
     }
 }
