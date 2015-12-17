@@ -210,11 +210,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if(cardok)
                 {
+
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
                         FindCard = 1;
                         if (wName == "goldcardlock")
                             W.Cast();
+                    }
+                    else if (Program.Combo && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && W.GetDamage((Obj_AI_Hero)Orbwalker.GetTarget()) + Player.GetAutoAttackDamage((Obj_AI_Hero)Orbwalker.GetTarget()) > Orbwalker.GetTarget().Health)
+                    {
+                        W.Cast();
                     }
                     else if (Program.Farm && ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
                     {
