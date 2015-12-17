@@ -43,6 +43,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("WblockAA", "Block AA if seeking gold card", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass Yellow low range", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space 
@@ -64,7 +65,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-            
+            if(Program.Combo && W.IsReady()  && FindCard == 1 && W.Instance.Name != "PickACard" &&  Config.Item("WblockAA", true).GetValue<bool>())
+            {
+                args.Process = false;
+            }
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -77,12 +81,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 cardok = false;
             }
 
-            if(Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
+            if(Program.LagFree(2)  && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
                 
             if (R.IsReady())
             {
-                if(W.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                if(Program.LagFree(3) && W.IsReady() && Config.Item("autoR", true).GetValue<bool>())
                     LogicR();
 
                 if (Config.Item("useR", true).GetValue<KeyBind>().Active)
