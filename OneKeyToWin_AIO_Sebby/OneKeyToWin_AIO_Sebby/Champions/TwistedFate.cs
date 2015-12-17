@@ -216,7 +216,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Player.CountEnemiesInRange(700) > 0 || ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
+                    else if (Program.Farm && ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
                     {
                         FindCard = 1;
                         if (wName == "goldcardlock")
@@ -228,7 +228,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "redcardlock")
                             W.Cast();
                     }
-                    else if (((Player.ManaPercent < 90 && Program.Farm) || Player.Mana < RMANA + QMANA)&& Config.Item("farmW", true).GetValue<bool>())
+                    else if (( Program.Farm || Player.Mana < RMANA + QMANA)&& Config.Item("farmW", true).GetValue<bool>())
                     {
                         FindCard = 2;
                         if (wName == "bluecardlock")
