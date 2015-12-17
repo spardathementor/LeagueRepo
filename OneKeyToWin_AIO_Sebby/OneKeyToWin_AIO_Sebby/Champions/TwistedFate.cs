@@ -166,9 +166,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
-                else if ( Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion && Config.Item("farmBlue", true).GetValue<bool>())
+                else if ( Program.Farm && Orbwalker.GetTarget() != null && (Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmBlue", true).GetValue<bool>())
                     W.Cast();
-                else if (Program.Farm && Player.CountEnemiesInRange(700) > 0 && Config.Item("harasW", true).GetValue<bool>())
+                else if (Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
                     W.Cast();
             }
             else
