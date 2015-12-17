@@ -113,7 +113,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Player.Mana > RMANA + QMANA)
                 {
-                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && W.Instance.CooldownExpires - Game.Time - 3 > W.Instance.Cooldown )
+                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && (W.Instance.CooldownExpires - Game.Time  > 1 || Player.CountEnemiesInRange(800) == 0))
                     {
                         if (Program.Combo)
                             Program.CastSpell(Q, t);
