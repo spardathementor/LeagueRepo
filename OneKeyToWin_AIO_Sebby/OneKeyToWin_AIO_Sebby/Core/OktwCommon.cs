@@ -146,10 +146,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static bool CanHarras()
         {
-            if ( Player.IsWindingUp || Orbwalking.CanAttack())
-                return false;
-            else
+            if ( !Player.IsWindingUp && Orbwalking.CanAttack())
                 return true;
+            else
+                return false;
             
         }
 
