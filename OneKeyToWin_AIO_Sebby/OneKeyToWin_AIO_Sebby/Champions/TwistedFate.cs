@@ -37,7 +37,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRangeMini", "R range minimap", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("cardInfo", "Show card info", true).SetValue(true));
-            
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notR", "R info helper", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
@@ -166,7 +166,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && W.Instance.Name == "PickACard" && (W.Instance.CooldownExpires - Game.Time  > 2 || Player.CountEnemiesInRange(950) == 0))
                     {
-                        
                         if (Program.Combo)
                             Program.CastSpell(Q, t);
                         if (Program.Farm && !Player.UnderTurret(true) && OktwCommon.CanHarras() && Config.Item("harasW", true).GetValue<bool>())
@@ -290,7 +289,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
 
 
-            if (R.IsReady() && Player.HasBuff("destiny_marker"))
+            if (R.IsReady() && Config.Item("notR", true).GetValue<bool>() && Player.HasBuff("destiny_marker"))
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget() )
