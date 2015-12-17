@@ -60,7 +60,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnEndScene += Drawing_OnEndScene;
             Drawing.OnDraw += Drawing_OnDraw;
+            Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+        }
 
+        private void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+            
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -134,8 +139,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Player.Mana > RMANA + QMANA)
                 {
-                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && (W.Instance.CooldownExpires - Game.Time  > 2 || Player.CountEnemiesInRange(900) == 0))
+                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && W.Instance.Name == "PickACard" && (W.Instance.CooldownExpires - Game.Time  > 2 || Player.CountEnemiesInRange(950) == 0))
                     {
+                        
                         if (Program.Combo)
                             Program.CastSpell(Q, t);
                         if (Program.Farm && !Player.UnderTurret(true) && OktwCommon.CanHarras() && Config.Item("harasW", true).GetValue<bool>())
@@ -143,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
 
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
-                        Q.Cast(enemy, true);
+                        Q.Cast(enemy, true, true);
                 }
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
