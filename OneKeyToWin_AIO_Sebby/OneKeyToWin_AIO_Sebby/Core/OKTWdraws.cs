@@ -211,10 +211,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 foreach (var obj in OKTWward.HiddenObjList)
                 {
-                    if (obj.type == 0)
-                    {
-                        Utility.DrawCircle(obj.pos, 100, System.Drawing.Color.White, 3, 20, true);
-                    }
                     if (obj.type == 1)
                     {
                         Utility.DrawCircle(obj.pos, 100, System.Drawing.Color.Yellow, 3, 20,true);
@@ -236,37 +232,30 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private void OnDraw(EventArgs args)
         {
            
-
             if (Config.Item("disableDraws").GetValue<bool>())
                 return;
 
             if (Config.Item("showWards").GetValue<bool>())
             {
-                var circleSize = 60;
+                var circleSize = 30;
                 foreach (var obj in OKTWward.HiddenObjList)
                 {
-                    if (obj.type == 0)
-                    {
-                        Utility.DrawCircle(obj.pos, circleSize, System.Drawing.Color.White, 5, 1);
-                        DrawFontTextMap(Tahoma13, "" + (int)(obj.endTime - Game.Time), obj.pos, SharpDX.Color.White);
-                    }
                     if (obj.type == 1)
                     {
-                        Utility.DrawCircle(obj.pos, circleSize, System.Drawing.Color.Yellow, 5, 1);
+                        OktwCommon.DravTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.Yellow);
                         DrawFontTextMap(Tahoma13, "" + (int)(obj.endTime - Game.Time), obj.pos, SharpDX.Color.Yellow);
                     }
 
                     if (obj.type == 2)
                     {
-                        Utility.DrawCircle(obj.pos, circleSize, System.Drawing.Color.HotPink, 5, 1);
+                        OktwCommon.DravTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.HotPink);
                         DrawFontTextMap(Tahoma13, "VW", obj.pos, SharpDX.Color.HotPink);
                     }
                     if (obj.type == 3)
                     {
-                        Utility.DrawCircle(obj.pos, circleSize, System.Drawing.Color.Orange, 5, 1);
+                        OktwCommon.DravTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.Orange);
                         DrawFontTextMap(Tahoma13, "! " + (int)(obj.endTime - Game.Time), obj.pos, SharpDX.Color.Orange);
                     }
-
                 }
             }
 

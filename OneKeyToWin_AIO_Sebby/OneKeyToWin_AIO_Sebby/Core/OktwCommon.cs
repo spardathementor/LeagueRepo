@@ -314,6 +314,21 @@ namespace OneKeyToWin_AIO_Sebby
             return points;
         }
 
+        public static void DravTriangleOKTW(float radius, Vector3 position , System.Drawing.Color color, float bold = 1 )
+        {
+            var positionV2 = Drawing.WorldToScreen(position);
+
+            Vector2 a = new Vector2(positionV2.X + radius, positionV2.Y + radius / 2);
+            Vector2 b = new Vector2(positionV2.X - radius, positionV2.Y + radius / 2);
+            Vector2 c = new Vector2(positionV2.X, positionV2.Y - radius);
+
+            Drawing.DrawLine(a[0], a[1], b[0], b[1], bold, color);
+            Drawing.DrawLine(b[0], b[1], c[0], c[1], bold, color);
+            Drawing.DrawLine(c[0], c[1], a[0], a[1], bold, color);
+
+        }
+
+
         public static bool GetCollision(Obj_AI_Base target, Spell QWER, bool champion, bool minion)
         {
             var rDmg = QWER.GetDamage(target);
