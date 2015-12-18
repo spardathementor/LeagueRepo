@@ -196,10 +196,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
-                else if ( Program.Farm && Orbwalker.GetTarget() != null && (Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
-                    W.Cast();
-                else if (Program.Farm && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
-                    W.Cast();
+                else if(Program.Farm && Orbwalker.GetTarget() != null)
+                {
+                    if(Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
+                        W.Cast();
+                    else if ((Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
+                        W.Cast();
+                }
             }
             else
             {
@@ -211,23 +214,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if(cardok)
                 {
 
+                    Obj_AI_Hero orbTarget = null;
+
+                    var getTarget = Orbwalker.GetTarget();
+                    if (getTarget != null && getTarget.Type == GameObjectType.obj_AI_Hero)
+                    {
+                        orbTarget = (Obj_AI_Hero)getTarget;
+                    }
+
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
                         FindCard = 1;
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Program.Combo && Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && W.GetDamage((Obj_AI_Hero)Orbwalker.GetTarget()) + Player.GetAutoAttackDamage((Obj_AI_Hero)Orbwalker.GetTarget()) > Orbwalker.GetTarget().Health)
+                    else if (Program.Combo && orbTarget.IsValidTarget() && W.GetDamage(orbTarget) + Player.GetAutoAttackDamage(orbTarget) > orbTarget.Health)
                     {
                         W.Cast();
                     }
-                    else if (Program.Farm && ( Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero))
+                    else if (Program.Farm && orbTarget.IsValidTarget())
                     {
                         FindCard = 1;
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Player.ManaPercent > 80 && Program.LaneClear)
+                    else if (Player.ManaPercent > 90 && Program.LaneClear)
                     {
                         FindCard = 3;
                         if (wName == "redcardlock")
