@@ -227,7 +227,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Player.ManaPercent > 90 && Program.LaneClear)
+                    else if (Player.ManaPercent > 80 && Program.LaneClear)
                     {
                         FindCard = 3;
                         if (wName == "redcardlock")
