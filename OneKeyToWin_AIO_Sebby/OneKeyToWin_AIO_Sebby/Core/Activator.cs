@@ -282,7 +282,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Solari.IsReady() && !FaceOfTheMountain.IsReady() && !CanUse(heal) )
                 return;
 
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 40 && Player.Distance(ally.ServerPosition) < 700))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < 700))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
                 if (dmg == 0)
@@ -293,9 +293,9 @@ namespace OneKeyToWin_AIO_Sebby
                     if (!Config.Item("AllyHeal").GetValue<bool>() && !ally.IsMe)
                         return;
 
-                    if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 10)
+                    if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
                         Player.Spellbook.CastSpell(heal, ally);
-                    else if (ally.Health - dmg < ally.Level * 10)
+                    else if (ally.Health - dmg < ally.Level * 15)
                        Player.Spellbook.CastSpell(heal, ally);
                 }
 
