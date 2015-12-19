@@ -343,8 +343,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
             {
                 var positions = new List<Vector3> { result.CastPosition};
-
+                var originalUnit = input.Unit;
                 result.CollisionObjects = Collision.GetCollision(positions, input);
+                result.CollisionObjects.RemoveAll(i => i.NetworkId == originalUnit.NetworkId);
                 result.Hitchance = result.CollisionObjects.Count > 0 ? HitChance.Collision : result.Hitchance;
             }
             return result;
