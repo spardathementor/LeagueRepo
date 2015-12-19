@@ -42,7 +42,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wmode", "W mode", true).SetValue(new StringList(new[] { "Auto", "Manual" }, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wgold", "Gold key", true).SetValue(new KeyBind("Y".ToCharArray()[0], KeyBindType.Press))); //32 == space 
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wblue", "Blue key", true).SetValue(new KeyBind("U".ToCharArray()[0], KeyBindType.Press))); //32 == space 
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wred", "RED key", true).SetValue(new KeyBind("I".ToCharArray()[0], KeyBindType.Press))); //32 == space 
+
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("WblockAA", "Block AA if seeking GOLD card", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass GOLD low range", true).SetValue(true));
 
@@ -62,6 +66,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Drawing.OnEndScene += Drawing_OnEndScene;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+            Game.OnWndProc += Game_OnWndProc;
+        }
+
+        private void Game_OnWndProc(WndEventArgs args)
+        {
+            if (args.WParam == 16)
+            {
+                Config.Item("Wgold", true).Show(Config.Item("Wmode", true).GetValue<StringList>().SelectedIndex == 1);
+                Config.Item("Wblue", true).Show(Config.Item("Wmode", true).GetValue<StringList>().SelectedIndex == 1);
+                Config.Item("Wred", true).Show(Config.Item("Wmode", true).GetValue<StringList>().SelectedIndex == 1);
+                Config.Item("harasW", true).Show(Config.Item("Wmode", true).GetValue<StringList>().SelectedIndex == 0);
+            }
         }
 
         private void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
@@ -74,12 +90,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if(W.IsReady())
-                LogicW();
+            if (W.IsReady())
+            {
+                if(Config.Item("Wmode", true).GetValue<StringList>().SelectedIndex == 0)
+                    LogicW();
+                else
+                    LogicWmaunal();
+            }
             else
             {
                 temp = null;
                 cardok = false;
+                
             }
 
             if(Program.LagFree(2)  && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
@@ -110,6 +132,137 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
                 //Program.debug("" + (W.Instance.CooldownExpires - Game.Time));
+        }
+
+        private void LogicWmaunal()
+        {
+            var wName = W.Instance.Name;
+            if (wName == "PickACard")
+            {
+                if (Config.Item("Wgold", true).GetValue<KeyBind>().Active)
+                {
+                    FindCard = 1;
+                    W.Cast();
+                }
+                else if (Config.Item("Wblue", true).GetValue<KeyBind>().Active)
+                {
+                    FindCard = 2;
+                    W.Cast();
+                }
+                else if (Config.Item("Wred", true).GetValue<KeyBind>().Active)
+                {
+                    FindCard = 3;
+                    W.Cast();
+                }
+            }
+            else
+            {
+                Program.debug("PICK " + FindCard);
+                if (temp == null)
+                    temp = wName;
+                else if (temp != wName)
+                    cardok = true;
+
+                if (cardok)
+                {
+                    if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
+                    {
+                        FindCard = 1;
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                    else if (FindCard == 1)
+                    {
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                    else if (FindCard == 2)
+                    {
+                        if (wName == "bluecardlock")
+                            W.Cast();
+                    }
+                    else if (FindCard == 3)
+                    {
+                        if (wName == "redcardlock")
+                            W.Cast();
+                    }
+                }
+            }
+        }
+
+        private void LogicW()
+        {
+            var wName = W.Instance.Name;
+            var t = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
+
+            if (wName == "PickACard")
+            {
+                if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
+                    W.Cast();
+                else if (t.IsValidTarget() && Program.Combo)
+                    W.Cast();
+                else if (Program.Farm && Orbwalker.GetTarget() != null)
+                {
+                    if (Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
+                        W.Cast();
+                    else if ((Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
+                        W.Cast();
+                }
+            }
+            else
+            {
+                if (temp == null)
+                    temp = wName;
+                else if (temp != wName)
+                    cardok = true;
+
+                if (cardok)
+                {
+
+                    Obj_AI_Hero orbTarget = null;
+
+                    var getTarget = Orbwalker.GetTarget();
+                    if (getTarget != null && getTarget.Type == GameObjectType.obj_AI_Hero)
+                    {
+                        orbTarget = (Obj_AI_Hero)getTarget;
+                    }
+
+                    if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
+                    {
+                        FindCard = 1;
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                    else if (Program.Combo && orbTarget.IsValidTarget() && W.GetDamage(orbTarget) + Player.GetAutoAttackDamage(orbTarget) > orbTarget.Health)
+                    {
+                        W.Cast();
+                    }
+                    else if (Program.Farm && orbTarget.IsValidTarget())
+                    {
+                        FindCard = 1;
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                    else if (Player.ManaPercent > 90 && Program.LaneClear)
+                    {
+                        FindCard = 3;
+                        if (wName == "redcardlock")
+                            W.Cast();
+                    }
+                    else if ((Program.Farm || Player.Mana < RMANA + QMANA) && Config.Item("farmW", true).GetValue<bool>())
+                    {
+                        FindCard = 2;
+                        if (wName == "bluecardlock")
+                            W.Cast();
+                    }
+                    else
+                    {
+                        FindCard = 1;
+                        if (wName == "goldcardlock")
+                            W.Cast();
+                    }
+                }
+            }
         }
 
         private void Jungle()
@@ -185,80 +338,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void LogicW()
-        {
-            var wName = W.Instance.Name;
-            var t = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
-
-            if (wName == "PickACard")
-            {
-                if(R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
-                    W.Cast();
-                else if (t.IsValidTarget() && Program.Combo)
-                    W.Cast();
-                else if(Program.Farm && Orbwalker.GetTarget() != null)
-                {
-                    if(Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
-                        W.Cast();
-                    else if ((Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
-                        W.Cast();
-                }
-            }
-            else
-            {
-                if (temp == null)
-                    temp = wName;
-                else if (temp != wName)
-                    cardok = true;
-
-                if(cardok)
-                {
-
-                    Obj_AI_Hero orbTarget = null;
-
-                    var getTarget = Orbwalker.GetTarget();
-                    if (getTarget != null && getTarget.Type == GameObjectType.obj_AI_Hero)
-                    {
-                        orbTarget = (Obj_AI_Hero)getTarget;
-                    }
-
-                    if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
-                    {
-                        FindCard = 1;
-                        if (wName == "goldcardlock")
-                            W.Cast();
-                    }
-                    else if (Program.Combo && orbTarget.IsValidTarget() && W.GetDamage(orbTarget) + Player.GetAutoAttackDamage(orbTarget) > orbTarget.Health)
-                    {
-                        W.Cast();
-                    }
-                    else if (Program.Farm && orbTarget.IsValidTarget())
-                    {
-                        FindCard = 1;
-                        if (wName == "goldcardlock")
-                            W.Cast();
-                    }
-                    else if (Player.ManaPercent > 90 && Program.LaneClear)
-                    {
-                        FindCard = 3;
-                        if (wName == "redcardlock")
-                            W.Cast();
-                    }
-                    else if (( Program.Farm || Player.Mana < RMANA + QMANA)&& Config.Item("farmW", true).GetValue<bool>())
-                    {
-                        FindCard = 2;
-                        if (wName == "bluecardlock")
-                            W.Cast();
-                    } 
-                    else 
-                    {
-                        FindCard = 1;
-                        if (wName == "goldcardlock")
-                            W.Cast();
-                    }
-                }
-            }
-        }
+        
 
         private void Drawing_OnEndScene(EventArgs args)
         {
