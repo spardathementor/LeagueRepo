@@ -101,7 +101,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 temp = null;
                 cardok = false;
-                
             }
 
             if(Program.LagFree(2)  && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
@@ -139,7 +138,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var wName = W.Instance.Name;
             if (wName == "PickACard")
             {
-                if (Config.Item("Wgold", true).GetValue<KeyBind>().Active)
+                if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
+                {
+                    FindCard = 1;
+                    W.Cast();
+                }
+                else if (Config.Item("Wgold", true).GetValue<KeyBind>().Active)
                 {
                     FindCard = 1;
                     W.Cast();
@@ -342,16 +346,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnEndScene(EventArgs args)
         {
-
-            if (Config.Item("rRangeMini", true).GetValue<bool>())
+            if (R.IsReady() && Config.Item("rRangeMini", true).GetValue<bool>())
             {
-                if (R.IsReady())
-                    Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
-            }
-            else
                 Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
-
-
+            }
         }
 
         public static void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
