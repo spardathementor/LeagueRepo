@@ -241,6 +241,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         W.Cast();
                     }
+                    else if ( Player.Mana < RMANA + QMANA)
+                    {
+                        FindCard = 2;
+                        if (wName == "bluecardlock")
+                            W.Cast();
+                    }
                     else if (Program.Farm && orbTarget.IsValidTarget())
                     {
                         FindCard = 1;
