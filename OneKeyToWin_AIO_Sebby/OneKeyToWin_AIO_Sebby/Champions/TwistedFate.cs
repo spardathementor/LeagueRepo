@@ -265,7 +265,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "bluecardlock")
                             W.Cast();
                     }
-                    else
+                    else if(Program.Combo)
                     {
                         FindCard = 1;
                         if (wName == "goldcardlock")
