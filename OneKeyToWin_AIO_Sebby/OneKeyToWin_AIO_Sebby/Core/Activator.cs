@@ -580,7 +580,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var t = TargetSelector.GetTarget(Botrk.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
                 {
-                    if (Config.Item("BotrkKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Physical, t.MaxHealth * 0.1) > t.Health)
+                    if (Config.Item("BotrkKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Physical, t.MaxHealth * 0.1) > t.Health - OktwCommon.GetIncomingDamage(t))
                         Botrk.Cast(t);
                     if (Config.Item("BotrkLS").GetValue<bool>() && Player.Health < Player.MaxHealth * 0.5)
                         Botrk.Cast(t);
@@ -594,7 +594,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var t = TargetSelector.GetTarget(Hextech.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget())
                 {
-                    if (Config.Item("HextechKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 150 + Player.FlatMagicDamageMod * 0.4) > t.Health)
+                    if (Config.Item("HextechKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 150 + Player.FlatMagicDamageMod * 0.4) > t.Health - OktwCommon.GetIncomingDamage(t))
                         Hextech.Cast(t);
                     if (Config.Item("HextechCombo").GetValue<bool>() && Program.Combo)
                         Hextech.Cast(t);
@@ -630,7 +630,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var t = TargetSelector.GetTarget(Cutlass.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget())
                 {
-                    if (Config.Item("CutlassKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 100) > t.Health)
+                    if (Config.Item("CutlassKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 100) > t.Health - OktwCommon.GetIncomingDamage(t))
                         Cutlass.Cast(t);
                     if (Config.Item("CutlassCombo").GetValue<bool>() && Program.Combo)
                         Cutlass.Cast(t);
