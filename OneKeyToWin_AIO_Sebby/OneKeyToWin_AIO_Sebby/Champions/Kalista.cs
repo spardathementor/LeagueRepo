@@ -40,15 +40,6 @@ namespace OneKeyToWin_AIO_Sebby
             Drawing.OnDraw += Drawing_OnDraw;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-            Spellbook.OnCastSpell += Spellbook_OnCastSpell;
-        }
-
-        private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
-        {
-            if (args.Slot == SpellSlot.E )
-            {
-                lastecast = Game.Time;
-            }
         }
 
         private void LoadMenuOKTW()
@@ -91,7 +82,6 @@ namespace OneKeyToWin_AIO_Sebby
                 if (args.SData.Name == "KalistaExpungeWrapper")
                 {
                     lastecast = Game.Time;
-                    Orbwalking.ResetAutoAttackTimer();
                 }
                 if (args.SData.Name == "kalistaw")
                 {
@@ -139,9 +129,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (E.IsReady())
             {
-                
                 LogicE();
-
                 JungleE();
             }
 
@@ -164,7 +152,7 @@ namespace OneKeyToWin_AIO_Sebby
                 double dmg = OktwCommon.GetIncomingDamage(Player, 1);
                 if (dmg > 0)
                 {
-                    if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
+                    if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 10)
                         CastE();
                     else if (Player.Health - dmg < Player.Level * 10)
                         CastE();
@@ -178,7 +166,7 @@ namespace OneKeyToWin_AIO_Sebby
                     double dmg = OktwCommon.GetIncomingDamage(AllyR, 1);
                     if (dmg > 0)
                     {
-                        if (AllyR.Health - dmg < AllyR.CountEnemiesInRange(700) * AllyR.Level * 20)
+                        if (AllyR.Health - dmg < AllyR.CountEnemiesInRange(700) * AllyR.Level * 10)
                             R.Cast();
                         else if (AllyR.Health - dmg < AllyR.Level * 10)
                             R.Cast();
@@ -232,7 +220,7 @@ namespace OneKeyToWin_AIO_Sebby
             int countMinion = 0;
             Obj_AI_Base bestMinion = null;
 
-                foreach (var minion in minions.Where(minion => minion.IsValidTarget(Q.Range) && Q.GetDamage(minion) > minion.Health))
+                foreach (var minion in minions.Where(minion => minion.HealthPercent < 95 && minion.IsValidTarget(Q.Range) && Q.GetDamage(minion) > minion.Health))
                 {
                     var poutput = Q.GetPrediction(minion);
                     var col = poutput.CollisionObjects;
@@ -272,7 +260,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range - 50);
 
-            foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range ) && minion.HasBuff("kalistaexpungemarker")))
+            foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range) && minion.HealthPercent < 95 && minion.HasBuff("kalistaexpungemarker")))
             {
                 if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate)
                 {
