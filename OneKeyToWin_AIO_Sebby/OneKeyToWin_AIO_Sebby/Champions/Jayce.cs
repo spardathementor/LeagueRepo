@@ -34,8 +34,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E2 = new Spell(SpellSlot.E, 240);
             R = new Spell(SpellSlot.R);
 
-            Q.SetSkillshot(0.25f, 80, 1200, true, SkillshotType.SkillshotLine);
-            Qext.SetSkillshot(0.30f, 100, 1600, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 70, 1450, true, SkillshotType.SkillshotLine);
+            Qext.SetSkillshot(0.30f, 100, 2000, false, SkillshotType.SkillshotLine);
             QextCol.SetSkillshot(0.30f, 100, 1600, true, SkillshotType.SkillshotLine);
             Q2.SetTargetted(0.25f, float.MaxValue);
             E.SetSkillshot(0.1f, 120, float.MaxValue, false, SkillshotType.SkillshotCircle);
@@ -188,7 +188,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void OnUpdate(EventArgs args)
         {
-            if (Range && E.IsReady() && Utils.TickCount - Etick < 200 + Game.Ping)
+            if (Range && E.IsReady() && Utils.TickCount - Etick < 250 + Game.Ping)
             {
                 E.Cast(EcastPos);
             }
