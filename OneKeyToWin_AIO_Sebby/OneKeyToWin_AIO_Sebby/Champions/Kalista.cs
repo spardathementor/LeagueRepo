@@ -99,64 +99,9 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (R.IsReady() && sender.IsAlly && args.SData.Name == "RocketGrab" && Player.Distance(sender.Position) < R.Range && Player.Distance(sender.Position) > Config.Item("rangeBalista", true).GetValue<Slider>().Value)
+            if (R.IsReady() && sender.IsAlly && !sender.IsMinion && args.Target == null && args.SData.Name == "RocketGrab" && Player.Distance(sender.Position) < R.Range && Player.Distance(sender.Position) > Config.Item("rangeBalista", true).GetValue<Slider>().Value)
             {
                 grabTime = Game.Time;
-            }
-
-            if (!sender.IsEnemy || sender.IsMinion)
-                return;
-
-            if (E.IsReady()  && Config.Item("Edead", true).GetValue<bool>() && sender.IsValidTarget(1500))
-            {
-                double dmg = 0;
-
-                if (args.Target != null && args.Target.IsMe)
-                {
-                    dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
-                }
-                else 
-                {
-                    var castArea = Player.Distance(args.End) * (args.End - Player.ServerPosition).Normalized() + Player.ServerPosition;
-                    if (castArea.Distance(Player.ServerPosition) < Player.BoundingRadius / 2)
-                    {
-                        dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
-                    }
-                }
-
-                if (Player.Health - dmg < (Player.CountEnemiesInRange(600) * Player.Level * 10 ) + (Player.Level * 10))
-                {
-                     CastE();
-                }
-            }
-            if (R.IsReady())
-            {
-                if (AllyR != null && AllyR.IsVisible && AllyR.Distance(Player.Position) < R.Range)
-                {
-                    if (AllyR.Health < AllyR.CountEnemiesInRange(600) * AllyR.Level * 30)
-                    {
-                        R.Cast();
-                    }
-                    double dmg = 0;
-
-                    if (args.Target != null && args.Target.NetworkId == AllyR.NetworkId)
-                    {
-                        dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
-                    }
-                    else
-                    {
-                        var castArea = AllyR.Distance(args.End) * (args.End - AllyR.ServerPosition).Normalized() + AllyR.ServerPosition;
-                        if (castArea.Distance(AllyR.ServerPosition) < AllyR.BoundingRadius / 2)
-                        {
-                            dmg = dmg + sender.GetSpellDamage(AllyR, args.SData.Name);
-                        }
-                    }
-
-                    if (AllyR.Health - dmg < (Player.CountEnemiesInRange(600) * AllyR.Level * 10) + (AllyR.Level * 10))
-                    {
-                        R.Cast();
-                    }
-                }
             }
         }
 
@@ -185,6 +130,8 @@ namespace OneKeyToWin_AIO_Sebby
                     return;
             }
 
+            SurvivalLogic();
+
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -192,8 +139,9 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (E.IsReady())
             {
-                if(!Player.IsDashing())
-                    LogicE();
+                
+                LogicE();
+
                 JungleE();
             }
 
@@ -207,6 +155,36 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Program.LagFree(4) && W.IsReady() && Program.None && !Player.IsWindingUp && !Player.IsDashing())
                 LogicW();
+        }
+
+        private void SurvivalLogic()
+        {
+            if (E.IsReady() && Player.HealthPercent < 50 && Config.Item("Edead", true).GetValue<bool>() )
+            {
+                double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+                if (dmg > 0)
+                {
+                    if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
+                        CastE();
+                    else if (Player.Health - dmg < Player.Level * 10)
+                        CastE();
+                }
+            }
+
+            if (R.IsReady())
+            {
+                if (R.IsReady() && AllyR != null && AllyR.IsVisible && AllyR.HealthPercent < 50 && AllyR.Distance(Player.Position) < R.Range)
+                {
+                    double dmg = OktwCommon.GetIncomingDamage(AllyR, 1);
+                    if (dmg > 0)
+                    {
+                        if (AllyR.Health - dmg < AllyR.CountEnemiesInRange(700) * AllyR.Level * 20)
+                            R.Cast();
+                        else if (AllyR.Health - dmg < AllyR.Level * 10)
+                            R.Cast();
+                    }
+                }
+            }
         }
 
         private void LogicQ()
