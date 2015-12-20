@@ -49,14 +49,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsValid))
             {
                 for (int i = 0; i < 4; i++)
                 {
                     if (enemy.Spellbook.Spells[i] != null)
                     {
                         var spell2 = enemy.Spellbook.Spells[i];
-                        var spell = Damage.Spells[enemy.ChampionName].FirstOrDefault(s => s.Slot == spell2.Slot);
+                        var spell = Damage.Spells[enemy.ChampionName].FirstOrDefault(s => s.Slot == enemy.Spellbook.Spells[i].Slot);
                         if (spell != null)
                         {
                             if (spell.DamageType == Damage.DamageType.Physical || spell.DamageType == Damage.DamageType.True)
@@ -70,7 +70,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
 
-            foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team == Player.Team))
+            foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(ally => ally.IsAlly && ally.IsValid))
             {
                 Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("skillshot" + ally.ChampionName, "skillshot", true).SetValue(true));
                 Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Shield ally").SubMenu(ally.ChampionName).AddItem(new MenuItem("targeted" + ally.ChampionName, "targeted", true).SetValue(true));
