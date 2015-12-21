@@ -52,8 +52,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("HpBar", "Dmg indicators BAR OKTW© style").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("ShowClicks", "Show enemy clicks").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("SS", "SS notification").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("showWards", "Show hidden objects , wards BETA").SetValue(true));
-            
+            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("showWards", "Show hidden objects, wards").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("minimap", "Mini-map hack").SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarm", "OKTW spells farm").SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmMode", "SPELLS FARM TOGGLE MODE").SetValue(new StringList(new[] { "Scroll down", "Scroll press", "Key toggle" , "Disable" }, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmKeyToggle", "Key toggle").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
@@ -80,7 +81,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Drawing.OnDraw += OnDraw;
             Drawing.OnEndScene += Drawing_OnEndScene;
             Game.OnWndProc += Game_OnWndProc;
-            
+
         }
 
         private void Game_OnWndProc(WndEventArgs args)
@@ -207,6 +208,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Drawing_OnEndScene(EventArgs args)
         {
+            if (Config.Item("minimap").GetValue<bool>())
+            {
+                foreach (var enemy in Program.Enemies)
+                {
+                    if (!enemy.IsVisible)
+                    {
+                        var ChampionInfoOne = Core.OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
+                        if (ChampionInfoOne != null)
+                        {
+                            var wts = Drawing.WorldToMinimap(ChampionInfoOne.LastVisablePos);
+                            DrawFontTextScreen(Tahoma13, enemy.ChampionName[0].ToString() + enemy.ChampionName[1].ToString(), wts[0], wts[1], Color.Yellow);
+                        }
+                    }
+                }
+            }
             if (Config.Item("showWards").GetValue<bool>())
             {
                 foreach (var obj in OKTWward.HiddenObjList)
