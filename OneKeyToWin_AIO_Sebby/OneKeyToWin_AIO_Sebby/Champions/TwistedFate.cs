@@ -37,7 +37,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRangeMini", "R range minimap", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("cardInfo", "Show card info", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notR", "R info helper", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notR", "R info helper", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
@@ -205,11 +205,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
                     W.Cast();
-                else if (Program.Farm && Orbwalker.GetTarget() != null)
+                else if ( Orbwalker.GetTarget() != null)
                 {
-                    if (Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
+                    if (Program.Farm && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harasW", true).GetValue<bool>())
                         W.Cast();
-                    else if ((Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
+                    else if (Program.LaneClear && (Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
                         W.Cast();
                 }
             }
@@ -259,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "redcardlock")
                             W.Cast();
                     }
-                    else if ((Program.Farm || Player.Mana < RMANA + QMANA) && Config.Item("farmW", true).GetValue<bool>())
+                    else if ((Program.LaneClear || Player.Mana < RMANA + QMANA) && Config.Item("farmW", true).GetValue<bool>())
                     {
                         FindCard = 2;
                         if (wName == "bluecardlock")
@@ -389,12 +389,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
 
 
-            if (R.IsReady() && Config.Item("notR", true).GetValue<bool>() && Player.HasBuff("destiny_marker"))
+            if (R.IsReady() && Config.Item("notR", true).GetValue<bool>() )
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget() )
                 {
-                    Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "AUTO R TARGET: " + t.ChampionName + " Heal " + t.Health + " My damage: " + (Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3));
+                    var comboDMG = Q.GetDamage(t) + W.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3;
+                    if (Player.HasBuff("destiny_marker"))
+                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Yellow, "AUTO R TARGET: " + t.ChampionName + " Heal " + t.Health + " My damage: " + comboDMG);
+                    else if (comboDMG > t.Health)
+                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "You can kill: " + t.ChampionName + " Heal " + t.Health + " My damage: " + comboDMG);
                 }
             }
         }
