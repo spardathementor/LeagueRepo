@@ -232,7 +232,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Survival()
         {
-            if (Player.HealthPercent < 50 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
+            if (Player.HealthPercent < 60 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
             {
                 double dmg = OktwCommon.GetIncomingDamage(Player, 1);
                 if (dmg > 0)
@@ -261,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
                     {
-                        if (dmg > Player.Level * 35)
+                        if (dmg > Player.Level * 30)
                         {
                             Zhonya.Cast();
                         }
@@ -270,7 +270,7 @@ namespace OneKeyToWin_AIO_Sebby
                             Zhonya.Cast();
 
                         }
-                        else if (Player.Health - dmg < Player.Level * 10)
+                        else if (Player.Health - dmg < Player.Level * 25)
                         {
                             Zhonya.Cast();
 
@@ -358,9 +358,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Cleansers();
             Smite();
-
-            if(Program.LagFree(0) || Program.LagFree(2))
-                Survival();
+            Survival();
 
             if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
                 return;
