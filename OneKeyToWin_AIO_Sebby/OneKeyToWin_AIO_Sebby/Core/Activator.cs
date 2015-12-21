@@ -74,11 +74,12 @@ namespace OneKeyToWin_AIO_Sebby
             if (smite != SpellSlot.Unknown)
             {
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("SmiteEnemy", "Auto Smite enemy under 50% hp").SetValue(true));
-                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Smite", "Auto Smite mobs").SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Smite", "Auto Smite mobs OKTW").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rred", "Red", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rblue", "Blue", true).SetValue(true));
+                Config.Item("Smite").Permashow(true);
             }
 
             if (flash != SpellSlot.Unknown)
@@ -398,7 +399,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Smite()
         {
-            if (CanUse(smite) && Config.Item("Smite").GetValue<bool>())
+            if (CanUse(smite) )
             {
                 var mobs = MinionManager.GetMinions(Player.ServerPosition, 520, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.Health);
                 if (mobs.Count == 0 && Config.Item("SmiteEnemy").GetValue<bool>() && (Player.GetSpellSlot("s5_summonersmiteplayerganker") != SpellSlot.Unknown || Player.GetSpellSlot("s5_summonersmiteduel") != SpellSlot.Unknown))
@@ -409,16 +410,18 @@ namespace OneKeyToWin_AIO_Sebby
                         Player.Spellbook.CastSpell(smite, enemy);
                     }
                 }
-
-                foreach (var mob in mobs)
+                if (mobs.Count > 0 && Config.Item("Smite").GetValue<KeyBind>().Active)
                 {
-                    if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
-                        || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
-                        || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
-                        || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
-                        && HealthPrediction.GetHealthPrediction(mob,100,20)< SmiteDamage[Player.Level])
+                    foreach (var mob in mobs)
                     {
-                        Player.Spellbook.CastSpell(smite, mob);
+                        if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
+                            || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
+                            || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
+                            || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
+                            && HealthPrediction.GetHealthPrediction(mob, 20, 20) < SmiteDamage[Player.Level])
+                        {
+                            Player.Spellbook.CastSpell(smite, mob);
+                        }
                     }
                 }
             }
