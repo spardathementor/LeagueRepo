@@ -25,14 +25,14 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 1200);
-            Q2 = new Spell(SpellSlot.Q, 1200);
+            Q = new Spell(SpellSlot.Q, 1170);
+            Q2 = new Spell(SpellSlot.Q, 1170);
             W = new Spell(SpellSlot.W, 5000);
             E = new Spell(SpellSlot.E, 1000);
             R = new Spell(SpellSlot.R, 1500f);
 
-            Q.SetSkillshot(0f, 40f, 2400f, true, SkillshotType.SkillshotLine);
-            Q2.SetSkillshot(0.25f, 40f, 1200f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.1f, 40f, 2400f, true, SkillshotType.SkillshotLine);
+            Q2.SetSkillshot(0.1f, 40f, 2400f, false, SkillshotType.SkillshotLine);
 
             LoadMenuOKTW();
 
@@ -149,12 +149,12 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (E.IsReady() && Player.HealthPercent < 50 && Config.Item("Edead", true).GetValue<bool>() )
             {
-                double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+                double dmg = OktwCommon.GetIncomingDamage(Player, 0.5F);
                 if (dmg > 0)
                 {
-                    if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 10)
+                    if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 5)
                         CastE();
-                    else if (Player.Health - dmg < Player.Level * 10)
+                    else if (Player.Health - dmg < Player.Level * 5)
                         CastE();
                 }
             }
