@@ -675,7 +675,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Hunter.IsReady())
                 {
-                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 250 < Player.MaxHealth)
                         Hunter.Cast();
                     else if (Player.Health < Player.MaxHealth * 0.6)
                         Hunter.Cast();
@@ -686,7 +686,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Corrupting.IsReady())
                 {
-                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 250 < Player.MaxHealth)
                         Corrupting.Cast();
                     else if (Player.Health < Player.MaxHealth * 0.6)
                         Corrupting.Cast();
@@ -697,7 +697,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Flask.IsReady())
                 {
-                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 250 < Player.MaxHealth)
                         Flask.Cast();
                     else if (Player.Health < Player.MaxHealth * 0.6)
                         Flask.Cast();
@@ -708,7 +708,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Refillable.IsReady())
                 {
-                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 250 < Player.MaxHealth)
                         Refillable.Cast();
                     else if (Player.Health < Player.MaxHealth * 0.6)
                         Refillable.Cast();
@@ -717,7 +717,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Potion.IsReady())
                 {
-                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 250 < Player.MaxHealth)
                         Potion.Cast();
                     else if (Player.Health < Player.MaxHealth * 0.6)
                         Potion.Cast();
@@ -726,7 +726,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Biscuit.IsReady() )
                 {
-                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 200 < Player.MaxHealth)
+                    if (Player.CountEnemiesInRange(700) > 0 && Player.Health + 250 < Player.MaxHealth)
                         Biscuit.Cast();
                     else if (Player.Health < Player.MaxHealth * 0.6)
                         Biscuit.Cast();
