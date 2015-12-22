@@ -77,6 +77,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Smite", "Auto Smite mobs OKTW").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rherald", "Herald", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rred", "Red", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rblue", "Blue", true).SetValue(true));
                 Config.Item("Smite").Permashow(true);
@@ -414,6 +415,7 @@ namespace OneKeyToWin_AIO_Sebby
                     {
                         if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
+                            || (mob.SkinName == "SRU_RiftHerald" && Config.Item("Rherald", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
                             && HealthPrediction.GetHealthPrediction(mob, 20, 20) < SmiteDamage[Player.Level])
