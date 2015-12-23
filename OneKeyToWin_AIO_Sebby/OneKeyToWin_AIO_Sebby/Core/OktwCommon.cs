@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -42,16 +40,13 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private static List<Obj_AI_Base> minions;
         private static YasuoWall yasuoWall = new YasuoWall();
 
         private static List<UnitIncomingDamage> IncomingDamageList = new List<UnitIncomingDamage>();
         private static List<Obj_AI_Hero> ChampionList = new List<Obj_AI_Hero>();
 
-
         public void LoadOKTW()
         {
-
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
             {
                 ChampionList.Add(hero);
@@ -150,7 +145,6 @@ namespace OneKeyToWin_AIO_Sebby
                 return true;
             else
                 return false;
-            
         }
 
         public static float GetEchoLudenDamage(Obj_AI_Hero target)
@@ -328,52 +322,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         }
 
-
-        public static bool GetCollision(Obj_AI_Base target, Spell QWER, bool champion, bool minion)
-        {
-            var rDmg = QWER.GetDamage(target);
-            int collision = 0;
-            PredictionOutput output = QWER.GetPrediction(target);
-            Vector2 direction = output.CastPosition.To2D() - ObjectManager.Player.Position.To2D();
-            direction.Normalize();
-            if (champion)
-            {
-                foreach (var enemy in Program.Enemies.Where(x => x.IsEnemy && x.IsValidTarget()))
-                {
-                    PredictionOutput prediction = QWER.GetPrediction(enemy);
-                    Vector3 predictedPosition = prediction.CastPosition;
-                    Vector3 v = output.CastPosition - ObjectManager.Player.ServerPosition;
-                    Vector3 w = predictedPosition - ObjectManager.Player.ServerPosition;
-                    double c1 = Vector3.Dot(w, v);
-                    double c2 = Vector3.Dot(v, v);
-                    double b = c1 / c2;
-                    Vector3 pb = ObjectManager.Player.ServerPosition + ((float)b * v);
-                    float length = Vector3.Distance(predictedPosition, pb);
-                    if (length < QWER.Width )
-                        return true;
-                }
-            }
-            if (minion)
-            {
-                var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, QWER.Range, MinionTypes.All);
-                foreach (var enemy in allMinions.Where(x => x.IsEnemy && x.IsValidTarget()))
-                {
-                    PredictionOutput prediction = QWER.GetPrediction(enemy);
-                    Vector3 predictedPosition = prediction.CastPosition;
-                    Vector3 v = output.CastPosition - ObjectManager.Player.ServerPosition;
-                    Vector3 w = predictedPosition - ObjectManager.Player.ServerPosition;
-                    double c1 = Vector3.Dot(w, v);
-                    double c2 = Vector3.Dot(v, v);
-                    double b = c1 / c2;
-                    Vector3 pb = ObjectManager.Player.ServerPosition + ((float)b * v);
-                    float length = Vector3.Distance(predictedPosition, pb);
-                    if (length < QWER.Width)
-                        return true;
-                }
-            }
-            return false;
-        }
-
         public static int GetBuffCount(Obj_AI_Base target, String buffName)
         {
             foreach (var buff in target.Buffs.Where(buff => buff.Name == buffName))
@@ -403,22 +351,6 @@ namespace OneKeyToWin_AIO_Sebby
                     .Where(buff => buff.Name == buffName)
                     .Select(buff => buff.EndTime)
                     .FirstOrDefault() - Game.Time;
-        }
-
-        public static int WayPointAnalysis(Obj_AI_Base unit , Spell QWER)
-        {
-            int HC = 0;
-
-            if (QWER.Delay < 0.25f)
-                HC = 2;
-            else
-                HC = 1;
-
-            if (unit.Path.Count() == 1)
-                HC = 2;
-
-            return HC;
-
         }
     }
 }
