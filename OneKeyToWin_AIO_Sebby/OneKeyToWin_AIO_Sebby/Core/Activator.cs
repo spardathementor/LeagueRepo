@@ -357,11 +357,16 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.InFountain() || Player.IsRecalling() || Player.IsDead)
+            {
+                return;
+            }
+
             Cleansers();
             Smite();
             Survival();
 
-            if (!Program.LagFree(0) || Player.IsRecalling() || Player.IsDead)
+            if (!Program.LagFree(0))
                 return;
 
             if (Config.Item("pots").GetValue<bool>())
@@ -664,76 +669,49 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void PotionManagement()
         {
-            if (!Player.InFountain() && !Player.HasBuff("Recall"))
+            if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlaskJungle") || Player.HasBuff("ItemDarkCrystalFlask"))
+                return;
+
+            if (Potion.IsReady())
             {
-                if (ManaPotion.IsReady() && !Player.HasBuff("FlaskOfCrystalWater"))
-                {
-                    if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200)
-                        ManaPotion.Cast();
-                }
+                if (Player.Health + 200 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
+                    Potion.Cast();
+                else if (Player.Health < Player.MaxHealth * 0.6)
+                    Potion.Cast();
+                return;
+            }
+            else if (Biscuit.IsReady())
+            {
+                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
+                    Biscuit.Cast();
+                else if (Player.Health < Player.MaxHealth * 0.6)
+                    Biscuit.Cast();
+                return;
+            }
+            else if (Hunter.IsReady())
+            {
+                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
+                    Hunter.Cast();
+                else if (Player.Health < Player.MaxHealth * 0.6)
+                    Hunter.Cast();
+                return;
+            }
+            else if (Corrupting.IsReady())
+            {
+                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
+                    Corrupting.Cast();
+                else if (Player.Health < Player.MaxHealth * 0.6)
+                    Corrupting.Cast();
 
-                if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlask") || Player.HasBuff("ItemCrystalFlaskJungle") || Player.HasBuff("ItemDarkCrystalFlask"))
-                    return;
-
-                if (Hunter.IsReady())
-                {
-                    if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                        Hunter.Cast();
-                    else if (Player.Health < Player.MaxHealth * 0.6)
-                        Hunter.Cast();
-                    else if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200 && !Player.HasBuff("FlaskOfCrystalWater"))
-                        Hunter.Cast();
-                    return;
-                }
-
-                if (Corrupting.IsReady())
-                {
-                    if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                        Corrupting.Cast();
-                    else if (Player.Health < Player.MaxHealth * 0.6)
-                        Corrupting.Cast();
-                    else if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200 && !Player.HasBuff("FlaskOfCrystalWater"))
-                        Corrupting.Cast();
-                    return;
-                }
-
-                if (Flask.IsReady())
-                {
-                    if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                        Flask.Cast();
-                    else if (Player.Health < Player.MaxHealth * 0.6)
-                        Flask.Cast();
-                    else if (Player.CountEnemiesInRange(1200) > 0 && Player.Mana < 200 && !Player.HasBuff("FlaskOfCrystalWater"))
-                        Flask.Cast();
-                    return;
-                }
-
-                if (Refillable.IsReady())
-                {
-                    if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                        Refillable.Cast();
-                    else if (Player.Health < Player.MaxHealth * 0.6)
-                        Refillable.Cast();
-                    return;
-                }
-
-                if (Potion.IsReady())
-                {
-                    if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0 )
-                        Potion.Cast();
-                    else if (Player.Health < Player.MaxHealth * 0.6)
-                        Potion.Cast();
-                    return;
-                }
-
-                if (Biscuit.IsReady() )
-                {
-                    if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                        Biscuit.Cast();
-                    else if (Player.Health < Player.MaxHealth * 0.6)
-                        Biscuit.Cast();
-                    return;
-                }
+                return;
+            }
+            else if (Refillable.IsReady())
+            {
+                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
+                    Refillable.Cast();
+                else if (Player.Health < Player.MaxHealth * 0.6)
+                    Refillable.Cast();
+                return;
             }
         }
 
