@@ -18,7 +18,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public GameObject Tibbers;
         public float TibbersTimer = 0;
-
+        private bool HaveStun = false;
         private Obj_AI_Hero Player
         {
             get { return ObjectManager.Player; }
@@ -30,13 +30,27 @@ namespace OneKeyToWin_AIO_Sebby
             E = new Spell(SpellSlot.E);
             R = new Spell(SpellSlot.R, 625f);
             Q.SetTargetted(0.25f, 1400f);
-            W.SetSkillshot(0.50f, 250f, 3000, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(0.30f, 200f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.25f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
-            LoadMenuOKTW();
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("ComboInfo", "Combo Info", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 30)));
+
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 0, 5)));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+                Config.SubMenu(Player.ChampionName).SubMenu("Stun in combo").AddItem(new MenuItem("stun" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
-            Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
             //Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -44,33 +58,19 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnCreate(GameObject obj, EventArgs args)
         {
-            if (obj.IsValid && obj.Name == "Tibbers" )
+            if (obj.IsValid && obj.IsAlly && obj.Type == GameObjectType.obj_AI_Minion && obj.Name == "Tibbers")
+            {
                 Tibbers = obj;
-        }
-
-        private void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
-        {
-            if (Config.Item("sup", true).GetValue<bool>()  && (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit))
-            {
-                if (((Obj_AI_Base)Orbwalker.GetTarget()).IsMinion) args.Process = false;
+                Program.debug("" + obj.Type);
             }
-
-            if (Program.Combo && !Config.Item("AACombo", true).GetValue<bool>())
-            {
-                var t = args.Target as Obj_AI_Hero;
-                args.Process = false;
-                if ((Player.GetAutoAttackDamage(t) * 2 > t.Health || Player.Mana < RMANA || !OktwCommon.CanMove(t)))
-                    args.Process = true; 
-            }
-
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            HaveStun = Player.HasBuff("pyromania_particle");
+
             if (ObjectManager.Player.HasBuff("Recall"))
                 return;
-
-            
 
             var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
 
@@ -114,7 +114,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (Program.LagFree(1))
             {
-                if (Config.Item("sup", true).GetValue<bool>())
+                if (Config.Item("supportMode", true).GetValue<bool>())
                 {
                     if (Q.IsReady() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.Mana > RMANA + QMANA)
                         farmQ();
@@ -192,22 +192,6 @@ namespace OneKeyToWin_AIO_Sebby
             get { return ObjectManager.Player.HasBuff("infernalguardiantimer"); }
         }
 
-        private bool HaveStun
-        {
-            get { 
-                var buffs = Player.Buffs.Where(buff => (buff.Name.ToLower() == "pyromania" || buff.Name.ToLower() == "pyromania_particle"));
-                if (buffs.Any())
-                {
-                    var buff = buffs.First();
-                    if (buff.Name.ToLower() == "pyromania_particle")
-                        return true;
-                    else
-                        return false;
-                }
-                return false;
-            }
-        }
-
         private void SetMana()
         {
             if ((Config.Item("manaDisable", true).GetValue<bool>() && Program.Combo) || Player.HealthPercent < 20)
@@ -227,28 +211,6 @@ namespace OneKeyToWin_AIO_Sebby
                 RMANA = QMANA - Player.PARRegenRate * Q.Instance.Cooldown;
             else
                 RMANA = R.Instance.ManaCost;
-        }
-
-        private void LoadMenuOKTW()
-        {
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("ComboInfo", "Combo Info", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
-
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 30)));
-
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("sup", "Support mode", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("AACombo", "AA in combo", true).SetValue(false));
-
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 0, 5)));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("Stun in combo").AddItem(new MenuItem("stun" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
         }
 
         public static void drawText(string msg, Obj_AI_Hero Hero, System.Drawing.Color color)
