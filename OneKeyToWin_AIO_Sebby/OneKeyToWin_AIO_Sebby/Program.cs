@@ -2,18 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
-using System.Drawing;
 using SPrediction;
+
 namespace OneKeyToWin_AIO_Sebby
 {
     internal class Program
     {
-        
         public static Menu Config;
         public static Orbwalking.Orbwalker Orbwalker;
         public static Spell Q, W, E, R, DrawSpell;
@@ -33,7 +30,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void GameOnOnGameLoad(EventArgs args)
         {
-
             Q = new Spell(SpellSlot.Q);
             E = new Spell(SpellSlot.E);
             W = new Spell(SpellSlot.W);
@@ -266,6 +262,19 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += OnUpdate;
             Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
             Drawing.OnDraw += OnDraw;
+            Game.OnWndProc += Game_OnWndProc;
+        }
+
+        private static void Game_OnWndProc(WndEventArgs args)
+        {
+            if (args.WParam == 16)
+            {
+                if (AIOmode != Config.Item("AIOmode", true).GetValue<StringList>().SelectedIndex)
+                    Config.Item("aiomodes").Show(true);
+                else
+                    Config.Item("aiomodes").Show(false);
+
+            }
         }
 
         private static void PositionHelper()
@@ -317,8 +326,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
         {
-
-            if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>()  && args.Target.Type == GameObjectType.obj_AI_Hero )
+            if (Combo && args.Target.Type == GameObjectType.obj_AI_Hero && Config.Item("comboDisableMode", true).GetValue<bool>())
             {
                 var t = (Obj_AI_Hero)args.Target;
                 if( 4 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen"))
@@ -330,7 +338,7 @@ namespace OneKeyToWin_AIO_Sebby
                 args.Process = false;
             }
 
-            if (Config.Item("supportMode",true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed)
+            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && Config.Item("supportMode",true).GetValue<bool>())
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Minion) args.Process = false;
             }
@@ -340,17 +348,12 @@ namespace OneKeyToWin_AIO_Sebby
         {
             PositionHelper();
             tickIndex++;
-             
+
             if (tickIndex > 4)
                 tickIndex = 0;
 
             if (!LagFree(0))
                 return;
-            
-            if(AIOmode != Config.Item("AIOmode", true).GetValue<StringList>().SelectedIndex)
-                Config.Item("aiomodes").Show(true);
-            else
-                Config.Item("aiomodes").Show(false);
 
             JunglerTimer();
         }
