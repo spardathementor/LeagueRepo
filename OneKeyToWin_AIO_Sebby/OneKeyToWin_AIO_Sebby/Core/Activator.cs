@@ -74,6 +74,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (smite != SpellSlot.Unknown)
             {
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("SmiteEnemy", "Auto Smite enemy under 50% hp").SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("SmiteEnemyKS", "Auto Smite enemy KS").SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Smite", "Auto Smite mobs OKTW").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Smite").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
@@ -406,12 +407,18 @@ namespace OneKeyToWin_AIO_Sebby
             if (CanUse(smite) )
             {
                 var mobs = MinionManager.GetMinions(Player.ServerPosition, 520, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.Health);
-                if (mobs.Count == 0 && Config.Item("SmiteEnemy").GetValue<bool>() && (Player.GetSpellSlot("s5_summonersmiteplayerganker") != SpellSlot.Unknown || Player.GetSpellSlot("s5_summonersmiteduel") != SpellSlot.Unknown))
+                if (mobs.Count == 0 && (Player.GetSpellSlot("s5_summonersmiteplayerganker") != SpellSlot.Unknown || Player.GetSpellSlot("s5_summonersmiteduel") != SpellSlot.Unknown))
                 {
                     var enemy = TargetSelector.GetTarget(500, TargetSelector.DamageType.True);
                     if (enemy.IsValidTarget() && enemy.HealthPercent < 50)
                     {
-                        Player.Spellbook.CastSpell(smite, enemy);
+                        if(enemy.HealthPercent < 50 && Config.Item("SmiteEnemy").GetValue<bool>())
+                            Player.Spellbook.CastSpell(smite, enemy);
+                        
+                        var smiteDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Smite);
+                        
+                        if ( Config.Item("SmiteEnemyKS").GetValue<bool>() && enemy.Health - OktwCommon.GetIncomingDamage(enemy) < smiteDmg)
+                            Player.Spellbook.CastSpell(smite, enemy);
                     }
                 }
                 if (mobs.Count > 0 && Config.Item("Smite").GetValue<KeyBind>().Active)
