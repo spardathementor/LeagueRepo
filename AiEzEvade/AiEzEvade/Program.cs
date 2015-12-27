@@ -50,6 +50,7 @@ namespace AiEzEvade
         public static Menu Config;
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static int TickLimit = 0;
+        public static int Mode = 0;
 
         private static void Game_OnGameLoad(EventArgs args)
         {
@@ -64,22 +65,58 @@ namespace AiEzEvade
         {
             if (Utils.TickCount - TickLimit > 100)
             {
-                SetEE(set);
                 TickLimit = Utils.TickCount;
+
+                var newMode = 0;
+
+                if(Player.HealthPercent < 40)
+                {
+                    newMode = 2;
+                }
+                else if (Player.HealthPercent < 70)
+                {
+                    newMode = 1;
+                }
+                else 
+                {
+                    newMode = 0;
+                }
+
+                if (newMode != Mode )
+                {
+                    if(newMode==0)
+                    {
+                        set = new EEsettings(2,true,false,false,true,false,true,150,200,100,false);
+                        SetEE(set);
+                        Mode = newMode;
+                        return;
+                    }
+                    if (newMode == 1)
+                    {
+                        set = new EEsettings(2,true,false,false,true,false,true,100,150,100,false);
+                        SetEE(set);
+                        Mode = newMode;
+                        return;
+                    }
+                    if (newMode == 2)
+                    {
+                        set = new EEsettings(0,false,false,true,false,false,false,10,0,0, true);
+                        SetEE(set);
+                        Mode = newMode;
+                        return;
+                    }
+                }
             }
         }
 
         private static void SetEE(EEsettings sets)
         {
-
             Menu.GetMenu("ezEvade", "ezEvade").Item("EvadeMode").SetValue<StringList>(new StringList(new[] { "Smooth", "Fastest", "Very Smooth" }, sets.EvadeMode));
-
             Menu.GetMenu("ezEvade", "ezEvade").Item("DodgeDangerous").SetValue<Boolean>(sets.DodgeDangerous);
             Menu.GetMenu("ezEvade", "ezEvade").Item("DodgeCircularSpells").SetValue<Boolean>(sets.DodgeCircularSpells);
             Menu.GetMenu("ezEvade", "ezEvade").Item("DodgeFOWSpells").SetValue<Boolean>(sets.DodgeFOWSpells);
             Menu.GetMenu("ezEvade", "ezEvade").Item("CheckSpellCollision").SetValue<Boolean>(sets.CheckSpellCollision);
             Menu.GetMenu("ezEvade", "ezEvade").Item("ContinueMovement").SetValue<Boolean>(sets.ContinueMovement);
-
             Menu.GetMenu("ezEvade", "ezEvade").Item("ContinueMovement").SetValue<Boolean>(sets.ClickOnlyOnce);
             Menu.GetMenu("ezEvade", "ezEvade").Item("TickLimiter").SetValue<Slider>(new Slider(sets.TickLimiter, 0, 500));
             Menu.GetMenu("ezEvade", "ezEvade").Item("ReactionTime").SetValue<Slider>(new Slider(sets.ReactionTime, 0, 500));
