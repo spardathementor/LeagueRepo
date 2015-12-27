@@ -50,7 +50,7 @@ namespace AiEzEvade
         public static Menu Config;
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static int TickLimit = 0;
-        public static int Mode = 0;
+        public static int Mode = 3;
 
         private static void Game_OnGameLoad(EventArgs args)
         {
@@ -63,7 +63,7 @@ namespace AiEzEvade
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
-            if (Utils.TickCount - TickLimit > 100)
+            if (Utils.TickCount - TickLimit > 200)
             {
                 TickLimit = Utils.TickCount;
 
@@ -93,7 +93,7 @@ namespace AiEzEvade
                     }
                     if (newMode == 1)
                     {
-                        set = new EEsettings(2,true,false,false,true,false,true,100,150,100,false);
+                        set = new EEsettings(2,true,true,true,true,false,true,100,150,100,false);
                         SetEE(set);
                         Mode = newMode;
                         return;
