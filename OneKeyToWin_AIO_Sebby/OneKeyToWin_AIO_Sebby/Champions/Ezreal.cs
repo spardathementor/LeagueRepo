@@ -165,9 +165,6 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 if (Esmart && Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(500) < 4)
                     E.Cast(Player.Position.Extend(Game.CursorPos, E.Range), true);
-                
-                if (!CursorPosition.IsZero)
-                    E.Cast(Player.Position.Extend(CursorPosition, E.Range), true);
             }
             else
             {
