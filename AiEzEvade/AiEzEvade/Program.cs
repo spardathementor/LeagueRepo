@@ -76,8 +76,8 @@ namespace AiEzEvade
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumCheckSpellCollision", "Check Spell Collision").SetValue(true));
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumClickOnlyOnce", "Click Only Once").SetValue(true));
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumTickLimiter", "Tick Limiter").SetValue(new Slider(100, 1000, 0)));
-            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumReactionTime", "Reaction Time").SetValue(new Slider(150, 1000, 0)));
-            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(50, 1000, 0)));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumReactionTime", "Reaction Time").SetValue(new Slider(200, 1000, 0)));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(200, 1000, 0)));
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumFastMovementBlock", "Fast Movement Block").SetValue(false));
 
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighHp", "Activation under % HP").SetValue(new Slider(40, 100, 0)));
@@ -87,9 +87,9 @@ namespace AiEzEvade
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeFOWSpells", "Dodge FOW Spells").SetValue(true));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighCheckSpellCollision", "Check Spell Collision").SetValue(true));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighClickOnlyOnce", "Click Only Once").SetValue(false));
-            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighTickLimiter", "Tick Limiter").SetValue(new Slider(10, 1000, 0)));
-            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighReactionTime", "Reaction Time").SetValue(new Slider(0, 1000, 0)));
-            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(0, 1000, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighTickLimiter", "Tick Limiter").SetValue(new Slider(70, 1000, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighReactionTime", "Reaction Time").SetValue(new Slider(50, 1000, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(50, 1000, 0)));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighFastMovementBlock", "Fast Movement Block").SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
