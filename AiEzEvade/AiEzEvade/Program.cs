@@ -56,7 +56,41 @@ namespace AiEzEvade
         {
             Config = new Menu("AiEzEvade", "AiEzEvade", true);
             Config.AddToMainMenu();
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowHp", "Activation above % HP").SetValue(new Slider(70, 100, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowEvadeMode", "Evade Mode").SetValue(new Slider(2, 2, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowDodgeDangerous", "Dodge only Dangerous").SetValue(true));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowDodgeCircularSpells", "Dodge Circular Spells").SetValue(false));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowDodgeFOWSpells", "Dodge FOW Spells").SetValue(false));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowCheckSpellCollision", "Check Spell Collision").SetValue(true));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowClickOnlyOnce", "Click Only Once").SetValue(true));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowTickLimiter", "Tick Limiter").SetValue(new Slider(100, 1000, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowReactionTime", "Reaction Time").SetValue(new Slider(200, 1000, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(50, 1000, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowFastMovementBlock", "Fast Movement Block").SetValue(false));
 
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("0", "Activation between LOW and HIGH"));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumEvadeMode", "Evade Mode").SetValue(new Slider(2, 2, 0)));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumDodgeDangerous", "Dodge only Dangerous").SetValue(false));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumDodgeCircularSpells", "Dodge Circular Spells").SetValue(false));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumDodgeFOWSpells", "Dodge FOW Spells").SetValue(true));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumCheckSpellCollision", "Check Spell Collision").SetValue(true));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumClickOnlyOnce", "Click Only Once").SetValue(true));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumTickLimiter", "Tick Limiter").SetValue(new Slider(100, 1000, 0)));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumReactionTime", "Reaction Time").SetValue(new Slider(150, 1000, 0)));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(50, 1000, 0)));
+            Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumFastMovementBlock", "Fast Movement Block").SetValue(false));
+
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighHp", "Activation under % HP").SetValue(new Slider(40, 100, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighEvadeMode", "Evade Mode").SetValue(new Slider(0, 2, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeDangerous", "Dodge only Dangerous").SetValue(false));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeCircularSpells", "Dodge Circular Spells").SetValue(true));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeFOWSpells", "Dodge FOW Spells").SetValue(true));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighCheckSpellCollision", "Check Spell Collision").SetValue(true));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighClickOnlyOnce", "Click Only Once").SetValue(false));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighTickLimiter", "Tick Limiter").SetValue(new Slider(10, 1000, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighReactionTime", "Reaction Time").SetValue(new Slider(0, 1000, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(0, 1000, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighFastMovementBlock", "Fast Movement Block").SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
         }
@@ -69,38 +103,74 @@ namespace AiEzEvade
 
                 var newMode = 0;
 
-                if(Player.HealthPercent < 40)
+                if(Player.HealthPercent < Config.Item("LowHp").GetValue<Slider>().Value)
                 {
                     newMode = 2;
                 }
-                else if (Player.HealthPercent < 70)
+                else if (Player.HealthPercent > Config.Item("HighHp").GetValue<Slider>().Value)
                 {
-                    newMode = 1;
+                    newMode = 0;
                 }
                 else 
                 {
-                    newMode = 0;
+                    newMode = 1;
                 }
 
                 if (newMode != Mode )
                 {
                     if(newMode==0)
                     {
-                        set = new EEsettings(2,true,false,false,true,false,true,150,200,100,false);
+                        set = new EEsettings(
+                            Config.Item("LowEvadeMode").GetValue<Slider>().Value,
+                            Config.Item("LowDodgeDangerous").GetValue<bool>(),
+                            Config.Item("LowDodgeCircularSpells").GetValue<bool>(),
+                            Config.Item("LowDodgeFOWSpells").GetValue<bool>(),
+                            Config.Item("LowCheckSpellCollision").GetValue<bool>(),
+                            false,
+                            Config.Item("LowClickOnlyOnce").GetValue<bool>(),
+                            Config.Item("LowTickLimiter").GetValue<Slider>().Value,
+                            Config.Item("LowReactionTime").GetValue<Slider>().Value,
+                            Config.Item("LowSpellDetectionTime").GetValue<Slider>().Value, 
+                            Config.Item("LowFastMovementBlock").GetValue<bool>());
+
                         SetEE(set);
                         Mode = newMode;
                         return;
                     }
                     if (newMode == 1)
                     {
-                        set = new EEsettings(2,true,true,true,true,false,true,100,150,100,false);
+                        set = new EEsettings(
+                           Config.Item("MediumEvadeMode").GetValue<Slider>().Value,
+                           Config.Item("MediumDodgeDangerous").GetValue<bool>(),
+                           Config.Item("MediumDodgeCircularSpells").GetValue<bool>(),
+                           Config.Item("MediumDodgeFOWSpells").GetValue<bool>(),
+                           Config.Item("MediumCheckSpellCollision").GetValue<bool>(),
+                           false,
+                           Config.Item("MediumClickOnlyOnce").GetValue<bool>(),
+                           Config.Item("MediumTickLimiter").GetValue<Slider>().Value,
+                           Config.Item("MediumReactionTime").GetValue<Slider>().Value,
+                           Config.Item("MediumSpellDetectionTime").GetValue<Slider>().Value,
+                           Config.Item("MediumFastMovementBlock").GetValue<bool>());
+
                         SetEE(set);
                         Mode = newMode;
                         return;
                     }
                     if (newMode == 2)
                     {
-                        set = new EEsettings(0,false,false,true,false,false,false,10,0,0, true);
+                        set = new EEsettings(
+                            Config.Item("HighEvadeMode").GetValue<Slider>().Value,
+                            Config.Item("HighDodgeDangerous").GetValue<bool>(),
+                            Config.Item("HighDodgeCircularSpells").GetValue<bool>(),
+                            Config.Item("HighDodgeFOWSpells").GetValue<bool>(),
+                            Config.Item("HighCheckSpellCollision").GetValue<bool>(),
+                            false,
+                            Config.Item("HighClickOnlyOnce").GetValue<bool>(),
+                            Config.Item("HighTickLimiter").GetValue<Slider>().Value,
+                            Config.Item("HighReactionTime").GetValue<Slider>().Value,
+                            Config.Item("HighSpellDetectionTime").GetValue<Slider>().Value,
+                            Config.Item("HighFastMovementBlock").GetValue<bool>());
+
                         SetEE(set);
                         Mode = newMode;
                         return;
