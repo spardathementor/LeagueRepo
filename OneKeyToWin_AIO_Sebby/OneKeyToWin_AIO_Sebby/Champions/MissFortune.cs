@@ -22,12 +22,12 @@ namespace OneKeyToWin_AIO_Sebby
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 655f);
-            Q1 = new Spell(SpellSlot.Q, 1200f);
+            Q1 = new Spell(SpellSlot.Q, 1300f);
             W = new Spell(SpellSlot.W);
             E = new Spell(SpellSlot.E, 1000f);
             R = new Spell(SpellSlot.R, 1350f);
 
-            Q1.SetSkillshot(0.25f, 100f, 2000f, true, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 80f, 1200f, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
             E.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.25f, 100f, 2000f, false, SkillshotType.SkillshotCircle);
@@ -269,8 +269,9 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (Config.Item("killQ", true).GetValue<bool>() && Q.GetDamage(minionQ) < minionQ.Health)
                         return;
-
-                    if (minionQ.Distance(Player.Position) > 400 && minionQ.Distance(poutput.CastPosition) < 380 && minionQ.Distance(t1.Position) < 380 && minionQ.Distance(t1.Position) > 150)
+                    var minionToT = minionQ.Distance(t1.Position);
+                    var minionToP = minionQ.Distance(poutput.CastPosition);
+                    if (minionToP < 400 && minionToT < 420 && minionToT > 150 && minionToP > 200)
                     {
                         if (Q.GetDamage(t1) + Player.GetAutoAttackDamage(t1) > t1.Health)
                             Q.Cast(col.Last());
