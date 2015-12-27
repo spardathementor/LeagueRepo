@@ -64,8 +64,8 @@ namespace AiEzEvade
             Config.SubMenu("LOW danger").AddItem(new MenuItem("LowCheckSpellCollision", "Check Spell Collision").SetValue(true));
             Config.SubMenu("LOW danger").AddItem(new MenuItem("LowClickOnlyOnce", "Click Only Once").SetValue(true));
             Config.SubMenu("LOW danger").AddItem(new MenuItem("LowTickLimiter", "Tick Limiter").SetValue(new Slider(100, 1000, 0)));
-            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowReactionTime", "Reaction Time").SetValue(new Slider(200, 1000, 0)));
-            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(50, 1000, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowReactionTime", "Reaction Time").SetValue(new Slider(250, 1000, 0)));
+            Config.SubMenu("LOW danger").AddItem(new MenuItem("LowSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(100, 1000, 0)));
             Config.SubMenu("LOW danger").AddItem(new MenuItem("LowFastMovementBlock", "Fast Movement Block").SetValue(false));
 
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("0", "Activation between LOW and HIGH"));
@@ -80,7 +80,7 @@ namespace AiEzEvade
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumSpellDetectionTime", "Spell Detection Time").SetValue(new Slider(200, 1000, 0)));
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumFastMovementBlock", "Fast Movement Block").SetValue(false));
 
-            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighHp", "Activation under % HP").SetValue(new Slider(40, 100, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighHp", "Activation under % HP").SetValue(new Slider(35, 100, 0)));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighEvadeMode", "Evade Mode").SetValue(new Slider(1, 2, 0)));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeDangerous", "Dodge only Dangerous").SetValue(false));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeCircularSpells", "Dodge Circular Spells").SetValue(true));
