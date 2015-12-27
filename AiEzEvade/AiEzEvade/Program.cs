@@ -81,7 +81,7 @@ namespace AiEzEvade
             Config.SubMenu("MEDIUM danger").AddItem(new MenuItem("MediumFastMovementBlock", "Fast Movement Block").SetValue(false));
 
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighHp", "Activation under % HP").SetValue(new Slider(40, 100, 0)));
-            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighEvadeMode", "Evade Mode").SetValue(new Slider(0, 2, 0)));
+            Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighEvadeMode", "Evade Mode").SetValue(new Slider(1, 2, 0)));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeDangerous", "Dodge only Dangerous").SetValue(false));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeCircularSpells", "Dodge Circular Spells").SetValue(true));
             Config.SubMenu("HIGH danger").AddItem(new MenuItem("HighDodgeFOWSpells", "Dodge FOW Spells").SetValue(true));
