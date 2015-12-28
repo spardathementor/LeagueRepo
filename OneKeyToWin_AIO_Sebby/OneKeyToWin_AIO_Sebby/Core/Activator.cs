@@ -237,29 +237,30 @@ namespace OneKeyToWin_AIO_Sebby
             if (Player.HealthPercent < 60 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
             {
                 double dmg = OktwCommon.GetIncomingDamage(Player, 1);
-                if (dmg > 0)
-                {
+                var enemys = Player.CountEnemiesInRange(700);
+                if(dmg > 0 || enemys > 0)
+                { 
                     if (CanUse(barrier) && Config.Item("Barrier").GetValue<bool>())
-                    {
-                        var value = 95 + Player.Level * 20;
-                        if (dmg > value && Player.HealthPercent < 50)
-                            Player.Spellbook.CastSpell(barrier, Player);
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
-                            Player.Spellbook.CastSpell(barrier, Player);
-                        else if (Player.Health - dmg < Player.Level * 10)
-                            Seraph.Cast();
-                    }
+                        {
+                            var value = 95 + Player.Level * 20;
+                            if (dmg > value && Player.HealthPercent < 50)
+                                Player.Spellbook.CastSpell(barrier, Player);
+                            else if (Player.Health - dmg < enemys * Player.Level * 20)
+                                Player.Spellbook.CastSpell(barrier, Player);
+                            else if (Player.Health - dmg < Player.Level * 10)
+                                Seraph.Cast();
+                        }
 
-                    if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
-                    {
-                        var value = Player.Mana * 0.2 + 150;
-                        if (dmg > value && Player.HealthPercent < 50)
-                            Seraph.Cast();
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 20)
-                            Seraph.Cast();
-                        else if (Player.Health - dmg < Player.Level * 10)
-                            Seraph.Cast();
-                    }
+                        if (Seraph.IsReady() && Config.Item("Seraph").GetValue<bool>())
+                        {
+                            var value = Player.Mana * 0.2 + 150;
+                            if (dmg > value && Player.HealthPercent < 50)
+                                Seraph.Cast();
+                            else if (Player.Health - dmg < enemys * Player.Level * 20)
+                                Seraph.Cast();
+                            else if (Player.Health - dmg < Player.Level * 10)
+                                Seraph.Cast();
+                        }
 
                     if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
                     {
@@ -267,12 +268,12 @@ namespace OneKeyToWin_AIO_Sebby
                         {
                             Zhonya.Cast();
                         }
-                        else if (Player.Health - dmg < Player.CountEnemiesInRange(700) * Player.Level * 25)
+                        else if (Player.Health - dmg < enemys * Player.Level * 25)
                         {
                             Zhonya.Cast();
 
                         }
-                        else if (Player.Health - dmg < Player.Level * 25)
+                        else if (Player.Health - dmg < Player.Level * 10)
                         {
                             Zhonya.Cast();
 
@@ -288,7 +289,8 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < 700))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-                if (dmg == 0)
+                var enemys = ally.CountEnemiesInRange(700);
+                if (dmg == 0 && enemys == 0)
                     continue;
 
                 if (CanUse(heal) && Config.Item("Heal").GetValue<bool>())
@@ -296,9 +298,9 @@ namespace OneKeyToWin_AIO_Sebby
                     if (!Config.Item("AllyHeal").GetValue<bool>() && !ally.IsMe)
                         return;
 
-                    if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
+                    if (ally.Health - dmg < enemys * ally.Level * 15)
                         Player.Spellbook.CastSpell(heal, ally);
-                    else if (ally.Health - dmg < ally.Level * 15)
+                    else if (ally.Health - dmg < ally.Level * 10)
                        Player.Spellbook.CastSpell(heal, ally);
                 }
 
@@ -307,7 +309,7 @@ namespace OneKeyToWin_AIO_Sebby
                     var value = 75 + (15 * Player.Level);
                     if (dmg > value && Player.HealthPercent < 50)
                         Solari.Cast();
-                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
+                    else if (ally.Health - dmg < enemys * ally.Level * 15)
                         Solari.Cast();
                     else if (ally.Health - dmg < ally.Level * 10)
                         Solari.Cast();
@@ -318,7 +320,7 @@ namespace OneKeyToWin_AIO_Sebby
                     var value = 0.1 * Player.MaxHealth;
                     if (dmg > value && Player.HealthPercent < 50)
                         FaceOfTheMountain.Cast(ally);
-                    else if (ally.Health - dmg < ally.CountEnemiesInRange(700) * ally.Level * 15)
+                    else if (ally.Health - dmg < enemys * ally.Level * 15)
                         FaceOfTheMountain.Cast(ally);
                     else if (ally.Health - dmg < ally.Level * 10)
                         FaceOfTheMountain.Cast(ally);
