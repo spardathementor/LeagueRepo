@@ -159,7 +159,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         var cursorToTarget = Qtarget.Distance(Game.CursorPos);
                         var ext = QMissile.Position.Extend(Qtarget.ServerPosition, cursorToTarget + misToTarget);
 
-                        if (ext.Distance(Player.Position) < 500 && ext.CountEnemiesInRange(400) < 2)
+                        if (ext.Distance(Player.Position) < 600 && ext.CountEnemiesInRange(400) < 2)
                         {
                             return ext;
                         }
@@ -186,10 +186,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(dashPosition);
                 }
                 var posPred = fallow();
-                if (posPred != Vector3.Zero)
+                if (posPred != Vector3.Zero )
                 {
-                    R.Cast(fallow());
-                    Program.debug("AIMMMM");
+                    MissileClient missile = (MissileClient)QMissile;
+                    if (missile.SData.Name == "AhriOrbReturn" && Player.Distance(posPred) > 200)
+                    {
+                        R.Cast(posPred);
+                        Program.debug("AIMMMM");
+                    }
                 }
             }
             
