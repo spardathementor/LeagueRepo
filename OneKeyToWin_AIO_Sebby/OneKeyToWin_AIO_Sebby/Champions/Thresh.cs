@@ -139,7 +139,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     CastE(true, t);
                 }
-                E.Cast(revertPosition);
             }
         }
 
