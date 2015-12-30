@@ -289,7 +289,7 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             }
 
-            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() && enemy.IsFacing(Player)))
+            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() ))
             {
                 if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
                     OktwCommon.blockAttack = true;
@@ -336,7 +336,7 @@ namespace OneKeyToWin_AIO_Sebby
                     args.Process = false;
             }
 
-            if (!Player.IsMelee && OktwCommon.YasuoInGame && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) &&  Config.Item("collAA", true).GetValue<bool>())
+            if (!Player.IsMelee && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) &&  Config.Item("collAA", true).GetValue<bool>())
             {
                 args.Process = false;
             }
@@ -428,27 +428,22 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static bool IsJungler(Obj_AI_Hero hero) { return hero.Spellbook.Spells.Any(spell => spell.Name.ToLower().Contains("smite")); }
 
-        public static float GetRealDmg(Spell QWER, Obj_AI_Hero target)
-        {
-            if (Orbwalking.InAutoAttackRange(target) || target.CountAlliesInRange(300) > 0)
-                return QWER.GetDamage(target) + (float)ObjectManager.Player.GetAutoAttackDamage(target) * 2;
-            else
-                return QWER.GetDamage(target);
-        }
-
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
                 Core.SkillshotType CoreType2 = Core.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
+
                 if (QWER.Type == SkillshotType.SkillshotCircle)
                 {
                     CoreType2 = Core.SkillshotType.SkillshotCircle;
                     aoe2 = true;
                 }
+
                 if (QWER.Width > 80 && !QWER.Collision)
                     aoe2 = true;
+
                 var predInput2 = new Core.PredictionInput
                 {
                     Aoe = aoe2,
