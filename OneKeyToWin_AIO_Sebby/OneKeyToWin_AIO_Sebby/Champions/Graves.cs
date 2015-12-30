@@ -179,6 +179,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
 
                 var qDmg = OktwCommon.GetKsDamage(t, Q);
+                var rDmg = R.GetDamage(t);
                 if (qDmg > t.Health)
                 {
                     Q.Cast(t, true);
@@ -186,10 +187,10 @@ namespace OneKeyToWin_AIO_Sebby
                     Program.debug("Q ks");
                 }
 
-                else if (qDmg + Program.GetRealDmg(R, t) > t.Health && R.IsReady())
+                else if (qDmg + rDmg > t.Health && R.IsReady())
                 {
                     Program.CastSpell(Q, t);
-                    if (Config.Item("fastR", true).GetValue<bool>() && Program.GetRealDmg(Q, t) < t.Health)
+                    if (Config.Item("fastR", true).GetValue<bool>() && rDmg < t.Health)
                         Program.CastSpell(R, t);
                     Program.debug("Q + R ks");
                 }
