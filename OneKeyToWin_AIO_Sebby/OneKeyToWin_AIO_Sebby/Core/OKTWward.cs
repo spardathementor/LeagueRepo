@@ -216,7 +216,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (!sender.IsEnemy || sender.IsAlly )
                 return;
 
-            if (sender.Type == GameObjectType.MissileClient && (sender is MissileClient))
+            if (sender is MissileClient)
             {
                 var missile = (MissileClient)sender;
                 

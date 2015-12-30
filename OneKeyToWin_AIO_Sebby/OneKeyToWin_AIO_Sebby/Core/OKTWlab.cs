@@ -64,13 +64,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 700, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
-            if (mobs.Count > 0)
-            {
-                var mob = mobs[0];
-                if (mob.HealthPercent < 100)
-                    Program.debug(" " + (Game.Time - castTime));
-            }
                 // foreach (var buff in ObjectManager.Player.Buffs)
                 // Program.debug(buff.Name);
         }
