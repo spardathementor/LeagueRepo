@@ -288,9 +288,10 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (Program.GetRealDmg(E, t) > t.Health)
+                var eDmg = OktwCommon.GetKsDamage(t, E);
+                if (eDmg > t.Health)
                     Program.CastSpell(E, t);
-                else if (E.GetDamage(t) + Q.GetDamage(t) > t.Health && Player.Mana > QMANA + EMANA + RMANA)
+                else if (eDmg + Q.GetDamage(t) > t.Health && Player.Mana > QMANA + EMANA + RMANA)
                     Program.CastSpell(E, t);
                 else if (Program.Combo && Player.Mana > RMANA + WMANA + QMANA + EMANA)
                 {
