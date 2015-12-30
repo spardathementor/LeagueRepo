@@ -186,6 +186,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static bool CollisionYasuo(Vector3 from, Vector3 to)
         {
+            if(!YasuoInGame)
+                return false;
+
             if ( Game.Time - yasuoWall.CastTime > 4)
                 return false;
 
