@@ -94,6 +94,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.IsRecalling())
+                return;
 
             if (Player.IsZombie)
             {
@@ -217,8 +219,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                     Program.CastSpell(Q, t);
             }
+            if (Player.IsWindingUp)
+                return;
 
-            if (!Player.IsWindingUp && !Program.None && !Program.Combo && Player.Mana > RMANA + QMANA * 2)
+            if (!Program.None && !Program.Combo && Player.Mana > RMANA + QMANA * 2)
             {
                 var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
 
