@@ -25,7 +25,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             
             Game.OnUpdate += Game_OnGameUpdate;
             Obj_AI_Base.OnLevelUp +=Obj_AI_Base_OnLevelUp;
-            Drawing.OnDraw += Drawing_OnDraw;
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -36,23 +35,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             lvl2 = Config.Item("2", true).GetValue<StringList>().SelectedIndex;
             lvl3 = Config.Item("3", true).GetValue<StringList>().SelectedIndex;
             lvl4 = Config.Item("4", true).GetValue<StringList>().SelectedIndex;
-        }
-
-        private void Drawing_OnDraw(EventArgs args)
-        {
-            if (Config.Item("AutoLvl").GetValue<bool>() && ObjectManager.Player.Level < 4)
-            {
-                if ((lvl2 == lvl3 || lvl2 == lvl4 || lvl3 == lvl4) && (int)Game.Time % 2 == 0)
-                {
-                    drawText("AutoLvlUp: PLEASE SET ABILITY SEQENCE", ObjectManager.Player.Position, System.Drawing.Color.OrangeRed, -200);
-                }
-            }
-        }
-
-        public static void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
-        {
-            var wts = Drawing.WorldToScreen(Hero);
-            Drawing.DrawText(wts[0] - (msg.Length) * 5, wts[1] + weight, color, msg);
         }
 
         private void Obj_AI_Base_OnLevelUp(Obj_AI_Base sender, EventArgs args)
