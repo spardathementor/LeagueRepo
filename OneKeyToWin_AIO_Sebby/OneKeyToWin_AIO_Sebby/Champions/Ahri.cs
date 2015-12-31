@@ -126,7 +126,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var posPred = fallow();
             if(posPred != Vector3.Zero)
-                Orbwalker.SetOrbwalkingPoint(fallow());
+                Orbwalker.SetOrbwalkingPoint(posPred);
+            else
+                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+
             if (Program.LagFree(0))
             {
                 SetMana();
