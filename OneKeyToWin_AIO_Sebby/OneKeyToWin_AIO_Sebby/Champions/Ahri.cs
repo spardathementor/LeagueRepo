@@ -39,7 +39,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("aimQ", "Auto aim Q return", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("aimQ", "Auto aim Q missile", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
@@ -124,11 +124,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            var posPred = fallow();
-            if(posPred != Vector3.Zero)
-                Orbwalker.SetOrbwalkingPoint(posPred);
-            else
-                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            if (Config.Item("aimQ", true).GetValue<bool>())
+            {
+                var posPred = fallow();
+                if (posPred != Vector3.Zero)
+                    Orbwalker.SetOrbwalkingPoint(posPred);
+                else
+                    Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            }
 
             if (Program.LagFree(0))
             {
@@ -148,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private Vector3 fallow( )
         {
-            if (QMissile != null && QMissile.IsValid && Qtarget.IsValidTarget() && Config.Item("aimQ", true).GetValue<bool>())
+            if (QMissile != null && QMissile.IsValid && Qtarget.IsValidTarget())
             {
                 var misToPlayer = Player.Distance(QMissile.Position);
                 var tarToPlayer = Player.Distance(Qtarget);
@@ -164,6 +167,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                         if (ext.Distance(Player.Position) < 600 && ext.CountEnemiesInRange(400) < 2)
                         {
+                            if(Config.Item("Qhelp", true).GetValue<bool>())
+                                Utility.DrawCircle(ext, 100, System.Drawing.Color.Cyan, 1, 1);
                             return ext;
                         }
                     }
