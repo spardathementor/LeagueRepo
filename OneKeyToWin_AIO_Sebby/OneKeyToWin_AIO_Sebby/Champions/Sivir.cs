@@ -17,17 +17,20 @@ namespace OneKeyToWin_AIO_Sebby
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private static GameObject QMissile = null;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        public Obj_AI_Hero Qtarget;
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 1180f);
-            Qc = new Spell(SpellSlot.Q, 1180f);
+            Q = new Spell(SpellSlot.Q, 1200f);
+            Qc = new Spell(SpellSlot.Q, 1200f);
             W = new Spell(SpellSlot.W, float.MaxValue);
             E = new Spell(SpellSlot.E, float.MaxValue);
             R = new Spell(SpellSlot.R, 25000f);
 
             Q.SetSkillshot(0.25f, 90f, 1350f, false, SkillshotType.SkillshotLine);
             Qc.SetSkillshot(0.25f, 90f, 1350f, true, SkillshotType.SkillshotLine);
+
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("aimQ", "Auto aim Q missile", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notif", "Notification (timers)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show KS notification", true).SetValue(true));
@@ -97,6 +100,35 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
+        private Vector3 fallow()
+        {
+            if (QMissile != null && QMissile.IsValid && Qtarget.IsValidTarget())
+            {
+                var misToPlayer = Player.Distance(QMissile.Position);
+                var tarToPlayer = Player.Distance(Qtarget);
+
+                if (misToPlayer > tarToPlayer)
+                {
+                    var misToTarget = Qtarget.Distance(QMissile.Position);
+
+                    if (misToTarget < Q.Range && misToTarget > 50)
+                    {
+                        var cursorToTarget = Qtarget.Distance(Game.CursorPos);
+                        var ext = QMissile.Position.Extend(Qtarget.ServerPosition, cursorToTarget + misToTarget);
+
+                        if (ext.Distance(Player.Position) < 600 && ext.CountEnemiesInRange(400) < 2)
+                        {
+                            if (Config.Item("Qhelp", true).GetValue<bool>())
+                                Utility.DrawCircle(ext, 100, System.Drawing.Color.Cyan, 1, 1);
+                            return ext;
+                        }
+                    }
+                }
+            }
+            return Vector3.Zero;
+        }
+
+
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             if (!unit.IsMe && Orbwalker.GetTarget().IsValidTarget())
@@ -162,6 +194,15 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Config.Item("aimQ", true).GetValue<bool>())
+            {
+                var posPred = fallow();
+                if (posPred != Vector3.Zero)
+                    Orbwalker.SetOrbwalkingPoint(posPred);
+                else
+                    Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            }
+
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -188,6 +229,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
+                Qtarget = t;
                 var qDmg = OktwCommon.GetKsDamage(t,Q) * 1.9;
                 if (Orbwalking.InAutoAttackRange(t))
                     qDmg = qDmg + Player.GetAutoAttackDamage(t) * 3;
