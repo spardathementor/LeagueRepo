@@ -26,12 +26,12 @@ namespace OneKeyToWin_AIO_Sebby
             Q1 = new Spell(SpellSlot.Q, 1000);
             W = new Spell(SpellSlot.W, 1620);
             E = new Spell(SpellSlot.E, 330f);
-            R = new Spell(SpellSlot.R, 300f);
+            R = new Spell(SpellSlot.R, 280f);
 
             Q.SetSkillshot(0.25f, 60f, 1650f, false, SkillshotType.SkillshotLine);
             Q1.SetSkillshot(0.5f, 150f, 1000f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(2.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.4f, 300f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.4f, 280f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             missileManager = new Core.MissileReturn("ekkoqmis", "ekkoqreturn", Q);
 
