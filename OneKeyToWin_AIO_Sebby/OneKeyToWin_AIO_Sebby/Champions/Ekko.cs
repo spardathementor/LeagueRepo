@@ -25,12 +25,12 @@ namespace OneKeyToWin_AIO_Sebby
             Q1 = new Spell(SpellSlot.Q, 1000);
             W = new Spell(SpellSlot.W, 1620);
             E = new Spell(SpellSlot.E, 330f);
-            R = new Spell(SpellSlot.R, 375f);
+            R = new Spell(SpellSlot.R, 320f);
 
-            Q.SetSkillshot(0.25f, 60f, 2200f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 60f, 1650f, false, SkillshotType.SkillshotLine);
             Q1.SetSkillshot(0.5f, 150f, 1000f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(2.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.6f, 375f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.6f, 320f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -137,7 +137,7 @@ namespace OneKeyToWin_AIO_Sebby
                     if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                         R.Cast();
 
-                    foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < 350 && RMissile.Position.Distance(t.ServerPosition) < 350))
+                    foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Range && RMissile.Position.Distance(t.ServerPosition) < R.Range))
                     {
                         var comboDmg = R.GetDamage(t) + GetWdmg(t) + Q.GetDamage(t) * 2 + E.GetDamage(t);
 
