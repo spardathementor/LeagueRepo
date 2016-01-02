@@ -21,7 +21,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public float StartRecallTime { get; set; }
         public float AbortRecallTime { get; set; }
         public float FinishRecallTime { get; set; }
-
+        
         public ChampionInfo()
         {
             LastVisableTime = Game.Time;
@@ -35,6 +35,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
     {
         public static List<ChampionInfo> ChampionInfoList = new List<ChampionInfo>();
         public static Obj_AI_Hero jungler;
+        private Vector3 EnemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy).Position;
 
         public void LoadOKTW()
         {
@@ -89,9 +90,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValid))
             {
                 var ChampionInfoOne = ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
-                if (enemy.IsVisible && !enemy.IsDead && enemy != null && enemy.IsValidTarget())
+                if (enemy.IsDead)
                 {
-                    var prepos = Prediction.GetPrediction(enemy, 0.4f).CastPosition;
+                    if (ChampionInfoOne != null)
+                    {
+                        ChampionInfoOne.NetworkId = enemy.NetworkId;
+                        ChampionInfoOne.LastVisablePos = EnemySpawn;
+                        ChampionInfoOne.LastVisableTime = Game.Time;
+                    }
+                }
+                else if (enemy.IsVisible)
+                {
+                    Vector3 prepos = enemy.Position;
+
+                    if (enemy.IsMoving)
+                        prepos = prepos.Extend(enemy.GetWaypoints().Last().To3D(), 125);
 
                     if (ChampionInfoOne == null)
                     {
@@ -105,15 +118,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         ChampionInfoOne.PredictedPos = prepos;
                     }
                 }
-                if (enemy.IsDead)
-                {
-                    if (ChampionInfoOne != null)
-                    {
-                        ChampionInfoOne.NetworkId = enemy.NetworkId;
-                        ChampionInfoOne.LastVisablePos = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy).Position;
-                        ChampionInfoOne.LastVisableTime = Game.Time;
-                    }
-                }
+                
             }
         }
 

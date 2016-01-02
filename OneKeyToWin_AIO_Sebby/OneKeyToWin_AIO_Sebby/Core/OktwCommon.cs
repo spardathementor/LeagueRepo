@@ -59,6 +59,12 @@ namespace OneKeyToWin_AIO_Sebby
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate += OnUpdate;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
+            Orbwalking.AfterAttack += afterAttack;
+        }
+
+        private void afterAttack(AttackableUnit unit, AttackableUnit target)
+        {
+            
         }
 
         private void OnUpdate(EventArgs args)
@@ -68,6 +74,11 @@ namespace OneKeyToWin_AIO_Sebby
                 float time = Game.Time - 2;
                 IncomingDamageList.RemoveAll(damage => time < damage.Time);
             }
+        }
+
+        public static bool CanCombo()
+        {
+            return !Player.IsWindingUp;
         }
 
         public static double GetIncomingDamage(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true )
@@ -127,7 +138,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!YasuoInGame)
                 return;
 
-            if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || sender.Type != GameObjectType.obj_AI_Hero || Player.Distance(sender.ServerPosition) > 2000)
+            if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || sender.Type != GameObjectType.obj_AI_Hero)
                 return;
 
             if (args.SData.Name == "YasuoWMovingWall")
@@ -256,7 +267,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
                 target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Knockback) ||
                 target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) ||
-                target.IsStunned || (target.IsChannelingImportantSpell() && !target.IsMoving))
+                target.IsStunned || (target.IsChannelingImportantSpell() && !target.IsMoving) || target.MoveSpeed < 10)
             {
                 return false;
             }
