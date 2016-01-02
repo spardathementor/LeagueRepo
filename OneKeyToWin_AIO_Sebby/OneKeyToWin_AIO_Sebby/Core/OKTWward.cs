@@ -299,14 +299,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
        
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-
-            if (sender.IsEnemy && !sender.IsMinion && sender is Obj_AI_Hero )
+            if (sender.IsEnemy && !sender.IsMinion && sender.Type == GameObjectType.obj_AI_Hero)
             {
-                AddWard(args.SData.Name.ToLower(), args.End);
+                if(args.Target == null)
+                    AddWard(args.SData.Name.ToLower(), args.End);
 
-                if (sender.Distance(Player.Position) < 800)
+                if ((OracleLens.IsReady() || VisionWard.IsReady()) && sender.Distance(Player.Position) < 800)
                 {
-                    switch (args.SData.Name)
+                    switch (args.SData.Name.ToLower())
                     {
                         case "akalismokebomb":
                             CastVisionWards(sender.ServerPosition);
