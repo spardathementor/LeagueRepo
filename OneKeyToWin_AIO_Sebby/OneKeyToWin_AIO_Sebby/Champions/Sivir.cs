@@ -15,9 +15,12 @@ namespace OneKeyToWin_AIO_Sebby
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell E, Q, Qc, W, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        private static GameObject QMissile = null;
+
+
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        public Obj_AI_Hero Qtarget;
+
+
+        public static Core.MissileReturn missileManager;
 
         public void LoadOKTW()
         {
@@ -30,11 +33,10 @@ namespace OneKeyToWin_AIO_Sebby
             Q.SetSkillshot(0.25f, 90f, 1350f, false, SkillshotType.SkillshotLine);
             Qc.SetSkillshot(0.25f, 90f, 1350f, true, SkillshotType.SkillshotLine);
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("aimQ", "Auto aim Q missile", true).SetValue(true));
+            missileManager = new Core.MissileReturn("SivirQMissile", "SivirQMissileReturn", Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notif", "Notification (timers)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show KS notification", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("Qhelp", "Show Q helper", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
@@ -71,63 +73,7 @@ namespace OneKeyToWin_AIO_Sebby
             Orbwalking.AfterAttack += Orbwalker_AfterAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Obj_SpellMissile.OnCreate += SpellMissile_OnCreateOld;
-            Obj_SpellMissile.OnDelete += Obj_SpellMissile_OnDelete;
         }
-
-        private void Obj_SpellMissile_OnDelete(GameObject sender, EventArgs args)
-        {
-            if (!sender.IsValid<MissileClient>())
-                return;
-            MissileClient missile = (MissileClient)sender;
-
-            if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && (missile.SData.Name == "SivirQMissile" || missile.SData.Name == "SivirQMissileReturn"))
-            {
-                QMissile = null;
-            }
-        }
-
-        private void SpellMissile_OnCreateOld(GameObject sender, EventArgs args)
-        {
-            if (!sender.IsValid<MissileClient>())
-                return;
-
-            MissileClient missile = (MissileClient)sender;
-
-            if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && (missile.SData.Name == "SivirQMissile" || missile.SData.Name == "SivirQMissileReturn"))
-            {
-               QMissile = sender;
-            }
-        }
-
-        private Vector3 fallow()
-        {
-            if (QMissile != null && QMissile.IsValid && Qtarget.IsValidTarget())
-            {
-                var misToPlayer = Player.Distance(QMissile.Position);
-                var tarToPlayer = Player.Distance(Qtarget);
-
-                if (misToPlayer > tarToPlayer)
-                {
-                    var misToTarget = Qtarget.Distance(QMissile.Position);
-
-                    if (misToTarget < Q.Range && misToTarget > 50)
-                    {
-                        var cursorToTarget = Qtarget.Distance(Game.CursorPos);
-                        var ext = QMissile.Position.Extend(Qtarget.ServerPosition, cursorToTarget + misToTarget);
-
-                        if (ext.Distance(Player.Position) < 600 && ext.CountEnemiesInRange(400) < 2)
-                        {
-                            if (Config.Item("Qhelp", true).GetValue<bool>())
-                                Utility.DrawCircle(ext, 100, System.Drawing.Color.Cyan, 1, 1);
-                            return ext;
-                        }
-                    }
-                }
-            }
-            return Vector3.Zero;
-        }
-
 
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
@@ -168,6 +114,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
+
             if (!E.IsReady() || !sender.IsEnemy || sender.IsMinion || args.Target == null  || !args.Target.IsMe || !sender.IsValid<Obj_AI_Hero>() || args.SData.Name == "TormentedSoil")
                 return;
 
@@ -194,15 +141,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Config.Item("aimQ", true).GetValue<bool>())
-            {
-                var posPred = fallow();
-                if (posPred != Vector3.Zero)
-                    Orbwalker.SetOrbwalkingPoint(posPred);
-                else
-                    Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
-            }
-
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -229,7 +167,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                Qtarget = t;
+                missileManager.Target = t;
                 var qDmg = OktwCommon.GetKsDamage(t,Q) * 1.9;
                 if (Orbwalking.InAutoAttackRange(t))
                     qDmg = qDmg + Player.GetAutoAttackDamage(t) * 3;
@@ -338,9 +276,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if (QMissile != null && Config.Item("Qhelp", true).GetValue<bool>())
-                OktwCommon.DrawLineRectangle(QMissile.Position, Player.Position, (int)Q.Width, 1, System.Drawing.Color.White);
-
             if (Config.Item("notif", true).GetValue<bool>())
             {
                 if (Player.HasBuff("sivirwmarker"))
