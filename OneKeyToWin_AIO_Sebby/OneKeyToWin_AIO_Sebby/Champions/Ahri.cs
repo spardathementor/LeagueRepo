@@ -18,6 +18,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static GameObject QMissile = null, EMissile = null;
         public Obj_AI_Hero Qtarget = null;
+        public static Core.MissileReturn missileManager;
 
         public void LoadOKTW()
         {
@@ -28,6 +29,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Q.SetSkillshot(0.25f, 100, 1600, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.25f, 60, 1550, true, SkillshotType.SkillshotLine);
+
+            missileManager = new Core.MissileReturn("AhriOrbMissile", "AhriOrbReturn", Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -124,15 +127,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Config.Item("aimQ", true).GetValue<bool>())
-            {
-                var posPred = fallow();
-                if (posPred != Vector3.Zero)
-                    Orbwalker.SetOrbwalkingPoint(posPred);
-                else
-                    Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
-            }
-
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -147,34 +141,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicQ();
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && Program.Combo)
                 LogicR();
-        }
-
-        private Vector3 fallow( )
-        {
-            if (QMissile != null && QMissile.IsValid && Qtarget.IsValidTarget())
-            {
-                var misToPlayer = Player.Distance(QMissile.Position);
-                var tarToPlayer = Player.Distance(Qtarget);
-
-                if (misToPlayer > tarToPlayer )
-                {
-                    var misToTarget = Qtarget.Distance(QMissile.Position);
-
-                    if (misToTarget < Q.Range && misToTarget > 50)
-                    {
-                        var cursorToTarget = Qtarget.Distance(Game.CursorPos);
-                        var ext = QMissile.Position.Extend(Qtarget.ServerPosition, cursorToTarget + misToTarget);
-
-                        if (ext.Distance(Player.Position) < 600 && ext.CountEnemiesInRange(400) < 2)
-                        {
-                            if(Config.Item("Qhelp", true).GetValue<bool>())
-                                Utility.DrawCircle(ext, 100, System.Drawing.Color.Cyan, 1, 1);
-                            return ext;
-                        }
-                    }
-                }
-            }
-            return Vector3.Zero;
         }
 
         private void LogicR()
@@ -193,11 +159,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     R.Cast(dashPosition);
                 }
-                var posPred = fallow();
+
+                var posPred = missileManager.CalculateReturnPos();
                 if (posPred != Vector3.Zero )
                 {
-                    MissileClient missile = (MissileClient)QMissile;
-                    if (missile.SData.Name == "AhriOrbReturn" && Player.Distance(posPred) > 200)
+                    
+                    if (missileManager.Missile.SData.Name == "AhriOrbReturn" && Player.Distance(posPred) > 200)
                     {
                         R.Cast(posPred);
                         Program.debug("AIMMMM");
@@ -256,7 +223,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                Qtarget = t;
+                missileManager.Target = t;
                 if (EMissile == null || !EMissile.IsValid)
                 {
                     if (Q.GetDamage(t) * 2 + OktwCommon.GetEchoLudenDamage(t) > t.Health)
@@ -354,10 +321,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnDraw(EventArgs args)
         {
-
-            if (QMissile != null && QMissile.IsValid && Config.Item("Qhelp", true).GetValue<bool>())
-                OktwCommon.DrawLineRectangle(QMissile.Position, Player.Position, (int)Q.Width, 1, System.Drawing.Color.White);
-
             if (Config.Item("qRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
