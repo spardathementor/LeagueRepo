@@ -7,8 +7,6 @@ using LeagueSharp.Common;
 using SharpDX;
 using System.Drawing;
 using LeagueSharp;
-using LeagueSharp.Common;
-using SharpDX;
 
 namespace OneKeyToWin_AIO_Sebby
 {
@@ -432,7 +430,7 @@ namespace OneKeyToWin_AIO_Sebby
                             || (mob.SkinName == "SRU_RiftHerald" && Config.Item("Rherald", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
-                            && mob.Health <= SmiteDamage[Player.Level])
+                            && mob.Health < SmiteDamage[Player.Level])
                         {
                             Player.Spellbook.CastSpell(smite, mob);
                         }
