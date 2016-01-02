@@ -262,11 +262,11 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (Zhonya.IsReady() && Config.Item("Zhonya").GetValue<bool>())
                     {
-                        if (dmg > Player.Level * 40)
+                        if (dmg > Player.Level * 35)
                         {
                             Zhonya.Cast();
                         }
-                        else if (Player.Health - dmg < enemys * Player.Level * 15)
+                        else if (Player.Health - dmg < enemys * Player.Level * 20)
                         {
                             Zhonya.Cast();
 
