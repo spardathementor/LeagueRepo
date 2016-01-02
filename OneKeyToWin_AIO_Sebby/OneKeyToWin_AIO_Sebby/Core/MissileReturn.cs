@@ -38,7 +38,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if (Missile != null && Missile.IsValid() && Config.Item("drawHelper", true).GetValue<bool>())
+            if (Missile != null && Missile.IsValid && Config.Item("drawHelper", true).GetValue<bool>())
                 OktwCommon.DrawLineRectangle(Missile.Position, Player.Position, (int)QWER.Width, 1, System.Drawing.Color.White);
         }
 
