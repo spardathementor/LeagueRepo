@@ -50,7 +50,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Waoe", "Cast only if 2 targets", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Waoe", "Cast if 2 targets", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("Rdmg", "R dmg % hp", true).SetValue(new Slider(20, 100, 0)));
@@ -122,13 +122,35 @@ namespace OneKeyToWin_AIO_Sebby
                         if (t.Health < comboDmg)
                             R.Cast();
                         Program.debug("ks");
-                        
+
                     }
 
                 }
                 if (Player.Health < Player.CountEnemiesInRange(600) * Player.Level * 15)
                 {
                     R.Cast();
+                }
+
+                if (Player.HealthPercent < 60)
+                {
+                    double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+                    var enemys = Player.CountEnemiesInRange(700);
+                    if (dmg > 0 || enemys > 0)
+                    {
+                        if (dmg > Player.Level * 40)
+                        {
+                            R.Cast();
+                        }
+                        else if (Player.Health - dmg < enemys * Player.Level * 25)
+                        {
+                            R.Cast();
+
+                        }
+                        else if (Player.Health - dmg < Player.Level * 10)
+                        {
+                            R.Cast();
+                        }
+                    }
                 }
             }
         }
@@ -264,17 +286,16 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() )
             {
-                W.CastIfWillHit(t, 2, true);
-                if (t.CountEnemiesInRange(250) > 1)
-                {
-                    Program.CastSpell(W, t);
-                }
+                
                 if (Config.Item("Waoe", true).GetValue<bool>())
-                    return;
-                if (t.HasBuffOfType(BuffType.Slow))
                 {
-                    Program.CastSpell(W, t);
+                    W.CastIfWillHit(t, 2, true);
+                    if (t.CountEnemiesInRange(250) > 1)
+                    {
+                        Program.CastSpell(W, t);
+                    }
                 }
+                    
                 if (Program.Combo  && W.GetPrediction(t).CastPosition.Distance(t.Position) > 200)
                     Program.CastSpell(W, t);
             }
