@@ -14,23 +14,26 @@ namespace OneKeyToWin_AIO_Sebby
     {
         private Menu Config = Program.Config;
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-
         private Spell E, Q, Q1,  R, W;
         private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0, Wtime = 0, Wtime2 = 0;
-        private static GameObject RMissile, WMissile2, WMissile, QMissile = null;
+        private static GameObject RMissile, WMissile2, WMissile;
+        public static Core.MissileReturn missileManager;
+
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 750); 
             Q1 = new Spell(SpellSlot.Q, 1000);
             W = new Spell(SpellSlot.W, 1620);
             E = new Spell(SpellSlot.E, 330f);
-            R = new Spell(SpellSlot.R, 320f);
+            R = new Spell(SpellSlot.R, 300f);
 
             Q.SetSkillshot(0.25f, 60f, 1650f, false, SkillshotType.SkillshotLine);
             Q1.SetSkillshot(0.5f, 150f, 1000f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(2.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.6f, 320f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.4f, 300f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+
+            missileManager = new Core.MissileReturn("ekkoqmis", "ekkoqreturn", Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -56,32 +59,7 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
-            GameObject.OnCreate += SpellMissile_OnCreateOld;
-            GameObject.OnDelete += Obj_SpellMissile_OnDelete;
-        }
 
-        private void Obj_SpellMissile_OnDelete(GameObject sender, EventArgs args)
-        {
-            if (!sender.IsValid<MissileClient>())
-                return;
-            MissileClient missile = (MissileClient)sender;
-            
-            if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && (missile.SData.Name == "ekkoqmis" || missile.SData.Name == "ekkoqreturn"))
-            {
-                QMissile = null;
-            }
-        }
-
-        private void SpellMissile_OnCreateOld(GameObject sender, EventArgs args)
-        {
-            if (!sender.IsValid<MissileClient>())
-                return;
-            MissileClient missile = (MissileClient)sender;
-            
-            if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && (missile.SData.Name == "ekkoqmis" || missile.SData.Name == "ekkoqreturn"))
-            {
-                QMissile = sender;
-            }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -236,8 +214,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t1 = TargetSelector.GetTarget(Q1.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-
-                Program.debug("" + Q.GetDamage(t));
+                missileManager.Target = t;
                 var qDmg = GetQdmg(t);
                 if (qDmg > t.Health)
                     Q.Cast(t, true);
@@ -254,6 +231,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (t1.IsValidTarget())
             {
+                missileManager.Target = t;
                 Program.debug("" + Q.GetDamage(t1));
                 var qDmg = GetQdmg(t1);
                 if (qDmg > t1.Health)
@@ -373,10 +351,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if (QMissile != null && Config.Item("Qhelp", true).GetValue<bool>())
+            if ( Config.Item("Qhelp", true).GetValue<bool>())
             {
-                OktwCommon.DrawLineRectangle(QMissile.Position, Player.Position, (int)Q.Width, 1, System.Drawing.Color.White);
-
                 if (WMissile != null && WMissile.IsValid)
                 {
                     Utility.DrawCircle(WMissile.Position, 300, System.Drawing.Color.Yellow, 1, 1);

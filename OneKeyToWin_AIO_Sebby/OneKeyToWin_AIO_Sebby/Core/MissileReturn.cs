@@ -17,7 +17,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private string MissileName, MissileReturnName;
         private Spell QWER;
-        private MissileClient Missile;
+        public MissileClient Missile;
         private Vector3 MissileEndPos;
 
         public MissileReturn(string missile, string missileReturnName, Spell qwer)
@@ -115,11 +115,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         var cursorToTarget = Target.Distance(Player.Position.Extend(Game.CursorPos, 100));
                         var ext = finishPosition.Extend(Target.ServerPosition, cursorToTarget + misToTarget);
 
-                        if (ext.Distance(Player.Position) < 600 && ext.CountEnemiesInRange(400) < 2)
+                        if (ext.Distance(Player.Position) < 800 && ext.CountEnemiesInRange(400) < 2)
                         {
                             if (Config.Item("drawHelper", true).GetValue<bool>())
                                 Utility.DrawCircle(ext, 100, System.Drawing.Color.White, 1, 1);
-                            
+                            Program.debug(Missile.SData.Name);
                             return ext;
                         }
                     }
