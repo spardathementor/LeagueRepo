@@ -53,8 +53,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Use on:").AddItem(new MenuItem("Eon" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "R KS ", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR2", "auto R fight logic + aim Q", true).SetValue(true));
+
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
@@ -139,59 +140,66 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicW();
             if (Program.LagFree(3) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
-            if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && Program.Combo)
+            if (Program.LagFree(4) && R.IsReady() && Program.Combo)
                 LogicR();
         }
 
         private void LogicR()
         {
             var dashPosition = Player.Position.Extend(Game.CursorPos, 450);
+
             if (Player.Distance(Game.CursorPos) < 450)
                 dashPosition = Game.CursorPos;
 
             if (dashPosition.CountEnemiesInRange(800) > 2)
                 return;
 
-            if (Player.HasBuff("AhriTumble"))
+            if (Config.Item("autoR2", true).GetValue<bool>())
             {
-                var BuffTime = OktwCommon.GetPassiveTime(Player, "AhriTumble");
-                if (BuffTime < 3)
+                if (Player.HasBuff("AhriTumble"))
                 {
-                    R.Cast(dashPosition);
-                }
-
-                var posPred = missileManager.CalculateReturnPos();
-                if (posPred != Vector3.Zero )
-                {
-                    
-                    if (missileManager.Missile.SData.Name == "AhriOrbReturn" && Player.Distance(posPred) > 200)
+                    var BuffTime = OktwCommon.GetPassiveTime(Player, "AhriTumble");
+                    if (BuffTime < 3)
                     {
-                        R.Cast(posPred);
-                        Program.debug("AIMMMM");
+                        R.Cast(dashPosition);
+                    }
+
+                    var posPred = missileManager.CalculateReturnPos();
+                    if (posPred != Vector3.Zero)
+                    {
+
+                        if (missileManager.Missile.SData.Name == "AhriOrbReturn" && Player.Distance(posPred) > 200)
+                        {
+                            R.Cast(posPred);
+                            Program.debug("AIMMMM");
+                        }
                     }
                 }
             }
-            
-            var t = TargetSelector.GetTarget(450 + R.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget())
-            {
-                var comboDmg = R.GetDamage(t) * 3;
-                if (Q.IsReady())
-                {
-                    comboDmg += Q.GetDamage(t) * 2;
-                }
-                if (W.IsReady())
-                {
-                    comboDmg += W.GetDamage(t) + W.GetDamage(t,1);
-                }
-                if (t.CountAlliesInRange(600) < 2 && comboDmg > t.Health && t.Position.Distance(Game.CursorPos) < t.Position.Distance(Player.Position)  && dashPosition.Distance(t.ServerPosition) < 500)
-                {
-                    R.Cast(dashPosition);
-                }
 
-                foreach (var target in Program.Enemies.Where(target => target.IsMelee && target.IsValidTarget(300)))
+            if (Config.Item("autoR", true).GetValue<bool>())
+            {
+                var t = TargetSelector.GetTarget(450 + R.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget())
                 {
-                    R.Cast(dashPosition);
+                    var comboDmg = R.GetDamage(t) * 3;
+                    if (Q.IsReady())
+                    {
+                        comboDmg += Q.GetDamage(t) * 2;
+                    }
+                    if (W.IsReady())
+                    {
+                        comboDmg += W.GetDamage(t) + W.GetDamage(t, 1);
+                    }
+                    if (t.CountAlliesInRange(600) < 2 && comboDmg > t.Health && t.Position.Distance(Game.CursorPos) < t.Position.Distance(Player.Position) && dashPosition.Distance(t.ServerPosition) < 500)
+                    {
+                        R.Cast(dashPosition);
+                    }
+
+                    foreach (var target in Program.Enemies.Where(target => target.IsMelee && target.IsValidTarget(300)))
+                    {
+                        R.Cast(dashPosition);
+                    }
                 }
             }
         }
