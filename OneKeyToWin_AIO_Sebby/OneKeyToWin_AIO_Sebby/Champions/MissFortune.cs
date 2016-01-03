@@ -39,8 +39,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harasQ", "Use Q on minion", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("killQ", "Use Q only if can kill minion", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("harasQ", "Use Q on minion", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("killQ", "Use Q only if can kill minion", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionMove", "Don't use if minions moving", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionWidth", "Collision width calculation", true).SetValue(new Slider(70, 200, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass W", true).SetValue(true));
@@ -254,10 +256,15 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (t1.IsValidTarget(Q1.Range) && Config.Item("harasQ", true).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 50)
             {
-                var minions = MinionManager.GetMinions(Player.ServerPosition, Q1.Range);
+                if (Config.Item("qMinionMove", true).GetValue<bool>())
+                {
+                    var minions = MinionManager.GetMinions(Player.ServerPosition, Q1.Range);
 
-                if (minions.Exists(x => x.IsMoving))
-                    return;
+                    if (minions.Exists(x => x.IsMoving))
+                        return;
+                }
+
+                Q1.Width = Config.Item("qMinionWidth", true).GetValue<Slider>().Value;
 
                 var poutput = Q1.GetPrediction(t1);
                 var col = poutput.CollisionObjects;
@@ -299,7 +306,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(E, t);
                     else 
                     {
-                        foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                             E.Cast(enemy, true, true);
                     }
                 }
