@@ -128,7 +128,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range)))
             {
-                if (enemy.Health < OktwCommon.GetKsDamage(enemy, R)  )
+                if (enemy.Health < OktwCommon.GetKsDamage(enemy, R) + (R.GetDamage(enemy,1) * (R.Instance.Ammo - 3)))
                 {
                     if (enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0)
                     {
