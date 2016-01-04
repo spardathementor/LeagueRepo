@@ -454,7 +454,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Speed = QWER.Speed,
                     Delay = QWER.Delay,
                     Range = QWER.Range,
-                    From = QWER.From,
+                    From = Player.ServerPosition,
                     Radius = QWER.Width,
                     Unit = target,
                     Type = CoreType2
