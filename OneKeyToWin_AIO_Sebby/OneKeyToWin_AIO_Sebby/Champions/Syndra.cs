@@ -24,14 +24,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             W = new Spell(SpellSlot.W, 950);
             E = new Spell(SpellSlot.E, 700);
             R = new Spell(SpellSlot.R, 675);
-            EQ = new Spell(SpellSlot.Q, Q.Range + 500);
-            Eany = new Spell(SpellSlot.Q, Q.Range + 500);
+            EQ = new Spell(SpellSlot.Q, Q.Range + 400);
+            Eany = new Spell(SpellSlot.Q, Q.Range + 400);
 
             Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.35f, 100, 2500f, false, SkillshotType.SkillshotLine);
             EQ.SetSkillshot(0.5f, 100f, 2500f, false, SkillshotType.SkillshotLine);
-            Eany.SetSkillshot(0.35f, 50f, 2000f, false, SkillshotType.SkillshotLine);
+            Eany.SetSkillshot(0.35f, 50f, 2500f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -186,6 +186,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
+            R.Range = R.Level == 3 ? 750 : 675;
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range)))
             {
                 if (enemy.Health < OktwCommon.GetKsDamage(enemy, R) + (R.GetDamage(enemy,1) * (R.Instance.Ammo - 3)))
@@ -250,8 +251,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && (!Orbwalker.InAutoAttackRange(minion) || (!minion.UnderTurret(true) && minion.UnderTurret()))))
                     {
-                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 1100);
-                        if (hpPred < Q.GetDamage(minion) * 0.9 && hpPred > minion.Health - hpPred * 2)
+                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 600);
+                        if (hpPred < Q.GetDamage(minion)  && hpPred > minion.Health - hpPred * 2)
                         {
                             Q.Cast(minion);
                             return;
@@ -263,8 +264,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && Orbwalker.InAutoAttackRange(minion)))
                     {
-                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 1100);
-                        if (hpPred < Q.GetDamage(minion) * 0.9 && hpPred > minion.Health - hpPred * 2)
+                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 600);
+                        if (hpPred < Q.GetDamage(minion) && hpPred > minion.Health - hpPred * 2)
                         {
                             Q.Cast(minion);
                             return;
