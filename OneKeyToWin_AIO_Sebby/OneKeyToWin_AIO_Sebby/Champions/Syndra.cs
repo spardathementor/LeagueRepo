@@ -30,7 +30,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.35f, 100, 2500f, false, SkillshotType.SkillshotLine);
-            EQ.SetSkillshot(0.6f, 100f, 2500f, false, SkillshotType.SkillshotLine);
+            EQ.SetSkillshot(0.5f, 100f, 2500f, false, SkillshotType.SkillshotLine);
             Eany.SetSkillshot(0.35f, 50f, 2000f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -71,7 +71,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("ELCminions", " ELaneClear minimum minions", true).SetValue(new Slider(5, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
-
 
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Game.OnUpdate += Game_OnGameUpdate;
@@ -122,11 +121,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 BallCleaner();
             }
 
-            if (Program.LagFree(1) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
-                LogicQ();
 
-            if (Program.LagFree(2) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
+            if (Program.LagFree(1) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
+
+            if (Program.LagFree(2) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
+                LogicQ();
 
             if (Program.LagFree(3) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
@@ -135,20 +135,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicR();
         }
 
-        private void BallCleaner()
-        {
-            if (BallsList.Count > 0)
-            {
-                BallsList.RemoveAll(ball => !ball.IsValid || ball.Mana == 19);
-            }
-        }
-
         private void TryBallE(Obj_AI_Hero t)
         {
             if (Q.IsReady())
             {
                 CastQE(t);
-                return;
             }
             else
             {
@@ -413,6 +404,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 RMANA = QMANA - Player.PARRegenRate * Q.Instance.Cooldown;
             else
                 RMANA = R.Instance.ManaCost;
+        }
+
+        private void BallCleaner()
+        {
+            if (BallsList.Count > 0)
+            {
+                BallsList.RemoveAll(ball => !ball.IsValid || ball.Mana == 19);
+            }
         }
     }
 }
