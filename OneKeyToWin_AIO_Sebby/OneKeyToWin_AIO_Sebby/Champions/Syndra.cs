@@ -76,9 +76,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
-
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+        }
+
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe && args.Slot == SpellSlot.Q && EQcastNow && E.IsReady())
+            {
+                var customeDelay = E.Delay - ((Player.Distance(args.End)) / E.Speed);
+                Program.debug("DEL " + customeDelay);
+                Utility.DelayAction.Add((int)(customeDelay * 1000), () => E.Cast(args.End));
+            }
         }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
@@ -88,17 +98,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            
+            if (E.IsReady())
+            {
+                if (Q.IsReady())
+                {
+                    EQcastNow = true;
+                    Q.Cast(gapcloser.End);
+                }
+                else if(gapcloser.Sender.IsValidTarget(E.Range))
+                {
+                    E.Cast(gapcloser.Sender);
+                }
+            }
         }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.Q && EQcastNow && E.IsReady())
-            {
-                var customeDelay = E.Delay - ((Player.Distance(args.StartPosition)) / E.Speed);
-                Program.debug("DEL " + customeDelay);
-                Utility.DelayAction.Add((int)(customeDelay * 1000), () => E.Cast(args.StartPosition));
-            }
+            
         }
 
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
@@ -120,7 +136,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SetMana();
                 BallCleaner();
             }
-
 
             if (Program.LagFree(1) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
@@ -162,9 +177,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Eany.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (OktwCommon.GetKsDamage(t, E) > t.Health)
+                if (OktwCommon.GetKsDamage(t, E)  + Q.GetDamage(t)> t.Health)
                     TryBallE(t);
-                if (Program.Combo && Player.Mana > RMANA + EMANA)
+                if (Program.Combo && Player.Mana > RMANA + EMANA + QMANA)
                     TryBallE(t);
             }
         }
@@ -216,7 +231,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Program.CastSpell(Q, t);
-                if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
+                if (Program.Combo && Player.Mana > RMANA + QMANA + EMANA && !E.IsReady())
                     Program.CastSpell(Q, t);
                 if (Program.Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harrasQ", true).GetValue<bool>()
                     && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
