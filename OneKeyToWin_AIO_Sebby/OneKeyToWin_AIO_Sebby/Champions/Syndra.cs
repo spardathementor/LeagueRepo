@@ -32,7 +32,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E.SetSkillshot(0.25f, (float)(45 * 0.5), 2500f, false, SkillshotType.SkillshotCircle);
             EQ.SetSkillshot(float.MaxValue, 55f, 2000f, false, SkillshotType.SkillshotCircle);
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show R notification", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
@@ -132,8 +131,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0)
                     {
-                        if (Q.IsReady() && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > Q.GetDamage(enemy))
-                            R.Cast(enemy);
+                        R.Cast(enemy);
                     }
                 }
             }
@@ -143,7 +141,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (W.Instance.ToggleState == 1)
             {
-                var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
+                var t = TargetSelector.GetTarget(W.Range - 100, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget())
                 {
                     if (OktwCommon.GetKsDamage(t, W) > t.Health)
@@ -245,7 +243,46 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnDraw(EventArgs args)
         {
-
+            if (Config.Item("qRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (Q.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
+            }
+            if (Config.Item("wRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (W.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, W.Range, System.Drawing.Color.Orange, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, W.Range, System.Drawing.Color.Orange, 1, 1);
+            }
+            if (Config.Item("eRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (E.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, E.Range, System.Drawing.Color.Yellow, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, E.Range, System.Drawing.Color.Yellow, 1, 1);
+            }
+            if (Config.Item("rRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (R.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.Gray, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.Gray, 1, 1);
+            }
         }
 
         private void SetMana()
