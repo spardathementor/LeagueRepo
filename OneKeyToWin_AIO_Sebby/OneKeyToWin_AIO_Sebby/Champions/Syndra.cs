@@ -16,9 +16,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private Spell E, Q, R, W, EQ, Eany;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        private Obj_AI_Base LastWObject;
         private static List<Obj_AI_Minion> BallsList = new List<Obj_AI_Minion>();
-
+        private bool EQcastNow = false;
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 790);
@@ -30,8 +29,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, (float)(45 * 0.5), 2500f, false, SkillshotType.SkillshotCircle);
-            EQ.SetSkillshot(0.25f, 55f, 2000f, false, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.35f, 100, 2500f, false, SkillshotType.SkillshotLine);
+            EQ.SetSkillshot(0.6f, 100f, 2500f, false, SkillshotType.SkillshotLine);
             Eany.SetSkillshot(0.35f, 50f, 2000f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -49,6 +48,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(false));
+
+
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("WmodeCombo", "W combo mode", true).SetValue(new StringList(new[] { "always", "run - cheese" }, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").AddItem(new MenuItem("WmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position", "My hero position" }, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -93,10 +94,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.E)
+            if (args.Slot == SpellSlot.Q && EQcastNow && E.IsReady())
             {
-                if (Q.IsReady())
-                    Q.Cast(args.StartPosition);
+                var customeDelay = E.Delay - ((Player.Distance(args.StartPosition)) / E.Speed);
+                Program.debug("DEL " + customeDelay);
+                Utility.DelayAction.Add((int)(customeDelay * 1000), () => E.Cast(args.StartPosition));
             }
         }
 
@@ -111,6 +113,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (!E.IsReady())
+                EQcastNow = false;
+
             if (Program.LagFree(1))
             { 
                 SetMana();
@@ -140,15 +145,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void TryBallE(Obj_AI_Hero t)
         {
-            var ePred = Eany.GetPrediction(t);
-            if (ePred.Hitchance >= HitChance.VeryHigh)
+            if (Q.IsReady())
             {
-                var playerToCP = Player.Distance(ePred.CastPosition);
-                foreach (var ball in BallsList.Where(ball => Player.Distance(ball.Position) < E.Range))
+                CastQE(t);
+                return;
+            }
+            else
+            {
+                var ePred = Eany.GetPrediction(t);
+                if (ePred.Hitchance >= HitChance.VeryHigh)
                 {
-                    var ballFinalPos = Player.ServerPosition.Extend(ball.Position, playerToCP);
-                    if (ballFinalPos.Distance(ePred.CastPosition) < 50)
-                        E.Cast(ball.Position);
+                    var playerToCP = Player.Distance(ePred.CastPosition);
+                    foreach (var ball in BallsList.Where(ball => Player.Distance(ball.Position) < E.Range))
+                    {
+                        var ballFinalPos = Player.ServerPosition.Extend(ball.Position, playerToCP);
+                        if (ballFinalPos.Distance(ePred.CastPosition) < 50)
+                            E.Cast(ball.Position);
+                    }
                 }
             }
         }
@@ -161,9 +174,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (OktwCommon.GetKsDamage(t, E) > t.Health)
                     TryBallE(t);
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
-                    TryBallE(t);
-                if (Program.Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harrasQ", true).GetValue<bool>()
-                    && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
                     TryBallE(t);
             }
         }
@@ -200,7 +210,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else
             {
-                W.From = LastWObject.Position;
                 var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget())
                 {
@@ -281,8 +290,63 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             if (obj != null)
             {
-                LastWObject = obj;
                 W.Cast(obj.Position);
+            }
+        }
+
+        private void CastQE(Obj_AI_Base target)
+        {
+            Core.SkillshotType CoreType2 = Core.SkillshotType.SkillshotLine;
+
+
+            var predInput2 = new Core.PredictionInput
+            {
+                Aoe = false,
+                Collision = EQ.Collision,
+                Speed = EQ.Speed,
+                Delay = EQ.Delay,
+                Range = EQ.Range,
+                From = Player.ServerPosition,
+                Radius = EQ.Width,
+                Unit = target,
+                Type = CoreType2
+            };
+            var poutput2 = Core.Prediction.GetPrediction(predInput2);
+
+            //var poutput2 = QWER.GetPrediction(target);
+
+            if (OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
+                return;
+            Vector3 castQpos = poutput2.CastPosition;
+
+            if (Player.Distance(castQpos) > Q.Range)
+                castQpos = Player.Position.Extend(castQpos, Q.Range);
+
+            if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+            {
+                if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                {
+                    EQcastNow = true;
+                    Q.Cast(castQpos);
+                }
+
+            }
+            else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+            {
+                if (poutput2.Hitchance >= Core.HitChance.High)
+                {
+                    EQcastNow = true;
+                    Q.Cast(castQpos);
+                }
+
+            }
+            else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
+            {
+                if (poutput2.Hitchance >= Core.HitChance.Medium)
+                {
+                    EQcastNow = true;
+                    Q.Cast(castQpos);
+                }
             }
         }
 
