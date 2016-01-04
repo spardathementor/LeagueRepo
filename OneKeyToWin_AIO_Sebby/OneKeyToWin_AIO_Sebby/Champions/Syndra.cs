@@ -156,7 +156,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 CastQE(t);
             }
-            else
+
+            if(!EQcastNow)
             {
                 var ePred = Eany.GetPrediction(t);
                 if (ePred.Hitchance >= HitChance.VeryHigh)
