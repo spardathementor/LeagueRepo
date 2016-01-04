@@ -27,7 +27,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             EQ = new Spell(SpellSlot.Q, Q.Range + 400);
             Eany = new Spell(SpellSlot.Q, Q.Range + 400);
 
-            Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.6f, 130f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 100, 2500f, false, SkillshotType.SkillshotLine);
             EQ.SetSkillshot(0.6f, 100f, 2500f, false, SkillshotType.SkillshotLine);
