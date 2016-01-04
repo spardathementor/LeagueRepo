@@ -93,6 +93,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Program.LagFree(1))
+                SetMana();
+
             if (!Config.Item("ignoreW", true).GetValue<bool>())
                 cardok = true;
 
@@ -354,7 +357,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        
+        private void SetMana()
+        {
+            if ((Config.Item("manaDisable", true).GetValue<bool>() && Program.Combo) || Player.HealthPercent < 20)
+            {
+                QMANA = 0;
+                WMANA = 0;
+                EMANA = 0;
+                RMANA = 0;
+                return;
+            }
+
+            QMANA = Q.Instance.ManaCost;
+            WMANA = W.Instance.ManaCost;
+            EMANA = E.Instance.ManaCost;
+
+            if (!R.IsReady())
+                RMANA = WMANA - Player.PARRegenRate * W.Instance.Cooldown;
+            else
+                RMANA = R.Instance.ManaCost;
+        }
 
         private void Drawing_OnEndScene(EventArgs args)
         {
