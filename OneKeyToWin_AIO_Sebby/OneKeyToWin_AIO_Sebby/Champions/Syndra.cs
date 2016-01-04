@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 100, 2500f, false, SkillshotType.SkillshotLine);
             EQ.SetSkillshot(0.6f, 100f, 2500f, false, SkillshotType.SkillshotLine);
-            Eany.SetSkillshot(0.35f, 50f, 2000f, false, SkillshotType.SkillshotLine);
+            Eany.SetSkillshot(0.30f, 50f, 2500f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -43,15 +43,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QHarassMana", "Harass Mana", true).SetValue(new Slider(30, 100, 0)));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Use on:").AddItem(new MenuItem("Qon" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-           
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto Q + E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Emana", "E % minimum mana", true).SetValue(new Slider(20, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto Q + E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EGapcloser", "Auto Q + E Gapcloser", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EInterrupter", "Auto Q + E Interrupter", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -65,7 +64,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
 
-            Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -79,19 +77,28 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (sender.IsMe && args.Slot == SpellSlot.Q && EQcastNow && E.IsReady())
             {
                 var customeDelay = Q.Delay - (E.Delay + ((Player.Distance(args.End)) / E.Speed));
-                Program.debug("DEL " + customeDelay);
                 Utility.DelayAction.Add((int)(customeDelay * 1000), () => E.Cast(args.End));
             }
         }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
-            
+            if (E.IsReady() && Config.Item("EInterrupter", true).GetValue<bool>())
+            {
+                if(sender.IsValidTarget(E.Range))
+                {
+                    E.Cast(sender.Position);
+                }
+                else if (Q.IsReady() && sender.IsValidTarget(EQ.Range))
+                {
+                    TryBallE(sender);
+                }
+            }
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (E.IsReady())
+            if (E.IsReady() && Config.Item("EGapcloser", true).GetValue<bool>())
             {
                 if (Q.IsReady())
                 {
@@ -103,11 +110,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     E.Cast(gapcloser.Sender);
                 }
             }
-        }
-
-        private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
-        {
-            
         }
 
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
@@ -149,7 +151,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 CastQE(t);
             }
-
             if(!EQcastNow)
             {
                 var ePred = Eany.GetPrediction(t);
@@ -200,13 +201,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var t = TargetSelector.GetTarget(W.Range - 100, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget())
                 {
-                    if (OktwCommon.GetKsDamage(t, W) > t.Health)
-                        CatchW();
                     if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                         CatchW();
-                    if (Program.Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harrasQ", true).GetValue<bool>()
+                    else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasW", true).GetValue<bool>()
                         && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
+                    {
                         CatchW();
+                    }
+                    else if (OktwCommon.GetKsDamage(t, W) > t.Health)
+                        CatchW();
+                    else if (Player.Mana > RMANA + WMANA)
+                    {
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                            Program.CastSpell(Q, t);
+                    }
+
                 }
             }
             else
@@ -222,7 +231,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicQ()
         {
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget() && Config.Item("Qon" + t.ChampionName).GetValue<bool>())
+            if (t.IsValidTarget())
             {
                 if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Program.CastSpell(Q, t);
