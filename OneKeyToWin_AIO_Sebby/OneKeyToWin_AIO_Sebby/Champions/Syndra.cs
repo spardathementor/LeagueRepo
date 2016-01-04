@@ -14,7 +14,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private Menu Config = Program.Config;
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        private Spell E, Q, R, W, EQ;
+        private Spell E, Q, R, W, EQ, Eany;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private Obj_AI_Base LastWObject;
         private static List<Obj_AI_Minion> BallsList = new List<Obj_AI_Minion>();
@@ -26,11 +26,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 700);
             R = new Spell(SpellSlot.R, 675);
             EQ = new Spell(SpellSlot.Q, Q.Range + 500);
+            Eany = new Spell(SpellSlot.Q, Q.Range + 500);
 
             Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, (float)(45 * 0.5), 2500f, false, SkillshotType.SkillshotCircle);
-            EQ.SetSkillshot(float.MaxValue, 55f, 2000f, false, SkillshotType.SkillshotCircle);
+            EQ.SetSkillshot(0.25f, 55f, 2000f, false, SkillshotType.SkillshotLine);
+            Eany.SetSkillshot(0.35f, 50f, 2000f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -74,6 +76,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
+
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+        }
+
+        private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
+        {
+            
+        }
+
+        private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            
         }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -99,10 +114,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(1))
             { 
                 SetMana();
-                if (BallsList.Count > 0)
-                { 
-                    BallsList.RemoveAll(ball => !ball.IsValid || ball.Mana == 19);
-                }
+                BallCleaner();
             }
 
             if (Program.LagFree(1) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
@@ -118,9 +130,42 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicR();
         }
 
+        private void BallCleaner()
+        {
+            if (BallsList.Count > 0)
+            {
+                BallsList.RemoveAll(ball => !ball.IsValid || ball.Mana == 19);
+            }
+        }
+
+        private void TryBallE(Obj_AI_Hero t)
+        {
+            var ePred = Eany.GetPrediction(t);
+            if (ePred.Hitchance >= HitChance.VeryHigh)
+            {
+                var playerToCP = Player.Distance(ePred.CastPosition);
+                foreach (var ball in BallsList.Where(ball => Player.Distance(ball.Position) < E.Range))
+                {
+                    var ballFinalPos = Player.ServerPosition.Extend(ball.Position, playerToCP);
+                    if (ballFinalPos.Distance(ePred.CastPosition) < 50)
+                        E.Cast(ball.Position);
+                }
+            }
+        }
+
         private void LogicE()
         {
-            
+            var t = TargetSelector.GetTarget(Eany.Range, TargetSelector.DamageType.Magical);
+            if (t.IsValidTarget())
+            {
+                if (OktwCommon.GetKsDamage(t, E) > t.Health)
+                    TryBallE(t);
+                if (Program.Combo && Player.Mana > RMANA + EMANA)
+                    TryBallE(t);
+                if (Program.Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harrasQ", true).GetValue<bool>()
+                    && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
+                    TryBallE(t);
+            }
         }
 
         private void LogicR()
