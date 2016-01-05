@@ -182,23 +182,24 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             R.Range = R.Level == 3 ? 750 : 675;
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && OktwCommon.ValidUlt(enemy)))
+            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
             {
                 var comboDMG = OktwCommon.GetKsDamage(enemy, R) ;
                 comboDMG += (R.GetDamage(enemy, 1) * (R.Instance.Ammo - 3));
                 comboDMG += OktwCommon.GetEchoLudenDamage(enemy);
-                if(Q.IsReady() && enemy.IsValidTarget(600))
+
+                if (Q.IsReady() && enemy.IsValidTarget(600))
                     comboDMG += Q.GetDamage(enemy);
-                if(E.IsReady())
+
+                if (E.IsReady())
                     comboDMG += E.GetDamage(enemy);
+
                 if (W.IsReady())
                     comboDMG += W.GetDamage(enemy);
-                if (enemy.Health < + OktwCommon.GetEchoLudenDamage(enemy))
+
+                if (enemy.Health < comboDMG )
                 {
-                    if (enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0)
-                    {
-                        R.Cast(enemy);
-                    }
+                    R.Cast(enemy);
                 }
             }
         }
