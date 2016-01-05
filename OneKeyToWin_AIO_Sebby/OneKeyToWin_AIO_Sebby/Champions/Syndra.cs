@@ -46,11 +46,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto Q + E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EGapcloser", "Auto Q + E Gapcloser", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto Q + E combo, ks", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harass E", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EInterrupter", "Auto Q + E Interrupter", true).SetValue(true));
 
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Auto Q + E Gapcloser").AddItem(new MenuItem("Egapcloser" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Use Q + E on").AddItem(new MenuItem("Eon" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcombo", "Extra combo dmg calculation", true).SetValue(true));
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Always R").AddItem(new MenuItem("Ralways" + enemy.ChampionName, enemy.ChampionName, true).SetValue(false));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -97,7 +107,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (E.IsReady() && Config.Item("EGapcloser", true).GetValue<bool>())
+            if (E.IsReady() && Config.Item("Egapcloser" + gapcloser.Sender.ChampionName, true).GetValue<bool>())
             {
                 if (Q.IsReady())
                 {
@@ -174,7 +184,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (OktwCommon.GetKsDamage(t, E) + Q.GetDamage(t)> t.Health)
                     TryBallE(t);
-                if (Program.Combo && Player.Mana > RMANA + EMANA + QMANA)
+                if (Program.Combo && Player.Mana > RMANA + EMANA + QMANA && Config.Item("Eon" + t.ChampionName, true).GetValue<bool>())
+                    TryBallE(t);
+                if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>())
                     TryBallE(t);
             }
         }
@@ -182,22 +194,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             R.Range = R.Level == 3 ? 750 : 675;
+
+            bool Rcombo = Config.Item("Rcombo", true).GetValue<bool>();
+
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
             {
+                if(Config.Item("Ralways" + enemy.ChampionName, true).GetValue<bool>())
+                    R.Cast(enemy);
+
                 var comboDMG = OktwCommon.GetKsDamage(enemy, R) ;
                 comboDMG += (R.GetDamage(enemy, 1) * (R.Instance.Ammo - 3));
                 comboDMG += OktwCommon.GetEchoLudenDamage(enemy);
 
-                if (Q.IsReady() && enemy.IsValidTarget(600))
-                    comboDMG += Q.GetDamage(enemy);
+                if (Rcombo)
+                {
+                    if (Q.IsReady() && enemy.IsValidTarget(600))
+                        comboDMG += Q.GetDamage(enemy);
 
-                if (E.IsReady())
-                    comboDMG += E.GetDamage(enemy);
+                    if (E.IsReady())
+                        comboDMG += E.GetDamage(enemy);
 
-                if (W.IsReady())
-                    comboDMG += W.GetDamage(enemy);
+                    if (W.IsReady())
+                        comboDMG += W.GetDamage(enemy);
+                }
 
-                if (enemy.Health < comboDMG )
+                if (enemy.Health < comboDMG)
                 {
                     R.Cast(enemy);
                 }
