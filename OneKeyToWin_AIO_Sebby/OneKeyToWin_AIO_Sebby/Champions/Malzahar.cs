@@ -59,7 +59,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Fast combo key use on:").AddItem(new MenuItem("Ron" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-             
+
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rturrent", "Don't R under turret", true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(true));
@@ -310,6 +312,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
+            if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
+                return;
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             if (Player.CountEnemiesInRange(900) < 3 && t.IsValidTarget() )
             {

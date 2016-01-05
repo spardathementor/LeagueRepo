@@ -54,6 +54,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("forceBlockMove", "Force block player", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("disableBlock", "Disable R key", true).SetValue(new KeyBind("R".ToCharArray()[0], KeyBindType.Press))); //32 == space
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rturrent", "Don't R under turret", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("newTarget", "Try change focus after attack ", true).SetValue(true));
 
@@ -315,6 +316,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicR()
         {
+            if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
+                return;
+
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
 
             if (t.IsValidTarget(R.Range) && OktwCommon.ValidUlt(t))

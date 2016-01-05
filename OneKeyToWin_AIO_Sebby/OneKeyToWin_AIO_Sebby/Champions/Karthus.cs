@@ -57,6 +57,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRzombie", "Auto R upon dying if can help team", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if enemy in x range", true).SetValue(new Slider(1500, 2000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("RenemyA", "Don't R if ally in x range near target", true).SetValue(new Slider(800, 2000, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rturrent", "Don't R under turret", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -148,8 +149,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
+
             if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(Config.Item("Renemy", true).GetValue<Slider>().Value) == 0)
             {
+                if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
+                    return;
+
                 foreach (var target in Program.Enemies.Where(target => target.IsValid && !target.IsDead))
                 {
                     if (target.IsValidTarget() && target.CountAlliesInRange(Config.Item("RenemyA", true).GetValue<Slider>().Value) == 0)

@@ -84,6 +84,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcol", "R collision width [400]", true).SetValue(new Slider(400, 1000, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rrange", "R minimum range [1000]", true).SetValue(new Slider(1000, 1500, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rturrent", "Don't R under turret", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
@@ -168,6 +169,10 @@ namespace OneKeyToWin_AIO_Sebby
         private void LogicR()
         {
             bool cast = false;
+
+            if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
+                return;
+
 
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.Distance(target.Position) > Config.Item("Rrange", true).GetValue<Slider>().Value && target.CountEnemiesInRange(Config.Item("Rcol", true).GetValue<Slider>().Value) == 1 && target.CountAlliesInRange(500) == 0 && OktwCommon.ValidUlt(target) ))
             {
