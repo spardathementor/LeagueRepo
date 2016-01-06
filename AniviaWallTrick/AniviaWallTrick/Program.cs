@@ -23,53 +23,58 @@ namespace AniviaWallTrick
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            if (Player.ChampionName == "Anivia")
+            E = new Spell(SpellSlot.E, 950);
+            E.SetSkillshot(0.6f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
+
+            if (false)
             {
-                foreach (var ally in HeroManager.Allies)
+                if (Player.ChampionName == "Anivia")
                 {
-                    if (ally.ChampionName == "Vayne")
-                        Vayne = ally;
-                    if (ally.ChampionName == "Poppy")
-                        Poppy = ally;
+                    foreach (var ally in HeroManager.Allies)
+                    {
+                        if (ally.ChampionName == "Vayne")
+                            Vayne = ally;
+                        if (ally.ChampionName == "Poppy")
+                            Poppy = ally;
+                    }
+
+                    W = new Spell(SpellSlot.W, 950);
+                    W.SetSkillshot(0.6f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
+
+
+                }
+                else if (Player.ChampionName == "Vayne")
+                {
+                    foreach (var ally in HeroManager.Allies)
+                    {
+                        if (ally.ChampionName == "Anivia")
+                            Vayne = ally;
+                    }
+
+                    E = new Spell(SpellSlot.E, 670);
+
+
+                }
+                else if (Player.ChampionName == "Poppy")
+                {
+                    foreach (var ally in HeroManager.Allies)
+                    {
+                        if (ally.ChampionName == "Anivia")
+                            Vayne = ally;
+                    }
+
+                    E = new Spell(SpellSlot.E, 525);
+
+
+                }
+                else
+                {
+                    return;
                 }
 
-                W = new Spell(SpellSlot.W, 950);
-                W.SetSkillshot(0.6f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
-
-
+                if (Vayne == null && Anivia == null && Poppy == null)
+                    return;
             }
-            else if (Player.ChampionName == "Vayne")
-            {
-                foreach (var ally in HeroManager.Allies)
-                {
-                    if (ally.ChampionName == "Anivia")
-                        Vayne = ally;
-                }
-
-                E = new Spell(SpellSlot.E, 670);
-
-
-            }
-            else if (Player.ChampionName == "Poppy")
-            {
-                foreach (var ally in HeroManager.Allies)
-                {
-                    if (ally.ChampionName == "Anivia")
-                        Vayne = ally;
-                }
-
-                E = new Spell(SpellSlot.E, 525);
-
-
-            }
-            else
-            {
-                return;
-            }
-
-            if(Vayne == null && Anivia == null && Poppy == null)
-                return;
-
             Config = new Menu("AniviaWallTrick " + Player.ChampionName + " plugin", "AniviaWallTrick " + Player.ChampionName + " plugin", true);
             Config.AddToMainMenu();
 
@@ -97,7 +102,7 @@ namespace AniviaWallTrick
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsAlly && !sender.IsMinion && Player.ChampionName == "Anivia" && W.IsReady() )
+            if (sender.IsAlly && !sender.IsMinion && E.IsReady() )
             {
                 if(args.SData.Name == "VayneCondemnMissile")
                 {
@@ -108,9 +113,9 @@ namespace AniviaWallTrick
                 }
                 else if (args.SData.Name == "PoppyE")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -470);
-                    if (Player.Distance(position) < W.Range)
-                        W.Cast(position);
+                    var position = args.Target.Position.Extend(sender.Position, -500);
+                    if (Player.Distance(position) < E.Range)
+                        E.Cast(position);
                 }
             }
         }
