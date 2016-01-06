@@ -97,17 +97,17 @@ namespace AniviaWallTrick
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsAlly && !sender.IsMinion && sender.IsChampion() && W.IsReady() && Player.ChampionName == "Anivia")
+            if (sender.IsAlly && !sender.IsMinion && Player.ChampionName == "Anivia" && W.IsReady() )
             {
                 if(args.SData.Name == "VayneCondemnMissile")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -300);
+                    var position = args.Target.Position.Extend(sender.Position, -400);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
                 else if (args.SData.Name == "PoppyE")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -300);
+                    var position = args.Target.Position.Extend(sender.Position, -400);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
