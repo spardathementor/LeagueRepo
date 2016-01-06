@@ -102,13 +102,13 @@ namespace AniviaWallTrick
                 if(args.SData.Name == "VayneCondemnMissile")
                 {
 
-                    var position = args.Target.Position.Extend(sender.Position, -360);
+                    var position = args.Target.Position.Extend(sender.Position, -380);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
                 else if (args.SData.Name == "PoppyE")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -360);
+                    var position = args.Target.Position.Extend(sender.Position, -380);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
