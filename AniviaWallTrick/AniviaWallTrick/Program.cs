@@ -83,7 +83,7 @@ namespace AniviaWallTrick
             {
                 var rSlot = Anivia.Spellbook.Spells[1];
                 var time = rSlot.CooldownExpires - Game.Time;
-
+                
                 if (time < 0)
                 {
                     var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
@@ -101,13 +101,14 @@ namespace AniviaWallTrick
             {
                 if(args.SData.Name == "VayneCondemnMissile")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -400);
+
+                    var position = args.Target.Position.Extend(sender.Position, -360);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
                 else if (args.SData.Name == "PoppyE")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -400);
+                    var position = args.Target.Position.Extend(sender.Position, -360);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
