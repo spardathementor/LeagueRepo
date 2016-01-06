@@ -108,7 +108,7 @@ namespace AniviaWallTrick
                 }
                 else if (args.SData.Name == "PoppyE")
                 {
-                    var position = args.Target.Position.Extend(sender.Position, -420);
+                    var position = args.Target.Position.Extend(sender.Position, -470);
                     if (Player.Distance(position) < W.Range)
                         W.Cast(position);
                 }
