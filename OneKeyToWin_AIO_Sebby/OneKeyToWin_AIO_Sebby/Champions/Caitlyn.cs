@@ -89,8 +89,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
-
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("ForceAA", "Force AA trap enemy", true).SetValue(true));
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -159,11 +157,6 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Game.Time - QCastTime > 1)
                 LogicR();
             return;
-            if (Orbwalking.CanAttack() && !Program.None && Player.HasBuff("CaitlynHeadshotRangeCheck"))
-            {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(1300) && enemy.HasBuff("caitlynyordletrapinternal")))
-                    Player.IssueOrder(GameObjectOrder.AttackUnit, enemy);
-            }
         }
 
         private void LogicR()
