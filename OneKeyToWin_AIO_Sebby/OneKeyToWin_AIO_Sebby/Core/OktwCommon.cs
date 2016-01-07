@@ -152,11 +152,19 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static bool CanHarras()
         {
-            if ( !Player.IsWindingUp && Orbwalking.CanAttack() && !Player.UnderTurret(true))
+            if ( !Player.IsWindingUp && !Player.UnderTurret(true) && Orbwalking.CanMove(50) && !ShouldWait())
                 return true;
             else
                 return false;
         }
+
+        private static bool ShouldWait()
+        {
+            return
+                MinionManager.GetMinions(Player.AttackRange + 300, MinionTypes.All, MinionTeam.Enemy).Any( minion =>
+                            minion.IsValidTarget() && HealthPrediction.LaneClearHealthPrediction(minion, 300, 50) <= Player.GetAutoAttackDamage(minion));
+        }
+
 
         public static float GetEchoLudenDamage(Obj_AI_Hero target)
         {
