@@ -103,7 +103,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
-                var rDmg = R.GetDamage(t);
+                var rDmg = OktwCommon.GetKsDamage(t,R);
                 var qDmg = Q.GetDamage(t);
                 if (rDmg * 2> t.Health)
                     CastR(R, t);
