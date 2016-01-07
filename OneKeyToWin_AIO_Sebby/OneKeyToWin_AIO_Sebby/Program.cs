@@ -221,6 +221,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Syndra":
                         new Champions.Syndra().LoadOKTW();
                         break;
+                    case "Velkoz":
+                        new Champions.Velkoz().LoadOKTW();
+                        break;
                 }
             }
 
@@ -308,16 +311,17 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
 
-                if (enemy.Distance(bestPoint) > dodgeRange)
+                if (!bestPoint.IsWall() && !bestPoint.UnderTurret(true) && enemy.Distance(bestPoint) > dodgeRange)
                 {
                     Orbwalker.SetOrbwalkingPoint(bestPoint);
-                    
                 }
                 else
                 {
                     var fastPoint = enemy.ServerPosition.Extend(Player.ServerPosition, dodgeRange);
-                    if(fastPoint.CountEnemiesInRange(dodgeRange) <= Player.CountEnemiesInRange(dodgeRange))
+                    if (!fastPoint.IsWall() && !fastPoint.UnderTurret(true) && fastPoint.CountEnemiesInRange(dodgeRange) <= Player.CountEnemiesInRange(dodgeRange))
+                    {
                         Orbwalker.SetOrbwalkingPoint(fastPoint);
+                    }
                 }
                 dodgeTime = Game.Time;
                 return;
