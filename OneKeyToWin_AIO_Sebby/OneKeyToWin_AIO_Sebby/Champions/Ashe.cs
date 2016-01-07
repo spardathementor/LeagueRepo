@@ -184,16 +184,14 @@ namespace OneKeyToWin_AIO_Sebby
                 var col = poutput.CollisionObjects.Count(ColObj => ColObj.IsEnemy && ColObj.IsMinion && !ColObj.IsDead);
                 if (t.IsDead || col > 0 || t.Path.Count() > 1 || (int)poutput.Hitchance < 5)
                     return;
-
-                
-                if (OktwCommon.GetKsDamage(t, W) > t.Health)
-                {
-                    W.Cast(t,true);
-                }
-                else if (Program.Combo && ObjectManager.Player.Mana > RMANA + WMANA)
+                if (Program.Combo && ObjectManager.Player.Mana > RMANA + WMANA)
                     W.Cast(t, true, true);
                 else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
                     W.Cast(t, true, true);
+                else if(OktwCommon.GetKsDamage(t, W) > t.Health)
+                {
+                    W.Cast(t, true);
+                }
                 else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
