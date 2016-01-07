@@ -60,7 +60,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcombo", "Extra combo dmg calculation", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Always R").AddItem(new MenuItem("Ralways" + enemy.ChampionName, enemy.ChampionName, true).SetValue(false));
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Use on").AddItem(new MenuItem("Rmode" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "KS ", "Always ", "Never " }, 0)));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -199,7 +199,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
             {
-                if(Config.Item("Ralways" + enemy.ChampionName, true).GetValue<bool>())
+                int Rmode = Config.Item("Rmode" + enemy.ChampionName, true).GetValue<StringList>().SelectedIndex;
+
+                if (Rmode == 2)
+                    continue;
+                else if (Rmode == 1)
                     R.Cast(enemy);
 
                 var comboDMG = OktwCommon.GetKsDamage(enemy, R) ;
