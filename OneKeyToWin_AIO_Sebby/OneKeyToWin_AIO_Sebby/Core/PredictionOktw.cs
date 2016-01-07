@@ -374,7 +374,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
 
-            result.Hitchance = HitChance.Medium;
+            result.Hitchance = HitChance.High;
 
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
@@ -426,7 +426,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // NEW VISABLE ///////////////////////////////////////////////////////////////////////////////////
 
-            if (UnitTracker.GetLastVisableTime(input.Unit) < 0.08d)
+            if (UnitTracker.GetLastVisableTime(input.Unit) < 0.1d)
             {
                 Program.debug("PRED: NEW VISABLE");
                 result.Hitchance = HitChance.Medium;
