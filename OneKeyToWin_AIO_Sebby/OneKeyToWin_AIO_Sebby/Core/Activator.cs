@@ -18,7 +18,7 @@ namespace OneKeyToWin_AIO_Sebby
         private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public int Muramana = 3042;
         public int Manamune = 3004;
-        private int [] SmiteDamage = { 390, 410, 430, 450, 480, 510, 540, 570, 600, 640, 680, 720, 760, 800, 850, 900, 950, 1000};
+        //private int [] SmiteDamage = { 390, 410, 430, 450, 480, 510, 540, 570, 600, 640, 680, 720, 760, 800, 850, 900, 950, 1000};
         private SpellSlot heal, barrier, ignite, exhaust, flash, smite , teleport;
 
         public static Items.Item
@@ -430,7 +430,7 @@ namespace OneKeyToWin_AIO_Sebby
                             || (mob.SkinName == "SRU_RiftHerald" && Config.Item("Rherald", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
-                            && mob.Health < SmiteDamage[Player.Level])
+                            && mob.Health <= Player.GetSummonerSpellDamage(mob, Damage.SummonerSpell.Smite))
                         {
                             Player.Spellbook.CastSpell(smite, mob);
                         }
