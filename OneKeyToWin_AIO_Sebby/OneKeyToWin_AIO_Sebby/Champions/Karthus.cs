@@ -214,17 +214,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget() && Config.Item("Qon" + t.ChampionName).GetValue<bool>())
             {
-                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
-                    Program.CastSpell(Q, t);
+                
                 if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                     Program.CastSpell(Q, t);
-                if (Program.Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harrasQ", true).GetValue<bool>() 
+                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasQ", true).GetValue<bool>() 
                     && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
                     Program.CastSpell(Q, t);
+                else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
+                    Program.CastSpell(Q, t);
+
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                     Program.CastSpell(Q, t);
             }
-            if (Player.IsWindingUp)
+            if (!OktwCommon.CanHarras())
                 return;
 
             if (!Program.None && !Program.Combo && Player.Mana > RMANA + QMANA * 2)
