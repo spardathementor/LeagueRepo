@@ -255,7 +255,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     var positionT = Player.ServerPosition - (t.Position - Player.ServerPosition);
 
-                    if (Q.IsReady() && Player.Position.Extend(positionT, 400).CountEnemiesInRange(700) < 3)
+                    if (Q.IsReady() && Player.Position.Extend(positionT, 400).CountEnemiesInRange(700) < 2)
                     {
                         var eDmg = E.GetDamage(t);
                         var qDmg = Q.GetDamage(t);
