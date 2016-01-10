@@ -191,7 +191,7 @@ namespace AiEzEvade
             Menu.GetMenu("ezEvade", "ezEvade").Item("TickLimiter").SetValue<Slider>(new Slider(sets.TickLimiter, 0, 500));
             Menu.GetMenu("ezEvade", "ezEvade").Item("ReactionTime").SetValue<Slider>(new Slider(sets.ReactionTime, 0, 500));
             Menu.GetMenu("ezEvade", "ezEvade").Item("SpellDetectionTime").SetValue<Slider>(new Slider(sets.SpellDetectionTime, 0, 1000));
-            Menu.GetMenu("ezEvade", "ezEvade").Item("FastMovementBlock").SetValue<Boolean>(sets.FastMovementBlock);
+            //Menu.GetMenu("ezEvade", "ezEvade").Item("FastMovementBlock").SetValue<Boolean>(sets.FastMovementBlock);
         }
     }
 }
