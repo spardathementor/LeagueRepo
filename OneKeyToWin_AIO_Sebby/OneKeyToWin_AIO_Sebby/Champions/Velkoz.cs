@@ -85,34 +85,87 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            var CircleLineSegmentN = 10;
-            var radius = 500;
-            var position = Player.Position;
-            var posExtend = position.Extend(Game.CursorPos, radius);
-            var posExtendX = position.X + posExtend.X;
-            var posExtendY = position.Y + posExtend.Y;
-
-            for (var i = 1; i <= CircleLineSegmentN; i++)
-            {
-                var angle = i * 2 * Math.PI / CircleLineSegmentN;
-                var point = new Vector3(position.X + posExtendX * (float)Math.Cos(angle), position.Y + posExtendY * (float)Math.Sin(angle), position.Z);
-
-                Utility.DrawCircle(point, 100, System.Drawing.Color.Aqua, 1, 1);
-
-            }
+            BestAim(Game.CursorPos);
         }
 
-        private List<Vector3> CirclePoint(float CircleLineSegmentN, float radius, Vector3 position)
+        private List<Vector3> AimQ(Vector3 finalPos)
         {
+            var CircleLineSegmentN = 36;
+            var radius = 500;
+            var position = Player.Position;
+            var posExtCursor = Player.Position.Extend(Game.CursorPos, radius);
+
             List<Vector3> points = new List<Vector3>();
             for (var i = 1; i <= CircleLineSegmentN; i++)
             {
                 var angle = i * 2 * Math.PI / CircleLineSegmentN;
                 var point = new Vector3(position.X + radius * (float)Math.Cos(angle), position.Y + radius * (float)Math.Sin(angle), position.Z);
-                points.Add(point);
+
+
+                if (point.Distance(posExtCursor) < 430)
+                {
+                    points.Add(point);
+                    Utility.DrawCircle(point, 20, System.Drawing.Color.Aqua, 1, 1);
+                }
+                
             }
-            return points;
+
+            var point2 = points.OrderBy(x => x.Distance(finalPos));
+
+            return point2.ToList();
         }
+
+        private void BestAim(Vector3 predictionPos)
+        {
+            var pointList = AimQ(predictionPos);
+            Vector2 start = Player.Position.To2D();
+            var c1 = predictionPos.Distance(Player.Position);
+
+            foreach ( var point in pointList )
+            {
+                for (var j = 400; j <= 1050; j = j + 50)
+                {
+
+                    var posExtend = Player.Position.Extend(point, j);
+
+                    var a1 = Player.Distance(Player.Position.Extend(point, j));
+
+                    var collision = Q.GetCollision(Player.Position.To2D(), new List<Vector2> { posExtend.To2D() } );
+                    if (collision.Count > 0)
+                        continue;
+
+                    float b1 = (float)Math.Sqrt((c1 * c1) - (a1 * a1));
+
+                    var pointA = Player.Position.Extend(point, a1);
+                    Vector2 end = pointA.To2D();
+                    var dir = (end - start).Normalized();
+                    var pDir = dir.Perpendicular();
+
+                    var rightEndPos = end + pDir * b1;
+                    var leftEndPos = end - pDir * b1;
+
+                    var rEndPos = new Vector3(rightEndPos.X, rightEndPos.Y, ObjectManager.Player.Position.Z);
+                    var lEndPos = new Vector3(leftEndPos.X, leftEndPos.Y, ObjectManager.Player.Position.Z);
+                    //Drawing.DrawLine(rStartPos, rEndPos, 1, System.Drawing.Color.Aqua);
+                    //Drawing.DrawLine(lStartPos, lEndPos, 1, System.Drawing.Color.Aqua);
+                    //Drawing.DrawLine(rStartPos, lStartPos, 1, System.Drawing.Color.Aqua);
+                    //if(rEndPos.Distance(predictionPos) < 200 || lEndPos.Distance(predictionPos) < 200)
+                    //Drawing.DrawLine(lEndPos, rEndPos, 1, System.Drawing.Color.Aqua);
+
+                    if (lEndPos.Distance(predictionPos) < 50 || rEndPos.Distance(predictionPos) < 50)
+                    {
+                        Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
+                        Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        return;
+                    }
+                    //return;
+                }
+                
+            }
+        }
+
+
 
         private void Game_OnGameUpdate(EventArgs args)
         {
