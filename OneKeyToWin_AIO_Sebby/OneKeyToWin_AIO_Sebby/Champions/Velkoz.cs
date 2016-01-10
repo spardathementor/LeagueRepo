@@ -28,12 +28,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 1550);
 
             Q.SetSkillshot(0.25f, 50f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.25f, 55f, 2100, true, SkillshotType.SkillshotLine);
-            QDummy.SetSkillshot(0.25f, 55f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.25f, 55f, 2100f, true, SkillshotType.SkillshotLine);
+            QDummy.SetSkillshot(0.5f, 55f, 1600f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.5f, 100f, 1500f, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.3f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
-
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -93,50 +92,49 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var CircleLineSegmentN = 36;
             var radius = 500;
             var position = Player.Position;
-            var posExtCursor = Player.Position.Extend(Game.CursorPos, radius);
 
             List<Vector3> points = new List<Vector3>();
             for (var i = 1; i <= CircleLineSegmentN; i++)
             {
                 var angle = i * 2 * Math.PI / CircleLineSegmentN;
                 var point = new Vector3(position.X + radius * (float)Math.Cos(angle), position.Y + radius * (float)Math.Sin(angle), position.Z);
-
-
-                if (point.Distance(posExtCursor) < 430)
+                if (point.Distance(finalPos) < 430)
                 {
                     points.Add(point);
-                    Utility.DrawCircle(point, 20, System.Drawing.Color.Aqua, 1, 1);
+                    //Utility.DrawCircle(point, 20, System.Drawing.Color.Aqua, 1, 1);
                 }
-                
             }
 
             var point2 = points.OrderBy(x => x.Distance(finalPos));
-
-            return point2.ToList();
+            points = point2.ToList();
+            points.RemoveAt(0);
+            points.RemoveAt(1);
+            return points;
         }
 
         private void BestAim(Vector3 predictionPos)
         {
             var pointList = AimQ(predictionPos);
+
             Vector2 start = Player.Position.To2D();
             var c1 = predictionPos.Distance(Player.Position);
+            var playerPos2d = Player.Position.To2D();
 
             foreach ( var point in pointList )
             {
                 for (var j = 400; j <= 1050; j = j + 50)
                 {
-
                     var posExtend = Player.Position.Extend(point, j);
 
-                    var a1 = Player.Distance(Player.Position.Extend(point, j));
+                    var collision = Q.GetCollision(playerPos2d, new List<Vector2> { posExtend.To2D() } );
 
-                    var collision = Q.GetCollision(Player.Position.To2D(), new List<Vector2> { posExtend.To2D() } );
                     if (collision.Count > 0)
-                        continue;
+                        break; 
 
+                    var a1 = Player.Distance(posExtend);
                     float b1 = (float)Math.Sqrt((c1 * c1) - (a1 * a1));
-
                     var pointA = Player.Position.Extend(point, a1);
+
                     Vector2 end = pointA.To2D();
                     var dir = (end - start).Normalized();
                     var pDir = dir.Perpendicular();
@@ -152,13 +150,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     //if(rEndPos.Distance(predictionPos) < 200 || lEndPos.Distance(predictionPos) < 200)
                     //Drawing.DrawLine(lEndPos, rEndPos, 1, System.Drawing.Color.Aqua);
 
-                    if (lEndPos.Distance(predictionPos) < 50 || rEndPos.Distance(predictionPos) < 50)
+                    if (lEndPos.Distance(predictionPos) < 50)
                     {
+                        var collisionS = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { lEndPos.To2D() });
+                        if (collisionS.Count > 0)
+                            continue;
                         Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
                         Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
                         Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        if (Program.Combo)
+                            Q.Cast(pointA);
                         return;
                     }
+                    if ( rEndPos.Distance(predictionPos) < 50)
+                    {
+                        var collisionR = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { rEndPos.To2D() });
+                        if (collisionR.Count > 0)
+                            continue;
+                        Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
+                        Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        if (Program.Combo)
+                            Q.Cast(pointA);
+                        return;
+                    }
+
                     //return;
                 }
                 
