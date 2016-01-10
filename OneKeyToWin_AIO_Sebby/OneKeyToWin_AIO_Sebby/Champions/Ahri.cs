@@ -114,7 +114,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (gapcloser.Sender.IsValidTarget(E.Range) && Config.Item("Egapcloser" + gapcloser.Sender.ChampionName, true).GetValue<bool>())
+            if (E.IsReady() && gapcloser.Sender.IsValidTarget(E.Range) && Config.Item("Egapcloser" + gapcloser.Sender.ChampionName, true).GetValue<bool>())
             {
                 E.Cast(gapcloser.Sender);
             }
@@ -122,7 +122,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (Player.Distance(sender.ServerPosition) < E.Range)
+            if (E.IsReady() && Player.Distance(sender.ServerPosition) < E.Range)
             {
                 E.Cast(sender);
             }
