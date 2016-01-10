@@ -112,7 +112,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if (Player.Distance(gapcloser.Sender.ServerPosition) < E.Range)
+            if (gapcloser.Sender.IsValidTarget(E.Range))
             {
                 E.Cast(gapcloser.Sender);
             }
