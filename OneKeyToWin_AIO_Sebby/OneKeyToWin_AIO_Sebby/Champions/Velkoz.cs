@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q = new Spell(SpellSlot.Q, 1200);
             QSplit = new Spell(SpellSlot.Q, 1100);
             QDummy = new Spell(SpellSlot.Q, (float)Math.Sqrt(Math.Pow(Q.Range, 2) + Math.Pow(QSplit.Range, 2)));
-            W = new Spell(SpellSlot.W, 1150);
+            W = new Spell(SpellSlot.W, 1100);
             E = new Spell(SpellSlot.E, 800);
             R = new Spell(SpellSlot.R, 1550);
 
@@ -32,7 +32,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             QSplit.SetSkillshot(0.15f, 60f, 2100f, false, SkillshotType.SkillshotLine);
             QDummy.SetSkillshot(0.4f, 55f, 1300, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 150f, 1500f, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.5f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.3f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
