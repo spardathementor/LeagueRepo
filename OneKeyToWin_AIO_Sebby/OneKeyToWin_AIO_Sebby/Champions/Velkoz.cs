@@ -232,7 +232,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (QMissile != null && QMissile.IsValid)
             {
-                var realPosition = QMissile.StartPosition.Extend(QMissile.EndPosition, QMissile.StartPosition.Distance(QMissile.Position) + Game.Ping / 2 + 80);
+                var realPosition = QMissile.StartPosition.Extend(QMissile.EndPosition, QMissile.StartPosition.Distance(QMissile.Position) + Game.Ping / 2 + 60);
                 //Q.Cast();
 
                 QSplit.UpdateSourcePosition(realPosition, realPosition);
@@ -289,7 +289,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             foreach ( var point in pointList )
             {
-                for (var j = 400; j <= 1150; j = j + 50)
+                for (var j = 400; j <= 1100; j = j + 50)
                 {
                     var posExtend = Player.Position.Extend(point, j);
 
