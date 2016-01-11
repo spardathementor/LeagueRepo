@@ -28,11 +28,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 800);
             R = new Spell(SpellSlot.R, 1550);
 
-            Q.SetSkillshot(0.25f, 50f, 1300f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 60f, 1300f, true, SkillshotType.SkillshotLine);
             QSplit.SetSkillshot(0.15f, 60f, 2100f, false, SkillshotType.SkillshotLine);
             QDummy.SetSkillshot(0.4f, 55f, 1300, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.5f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.85f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.3f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -48,8 +48,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto Q + E combo, ks", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harass Q + E", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harass aaaaaaaaE", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EInterrupter", "Auto Q + E Interrupter", true).SetValue(true));
          
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
@@ -338,6 +338,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnDraw(EventArgs args)
         {
+            //Utility.DrawCircle(Game.CursorPos, E.Width, System.Drawing.Color.Cyan, 1, 1);
             if (Config.Item("qRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
