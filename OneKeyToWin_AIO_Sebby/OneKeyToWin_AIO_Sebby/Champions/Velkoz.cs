@@ -21,19 +21,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 1200);
+            Q = new Spell(SpellSlot.Q, 1180);
             QSplit = new Spell(SpellSlot.Q, 1000);
             QDummy = new Spell(SpellSlot.Q, (float)Math.Sqrt(Math.Pow(Q.Range, 2) + Math.Pow(QSplit.Range, 2)));
-            W = new Spell(SpellSlot.W, 1100);
+            W = new Spell(SpellSlot.W, 1050);
             E = new Spell(SpellSlot.E, 800);
-            R = new Spell(SpellSlot.R, 1550);
+            R = new Spell(SpellSlot.R, 1500);
 
             Q.SetSkillshot(0.25f, 70f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.1f, 70f, 2100f, false, SkillshotType.SkillshotLine);
-            QDummy.SetSkillshot(0.4f, 55f, 1300, false, SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.1f, 70f, 2100f, true, SkillshotType.SkillshotLine);
+            QDummy.SetSkillshot(0.5f, 55f, 1200, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.85f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.3f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.25f, 100f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -88,6 +88,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+           
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -99,8 +100,36 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(3) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
 
-            if (Program.LagFree(4) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
-                LogicW();
+            if (Program.LagFree(4))
+            {
+                if(W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
+                    LogicW();
+                if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                    LogicR();
+            }
+        }
+
+        private void LogicR()
+        {
+            var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+            if (t.IsValidTarget() && t.Health - OktwCommon.GetIncomingDamage(t) > 0 && Player.CountEnemiesInRange(400) == 0)
+            {
+                //900 - 100%
+                //1500 - 10 %
+                var rDmg = OktwCommon.GetKsDamage(t, R);
+                var distance = Player.Distance(t);
+
+                if (distance > 900 && OktwCommon.CanMove(t))
+                {
+                    float adjust = (R.Range - distance) / 600;
+                    rDmg = rDmg * adjust;
+                }
+
+                if(rDmg>t.Health)
+                {
+                    R.Cast(t);
+                }
+            }
         }
 
         private void LogicE()
@@ -293,17 +322,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     var posExtend = Player.Position.Extend(point, j);
 
-                    var collision = Q.GetCollision(playerPos2d, new List<Vector2> { posExtend.To2D() } );
-
-                    if (collision.Count > 0)
-                        break; 
-
                     var a1 = Player.Distance(posExtend);
                     float b1 = (float)Math.Sqrt((c1 * c1) - (a1 * a1));
 
                     if (b1 > QSplit.Range)
                         continue;
-
+                    
                     var pointA = Player.Position.Extend(point, a1);
 
                     Vector2 end = pointA.To2D();
@@ -318,19 +342,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                     if (lEndPos.Distance(predictionPos) < QSplit.Width)
                     {
-                        
+                        var collision = Q.GetCollision(playerPos2d, new List<Vector2> { posExtend.To2D() });
+                        if (collision.Count > 0)
+                            break;
+
                         var collisionS = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { lEndPos.To2D() });
                         if (collisionS.Count > 0)
-                            continue;
+                            break;
 
                         Q.Cast(pointA);
                         return;
                     }
                     if ( rEndPos.Distance(predictionPos) < QSplit.Width)
                     {
+                        var collision = Q.GetCollision(playerPos2d, new List<Vector2> { posExtend.To2D() });
+                        if (collision.Count > 0)
+                            break;
+
                         var collisionR = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { rEndPos.To2D() });
                         if (collisionR.Count > 0)
-                            continue;
+                            break;
 
                         Q.Cast(pointA);
                         return;
