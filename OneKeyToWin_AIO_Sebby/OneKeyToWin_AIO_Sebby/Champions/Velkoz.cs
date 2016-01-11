@@ -29,7 +29,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 1550);
 
             Q.SetSkillshot(0.25f, 50f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.10f, 55f, 2100f, false, SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.0f, 55f, 2100f, false, SkillshotType.SkillshotLine);
             QDummy.SetSkillshot(0.5f, 55f, 1300, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.5f, 100f, 1500f, false, SkillshotType.SkillshotCircle);
@@ -97,33 +97,61 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            SetMana();
             if (Q.IsReady())
             {
-                var t = TargetSelector.GetTarget(QDummy.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget())
+                LogicQ();
+            }
+        }
+
+        private void LogicQ()
+        {
+            var t = TargetSelector.GetTarget(QDummy.Range, TargetSelector.DamageType.Magical);
+            if (t.IsValidTarget())
+            {
+                if (Q.Instance.Name == "VelkozQ")
                 {
-                    if (Q.Instance.Name == "VelkozQ")
+                    if (Program.LagFree(1) || Program.LagFree(2))
                     {
-                        var pred = QDummy.GetPrediction(t);
-                        if (pred.Hitchance >= HitChance.High)
+                        if (Program.Combo && Player.Mana > RMANA + QMANA + EMANA)
+                            CastQ(t);
+                        else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
+                            CastQ(t);
+                        else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
+                            CastQ(t);
+                        else if (Player.Mana > RMANA + QMANA)
                         {
-                            if (Program.LagFree(1))
-                                pointList = AimQ(pred.CastPosition);
-                            if (Program.LagFree(2))
-                                BestAim(pred.CastPosition);
+                            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(QDummy.Range) && !OktwCommon.CanMove(enemy)))
+                                CastQ(t);
                         }
                     }
-                    else
-                    {
-                        DetonateQ(t);
-                    }
+                }
+                else
+                {
+                    DetonateQ(t);
                 }
             }
         }
 
-        private void Drawing_OnDraw(EventArgs args)
+
+        private void CastQ(Obj_AI_Base t)
         {
-            
+            var Qpred = Q.GetPrediction(t);
+            if (Qpred.Hitchance >= HitChance.High)
+            {
+                Program.CastSpell(Q, t);
+            }
+            else
+            {
+                var pred = QDummy.GetPrediction(t);
+                if (pred.Hitchance >= HitChance.High)
+                {
+                    if (Program.LagFree(1))
+                        pointList = AimQ(pred.CastPosition);
+                    if (Program.LagFree(2))
+                        BestAim(pred.CastPosition);
+                }
+            }
         }
 
         private void DetonateQ(Obj_AI_Base t)
@@ -187,7 +215,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             foreach ( var point in pointList )
             {
-                for (var j = 400; j <= 1050; j = j + 50)
+                for (var j = 400; j <= 1100; j = j + 50)
                 {
                     var posExtend = Player.Position.Extend(point, j);
 
@@ -234,6 +262,71 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
             }
+        }
+
+        private void Drawing_OnDraw(EventArgs args)
+        {
+            if (Config.Item("qRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (Q.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
+            }
+            if (Config.Item("wRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (W.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, W.Range, System.Drawing.Color.Orange, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, W.Range, System.Drawing.Color.Orange, 1, 1);
+            }
+            if (Config.Item("eRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (E.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, E.Range, System.Drawing.Color.Yellow, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, E.Range, System.Drawing.Color.Yellow, 1, 1);
+            }
+            if (Config.Item("rRange", true).GetValue<bool>())
+            {
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if (R.IsReady())
+                        Utility.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.Gray, 1, 1);
+                }
+                else
+                    Utility.DrawCircle(ObjectManager.Player.Position, R.Range, System.Drawing.Color.Gray, 1, 1);
+            }
+        }
+
+        private void SetMana()
+        {
+            if ((Config.Item("manaDisable", true).GetValue<bool>() && Program.Combo) || Player.HealthPercent < 20)
+            {
+                QMANA = 0;
+                WMANA = 0;
+                EMANA = 0;
+                RMANA = 0;
+                return;
+            }
+
+            QMANA = Q.Instance.ManaCost;
+            WMANA = W.Instance.ManaCost;
+            EMANA = E.Instance.ManaCost;
+
+            if (!R.IsReady())
+                RMANA = QMANA - Player.PARRegenRate * Q.Instance.Cooldown;
+            else
+                RMANA = R.Instance.ManaCost;
         }
     }
 }
