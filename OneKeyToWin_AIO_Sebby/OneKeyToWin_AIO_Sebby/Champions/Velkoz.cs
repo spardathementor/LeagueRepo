@@ -16,20 +16,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private Spell E, Q, R, W , QSplit, QDummy;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        private static List<Obj_AI_Minion> BallsList = new List<Obj_AI_Minion>();
         private MissileClient QMissile = null;
         private List<Vector3> pointList;
+
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 1200);
-            QSplit = new Spell(SpellSlot.Q, 1100);
+            QSplit = new Spell(SpellSlot.Q, 1000);
             QDummy = new Spell(SpellSlot.Q, (float)Math.Sqrt(Math.Pow(Q.Range, 2) + Math.Pow(QSplit.Range, 2)));
             W = new Spell(SpellSlot.W, 1100);
             E = new Spell(SpellSlot.E, 800);
             R = new Spell(SpellSlot.R, 1550);
 
-            Q.SetSkillshot(0.25f, 60f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.15f, 60f, 2100f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 70f, 1300f, true, SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.1f, 70f, 2100f, false, SkillshotType.SkillshotLine);
             QDummy.SetSkillshot(0.4f, 55f, 1300, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.85f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
@@ -95,8 +95,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
+
             if (Program.LagFree(3) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
+
             if (Program.LagFree(4) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
         }
@@ -316,6 +318,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                     if (lEndPos.Distance(predictionPos) < QSplit.Width)
                     {
+                        
                         var collisionS = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { lEndPos.To2D() });
                         if (collisionS.Count > 0)
                             continue;
