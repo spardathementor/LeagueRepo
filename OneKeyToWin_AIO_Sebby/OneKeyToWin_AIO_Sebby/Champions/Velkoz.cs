@@ -30,7 +30,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Q.SetSkillshot(0.25f, 70f, 1300f, true, SkillshotType.SkillshotLine);
             QSplit.SetSkillshot(0.1f, 70f, 2100f, true, SkillshotType.SkillshotLine);
-            QDummy.SetSkillshot(0.5f, 55f, 1200, false, SkillshotType.SkillshotLine);
+            QDummy.SetSkillshot(0.4f, 55f, 1300, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.85f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.25f, 100f, float.MaxValue, false, SkillshotType.SkillshotLine);
@@ -49,14 +49,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harass aaaaaaaaE", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EInterrupter", "Auto Q + E Interrupter", true).SetValue(true));
-         
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcombo", "Extra combo dmg calculation", true).SetValue(true));
-
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harass E", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EInterrupter", "Auto E Interrupter", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position", "Player position", "Prediction" }, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Always R").AddItem(new MenuItem("Ralways" + enemy.ChampionName, enemy.ChampionName, true).SetValue(false));
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -71,9 +70,30 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
-            //Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
-            //Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
-            //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+        }
+
+        private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
+        {
+            var t = gapcloser.Sender;
+            if (E.IsReady() && t.IsValidTarget(E.Range) && Config.Item("EGCchampion" + t.ChampionName, true).GetValue<bool>())
+            {
+                if (Config.Item("EmodeGC", true).GetValue<StringList>().SelectedIndex == 0)
+                    E.Cast(gapcloser.End);
+                else if (Config.Item("EmodeGC", true).GetValue<StringList>().SelectedIndex == 1)
+                    E.Cast(Player.Position);
+                else
+                    E.Cast(t.ServerPosition);
+            }
+        }
+
+        private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
+        {
+            if (E.IsReady() && sender.IsValidTarget(E.Range) && Config.Item("EInterrupter", true).GetValue<bool>())
+            {
+                E.Cast(sender);
+            }
         }
 
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
