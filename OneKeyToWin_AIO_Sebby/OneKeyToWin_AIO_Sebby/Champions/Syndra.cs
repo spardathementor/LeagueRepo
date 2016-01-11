@@ -257,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
 
                     if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
-                        CatchW();
+                        CatchW(true);
                 }
             }
             else
@@ -475,11 +475,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void CatchW()
+        private void CatchW(bool onlyMinin = false)
         {
             var catchRange = 925;
             Obj_AI_Base obj = null;
-            if (BallsList.Count > 0)
+            if (BallsList.Count > 0 && !onlyMinin)
             {
                 obj = BallsList.Find(ball => ball.Distance(Player) < catchRange);
             }
