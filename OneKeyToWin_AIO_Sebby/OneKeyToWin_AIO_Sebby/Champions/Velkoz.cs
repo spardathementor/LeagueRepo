@@ -33,7 +33,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             QDummy.SetSkillshot(0.4f, 55f, 1500, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.85f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.25f, 100f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.1f, 80f, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -72,6 +72,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            Spellbook.OnUpdateChargedSpell += Spellbook_OnUpdateChargedSpell;
+        }
+
+        private void Spellbook_OnUpdateChargedSpell(Spellbook sender, SpellbookUpdateChargedSpellEventArgs args)
+        {
+            if (sender.Owner.IsMe)
+            {
+                args.Process = !Config.Item("autoR", true).GetValue<bool>();
+            }
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -108,7 +117,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-           
+            if (Config.Item("autoR", true).GetValue<bool>() && Player.IsChannelingImportantSpell())
+            {
+                var t = TargetSelector.GetTarget(R.Range + 150, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget() && OktwCommon.ValidUlt(t))
+                {
+                    Player.Spellbook.UpdateChargedSpell(SpellSlot.R, R.GetPrediction(t, true).CastPosition, false, false);
+                }
+            }
+
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -132,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget() && t.Distance(Game.CursorPos) < 600 && t.Health - OktwCommon.GetIncomingDamage(t) > 0 && Player.CountEnemiesInRange(400) == 0)
+            if (t.IsValidTarget()  && Player.CountEnemiesInRange(400) == 0)
             {
                 //900 - 100%
                 //1500 - 10 %
@@ -145,7 +162,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     rDmg = rDmg * adjust;
                 }
 
-                if(rDmg>t.Health)
+                if(rDmg > t.Health && OktwCommon.ValidUlt(t) && t.Health - OktwCommon.GetIncomingDamage(t) > 0)
                 {
                     R.Cast(t);
                 }
