@@ -215,7 +215,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             foreach ( var point in pointList )
             {
-                for (var j = 400; j <= 1100; j = j + 50)
+                for (var j = 400; j <= 1150; j = j + 50)
                 {
                     var posExtend = Player.Position.Extend(point, j);
 
@@ -228,7 +228,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     float b1 = (float)Math.Sqrt((c1 * c1) - (a1 * a1));
 
                     if (b1 > QSplit.Range)
-                        break;
+                        continue;
 
                     var pointA = Player.Position.Extend(point, a1);
 
