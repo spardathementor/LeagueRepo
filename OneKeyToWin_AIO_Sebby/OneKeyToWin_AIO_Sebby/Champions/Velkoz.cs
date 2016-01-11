@@ -66,6 +66,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", " LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
@@ -129,6 +130,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(0))
             {
                 SetMana();
+                Jungle();
             }
 
             if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
@@ -401,6 +403,34 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             break;
 
                         Q.Cast(pointA);
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void Jungle()
+        {
+            if (Program.LaneClear && Player.Mana > RMANA + QMANA)
+            {
+                var mobs = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                if (mobs.Count > 0)
+                {
+                    var mob = mobs[0];
+                    if (W.IsReady() && Config.Item("jungleW", true).GetValue<bool>())
+                    {
+                        W.Cast(mob.ServerPosition);
+                        return;
+                    }
+                    else if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>())
+                    {
+                        Q.Cast(mob.ServerPosition);
+                        return;
+                    }
+
+                    else if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
+                    {
+                        E.Cast(mob.ServerPosition);
                         return;
                     }
                 }
