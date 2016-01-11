@@ -29,7 +29,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 1550);
 
             Q.SetSkillshot(0.25f, 50f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.0f, 55f, 2100f, false, SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.1f, 65f, 2100f, false, SkillshotType.SkillshotLine);
             QDummy.SetSkillshot(0.5f, 55f, 1300, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.5f, 100f, 1500f, false, SkillshotType.SkillshotCircle);
