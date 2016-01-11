@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget()  && Player.CountEnemiesInRange(400) == 0)
+            if (t.IsValidTarget()  && Player.CountEnemiesInRange(400) == 0 && !Player.UnderTurret(true))
             {
                 //900 - 100%
                 //1500 - 10 %
@@ -248,6 +248,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Program.LagFree(1) || Program.LagFree(2))
                     {
+                        QSplit.Collision = true;
                         if (Program.Combo && Player.Mana > RMANA + QMANA )
                             CastQ(t);
                         else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
@@ -300,6 +301,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (QMissile != null && QMissile.IsValid)
             {
+                QSplit.Collision = false;
                 var realPosition = QMissile.StartPosition.Extend(QMissile.EndPosition, QMissile.StartPosition.Distance(QMissile.Position) + Game.Ping / 2 + 60);
                 //Q.Cast();
 
