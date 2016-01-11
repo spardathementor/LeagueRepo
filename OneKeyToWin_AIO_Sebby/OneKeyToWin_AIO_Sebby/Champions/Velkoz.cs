@@ -17,7 +17,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private Spell E, Q, R, W , QSplit, QDummy;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private static List<Obj_AI_Minion> BallsList = new List<Obj_AI_Minion>();
-        private bool EQcastNow = false;
+        private MissileClient QMissile = null;
+
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 1200);
@@ -28,7 +29,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 1550);
 
             Q.SetSkillshot(0.25f, 50f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.25f, 55f, 2100f, true, SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.25f, 55f, 2100f, false, SkillshotType.SkillshotLine);
             QDummy.SetSkillshot(0.5f, 55f, 1600f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.5f, 100f, 1500f, false, SkillshotType.SkillshotCircle);
@@ -75,16 +76,80 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
-            //GameObject.OnCreate += Obj_AI_Base_OnCreate;
+            GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
             //Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             //Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
         }
 
+        private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
+        {
+            if (sender.IsValid<MissileClient>() && sender.IsAlly )
+            {
+                MissileClient missile = (MissileClient)sender;
+                if ( missile.SData.Name != null && missile.SData.Name == "VelkozQMissile")
+                {
+                    QMissile = missile;
+                }
+            }
+        }
+
+        private void Game_OnGameUpdate(EventArgs args)
+        {
+            if (Q.IsReady())
+            {
+                var t = TargetSelector.GetTarget(QDummy.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget())
+                {
+                    if (Q.Instance.Name == "VelkozQ")
+                    {
+                        if (Program.LagFree(1))
+                        {
+                            BestAim(QDummy.GetPrediction(t).CastPosition);
+                        }
+                    }
+                    else
+                    {
+                        DetonateQ(t);
+                    }
+                }
+            }
+        }
+
         private void Drawing_OnDraw(EventArgs args)
         {
-            BestAim(Game.CursorPos);
+            //BestAim(Game.CursorPos);
+
+            
+        }
+
+        private void DetonateQ(Obj_AI_Base t)
+        {
+            if (QMissile != null && QMissile.IsValid)
+            {
+                var realPosition = QMissile.StartPosition.Extend(QMissile.EndPosition, QMissile.StartPosition.Distance(QMissile.Position) + Game.Ping / 2 + 80);
+                //Q.Cast();
+
+                QSplit.UpdateSourcePosition(realPosition, realPosition);
+
+                Vector2 start = QMissile.StartPosition.To2D();
+                Vector2 end = realPosition.To2D();
+                var radius = QSplit.Range;
+
+                var dir = (end - start).Normalized();
+                var pDir = dir.Perpendicular();
+
+                var rightEndPos = end + pDir * radius;
+                var leftEndPos = end - pDir * radius;
+
+                var rEndPos = new Vector3(rightEndPos.X, rightEndPos.Y, ObjectManager.Player.Position.Z);
+                var lEndPos = new Vector3(leftEndPos.X, leftEndPos.Y, ObjectManager.Player.Position.Z);
+
+                if (QSplit.WillHit(t, rEndPos) || QSplit.WillHit(t, lEndPos))
+                    Q.Cast();
+            }
+
         }
 
         private List<Vector3> AimQ(Vector3 finalPos)
@@ -98,7 +163,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 var angle = i * 2 * Math.PI / CircleLineSegmentN;
                 var point = new Vector3(position.X + radius * (float)Math.Cos(angle), position.Y + radius * (float)Math.Sin(angle), position.Z);
-                if (point.Distance(finalPos) < 430)
+                if (point.Distance(Player.Position.Extend(finalPos, radius)) < 430)
                 {
                     points.Add(point);
                     //Utility.DrawCircle(point, 20, System.Drawing.Color.Aqua, 1, 1);
@@ -119,7 +184,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Vector2 start = Player.Position.To2D();
             var c1 = predictionPos.Distance(Player.Position);
             var playerPos2d = Player.Position.To2D();
-
+            Program.debug("now");
             foreach ( var point in pointList )
             {
                 for (var j = 400; j <= 1050; j = j + 50)
@@ -155,11 +220,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         var collisionS = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { lEndPos.To2D() });
                         if (collisionS.Count > 0)
                             continue;
-                        Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
-                        Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
-                        Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
-                        if (Program.Combo)
-                            Q.Cast(pointA);
+                        //Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
+                        //Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        //Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        
+                        Q.Cast(pointA);
                         return;
                     }
                     if ( rEndPos.Distance(predictionPos) < 50)
@@ -167,11 +232,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         var collisionR = QSplit.GetCollision(pointA.To2D(), new List<Vector2> { rEndPos.To2D() });
                         if (collisionR.Count > 0)
                             continue;
-                        Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
-                        Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
-                        Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
-                        if (Program.Combo)
-                            Q.Cast(pointA);
+                        //Utility.DrawCircle(pointA, 20, System.Drawing.Color.Red, 1, 1);
+                        //Utility.DrawCircle(lEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        //Utility.DrawCircle(rEndPos, 20, System.Drawing.Color.Yellow, 1, 1);
+                        
+                        Q.Cast(pointA);
                         return;
                     }
 
@@ -179,14 +244,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 
             }
-        }
-
-
-
-        private void Game_OnGameUpdate(EventArgs args)
-        {
-           
-
         }
     }
 }
