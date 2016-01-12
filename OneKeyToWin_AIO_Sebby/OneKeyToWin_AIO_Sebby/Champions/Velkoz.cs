@@ -30,7 +30,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Q.SetSkillshot(0.25f, 70f, 1300f, true, SkillshotType.SkillshotLine);
             QSplit.SetSkillshot(0.1f, 70f, 2100f, true, SkillshotType.SkillshotLine);
-            QDummy.SetSkillshot(0.5f, 55f, 1500, false, SkillshotType.SkillshotLine);
+            QDummy.SetSkillshot(0.5f, 55f, 1200, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(1f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.1f, 80f, float.MaxValue, false, SkillshotType.SkillshotLine);
