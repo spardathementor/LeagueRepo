@@ -299,7 +299,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.IsWindingUp)
                 return;
 
-            if (!Program.None && !Program.Combo && Player.Mana > RMANA + QMANA * 2)
+            if (!Program.None && !Program.Combo && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
                 var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
 
@@ -315,7 +315,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         }
                     }
                 }
-                if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>())
+                if (Program.LaneClear && Config.Item("farmQ", true).GetValue<bool>())
                 {
                     var farmPos = Q.GetCircularFarmLocation(allMinions, Q.Width);
                     if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
