@@ -250,7 +250,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         W.Cast();
                     }
-                    else if ( Player.Mana < RMANA + QMANA)
+                    else if ( Player.Mana < RMANA + QMANA + WMANA)
                     {
                         FindCard = 2;
                         if (wName == "bluecardlock")
