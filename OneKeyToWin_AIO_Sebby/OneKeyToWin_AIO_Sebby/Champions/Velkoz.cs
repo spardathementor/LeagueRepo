@@ -184,10 +184,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     var eDmg = OktwCommon.GetKsDamage(t, E);
                     var qDmg = Q.GetDamage(t);
-                    if (eDmg > t.Health)
-                        Program.CastSpell(E, t);
-                    else if (qDmg + eDmg > t.Health && Player.Mana > QMANA + EMANA)
-                        Program.CastSpell(E, t);
+                    if (qDmg + eDmg > t.Health)
+                    {
+                        if(eDmg > t.Health)
+                            Program.CastSpell(E, t);
+                        else if (Player.Mana > QMANA + EMANA)
+                            Program.CastSpell(E, t);
+                        return;
+                    }
                 }
                 if (!Program.None && Player.Mana > RMANA + EMANA)
                 {
@@ -212,7 +216,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
                     Program.CastSpell(W, t);
-                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA)
+                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                     Program.CastSpell(W, t);
                 else
                 {

@@ -64,12 +64,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (E.IsReady() && Sheen() && args.Target.IsValid<Obj_AI_Hero>())
             {
-
                 if(Program.Combo && Config.Item("autoE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA)
                     E.Cast(args.Target.Position);
                 if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA + QMANA)
                     E.Cast(args.Target.Position);
-
                 if (!Q.IsReady() && !R.IsReady() && args.Target.Health < Player.FlatPhysicalDamageMod * 2)
                     E.Cast();
             }
@@ -77,7 +75,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -118,12 +115,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         CastR(R, t);
                     }
-                    else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && !Player.UnderTurret(true) && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("Rammo", true).GetValue<Slider>().Value)
+                    else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("Rammo", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && Config.Item("harras" + enemy.ChampionName).GetValue<bool>()))
                             CastR(R, enemy);
                     }
-                    if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
+
+                    if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && !OktwCommon.CanMove(enemy)))
                             R.Cast(enemy, true);
@@ -175,23 +173,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                var qDmg = OktwCommon.GetKsDamage(t, Q);
-                var rDmg = R.GetDamage(t);
-                if (qDmg > t.Health)
-                    Q.Cast(t);
-                else if (rDmg + qDmg > t.Health && Player.Mana > RMANA + QMANA)
+                if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (rDmg + 2 * qDmg > t.Health && Player.Mana > QMANA + RMANA * 2)
+                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
-                    Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA)
+                else
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("harras" + enemy.ChampionName).GetValue<bool>()))
-                        Program.CastSpell(Q, enemy);
+                    var qDmg = OktwCommon.GetKsDamage(t, Q);
+                    var rDmg = R.GetDamage(t);
+                    if (qDmg > t.Health)
+                        Q.Cast(t);
+                    else if (rDmg + qDmg > t.Health && Player.Mana > RMANA + QMANA)
+                        Program.CastSpell(Q, t);
+                    else if (rDmg + 2 * qDmg > t.Health && Player.Mana > QMANA + RMANA * 2)
+                        Program.CastSpell(Q, t);
                 }
 
-                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
+                if (!Program.None && Player.Mana > RMANA + WMANA + EMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true, true);

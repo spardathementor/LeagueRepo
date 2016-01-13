@@ -171,18 +171,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                var qDmg = Q.GetDamage(t);
-                var wDmg = OktwCommon.GetKsDamage(t, W) + BonusDmg(t);
-                if (wDmg > t.Health)
+                if (Program.Combo && Player.Mana > RMANA + WMANA)
+                    Program.CastSpell(W, t);
+                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>()  && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                    Program.CastSpell(W, t);
+                else
                 {
-                    Program.CastSpell(W, t);
+                    var qDmg = Q.GetDamage(t);
+                    var wDmg = OktwCommon.GetKsDamage(t, W) + BonusDmg(t);
+                    if (wDmg > t.Health)
+                    {
+                        Program.CastSpell(W, t);
+                    }
+                    else if (wDmg + qDmg > t.Health && Player.Mana > QMANA + EMANA)
+                        Program.CastSpell(W, t);
                 }
-                else if (wDmg + qDmg > t.Health && Player.Mana > QMANA + EMANA)
-                    Program.CastSpell(W, t);
-                else if (Program.Combo && Player.Mana > RMANA + WMANA)
-                    Program.CastSpell(W, t);
-                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && (Player.Mana > Player.MaxMana * 0.8 || W.Level > Q.Level) && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
-                    Program.CastSpell(W, t);
 
                 if (Player.Mana > RMANA + WMANA)
                 {
@@ -204,17 +207,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                var eDmg = OktwCommon.GetKsDamage(t, E) + BonusDmg(t) + OktwCommon.GetEchoLudenDamage(t);
-                var wDmg = W.GetDamage(t);
-
-                if (eDmg > t.Health)
-                    E.CastOnUnit(t);
-                else if (wDmg + eDmg > t.Health && Player.Mana > WMANA + EMANA)
-                    E.CastOnUnit(t);
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
                     E.CastOnUnit(t);
                 else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     E.CastOnUnit(t);
+                else
+                {
+                    var eDmg = OktwCommon.GetKsDamage(t, E) + BonusDmg(t) + OktwCommon.GetEchoLudenDamage(t);
+                    var wDmg = W.GetDamage(t);
+                    if (eDmg > t.Health)
+                        E.CastOnUnit(t);
+                    else if (wDmg + eDmg > t.Health && Player.Mana > WMANA + EMANA)
+                        E.CastOnUnit(t);
+                }
             }
             else 
             {
@@ -252,8 +257,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     var prepos = R.GetPrediction(t2).CastPosition;
                     var dmgR = R.GetDamage(t2);
-
-
 
                     if (t2.Health < dmgR * 3)
                     {

@@ -171,17 +171,22 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                var qDmg = Q.GetDamage(t);
-
-                if (qDmg > t.Health)
+                if (Program.Combo && Player.Mana > EMANA + QMANA - 10)
                     Program.CastSpell(Q, t);
-                else if (Program.Combo && Player.Mana > EMANA + QMANA - 10)
-                    Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + WMANA && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                 {
                     Program.CastSpell(Q, t);
                 }
-                else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + EMANA)
+                else
+                {
+                    var qDmg = OktwCommon.GetKsDamage(t,Q);
+                    var eDmg = E.GetDamage(t);
+                    if (qDmg > t.Health)
+                        Program.CastSpell(Q, t);
+                    else if (qDmg + eDmg > t.Health && Player.Mana > QMANA + WMANA)
+                        Program.CastSpell(Q, t);
+                }
+                if (!Program.None && Player.Mana > RMANA + EMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true);
@@ -217,7 +222,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 var qCd = Q.Instance.CooldownExpires - Game.Time;
                 var rCd = R.Instance.CooldownExpires - Game.Time;
-                if (ObjectManager.Player.Level < 7)
+                if (Player.Level < 7)
                     rCd = 10;
                 //debug("Q " + qCd + "R " + rCd + "E now " + E.Instance.Cooldown);
                 var eDmg = OktwCommon.GetKsDamage(t, E);
@@ -233,7 +238,7 @@ namespace OneKeyToWin_AIO_Sebby
                     {
                         E.Cast(t, true);
                     }
-                    else if ( (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && !Player.UnderTurret(true) && QMissile == null)
+                    else if ( Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && !Player.UnderTurret(true) && QMissile == null)
                     {
                         E.Cast(t, true);
                     }

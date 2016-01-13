@@ -240,12 +240,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     
                     if (Program.Combo && Player.Mana > RMANA + QMANA)
                         Program.CastSpell(Q, t);
-                    else if (Program.Farm && OktwCommon.CanHarras() && Player.Mana > RMANA + WMANA + QMANA + QMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>())
+                    else if (Program.Farm  && Player.Mana > RMANA + WMANA + QMANA + QMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                         Program.CastSpell(Q, t);
                     else if (Q.GetDamage(t) * 2 + OktwCommon.GetEchoLudenDamage(t) > t.Health - OktwCommon.GetIncomingDamage(t))
                         Q.Cast(t, true);
                 }
-                if (Player.Mana > RMANA + QMANA )
+                if (!Program.None && Player.Mana > RMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true);
@@ -269,16 +269,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = Orbwalker.GetTarget() as Obj_AI_Hero;
             if (!t.IsValidTarget())
                 t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget() && Config.Item("Eon" + t.ChampionName,true).GetValue<bool>())
+            if (t.IsValidTarget() )
             {
-                if (Program.Combo && Player.Mana > RMANA + EMANA)
+                if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("Eon" + t.ChampionName, true).GetValue<bool>())
                     Program.CastSpell(E, t);
                 else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     Program.CastSpell(E, t);
                 else if (OktwCommon.GetKsDamage(t, E) < t.Health )
                     Program.CastSpell(E, t);
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
-                    E.Cast(enemy);
+                if (Player.Mana > RMANA + EMANA)
+                {
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy) && Config.Item("Eon" + enemy.ChampionName, true).GetValue<bool>()))
+                        E.Cast(enemy);
+                }
             }
         }
 
