@@ -89,7 +89,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnUpdateChargedSpell(Spellbook sender, SpellbookUpdateChargedSpellEventArgs args)
         {
-            if (sender.Owner.IsMe)
+            if (Program.Combo && sender.Owner.IsMe)
             {
                 args.Process = !Config.Item("autoR", true).GetValue<bool>();
             }
