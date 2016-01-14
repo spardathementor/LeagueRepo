@@ -81,7 +81,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if(sender.IsMe && Config.Item("autoRexploit", true).GetValue<bool>() && R.IsReady() && args.SData.IsAutoAttack() )
+            if(sender.IsMe && Program.Combo && Config.Item("autoRexploit", true).GetValue<bool>() && R.IsReady() && args.SData.IsAutoAttack() )
             {
                 R.Cast(args.Target.Position);
             }
@@ -89,7 +89,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnUpdateChargedSpell(Spellbook sender, SpellbookUpdateChargedSpellEventArgs args)
         {
-            if (Program.Combo && sender.Owner.IsMe)
+            if (sender.Owner.IsMe)
             {
                 args.Process = !Config.Item("autoR", true).GetValue<bool>();
             }
