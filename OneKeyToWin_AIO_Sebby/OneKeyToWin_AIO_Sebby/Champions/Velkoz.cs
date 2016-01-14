@@ -83,7 +83,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if(sender.IsMe && Program.Combo && Config.Item("autoRexploit", true).GetValue<bool>() && R.IsReady() && args.SData.IsAutoAttack() )
             {
-                R.Cast(args.Target.Position);
+
+                Utility.DelayAction.Add(20, () => R.Cast(args.Target.Position));
             }
         }
 
@@ -150,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
             else if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
-                LogicR();
+                LogicR(); 
 
             if (Program.LagFree(4))
             {
