@@ -111,11 +111,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && enemy.CountEnemiesInRange(rSplash) > 1))
                         t = enemy;
 
-                    if ((Program.Combo && Player.Mana > RMANA * 3) )
+                    if (Program.Combo && Player.Mana > RMANA * 3 )
                     {
                         CastR(R, t);
                     }
-                    else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("Rammo", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
+                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("Rammo", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && Config.Item("harras" + enemy.ChampionName).GetValue<bool>()))
                             CastR(R, enemy);
@@ -124,7 +124,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && !OktwCommon.CanMove(enemy)))
-                            R.Cast(enemy, true);
+                            CastR(R, t);
                     }
                 }
             }
