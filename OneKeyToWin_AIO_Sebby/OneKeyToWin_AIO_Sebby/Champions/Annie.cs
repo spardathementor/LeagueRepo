@@ -39,19 +39,20 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRks", "Auto R KS", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcombo", "Auto R Combo if stun is ready", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 2, 5)));
 
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Ultimate Manager").AddItem(new MenuItem("UM" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "Normal", "Always", "Never" }, 0)));
 
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 0, 5)));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("Stun in combo").AddItem(new MenuItem("stun" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
 
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
@@ -76,34 +77,43 @@ namespace OneKeyToWin_AIO_Sebby
 
             SetMana();
 
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget())
+            if (R.IsReady() && Program.LagFree(1) && !HaveTibers)
             {
-                if (R.IsReady() && Program.LagFree(1) && !HaveTibers && OktwCommon.ValidUlt(t))
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
                 {
-                    var poutput = R.GetPrediction(t, true);
+                    int Rmode = Config.Item("UM" + enemy.ChampionName, true).GetValue<StringList>().SelectedIndex;
+
+                    if (Rmode == 2)
+                        continue;
+                    else if (Rmode == 1)
+                        R.Cast(enemy);
+
+                    var poutput = R.GetPrediction(enemy, true);
                     var aoeCount = poutput.AoeTargetsHitCount;
-                    aoeCount = (aoeCount == 0) ? 1 : aoeCount;
 
                     if (HaveStun && aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                         R.Cast(poutput.CastPosition);
-                    else if (Program.Combo)
+                    else if (Program.Combo && HaveStun && Config.Item("autoRcombo", true).GetValue<bool>())
                         R.Cast(poutput.CastPosition);
                     else if (Config.Item("autoRks", true).GetValue<bool>())
                     {
-                        var comboDmg = OktwCommon.GetKsDamage(t, R);
+                        var comboDmg = OktwCommon.GetKsDamage(enemy, R);
 
                         if (W.IsReady() && RMANA + WMANA < Player.Mana)
-                            comboDmg += W.GetDamage(t);
+                            comboDmg += W.GetDamage(enemy);
 
-                        if(Q.IsReady() && RMANA + WMANA + QMANA < Player.Mana)
-                            comboDmg += Q.GetDamage(t);
+                        if (Q.IsReady() && RMANA + WMANA + QMANA < Player.Mana)
+                            comboDmg += Q.GetDamage(enemy);
 
-                        if (t.Health < comboDmg)
+                        if (enemy.Health < comboDmg)
                             R.Cast(poutput.CastPosition);
                     }
                 }
+            }
 
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
+            if (t.IsValidTarget())
+            {
                 if (W.IsReady() && Program.LagFree(2))
                 {
                     var poutput = W.GetPrediction(t, true);
@@ -195,10 +205,10 @@ namespace OneKeyToWin_AIO_Sebby
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
-                    if (Q.IsReady())
+                    if (W.IsReady())
+                        W.Cast(mob);
+                    else if (Q.IsReady())
                         Q.Cast(mob);
-                    if (W.IsReady() && Config.Item("farmW", true).GetValue<bool>()  )
-                        W.Cast(mob, true);
                 }
             }
 
