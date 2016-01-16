@@ -208,8 +208,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var minion = minionsList.Where(x => HealthPrediction.LaneClearHealthPrediction(x, 200, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();
                     Q.Cast(minion);
             }
-
-            if (Program.LaneClear && W.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
+            else if (Program.LaneClear && W.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
             {
                 var farmLocation = W.GetCircularFarmLocation(minionsList, W.Width);
                 if (farmLocation.MinionsHit > 1)
