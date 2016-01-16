@@ -39,16 +39,20 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRks", "Auto R KS", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcombo", "Auto R Combo if stun is ready", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 2, 5)));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Ultimate Manager").AddItem(new MenuItem("UM" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "Normal", "Always", "Never" }, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRks", "Auto R KS", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcombo", "Auto R Combo if stun is ready", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 2, 5)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
@@ -115,14 +119,14 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (W.IsReady() && Program.LagFree(2))
+                if (W.IsReady() && Program.LagFree(2) && Config.Item("autoW", true).GetValue<bool>())
                 {
                     var poutput = W.GetPrediction(t, true);
                     var aoeCount = poutput.AoeTargetsHitCount;
 
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         W.Cast(poutput.CastPosition);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana)
+                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harrasW", true).GetValue<bool>())
                         W.Cast(poutput.CastPosition);
                     else
                     {
@@ -135,11 +139,11 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
 
-                if (Q.IsReady() && Program.LagFree(3))
+                if (Q.IsReady() && Program.LagFree(3) && Config.Item("autoQ", true).GetValue<bool>())
                 {
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         Q.Cast(t);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana)
+                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harrasQ", true).GetValue<bool>())
                         Q.Cast(t);
                     else
                     {
