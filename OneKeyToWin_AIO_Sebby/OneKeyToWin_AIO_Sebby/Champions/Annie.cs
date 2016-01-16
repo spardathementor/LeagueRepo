@@ -85,11 +85,12 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (Rmode == 2)
                         continue;
-                    else if (Rmode == 1)
-                        R.Cast(enemy);
-
+                   
                     var poutput = R.GetPrediction(enemy, true);
                     var aoeCount = poutput.AoeTargetsHitCount;
+
+                    if (Rmode == 1)
+                        R.Cast(poutput.CastPosition);
 
                     if (HaveStun && aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                         R.Cast(poutput.CastPosition);
