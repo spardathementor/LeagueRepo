@@ -27,12 +27,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 975);
             R = new Spell(SpellSlot.R, 1050);
 
-
             Q.SetSkillshot(0.25f, 70, 1900, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.35f, 120, 1500, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.25f, 120, 1950, false, SkillshotType.SkillshotLine);
             Q.SetCharged("VarusQ", "VarusQ", 925, 1600, 1.5f);
-
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -131,6 +129,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (!OktwCommon.CanCombo())
+            {
+                Program.debug("dupa");
+                return;
+            }
 
             if (R.IsReady())
             {
@@ -218,9 +221,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(270) && target.IsMelee && Config.Item("GapCloser" + target.ChampionName).GetValue<bool>()))
                 {
-
                     Program.CastSpell(R, target);
-
                 }
             }
         }
@@ -266,14 +267,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         CastQ(t);
                     }
-                    else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA)
+                    else if (!Program.None && Player.Mana > RMANA + WMANA)
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                             CastQ(enemy);
                     }
                 }
             }
-            else if (Q.Range > 1500 && Player.CountEnemiesInRange(1450) == 0 && Program.LaneClear && (Q.IsCharging || (Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)))
+            else if (Program.LaneClear && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA && Q.Range > 1500 && Player.CountEnemiesInRange(1450) == 0 &&  (Q.IsCharging || (Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value)))
             {
                 var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
