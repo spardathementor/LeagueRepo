@@ -111,8 +111,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var poutput = R.GetPrediction(t, true);
 
                 var aoeCount = poutput.AoeTargetsHitCount;
-                if (aoeCount == 0)
-                    aoeCount = 1;
+
+                aoeCount = (aoeCount == 0) ? 1 : aoeCount;
 
                 if (Config.Item("rCount", true).GetValue<Slider>().Value > 0 && Config.Item("rCount", true).GetValue<Slider>().Value <= aoeCount)
                     R.Cast(poutput.CastPosition);
