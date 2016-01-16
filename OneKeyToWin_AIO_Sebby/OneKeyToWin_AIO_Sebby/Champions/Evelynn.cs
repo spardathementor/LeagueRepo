@@ -108,18 +108,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                var poutput = R.GetPrediction(t,true);
-               
+                var poutput = R.GetPrediction(t, true);
+
                 var aoeCount = poutput.AoeTargetsHitCount;
                 if (aoeCount == 0)
                     aoeCount = 1;
-                
+
                 if (Config.Item("rCount", true).GetValue<Slider>().Value > 0 && Config.Item("rCount", true).GetValue<Slider>().Value <= aoeCount)
                     R.Cast(poutput.CastPosition);
-                
-                if (Player.Health < Player.MaxHealth * 0.3)
-                    R.Cast(t);
-            }
+
+                if (Player.HealthPercent < 60)
+                {
+                    double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+                    var enemys = Player.CountEnemiesInRange(700);
+                    if (Player.Health - dmg < enemys * Player.Level * 20)
+                        R.Cast(poutput.CastPosition);
+                    else if (Player.Health - dmg < Player.Level * 10)
+                        R.Cast(poutput.CastPosition);
+                }
+            }      
         }
 
         private void Jungle()
