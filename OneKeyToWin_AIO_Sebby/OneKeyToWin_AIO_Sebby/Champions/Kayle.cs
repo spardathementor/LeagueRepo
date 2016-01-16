@@ -80,16 +80,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>() ))
             {
-                int sensitivity = 20;
-                double dmg = OktwCommon.GetIncomingDamage(ally);
-                int nearEnemys = ally.CountEnemiesInRange(900) ;
+                double dmg = OktwCommon.GetIncomingDamage(ally, 1);
+                var enemys = ally.CountEnemiesInRange(700);
+               
+                if (dmg == 0 && enemys == 0)
+                    continue;
 
-                nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;
+                enemys = (enemys == 0) ? 1 : enemys;
 
-                if (dmg > 100 + Player.Level * sensitivity)
-                    R.Cast(ally);
-                else if (ally.Health - dmg < nearEnemys * ally.Level * sensitivity)
-                    R.Cast(ally);
+                if (ally.Health - dmg < enemys * ally.Level * 15)
+                    R.CastOnUnit(ally);
             }
         }
 
