@@ -93,8 +93,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Program.LagFree(1))
-                SetMana();
 
             if (!Config.Item("ignoreW", true).GetValue<bool>())
                 cardok = true;
@@ -106,7 +104,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else
                     LogicWmaunal();
             }
-            else
+            else if (W.Instance.Name == "PickACard")
             {
                 temp = null;
                 cardok = false;
@@ -145,7 +143,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicWmaunal()
         {
             var wName = W.Instance.Name;
-            if (wName == "PickACard")
+            if (wName == "PickACard" && Utils.TickCount - W.LastCastAttemptT > 150)
             {
                 if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                 {
@@ -168,9 +166,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast();
                 }
             }
-            else
+            else if (Player.HasBuff("pickacard_tracker"))
             {
-                Program.debug("PICK " + FindCard);
                 if (temp == null)
                     temp = wName;
                 else if (temp != wName)
@@ -207,9 +204,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var wName = W.Instance.Name;
             var t = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
-
-            if (wName == "PickACard")
+            
+            if (wName == "PickACard" && Utils.TickCount - W.LastCastAttemptT > 150)
             {
+                if(!Program.None)
+                    Program.debug("PICK " + W.LastCastAttemptT + " " + Utils.TickCount);
                 if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     W.Cast();
                 else if (t.IsValidTarget() && Program.Combo)
@@ -222,8 +221,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         W.Cast();
                 }
             }
-            else
+            else if(Player.HasBuff("pickacard_tracker"))
             {
+                Program.debug("2PICK");
                 if (temp == null)
                     temp = wName;
                 else if (temp != wName)
@@ -231,9 +231,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (cardok)
                 {
-
+                    Program.debug(wName);
                     Obj_AI_Hero orbTarget = null;
-
+                    
                     var getTarget = Orbwalker.GetTarget();
                     if (getTarget != null && getTarget.Type == GameObjectType.obj_AI_Hero)
                     {
@@ -246,9 +246,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "goldcardlock")
                             W.Cast();
                     }
-                    else if (Program.Combo && orbTarget.IsValidTarget() && W.GetDamage(orbTarget) + Player.GetAutoAttackDamage(orbTarget) > orbTarget.Health)
+                    else if (Program.Combo && orbTarget.IsValidTarget() &&  W.GetDamage(orbTarget) + Player.GetAutoAttackDamage(orbTarget) > orbTarget.Health)
                     {
                         W.Cast();
+                        Program.debug("1" + wName);
                     }
                     else if ( Player.Mana < RMANA + QMANA + WMANA)
                     {
