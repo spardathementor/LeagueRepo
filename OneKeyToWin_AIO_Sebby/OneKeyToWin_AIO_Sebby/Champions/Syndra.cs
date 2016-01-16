@@ -332,7 +332,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
-                    if (W.IsReady() && Config.Item("jungleW", true).GetValue<bool>())
+                    if (W.IsReady() && Config.Item("jungleW", true).GetValue<bool>() && Utils.TickCount - W.LastCastAttemptT > 900)
                     {
                         W.Cast(mob.ServerPosition);
                         return;
