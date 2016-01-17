@@ -53,7 +53,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Ultimate Manager").AddItem(new MenuItem("UM" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "Normal", "Always", "Never" }, 0)));
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Ultimate Manager").AddItem(new MenuItem("UM" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "Normal", "Always", "Never", "Always Stun"}, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRks", "Auto R KS", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcombo", "Auto R Combo if stun is ready", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 2, 5)));
@@ -111,6 +111,9 @@ namespace OneKeyToWin_AIO_Sebby
                         var aoeCount = poutput.AoeTargetsHitCount;
 
                         if (Rmode == 1)
+                            R.Cast(poutput.CastPosition);
+
+                        if (Rmode == 3 && HaveStun)
                             R.Cast(poutput.CastPosition);
 
                         if (HaveStun && aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
