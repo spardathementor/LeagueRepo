@@ -344,9 +344,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 var positions = new List<Vector3> { result.CastPosition};
                 var originalUnit = input.Unit;
-                result.CollisionObjects = Collision.GetCollision(positions, input);
-                result.CollisionObjects.RemoveAll(i => i.NetworkId == originalUnit.NetworkId);
-                result.Hitchance = result.CollisionObjects.Count > 0 ? HitChance.Collision : result.Hitchance;
+                if (Collision.GetCollision(positions, input))
+                    result.Hitchance = HitChance.Collision;
             }
             return result;
         }
@@ -385,8 +384,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 speedDelay = 0;
-            else
-                speedDelay = distanceFromToUnit / input.Speed;
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
@@ -1078,9 +1075,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
         /// <summary>
         ///     Returns the list of the units that the skillshot will hit before reaching the set positions.
         /// </summary>
-        public static List<Obj_AI_Base> GetCollision(List<Vector3> positions, PredictionInput input)
+        public static bool GetCollision(List<Vector3> positions, PredictionInput input)
         {
-            var result = new List<Obj_AI_Base>();
+
             foreach (var position in positions)
             {
                 foreach (var objectType in input.CollisionObjects)
@@ -1088,13 +1085,27 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     switch (objectType)
                     {
                         case CollisionableObjects.Minions:
-                            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion =>
-                                            minion.IsValidTarget(Math.Min(input.Range + input.Radius + 100, 2000), true, input.From)))
+                            foreach (var minion in MinionManager.GetMinions(input.From, Math.Min(input.Range + input.Radius + 100, 2000)))
                             {
                                 input.Unit = minion;
 
-                                if (minion.ServerPosition.To2D().Distance(input.From.To2D()) < input.Radius)
-                                    result.Add(minion);
+                                var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
+                                float delay = (distanceFromToUnit / input.Speed) + input.Delay;
+
+                                if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
+                                    delay = input.Delay;
+
+                                int convert = (int)(delay * 1000);
+
+                                if (HealthPrediction.LaneClearHealthPrediction(minion, convert, 0) <= 0)
+                                {
+                                    Program.debug("IGNORE");
+                                    continue;
+                                }
+                                else if (distanceFromToUnit < input.Radius)
+                                    return true;
+                                else if (minion.ServerPosition.Distance(position) < input.Unit.BoundingRadius)
+                                    return true;
                                 else
                                 {
                                     var minionPos = minion.ServerPosition;
@@ -1107,7 +1118,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
                                     {
-                                        result.Add(minion);
+                                        return true;
                                     }
                                 }
                             }
@@ -1127,7 +1138,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                         .Distance(input.From.To2D(), position.To2D(), true, true) <=
                                     Math.Pow((input.Radius + 50 + hero.BoundingRadius), 2))
                                 {
-                                    result.Add(hero);
+                                    return true;
                                 }
                             }
                             break;
@@ -1139,14 +1150,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 var p = input.From.To2D().Extend(position.To2D(), step * i);
                                 if (NavMesh.GetCollisionFlags(p.X, p.Y).HasFlag(CollisionFlags.Wall))
                                 {
-                                    result.Add(ObjectManager.Player);
+                                    return true;
                                 }
                             }
                             break;
                     }
                 }
             }
-            return result.Distinct().ToList();
+            return false;
         }
     }
 
