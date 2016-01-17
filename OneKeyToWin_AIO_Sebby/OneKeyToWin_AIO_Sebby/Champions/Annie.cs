@@ -27,13 +27,13 @@ namespace OneKeyToWin_AIO_Sebby
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 625f);
-            W = new Spell(SpellSlot.W, 600f);
+            W = new Spell(SpellSlot.W, 590f);
             E = new Spell(SpellSlot.E);
             R = new Spell(SpellSlot.R, 625f);
             FR = new Spell(SpellSlot.R, 1000f );
 
             Q.SetTargetted(0.25f, 1400f);
-            W.SetSkillshot(0.35f, 150f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.30f, 150f, float.MaxValue, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             FR.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
@@ -248,10 +248,10 @@ namespace OneKeyToWin_AIO_Sebby
             var minionsList = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
             if (Q.IsReady())
             {
-                var minion = minionsList.Where(x => HealthPrediction.LaneClearHealthPrediction(x, 200, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();
-                    Q.Cast(minion);
+                var minion = minionsList.Where(x => HealthPrediction.LaneClearHealthPrediction(x, 250, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();
+                Q.Cast(minion);
             }
-            if (Program.LaneClear && W.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
+            else if (Program.LaneClear && W.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
             {
                 var farmLocation = W.GetCircularFarmLocation(minionsList, W.Width);
                 if (farmLocation.MinionsHit > 1)
