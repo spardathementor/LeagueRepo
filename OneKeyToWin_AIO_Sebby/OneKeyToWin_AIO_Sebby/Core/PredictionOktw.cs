@@ -374,7 +374,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
 
-            result.Hitchance = HitChance.High;
+            result.Hitchance = HitChance.Medium;
 
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
@@ -400,7 +400,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
-                pathMinLen = 600f + backToFront;
                 result.Hitchance = HitChance.High;
             }
 
