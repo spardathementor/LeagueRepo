@@ -1075,6 +1075,25 @@ namespace OneKeyToWin_AIO_Sebby.Core
         /// <summary>
         ///     Returns the list of the units that the skillshot will hit before reaching the set positions.
         /// </summary>
+        /// 
+        private static bool MinionIsDead(PredictionInput input, Obj_AI_Base minion , float distance)
+        {
+            float delay = (distance / input.Speed) + input.Delay;
+
+            if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
+                delay = input.Delay;
+
+            int convert = (int)(delay * 1000);
+
+            if (HealthPrediction.LaneClearHealthPrediction(minion, convert, 0) <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public static bool GetCollision(List<Vector3> positions, PredictionInput input)
         {
 
@@ -1090,22 +1109,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 input.Unit = minion;
 
                                 var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
-                                float delay = (distanceFromToUnit / input.Speed) + input.Delay;
 
-                                if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
-                                    delay = input.Delay;
-
-                                int convert = (int)(delay * 1000);
-
-                                if (HealthPrediction.LaneClearHealthPrediction(minion, convert, 0) <= 0)
+                                if (distanceFromToUnit < input.Radius)
                                 {
-                                    Program.debug("IGNORE");
-                                    continue;
+                                    if (MinionIsDead(input, minion, distanceFromToUnit))
+                                        continue;
+                                    else
+                                        return true;
                                 }
-                                else if (distanceFromToUnit < input.Radius)
-                                    return true;
                                 else if (minion.ServerPosition.Distance(position) < input.Unit.BoundingRadius)
-                                    return true;
+                                {
+                                    if (MinionIsDead(input, minion, distanceFromToUnit))
+                                        continue;
+                                    else
+                                        return true;
+                                }
                                 else
                                 {
                                     var minionPos = minion.ServerPosition;
@@ -1118,7 +1136,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
                                     {
-                                        return true;
+                                        if (MinionIsDead(input, minion, distanceFromToUnit))
+                                            continue;
+                                        else
+                                            return true;
                                     }
                                 }
                             }
