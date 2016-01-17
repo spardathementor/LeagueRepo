@@ -13,8 +13,9 @@ namespace OneKeyToWin_AIO_Sebby
     {
         private Menu Config = Program.Config;
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        public Spell Q, W, E, R;
+        public Spell Q, W, E, R, FR;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
+        private SpellSlot flash;
 
         public GameObject Tibbers;
         public float TibbersTimer = 0;
@@ -29,10 +30,14 @@ namespace OneKeyToWin_AIO_Sebby
             W = new Spell(SpellSlot.W, 600f);
             E = new Spell(SpellSlot.E);
             R = new Spell(SpellSlot.R, 625f);
+            FR = new Spell(SpellSlot.R, 1000f );
 
             Q.SetTargetted(0.25f, 1400f);
-            W.SetSkillshot(0.30f, 200f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.35f, 150f, float.MaxValue, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            FR.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+
+            flash = Player.GetSpellSlot("summonerflash");
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -53,6 +58,11 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcombo", "Auto R Combo if stun is ready", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 2, 5)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
+
+            if (flash != SpellSlot.Unknown)
+            {
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCountFlash", "Auto flash + R stun x enemies", true).SetValue(new Slider(4, 2, 5)));
+            }
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
@@ -83,35 +93,53 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (R.IsReady() && Program.LagFree(1) && !HaveTibers)
             {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
+                var realRange = R.Range;
+
+                if (flash.IsReady())
+                    realRange = FR.Range;
+
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(realRange) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
                 {
-                    int Rmode = Config.Item("UM" + enemy.ChampionName, true).GetValue<StringList>().SelectedIndex;
-
-                    if (Rmode == 2)
-                        continue;
-                   
-                    var poutput = R.GetPrediction(enemy, true);
-                    var aoeCount = poutput.AoeTargetsHitCount;
-
-                    if (Rmode == 1)
-                        R.Cast(poutput.CastPosition);
-
-                    if (HaveStun && aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
-                        R.Cast(poutput.CastPosition);
-                    else if (Program.Combo && HaveStun && Config.Item("autoRcombo", true).GetValue<bool>())
-                        R.Cast(poutput.CastPosition);
-                    else if (Config.Item("autoRks", true).GetValue<bool>())
+                    if (enemy.IsValidTarget(R.Range))
                     {
-                        var comboDmg = OktwCommon.GetKsDamage(enemy, R);
+                        int Rmode = Config.Item("UM" + enemy.ChampionName, true).GetValue<StringList>().SelectedIndex;
 
-                        if (W.IsReady() && RMANA + WMANA < Player.Mana)
-                            comboDmg += W.GetDamage(enemy);
+                        if (Rmode == 2)
+                            continue;
 
-                        if (Q.IsReady() && RMANA + WMANA + QMANA < Player.Mana)
-                            comboDmg += Q.GetDamage(enemy);
+                        var poutput = R.GetPrediction(enemy, true);
+                        var aoeCount = poutput.AoeTargetsHitCount;
 
-                        if (enemy.Health < comboDmg)
+                        if (Rmode == 1)
                             R.Cast(poutput.CastPosition);
+
+                        if (HaveStun && aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
+                            R.Cast(poutput.CastPosition);
+                        else if (Program.Combo && HaveStun && Config.Item("autoRcombo", true).GetValue<bool>())
+                            R.Cast(poutput.CastPosition);
+                        else if (Config.Item("autoRks", true).GetValue<bool>())
+                        {
+                            var comboDmg = OktwCommon.GetKsDamage(enemy, R);
+
+                            if (W.IsReady() && RMANA + WMANA < Player.Mana)
+                                comboDmg += W.GetDamage(enemy);
+
+                            if (Q.IsReady() && RMANA + WMANA + QMANA < Player.Mana)
+                                comboDmg += Q.GetDamage(enemy);
+
+                            if (enemy.Health < comboDmg)
+                                R.Cast(poutput.CastPosition);
+                        }
+                    }
+                    else if(HaveStun && flash.IsReady())
+                    {
+                        var poutputFlas = FR.GetPrediction(enemy, true);
+                        var aoeCountFlash = poutputFlas.AoeTargetsHitCount;
+                        if (HaveStun && aoeCountFlash >= Config.Item("rCountFlash", true).GetValue<Slider>().Value && Config.Item("rCountFlash", true).GetValue<Slider>().Value > 0)
+                        {
+                            Player.Spellbook.CastSpell(flash, poutputFlas.CastPosition);
+                            R.Cast(poutputFlas.CastPosition);
+                        }
                     }
                 }
             }
