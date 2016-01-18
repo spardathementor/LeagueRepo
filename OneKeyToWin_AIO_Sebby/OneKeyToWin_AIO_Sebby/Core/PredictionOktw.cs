@@ -494,7 +494,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     if (distanceFromToUnit > input.Range - fixRange)
                         result.Hitchance = HitChance.Medium;
-                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.8d)
+                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) > 0.8d)
                         result.Hitchance = HitChance.High;
                     else
                         result.Hitchance = HitChance.VeryHigh;
@@ -1245,28 +1245,24 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnNewPath += Obj_AI_Hero_OnNewPath;
-            Game.OnUpdate += Game_OnGameUpdate;
+            Obj_AI_Base.OnEnterLocalVisiblityClient += Obj_AI_Base_OnEnterLocalVisiblityClient;
         }
 
-        private static void Game_OnGameUpdate(EventArgs args)
+        private static void Obj_AI_Base_OnEnterLocalVisiblityClient(AttackableUnit sender, EventArgs args)
         {
-            foreach (var hero in Champion)
-            {
-                if (hero.IsVisible)
-                {
-                    if (hero.Path.Count() > 0)
-                        UnitTrackerInfoList.Find(x => x.NetworkId == hero.NetworkId).StopMoveTick = Utils.TickCount;
-                }
-                else
-                {
-                    UnitTrackerInfoList.Find(x => x.NetworkId == hero.NetworkId).LastInvisableTick = Utils.TickCount;
-                }
-            }
+            if (sender.Type != GameObjectType.obj_AI_Hero) return;
+
+            UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).LastInvisableTick = Utils.TickCount;
+
         }
 
         private static void Obj_AI_Hero_OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
         {
+            
             if (sender.Type != GameObjectType.obj_AI_Hero) return;
+            
+            if(args.Path.Count() == 1)
+                UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).StopMoveTick = Utils.TickCount;
 
             var info = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
             info.NewPathTick = Utils.TickCount;
