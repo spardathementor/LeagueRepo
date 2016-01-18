@@ -1253,20 +1253,19 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (sender.Type != GameObjectType.obj_AI_Hero) return;
 
             UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).LastInvisableTick = Utils.TickCount;
-
         }
 
         private static void Obj_AI_Hero_OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
         {
-            
             if (sender.Type != GameObjectType.obj_AI_Hero) return;
-            
-            if(args.Path.Count() == 1)
-                UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).StopMoveTick = Utils.TickCount;
 
             var info = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
+
             info.NewPathTick = Utils.TickCount;
-            if (args.Path.Last() != sender.ServerPosition)
+
+            if (args.Path.Count() == 1) // STOP MOVE DETECTION
+                UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).StopMoveTick = Utils.TickCount;
+            else // SPAM CLICK LOGIC
                 info.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
 
             if (info.PathBank.Count > 3)
