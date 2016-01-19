@@ -341,7 +341,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (Program.Combo)
                             Program.CastSpell(Q, t);
-                        if (Program.Farm && !Player.UnderTurret(true) && OktwCommon.CanHarras() && Config.Item("harasW", true).GetValue<bool>())
+                        if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasQ", true).GetValue<bool>())
                             Program.CastSpell(Q, t);
                     }
 
@@ -427,7 +427,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (Player.HasBuff("destiny_marker"))
                         Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Yellow, "AUTO R TARGET: " + t.ChampionName + " Heal " + t.Health + " My damage: " + comboDMG);
                     else if (comboDMG > t.Health)
-                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "You can kill: " + t.ChampionName + " Heal " + t.Health + " My damage: " + comboDMG);
+                        Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.5f, System.Drawing.Color.Red, "You can kill: " + t.ChampionName + " Heal " + t.Health + " My damage: " + comboDMG + " PRESS semi-manual cast");
                 }
             }
         }
