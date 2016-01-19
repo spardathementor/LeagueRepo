@@ -83,7 +83,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if(sender.IsMe && Program.Combo && Config.Item("autoRexploit", true).GetValue<bool>() && R.IsReady() && args.SData.IsAutoAttack() )
             {
-
                 Utility.DelayAction.Add(20, () => R.Cast(args.Target.Position));
             }
         }
@@ -246,7 +245,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
                     Program.CastSpell(W, t);
-                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() 
+                    && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                     Program.CastSpell(W, t);
                 else
                 {
@@ -278,7 +278,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(QDummy.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (Q.Instance.Name == "VelkozQ")
+                if (Q.Instance.Name == "VelkozQ" && Utils.TickCount - Q.LastCastAttemptT > 150)
                 {
                     if (Program.LagFree(1) || Program.LagFree(2))
                     {
