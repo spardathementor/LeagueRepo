@@ -44,7 +44,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("haras", "Harras Q", true).SetValue(true));
-            
+            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qOutRange", "Auto Q only out range AA", true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoRbuff", "Auto R if darius execute multi cast time out ", true).SetValue(true));
@@ -138,25 +139,28 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            if (Player.CountEnemiesInRange(Q.Range) > 0)
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+            if (t.IsValidTarget())
             {
-                if (Player.Mana > RMANA + QMANA && Program.Combo)
-                    Q.Cast();
-                else if (Program.Farm && ObjectManager.Player.Mana > RMANA + QMANA + EMANA + WMANA && Config.Item("haras", true).GetValue<bool>())
-                    Q.Cast();
-                if (!R.IsReady())
+                if (!Config.Item("qOutRange", true).GetValue<bool>() || Orbwalking.InAutoAttackRange(t))
                 {
-                    var target = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-                    if (target.IsValidTarget() && Player.Distance(target.Position) < Q.Range && Q.GetDamage(target) > target.Health)
+                    if (Player.Mana > RMANA + QMANA && Program.Combo)
+                        Q.Cast();
+                    else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA && Config.Item("haras", true).GetValue<bool>())
                         Q.Cast();
                 }
+
+                if (!R.IsReady() && OktwCommon.GetKsDamage(t, Q) > t.Health)
+                    Q.Cast();
             }
+            
             else if (Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + EMANA + WMANA && Program.LaneClear)
             {
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
-                foreach (var minion in allMinionsQ)
-                    if (Player.Distance(minion.ServerPosition) > 300 && minion.Health < Player.GetSpellDamage(minion, SpellSlot.Q) * 0.6)
-                        Q.Cast();
+                var minionsList = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+
+                if (minionsList.Any(x => Player.Distance(x.ServerPosition) > 300 && x.Health < Q.GetDamage(x) * 0.6))
+                    Q.Cast();
+                        
             }
         }
 
