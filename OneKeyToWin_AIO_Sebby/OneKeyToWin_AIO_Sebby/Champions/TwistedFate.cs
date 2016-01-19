@@ -332,22 +332,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (OktwCommon.GetKsDamage(t, Q)> t.Health && !Orbwalking.InAutoAttackRange(t))
-                    Program.CastSpell(Q, t);
+                    if (OktwCommon.GetKsDamage(t, Q)> t.Health && !Orbwalking.InAutoAttackRange(t))
+                        Program.CastSpell(Q, t);
 
-                if (Player.Mana > RMANA + QMANA)
-                {
-                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && W.Instance.Name == "PickACard" && (W.Instance.CooldownExpires - Game.Time  > 3 || Player.CountEnemiesInRange(950) == 0))
+                    if (W.Instance.CooldownExpires - Game.Time < W.Instance.Cooldown - 1.3 && W.Instance.Name == "PickACard" && (W.Instance.CooldownExpires - Game.Time > 3 || Player.CountEnemiesInRange(950) == 0))
                     {
-                        if (Program.Combo)
+                        if (Program.Combo && Player.Mana > RMANA + QMANA)
                             Program.CastSpell(Q, t);
-                        if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasQ", true).GetValue<bool>())
+                        if (Program.Farm && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("harrasQ", true).GetValue<bool>() && OktwCommon.CanHarras())
                             Program.CastSpell(Q, t);
                     }
 
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true, true);
-                }
+                
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
             {
