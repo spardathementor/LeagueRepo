@@ -44,11 +44,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            var posPred = CalculateReturnPos();
-            if (posPred != Vector3.Zero)
-                Orbwalker.SetOrbwalkingPoint(posPred);
-            else
-                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            if (Config.Item("aim", true).GetValue<bool>())
+            {
+                var posPred = CalculateReturnPos();
+                if (posPred != Vector3.Zero)
+                    Orbwalker.SetOrbwalkingPoint(posPred);
+                else
+                    Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+            }
             
         }
 
