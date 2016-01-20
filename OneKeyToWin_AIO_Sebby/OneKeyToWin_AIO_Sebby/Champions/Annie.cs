@@ -56,7 +56,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Ultimate Manager").AddItem(new MenuItem("UM" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "Normal", "Always", "Never", "Always Stun"}, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRks", "Auto R KS", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcombo", "Auto R Combo if stun is ready", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R stun x enemies", true).SetValue(new Slider(3, 2, 5)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCount", "Auto R x enemies", true).SetValue(new Slider(3, 2, 5)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("tibers", "TibbersAutoPilot", true).SetValue(true));
 
             if (flash != SpellSlot.Unknown)
@@ -116,7 +116,7 @@ namespace OneKeyToWin_AIO_Sebby
                         if (Rmode == 3 && HaveStun)
                             R.Cast(poutput.CastPosition);
 
-                        if (HaveStun && aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
+                        if (aoeCount >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                             R.Cast(poutput.CastPosition);
                         else if (Program.Combo && HaveStun && Config.Item("autoRcombo", true).GetValue<bool>())
                             R.Cast(poutput.CastPosition);
