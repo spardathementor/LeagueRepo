@@ -78,7 +78,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>() ))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>() ))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
                 var enemys = ally.CountEnemiesInRange(700);
@@ -88,7 +88,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 enemys = (enemys == 0) ? 1 : enemys;
 
-                if (ally.Health - dmg < enemys * ally.Level * 15)
+                if (ally.Health - dmg < enemys * ally.Level * 20)
                     R.CastOnUnit(ally);
             }
         }
