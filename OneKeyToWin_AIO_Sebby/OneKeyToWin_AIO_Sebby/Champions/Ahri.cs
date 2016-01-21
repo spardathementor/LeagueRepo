@@ -28,7 +28,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 600);
 
             Q.SetSkillshot(0.25f, 100, 1600, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 60, 1550, true, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 70, 1550, true, SkillshotType.SkillshotLine);
 
             missileManager = new Core.MissileReturn("AhriOrbMissile", "AhriOrbReturn", Q);
 
@@ -275,7 +275,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(E, t);
                 else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     Program.CastSpell(E, t);
-                else if (OktwCommon.GetKsDamage(t, E) < t.Health )
+                else if (OktwCommon.GetKsDamage(t, E) > t.Health )
                     Program.CastSpell(E, t);
                 if (Player.Mana > RMANA + EMANA)
                 {
