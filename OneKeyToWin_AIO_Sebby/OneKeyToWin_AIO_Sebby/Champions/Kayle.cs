@@ -99,13 +99,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
-                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
-                    Q.Cast(t);
-                else if (Program.Combo && ObjectManager.Player.Mana > WMANA + QMANA)
+                if (Program.Combo)
                     Q.Cast(t);
                 else if (Program.Farm && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
                     Q.Cast(t);
                 else if (Player.Health < Player.Level * 40 && !W.IsReady() && !R.IsReady())
+                    Q.Cast(t);
+                else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Q.Cast(t);
             }
         }
@@ -178,12 +178,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private bool FarmE()
         {
-            var allMinions = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All);
-            foreach (var minion in allMinions)
-            {
-                return true;
-            }
-                return false;
+            return (MinionManager.GetMinions(Player.ServerPosition, 600).Count > 0);
         }
 
         private void SetMana()
@@ -200,6 +195,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             QMANA = Q.Instance.ManaCost;
             WMANA = W.Instance.ManaCost;
             EMANA = E.Instance.ManaCost;
+            RMANA = 0;
 
             if (!Q.IsReady())
                 QMANA = QMANA - Player.PARRegenRate * Q.Instance.Cooldown;
