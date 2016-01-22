@@ -124,7 +124,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Hextech").AddItem(new MenuItem("HextechCombo", "Hextech always in combo").SetValue(true));
 
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("Youmuus", "Youmuus").SetValue(true));
-            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("YoumuusR", "LucianR, TwitchR, AsheQ").SetValue(true));
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("YoumuusR", "TwitchR, AsheQ").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("YoumuusKS", "Youmuus KS").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("YoumuusCombo", "Youmuus always in combo").SetValue(false));
 
