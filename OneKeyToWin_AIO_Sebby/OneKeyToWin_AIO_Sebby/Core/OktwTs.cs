@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             var orbT = Orbwalker.GetTarget();
            
-            if (orbT!= null &&  orbT.Type == GameObjectType.obj_AI_Hero)
+            if (orbT != null)
             {
                 var bestTarget = (Obj_AI_Hero)orbT;
                 var hitToBestTarget = bestTarget.Health / Player.GetAutoAttackDamage(bestTarget);
