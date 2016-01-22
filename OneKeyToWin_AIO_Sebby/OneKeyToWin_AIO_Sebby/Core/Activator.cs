@@ -621,28 +621,9 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Program.Combo && FrostQueen.IsReady() && Config.Item("FrostQueen").GetValue<bool>())
+            if (Program.Combo && FrostQueen.IsReady() && Config.Item("FrostQueen").GetValue<bool>() && Player.CountEnemiesInRange(1000) > 0)
             {
-                var t = TargetSelector.GetTarget(FrostQueen.Range, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget())
-                {
-                    var predInput2 = new Core.PredictionInput
-                    {
-                        Aoe = true,
-                        Collision = false,
-                        Speed = 1200,
-                        Delay = 0.25f,
-                        Range = FrostQueen.Range,
-                        From = Player.ServerPosition,
-                        Radius = 200,
-                        Unit = t,
-                        Type = Core.SkillshotType.SkillshotCircle
-                    };
-                    var poutput2 = Core.Prediction.GetPrediction(predInput2);
-
-                    if (poutput2.Hitchance >= Core.HitChance.High)
-                        FrostQueen.Cast(poutput2.CastPosition);
-                }
+                FrostQueen.Cast();
             }
 
             if (Cutlass.IsReady() && Config.Item("Cutlass").GetValue<bool>())
