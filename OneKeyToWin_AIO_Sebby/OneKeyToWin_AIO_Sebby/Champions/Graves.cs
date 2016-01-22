@@ -178,42 +178,40 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
 
-                var qDmg = OktwCommon.GetKsDamage(t, Q);
-                var rDmg = R.GetDamage(t);
-                if (qDmg > t.Health)
-                {
-                    Q.Cast(t, true);
-                    OverKill = Game.Time;
-                    Program.debug("Q ks");
-                }
-
-                else if (qDmg + rDmg > t.Health && R.IsReady())
-                {
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                    if (Config.Item("fastR", true).GetValue<bool>() && rDmg < t.Health)
-                        Program.CastSpell(R, t);
-                    Program.debug("Q + R ks");
-                }
-
+                else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA + QMANA)
+                    Program.CastSpell(Q, t);
                 else
                 {
-                    if (Program.Combo && Player.Mana > RMANA + QMANA)
+                    var qDmg = OktwCommon.GetKsDamage(t, Q);
+                    var rDmg = R.GetDamage(t);
+                    if (qDmg > t.Health)
+                    {
+                        Q.Cast(t, true);
+                        OverKill = Game.Time;
+                        Program.debug("Q ks");
+                    }
+                    else if (qDmg + rDmg > t.Health && R.IsReady())
+                    {
                         Program.CastSpell(Q, t);
-                    else if ((Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA + QMANA) )
-                        Program.CastSpell(Q, t);
+                        if (Config.Item("fastR", true).GetValue<bool>() && rDmg < t.Health)
+                            Program.CastSpell(R, t);
+                        Program.debug("Q + R ks");
+                    }
                 }
 
-                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
+                if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy);
                 }
             }
-            else if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && ObjectManager.Player.Mana > RMANA + QMANA + EMANA + WMANA)
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
             {
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
+                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
-                if (Qfarm.MinionsHit > 3)
+                if (Qfarm.MinionsHit > 2)
                     Q.Cast(Qfarm.Position);
             }
         }
@@ -223,24 +221,21 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                if (OktwCommon.GetKsDamage(t, W) > t.Health)
+                var wDmg = OktwCommon.GetKsDamage(t, W);
+                if (wDmg > t.Health)
                 {
                     W.Cast(t, true, true);
                     return;
                 }
-                else if (W.GetDamage(t) + Q.GetDamage(t) > t.Health && Player.Mana > QMANA + WMANA + RMANA)
+                else if (wDmg + Q.GetDamage(t) > t.Health && Player.Mana > QMANA + WMANA + RMANA)
                 {
                     W.Cast(t, true, true);
                 }
-                else if (Program.Combo)
+                else if (Program.Combo && Player.Mana > RMANA + WMANA + QMANA)
                 {
-                    if (ObjectManager.Player.Mana > RMANA + WMANA + QMANA + EMANA && !Orbwalking.InAutoAttackRange(t))
+                    if (!Orbwalking.InAutoAttackRange(t) || Player.CountEnemiesInRange(300) > 0 || t.CountEnemiesInRange(250) > 1 || Player.HealthPercent < 50)
                         W.Cast(t, true, true);
-                    else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA + WMANA && ObjectManager.Player.CountEnemiesInRange(300) > 0)
-                        W.Cast(t, true, true);
-                    else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA && t.CountEnemiesInRange(250) > 1)
-                        W.Cast(t, true, true);
-                    else if (ObjectManager.Player.Mana > RMANA + WMANA + QMANA + EMANA)
+                    else if (Player.Mana > RMANA + WMANA + QMANA + EMANA)
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                             W.Cast(enemy, true, true);
