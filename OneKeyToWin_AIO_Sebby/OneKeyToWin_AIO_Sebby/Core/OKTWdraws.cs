@@ -34,20 +34,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             Utility.DelayAction.Add(7000, () => Intro.Remove());
 
-            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "Disable Utility draws").SetValue(false));
+            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "DISABLE UTILITY DRAWS").SetValue(false));
 
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("championInfo", "Game Info").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("ShowKDA", "Show flash and R info").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("GankAlert", "Gank Alert").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Enemy info grid").AddItem(new MenuItem("championInfo", "Game Info").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Enemy info grid").AddItem(new MenuItem("ShowKDA", "Show flash and R CD").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Enemy info grid").AddItem(new MenuItem("ShowRecall", "Show recall").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Enemy info grid").AddItem(new MenuItem("posX", "posX").SetValue(new Slider(20, 100, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Enemy info grid").AddItem(new MenuItem("posY", "posY").SetValue(new Slider(10, 100, 0)));
 
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("posX", "posX").SetValue(new Slider(20, 100, 0)));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("posY", "posY").SetValue(new Slider(10, 100, 0)));
-
+            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("GankAlert", "Gank Alert").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("HpBar", "Dmg indicators BAR OKTW© style").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("ShowClicks", "Show enemy clicks").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("SS", "SS notification").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("showWards", "Show hidden objects, wards").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("minimap", "Mini-map hack").SetValue(true));
+
             if (Program.AIOmode != 2)
             {
                 Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarm", "OKTW spells farm").SetValue(true)).Show();
@@ -56,6 +57,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("showNot", "Show notification").SetValue(true));
                 Config.Item("spellFarm").Permashow(true);
             }
+
             Tahoma13B = new Font( Drawing.Direct3DDevice, new FontDescription
                { FaceName = "Tahoma", Height = 14, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.ClearType });
 
@@ -69,8 +71,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             E = new Spell(SpellSlot.E);
             W = new Spell(SpellSlot.W);
             R = new Spell(SpellSlot.R);
-
-
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += OnDraw;
@@ -290,6 +290,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var championInfo = Config.Item("championInfo").GetValue<bool>();
             var GankAlert = Config.Item("GankAlert").GetValue<bool>();
             var ShowKDA = Config.Item("ShowKDA").GetValue<bool>();
+            var ShowRecall = Config.Item("ShowRecall").GetValue<bool>();
             var ShowClicks = Config.Item("ShowClicks").GetValue<bool>();
             float posY = ((float)Config.Item("posY").GetValue<Slider>().Value * 0.01f) * Drawing.Height;
             float posX = ((float)Config.Item("posX").GetValue<Slider>().Value * 0.01f) * Drawing.Width;
