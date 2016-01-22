@@ -34,13 +34,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             Utility.DelayAction.Add(7000, () => Intro.Remove());
 
-
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "Disable Utility draws").SetValue(false));
-            //Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableChampion", "Disable AIO champion (utility mode only) need F5").SetValue(false));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Draw AAcirlce OKTW© style").AddItem(new MenuItem("OrbDraw", "Draw AAcirlce OKTW© style").SetValue(false));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Draw AAcirlce OKTW© style").AddItem(new MenuItem("orb", "Orbwalker target OKTW© style").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Draw AAcirlce OKTW© style").AddItem(new MenuItem("1", "pls disable Orbwalking > Drawing > AAcirlce"));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Draw AAcirlce OKTW© style").AddItem(new MenuItem("2", "My HP: 0-30 red, 30-60 orange,60-100 green"));
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("championInfo", "Game Info").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("ChampionInfo").AddItem(new MenuItem("ShowKDA", "Show flash and R info").SetValue(true));
@@ -530,46 +524,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 positionGang = positionGang + 100;
             }
 
-            if (Program.AIOmode != 2)
-            {
-                DrawOrbwalkerRange();
-                DrawOrbwalkerTarget();
-            }
-            else
+            if (Program.AIOmode == 2)
             {
                 Drawing.DrawText(Drawing.Width * 0.2f, Drawing.Height * 1f, System.Drawing.Color.Cyan, "OKTW AIO only utility mode ON");
             }
-        }
 
-        private void DrawOrbwalkerRange()
-        {
-            if (Config.Item("OrbDraw").GetValue<bool>())
-            {
-                var aaRange = ObjectManager.Player.AttackRange + ObjectManager.Player.BoundingRadius * 2;
-                if (Player.HealthPercent > 60)
-                    Utility.DrawCircle(ObjectManager.Player.Position, aaRange, System.Drawing.Color.GreenYellow, 1, 1);
-                else if (Player.HealthPercent > 30)
-                    Utility.DrawCircle(ObjectManager.Player.Position, aaRange, System.Drawing.Color.Orange, 1, 1);
-                else
-                    Utility.DrawCircle(ObjectManager.Player.Position, aaRange, System.Drawing.Color.Red, 1, 1);
-            }
-        }
-
-        private void DrawOrbwalkerTarget()
-        {
-            if (Config.Item("orb").GetValue<bool>())
-            {
-                var orbT = Orbwalker.GetTarget();
-                if (orbT.IsValidTarget())
-                {
-                    if (orbT.Health > orbT.MaxHealth * 0.6)
-                        Utility.DrawCircle(orbT.Position, orbT.BoundingRadius, System.Drawing.Color.GreenYellow, 1, 1);
-                    else if (orbT.Health > orbT.MaxHealth * 0.3)
-                        Utility.DrawCircle(orbT.Position, orbT.BoundingRadius, System.Drawing.Color.Orange, 1, 1);
-                    else
-                        Utility.DrawCircle(orbT.Position, orbT.BoundingRadius, System.Drawing.Color.Red, 1, 1);
-                }
-            }
         }
     }
 }
