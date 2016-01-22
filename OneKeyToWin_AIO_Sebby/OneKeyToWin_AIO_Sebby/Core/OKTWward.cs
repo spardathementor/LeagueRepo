@@ -87,7 +87,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
 
             if (Config.Item("autoBuy").GetValue<bool>() && Player.InFountain() && !ScryingOrb.IsOwned() && Player.Level >= 9)
-                ObjectManager.Player.BuyItem(ItemId.Farsight_Orb_Trinket);
+                Player.BuyItem(ItemId.Farsight_Orb_Trinket);
 
             if(rengar && Player.HasBuff("rengarralertsound"))
                 CastVisionWards(Player.ServerPosition);
@@ -105,50 +105,40 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var need = OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
 
                 if (need == null || need.PredictedPos == null)
-                    return;
+                    continue;
+
+                var PPDistance = need.PredictedPos.Distance(Player.Position);
+
+                if(PPDistance > 1400)
+                    continue;
 
                 var timer = Game.Time - need.LastVisableTime;
 
-                if (timer > 0.5 && timer < 4 && Program.Combo && Player.ChampionName == "Quinn" && W.IsReady()  && need.LastVisablePos.Distance(Player.Position) < 1500 && Config.Item("autoW", true).GetValue<bool>())
+                if (timer > 1 && timer < 3)
                 {
-                    W.Cast();
-                    return;
-                }
+                    if (Program.Combo && PPDistance < 1500 && Player.ChampionName == "Quinn" && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
+                    {
+                        W.Cast();
+                    }
 
-                if (timer > 1 && timer < 3 && Program.Combo && Player.ChampionName == "Karhus" && Q.IsReady() && Player.CountEnemiesInRange(900) == 0)
-                {
-                    if (need.PredictedPos.Distance(Player.Position) < 900 && need.LastVisablePos.Distance(Player.Position) < 900)
+                    if (Program.Combo && PPDistance < 900 && Player.ChampionName == "Karhus" && Q.IsReady() && Player.CountEnemiesInRange(900) == 0)
                     {
                         Q.Cast(need.PredictedPos);
-                        return;
                     }
-                }
 
-
-                if (timer > 1 && timer < 3 && Program.Combo && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0  && Config.Item("autoE", true).GetValue<bool>())
-                {
-                    if (need.PredictedPos.Distance(Player.Position) < 2000 && need.LastVisablePos.Distance(Player.Position) < 2000)
+                    if (Program.Combo && PPDistance < 1400 && Player.ChampionName == "Ashe" && E.IsReady() && Player.CountEnemiesInRange(800) == 0 && Config.Item("autoE", true).GetValue<bool>())
                     {
-                        E.Cast(ObjectManager.Player.Position.Extend(need.PredictedPos, 5000));
-                        return;
+                        E.Cast(Player.Position.Extend(need.PredictedPos, 5000));
                     }
-                }
 
-                if (timer > 0.5 && timer < 2 && Player.ChampionName == "MissFortune" && E.IsReady() &&  Program.Combo && Player.Mana > 200f)
-                {
-                    if (need.PredictedPos.Distance(Player.Position) < 800 && need.LastVisablePos.Distance(Player.Position) < 800)
+                    if (PPDistance < 800 && Player.ChampionName == "MissFortune" && E.IsReady() && Program.Combo && Player.Mana > 200)
                     {
-                        E.Cast(ObjectManager.Player.Position.Extend(need.PredictedPos, 800));
-                        return;
+                        E.Cast(Player.Position.Extend(need.PredictedPos, 800));
                     }
-                }
 
-                if (timer < 2 && !Player.IsWindingUp && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f &&  Config.Item("bushW", true).GetValue<bool>())
-                {
-                    if (need.PredictedPos.Distance(Player.Position) < 800 && need.LastVisablePos.Distance(Player.Position) < 800)
+                    if (!Player.IsWindingUp && PPDistance < 800 && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f && Config.Item("bushW", true).GetValue<bool>())
                     {
                         W.Cast(need.PredictedPos);
-                        return;
                     }
                 }
 
@@ -159,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                     if (NavMesh.IsWallOfGrass(need.PredictedPos, 0))
                     {
-                        if (need.PredictedPos.Distance(Player.Position) < 600 && Config.Item("AutoWard").GetValue<bool>())
+                        if (PPDistance < 600 && Config.Item("AutoWard").GetValue<bool>())
                         {
                             if (TrinketN.IsReady())
                             {
@@ -193,7 +183,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                             }
                         }
 
-                        if (need.PredictedPos.Distance(Player.Position) < 1400 && Config.Item("AutoWardBlue").GetValue<bool>())
+                        if (Config.Item("AutoWardBlue").GetValue<bool>())
                         {
                             if (FarsightOrb.IsReady())
                             {
@@ -227,29 +217,30 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         AddWard("teemorcast", missile.EndPosition);
                 }
             }
-
-            if (sender.Type == GameObjectType.obj_AI_Minion && (sender.Name.ToLower() == "visionward" || sender.Name.ToLower() == "sightward") && !HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100) )
+            else if (sender.Type == GameObjectType.obj_AI_Minion  )
             {
-                foreach (var obj in HiddenObjList)
+                if ((sender.Name.ToLower() == "visionward" || sender.Name.ToLower() == "sightward") && !HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100))
                 {
-                    if (obj.pos.Distance(sender.Position) < 400)
+                    foreach (var obj in HiddenObjList)
                     {
-                        if (obj.type == 0)
+                        if (obj.pos.Distance(sender.Position) < 400)
                         {
-                            HiddenObjList.Remove(obj);
-                            return;
+                            if (obj.type == 0)
+                            {
+                                HiddenObjList.Remove(obj);
+                                return;
+                            }
                         }
                     }
+
+                    var dupa = (Obj_AI_Minion)sender;
+                    if (dupa.Mana == 0)
+                        HiddenObjList.Add(new HiddenObj() { type = 2, pos = sender.Position, endTime = float.MaxValue });
+                    else
+                        HiddenObjList.Add(new HiddenObj() { type = 1, pos = sender.Position, endTime = Game.Time + dupa.Mana });
                 }
-
-                var dupa = (Obj_AI_Minion)sender;
-                if(dupa.Mana == 0)
-                    HiddenObjList.Add(new HiddenObj() { type = 2, pos = sender.Position, endTime = float.MaxValue });
-                else
-                    HiddenObjList.Add(new HiddenObj() { type = 1, pos = sender.Position, endTime = Game.Time + dupa.Mana });
             }
-
-            if (rengar &&  sender.Position.Distance(Player.Position) < 800)
+            else if (rengar && sender.Position.Distance(Player.Position) < 800)
             {
                 switch (sender.Name)
                 {

@@ -66,9 +66,6 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (AIOmode != 1)
             {
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                    Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").SubMenu("Custome jungler (select one)").AddItem(new MenuItem("ro" + enemy.ChampionName, enemy.ChampionName).SetValue(false));
-
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("timer", "GankTimer").SetValue(true));
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("1", "RED - be careful"));
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("2", "ORANGE - you have time"));
@@ -311,7 +308,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
 
-                if (!bestPoint.IsWall() && !bestPoint.UnderTurret(true) && enemy.Distance(bestPoint) > dodgeRange)
+                if ( enemy.Distance(bestPoint) > dodgeRange && !bestPoint.IsWall() && !bestPoint.UnderTurret(true) )
                 {
                     Orbwalker.SetOrbwalkingPoint(bestPoint);
                 }
@@ -336,7 +333,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (AIOmode == 2)
                 return;
-            if (Combo && args.Target.Type == GameObjectType.obj_AI_Hero && Config.Item("comboDisableMode", true).GetValue<bool>())
+
+            if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>())
             {
                 var t = (Obj_AI_Hero)args.Target;
                 if( 4 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen"))
@@ -375,18 +373,12 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (AIOmode != 1 && Config.Item("timer").GetValue<bool>() && jungler != null && jungler.IsValid)
             {
-                foreach (var enemy in Enemies.Where(enemy => enemy.IsValid))
-                {
-                    if (Config.Item("ro" + enemy.ChampionName) != null && Config.Item("ro" + enemy.ChampionName).GetValue<bool>())
-                        jungler = enemy;
-                }
-
                 if (jungler.IsDead)
                 {
                     
                     timer = (int)(enemySpawn.Position.Distance(Player.Position) / 370);
                 }
-                else if (jungler.IsVisible && jungler.IsValid)
+                else if (jungler.IsVisible)
                 {
                     float Way = 0;
                     var JunglerPath = Player.GetPath(Player.Position, jungler.Position);
@@ -395,9 +387,10 @@ namespace OneKeyToWin_AIO_Sebby
                         return;
                     foreach (var point in JunglerPath)
                     {
-                        if (PointStart.Distance(point) > 0)
+                        var PSDistance = PointStart.Distance(point);
+                        if (PSDistance > 0)
                         {
-                            Way += PointStart.Distance(point);
+                            Way += PSDistance;
                             PointStart = point;
                         }
                     }
