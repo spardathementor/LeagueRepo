@@ -16,6 +16,7 @@ namespace OneKeyToWin_AIO_Sebby
         private Spell E, Q, R, W;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        public static Core.OKTWdash Dash;
 
         public void LoadOKTW()
         {
@@ -52,6 +53,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("farmQ", "Q farm helper", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("QE", "try Q + E ", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("Qonly", "Q only after AA", true).SetValue(false));
+            Dash = new Core.OKTWdash(Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("GapCloser").AddItem(new MenuItem("gapQ", "Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("GapCloser").AddItem(new MenuItem("gapE", "E", true).SetValue(true));
@@ -79,8 +81,6 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             if (E.IsReady() && Config.Item("gapE", true).GetValue<bool>() )
                 E.Cast(target);
-            if (Q.IsReady() && (!E.IsReady() || !Config.Item("gapE", true).GetValue<bool>()) && DashCheck(Player.Position.Extend(Game.CursorPos, Q.Range)) && Config.Item("gapQ", true).GetValue<bool>() )
-                Q.Cast();
             return;
         }
 
@@ -100,19 +100,20 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (!Q.IsReady())
                 return;
-            var dashPosition = Player.Position.Extend(Game.CursorPos, Q.Range);
-            if (!DashCheck(dashPosition))
-                return;
 
             var t = target as Obj_AI_Hero;
 
-            if (t.IsValidTarget() && dashPosition.Distance(t.Position) < 500 && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
+            if (t.IsValidTarget() && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
             {
-                Q.Cast(dashPosition, true);
+                Dash.CastDash();
                 Program.debug("" + t.Name + GetWStacks(t));
             }
             else if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
             {
+                var dashPosition = Player.Position.Extend(Game.CursorPos, Q.Range);
+                if (!Dash.IsGoodPosition(dashPosition))
+                    return;
+
                 var minions = MinionManager.GetMinions(dashPosition, Player.AttackRange, MinionTypes.All);
                 
                 if (minions == null || minions.Count == 0)
@@ -147,7 +148,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (CondemnCheck(Player.ServerPosition, target) && Config.Item("stun" + target.ChampionName).GetValue<bool>() )
                         E.Cast(target);
-                    else if (Q.IsReady() && DashCheck(dashPosition) && Config.Item("QE", true).GetValue<bool>() && CondemnCheck(dashPosition, target))
+                    else if (Q.IsReady() && Dash.IsGoodPosition(dashPosition) && Config.Item("QE", true).GetValue<bool>() && CondemnCheck(dashPosition, target))
                     {
                         Q.Cast(dashPosition);
                         Program.debug("Q + E");
@@ -168,19 +169,19 @@ namespace OneKeyToWin_AIO_Sebby
                     E.Cast(ksTarget);
             }
 
-            if (Program.LagFree(1) && Q.IsReady() && DashCheck(dashPosition))
+            if (Program.LagFree(1) && Q.IsReady())
             {
                 if (Config.Item("autoQR", true).GetValue<bool>() && Player.HasBuff("vayneinquisition")  && Player.CountEnemiesInRange(1500) > 0 && Player.CountEnemiesInRange(670) != 1)
                 {
-                    Q.Cast(dashPosition, true);
+                    Dash.CastDash();
                 }
                 if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && !Config.Item("Qonly", true).GetValue<bool>())
                 {
                     var t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
 
-                    if (t.IsValidTarget() && !Orbwalking.InAutoAttackRange(t) && t.Position.Distance(Game.CursorPos) < t.Position.Distance(Player.Position) && dashPosition.CountEnemiesInRange(800) < 3 && !OktwCommon.IsFaced(t))
+                    if (t.IsValidTarget() && !Orbwalking.InAutoAttackRange(t) && t.Position.Distance(Game.CursorPos) < t.Position.Distance(Player.Position) &&  !OktwCommon.IsFaced(t))
                     {
-                        Q.Cast(dashPosition);
+                        Dash.CastDash();
                     }
                 }
             }
@@ -192,8 +193,8 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (target.IsValidTarget(270) && target.IsMelee)
                     {
-                        if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>() && DashCheck(dashPosition))
-                            Q.Cast(dashPosition, true);
+                        if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
+                            Dash.CastDash();
                         else if (E.IsReady() && Player.Health < Player.MaxHealth * 0.5)
                         {
                             E.Cast(target);
@@ -223,20 +224,6 @@ namespace OneKeyToWin_AIO_Sebby
                         R.Cast();
                 }
             }
-        }
-
-        private bool DashCheck(Vector3 dash)
-        {
-            if (
-                !Player.Position.Extend(dash, Q.Range).IsWall()
-                && !Player.Position.Extend(dash, Q.Range - 100).IsWall()
-                && !Player.Position.Extend(dash, Q.Range - 200).IsWall()
-                && !Player.Position.Extend(dash, Q.Range - 300).IsWall()
-                && dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(600) < 2 && dash.CountEnemiesInRange(300) < 1
-                && (!dash.UnderTurret(true) || Program.Combo))
-                return true;
-            else
-                return false;
         }
 
         private bool CondemnCheck(Vector3 fromPosition, Obj_AI_Hero target)

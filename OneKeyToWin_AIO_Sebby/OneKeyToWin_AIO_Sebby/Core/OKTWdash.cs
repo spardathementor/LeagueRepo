@@ -39,7 +39,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 int GapcloserMode = Config.Item("GapcloserMode", true).GetValue<StringList>().SelectedIndex;
                 if (GapcloserMode == 0)
                 {
-                    CastOnGoodPos(Player.Position.Extend(Game.CursorPos, DashSpell.Range));
+                    var bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
+                    if (IsGoodPosition(bestpoint))
+                        DashSpell.Cast(bestpoint);
                 }
                 else
                 {
@@ -60,7 +62,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                             bestpoint = point;
                         }
                     }
-                    CastOnGoodPos(bestpoint);
+                    if (IsGoodPosition(bestpoint))
+                        DashSpell.Cast(bestpoint);
                 }
             }
         }
@@ -69,7 +72,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             int DashMode = Config.Item("DashMode", true).GetValue<StringList>().SelectedIndex;
             if (DashMode == 0)
             {
-                CastOnGoodPos(Player.Position.Extend(Game.CursorPos, DashSpell.Range));
+                var bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
+                if (IsGoodPosition(bestpoint))
+                    DashSpell.Cast(bestpoint);
             }
             else if (DashMode == 1)
             {
@@ -87,10 +92,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     var rEndPos = new Vector3(rightEndPos.X, rightEndPos.Y, Player.Position.Z);
                     var lEndPos = new Vector3(leftEndPos.X, leftEndPos.Y, Player.Position.Z);
 
-                    if(Game.CursorPos.Distance(rEndPos) < Game.CursorPos.Distance(lEndPos))
-                        CastOnGoodPos(Player.Position.Extend(rEndPos, DashSpell.Range));
+                    if (Game.CursorPos.Distance(rEndPos) < Game.CursorPos.Distance(lEndPos))
+                    {
+                        var bestpoint = Player.Position.Extend(rEndPos, DashSpell.Range);
+                        if (IsGoodPosition(bestpoint))
+                            DashSpell.Cast(bestpoint);
+                    }
                     else
-                        CastOnGoodPos(Player.Position.Extend(lEndPos, DashSpell.Range));
+                    {
+                        var bestpoint = Player.Position.Extend(lEndPos, DashSpell.Range);
+                        if (IsGoodPosition(bestpoint))
+                            DashSpell.Cast(bestpoint);
+                    }
                 }
             }
             else if (DashMode == 2)
@@ -112,11 +125,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         bestpoint = point;
                     }
                 }
-                CastOnGoodPos(bestpoint);
+                if(IsGoodPosition(bestpoint))
+                    DashSpell.Cast(bestpoint);
             }
         }
 
-        private void CastOnGoodPos(Vector3 dashPos)
+        public bool IsGoodPosition(Vector3 dashPos)
         {
             if (Config.Item("WallCheck", true).GetValue<bool>())
             {
@@ -124,23 +138,28 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 for (int i = 1; i <= 5; i++)
                 {
                     if (Player.Position.Extend(dashPos, i * segment).IsWall())
-                        return;
+                        return false;
                 }
             }
 
             if (Config.Item("TurretCheck", true).GetValue<bool>())
             {
                 if(dashPos.UnderTurret(true))
-                    return;
+                    return false;
             }
+
             var enemyCheck = Config.Item("EnemyCheck", true).GetValue<Slider>().Value;
             var enemyCountDashPos = dashPos.CountEnemiesInRange(600);
-            var enemyCountPlayer = Player.CountEnemiesInRange(500);
+            
+            if (enemyCheck > enemyCountDashPos)
+                return true;
 
-            if (enemyCheck > enemyCountDashPos || enemyCountDashPos <= enemyCountPlayer)
-            {
-                DashSpell.Cast(dashPos);
-            }
+            var enemyCountPlayer = Player.CountEnemiesInRange(400);
+
+            if(enemyCountDashPos <= enemyCountPlayer)
+                return true;
+
+            return false;
         }
     }
 }
