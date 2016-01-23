@@ -25,7 +25,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("WallCheck", "Block dash in wall", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("TurretCheck", "Block dash under turret", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("GapcloserMode", "Gapcloser MODE", true).SetValue(new StringList(new[] { "Game Cursor", "Away - safe position" }, 1)));
+            Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").SubMenu("Gapcloser").AddItem(new MenuItem("GapcloserMode", "Gapcloser MODE", true).SetValue(new StringList(new[] { "Game Cursor", "Away - safe position" }, 1)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").SubMenu("Gapcloser").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
