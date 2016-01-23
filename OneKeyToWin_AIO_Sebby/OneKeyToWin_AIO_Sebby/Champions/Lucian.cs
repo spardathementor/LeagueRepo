@@ -20,6 +20,7 @@ namespace OneKeyToWin_AIO_Sebby
         private bool passRdy = false;
         private float castR = Game.Time;
         public Obj_AI_Hero Player {get { return ObjectManager.Player; }}
+        public static Core.OKTWdash Dash;
 
         public void LoadOKTW()
         {
@@ -36,6 +37,8 @@ namespace OneKeyToWin_AIO_Sebby
             R.SetSkillshot(0.1f, 110, 2800, true, SkillshotType.SkillshotLine);
             R1.SetSkillshot(0.1f, 110, 2800, false, SkillshotType.SkillshotLine);
 
+            
+
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -49,11 +52,8 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("ignoreCol", "Ignore collision", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("nktdE", "NoKeyToDash", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("slowE", "Auto SlowBuff E", true).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gapcloser").SubMenu("Use on:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
-
+            Dash = new Core.OKTWdash(E);
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -69,20 +69,6 @@ namespace OneKeyToWin_AIO_Sebby
             Orbwalking.AfterAttack += afterAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Spellbook.OnCastSpell +=Spellbook_OnCastSpell;
-            AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-
-        }
-
-        private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
-        {
-            if ( E.IsReady() && Player.Position.Extend(Game.CursorPos, 400).CountEnemiesInRange(400) < 2)
-            {
-                var t = gapcloser.Sender;
-                if (t.IsValidTarget(E.Range) && Config.Item("EGCchampion" + t.ChampionName, true).GetValue<bool>())
-                {
-                    E.Cast(Game.CursorPos);
-                }
-            }
         }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -256,31 +242,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-            
-            var dashPosition = Player.Position.Extend(Game.CursorPos, E.Range);
-            if (dashPosition.IsWall() || dashPosition.CountEnemiesInRange(800) > 2)
-                return;
-            if (Game.CursorPos.Distance(Player.Position) > Player.AttackRange + Player.BoundingRadius * 2 && Program.Combo && Config.Item("nktdE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA - 10)
-            {
-                if (!passRdy && !SpellLock)
-                    E.Cast(Game.CursorPos);
-                else if (!Orbwalker.GetTarget().IsValidTarget())
-                    E.Cast(Game.CursorPos);
-            }
-
-            if ( Player.Mana < RMANA + EMANA || !Config.Item("autoE", true).GetValue<bool>() || passRdy || SpellLock)
+            if ( Player.Mana < RMANA + EMANA || !Program.Combo || !Config.Item("autoE", true).GetValue<bool>() || passRdy || SpellLock)
                 return;
 
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(270) && target.IsMelee))
-            {
-                if (target.Position.Distance(Game.CursorPos) > target.Position.Distance(Player.Position))
-                    E.Cast(dashPosition, true);
-            }
-
-            if (Config.Item("slowE", true).GetValue<bool>() && Player.HasBuffOfType(BuffType.Slow))
-            {
-                E.Cast(dashPosition, true);
-            }
+            Dash.CastDash();
         }
 
 
@@ -377,14 +342,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Drawing_OnDraw(EventArgs args)
         {
-
-            if (Config.Item("nktdE", true).GetValue<bool>())
-            {
-                if (Game.CursorPos.Distance(Player.Position) > Player.AttackRange + Player.BoundingRadius * 2)
-                    drawText("dash: ON ", Player.Position, System.Drawing.Color.Red);
-                else
-                    drawText("dash: OFF ", Player.Position, System.Drawing.Color.GreenYellow);
-            }
 
             if (Config.Item("qRange", true).GetValue<bool>())
             {

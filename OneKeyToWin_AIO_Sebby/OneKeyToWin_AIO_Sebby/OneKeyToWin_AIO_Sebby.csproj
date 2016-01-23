@@ -101,6 +101,7 @@
     <Compile Include="Core\AutoLvlUp.cs" />
     <Compile Include="Core\MissileReturn.cs" />
     <Compile Include="Core\OktwCommon.cs" />
+    <Compile Include="Core\OKTWdash.cs" />
     <Compile Include="Core\OKTWdraws.cs" />
     <Compile Include="Core\OKTWlab.cs" />
     <Compile Include="Core\OktwTs.cs" />
