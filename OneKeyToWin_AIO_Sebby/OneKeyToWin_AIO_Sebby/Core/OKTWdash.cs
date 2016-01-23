@@ -135,7 +135,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
             var enemyCheck = Config.Item("EnemyCheck", true).GetValue<Slider>().Value;
             var enemyCountDashPos = dashPos.CountEnemiesInRange(600);
-            var enemyCountPlayer = Player.CountEnemiesInRange(600);
+            var enemyCountPlayer = Player.CountEnemiesInRange(500);
 
             if (enemyCheck > enemyCountDashPos || enemyCountDashPos <= enemyCountPlayer)
             {
