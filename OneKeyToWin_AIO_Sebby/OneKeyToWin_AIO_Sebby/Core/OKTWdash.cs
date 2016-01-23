@@ -109,7 +109,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             else if (DashMode == 2)
             {
                 var points = OktwCommon.CirclePoints(12, DashSpell.Range, Player.Position);
-                var bestpoint = Player.Position.Extend(Game.CursorPos, 400);
+                var bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
                 int enemies = bestpoint.CountEnemiesInRange(400);
                 foreach (var point in points)
                 {
