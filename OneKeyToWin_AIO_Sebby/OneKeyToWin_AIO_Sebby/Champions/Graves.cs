@@ -19,6 +19,7 @@ namespace OneKeyToWin_AIO_Sebby
         public bool Esmart = false;
         public float OverKill = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; }}
+        public static Core.OKTWdash Dash;
 
         public void LoadOKTW()
         {
@@ -52,20 +53,19 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("Haras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("Q config").SubMenu("Harras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Harras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W config").AddItem(new MenuItem("AGCW", "AntiGapcloser W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGCW", "AntiGapcloser W", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("AGCE", "AntiGapcloser E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("smartE", "SmartCast E key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Dash = new Core.OKTWdash(E);
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("fastR", "Fast R ks Combo", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("fastR", "Fast R ks Combo", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 0)));
@@ -89,12 +89,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var t = gapcloser.Sender;
                 if (t.IsValidTarget(E.Range) )
                 {
-                    if (E.IsReady() && Config.Item("AGCE", true).GetValue<bool>() && Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(400) < 3)
-                    {
-                        E.Cast(Player.Position.Extend(Game.CursorPos, E.Range), true);
-                        Program.debug("E AGC");
-                    }
-                    else if (W.IsReady() && Config.Item("AGCW", true).GetValue<bool>())
+                    if (W.IsReady() && Config.Item("AGCW", true).GetValue<bool>())
                     {
                         W.Cast(gapcloser.End);
                         Program.debug("W AGC");
@@ -112,18 +107,6 @@ namespace OneKeyToWin_AIO_Sebby
                 if (t.IsValidTarget())
                     R1.Cast(t, true);
             }
-
-            if (E.IsReady())
-            {
-                if (Config.Item("smartE", true).GetValue<KeyBind>().Active)
-                    Esmart = true;
-
-                if (Esmart && ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(500) < 4)
-                    E.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range), true);
-            }
-            else
-                Esmart = false;
-
 
             if (Program.LagFree(0))
             {
@@ -248,9 +231,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo2"))
             {
-                var dash = Player.Position.Extend(Game.CursorPos, E.Range);
-                if (dash.CountEnemiesInRange(800) < 3 && dash.CountEnemiesInRange(400) < 2 && dash.CountEnemiesInRange(200) < 1)
-                    E.Cast(dash);
+                Dash.CastDash();
             }
         }
 
