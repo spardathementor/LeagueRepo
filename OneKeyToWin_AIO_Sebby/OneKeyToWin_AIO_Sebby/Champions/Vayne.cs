@@ -87,7 +87,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             var t = args.Target as Obj_AI_Hero;
 
-            if (GetWStacks(t) < 2 && args.Target.Health > 3 * Player.GetAutoAttackDamage(t))
+            if (GetWStacks(t) < 2 && args.Target.Health > 5 * Player.GetAutoAttackDamage(t))
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(800) && GetWStacks(target) == 2))
                 {
