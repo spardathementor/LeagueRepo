@@ -253,11 +253,20 @@ namespace OneKeyToWin_AIO_Sebby
                     Program.CastSpell(R, target);
                     Program.debug("Rdmg");
                 }
-                else if (rDmg2 > target.Health)
+                else if (rDmg2 > target.Health )
                 {
-                    Program.CastSpell(R1, target);
-                    Program.debug("Rdmg2");
+                    if (!OktwCommon.IsSpellHeroCollision(target, R1))
+                    {
+                        Program.CastSpell(R1, target);
+                        Program.debug("Rdmg2");
+                    }
+                    else if (target.IsValidTarget(1200))
+                    {
+                        Program.CastSpell(R1, target);
+                        Program.debug("Rdmg2 collision");
+                    }
                 }
+
             }
         }
 
