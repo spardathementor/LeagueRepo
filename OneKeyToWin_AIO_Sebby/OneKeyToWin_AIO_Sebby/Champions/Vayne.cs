@@ -49,10 +49,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange2", "E push position", true).SetValue(false));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("farmQ", "Q farm helper", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("QE", "try Q + E ", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q config").AddItem(new MenuItem("Qonly", "Q only after AA", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("farmQ", "Q farm helper", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QE", "try Q + E ", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qonly", "Q only after AA", true).SetValue(false));
             Dash = new Core.OKTWdash(Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("GapCloser").AddItem(new MenuItem("gapQ", "Q", true).SetValue(true));
@@ -98,15 +98,30 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!Q.IsReady())
+            if (target.Type != GameObjectType.obj_AI_Hero)
                 return;
 
             var t = target as Obj_AI_Hero;
 
+            if (E.IsReady() && Config.Item("Eks", true).GetValue<bool>())
+            {
+                var dmgE = E.GetDamage(t) + OktwCommon.GetIncomingDamage(t, 0.5f, false);
+
+                if (GetWStacks(t) == 1)
+                    dmgE += Wdmg(t);
+
+                if (dmgE > t.Health)
+                {
+                    E.Cast(t);
+                }
+            }
+
+            if (!Q.IsReady())
+                return;
+
             if (t.IsValidTarget() && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
             {
                 Dash.CastDash();
-                Program.debug("" + t.Name + GetWStacks(t));
             }
             else if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
             {
@@ -131,11 +146,9 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private float Wdmg(Obj_AI_Base target)
+        private double Wdmg(Obj_AI_Base target)
         {
-            var dmg = (W.Level * 10 + 10) + ((0.03 + (W.Level * 0.01)) * target.MaxHealth );
-            return (float)dmg;
-
+            return target.MaxHealth * (4.5 + W.Level * 1.5) * 0.01;
         }
         private void Game_OnGameUpdate(EventArgs args)
         {
@@ -153,20 +166,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Q.Cast(dashPosition);
                         Program.debug("Q + E");
                     }
-
-                    if (Config.Item("Eks", true).GetValue<bool>())
-                    {
-                        var dmgE = E.GetDamage(target);
-                        if (dmgE > target.Health || (GetWStacks(target) == 2 && dmgE + Wdmg(target) > target.Health))
-                        {
-                            ksTarget = target;
-                            
-                        }  
-                    } 
                 }
-
-                if(ksTarget != Player)
-                    E.Cast(ksTarget);
             }
 
             if (Program.LagFree(1) && Q.IsReady())
@@ -230,12 +230,12 @@ namespace OneKeyToWin_AIO_Sebby
         {
             var prepos = E.GetPrediction(target);
 
-            float pushDistance = 460;
+            float pushDistance = 470;
 
             if (Player.ServerPosition != fromPosition)
-                pushDistance = 400 ;
+                pushDistance = 410 ;
 
-            int radius = 120;
+            int radius = 200;
             var start2 = target.ServerPosition;
             var end2 = prepos.CastPosition.Extend(fromPosition, -pushDistance);
 
