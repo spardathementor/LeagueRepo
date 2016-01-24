@@ -255,7 +255,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else if (rDmg2 > target.Health)
                 {
-                    Program.CastSpell(R, target);
+                    Program.CastSpell(R1, target);
                     Program.debug("Rdmg2");
                 }
             }
