@@ -27,7 +27,7 @@ namespace OneKeyToWin_AIO_Sebby
             W = new Spell(SpellSlot.W, 950f);
             E = new Spell(SpellSlot.E, 450f);
             R = new Spell(SpellSlot.R, 1000f);
-            R1 = new Spell(SpellSlot.R, 1500f);
+            R1 = new Spell(SpellSlot.R, 1700f);
 
             Q.SetSkillshot(0.25f, 100f, 2100f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
@@ -100,8 +100,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            
-                if (Config.Item("useR", true).GetValue<KeyBind>().Active && R.IsReady())
+            if (Config.Item("useR", true).GetValue<KeyBind>().Active && R.IsReady())
             {
                 var t = TargetSelector.GetTarget(1800, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
@@ -239,7 +238,6 @@ namespace OneKeyToWin_AIO_Sebby
         {
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R1.Range) && target.Health - OktwCommon.GetIncomingDamage(target) > 0 && OktwCommon.ValidUlt(target)))
             {
-
                 double rDmg = OktwCommon.GetKsDamage(target,R);
 
                 if (rDmg < target.Health)
@@ -247,8 +245,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 double rDmg2 = rDmg * 0.8;
                 
-                bool collision = OktwCommon.IsSpellHeroCollision(target, R);
-                if(target.IsValidTarget(R.Range) && !collision && rDmg > target.Health)
+                if(target.IsValidTarget(R.Range) && !OktwCommon.IsSpellHeroCollision(target, R) && rDmg > target.Health)
                 {
                     Program.CastSpell(R, target);
                     Program.debug("Rdmg");
@@ -266,7 +263,6 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.debug("Rdmg2 collision");
                     }
                 }
-
             }
         }
 
@@ -292,7 +288,6 @@ namespace OneKeyToWin_AIO_Sebby
         }
         private void Drawing_OnDraw(EventArgs args)
         {
-
             if (Config.Item("qRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
