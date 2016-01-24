@@ -237,65 +237,27 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicR()
         {
-            bool cast = false;
-            double secoundDmgR = 0.80;
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R1.Range) && OktwCommon.ValidUlt(target)))
+            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R1.Range) && target.Health - OktwCommon.GetIncomingDamage(target) > 0 && OktwCommon.ValidUlt(target)))
             {
 
-                float predictedHealth = target.Health + target.HPRegenRate ;
-                double Rdmg = OktwCommon.GetKsDamage(target,R);
-                var collisionTarget = target;
-                cast = true;
-                PredictionOutput output = R.GetPrediction(target);
-                Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
-                direction.Normalize();
-                List<Obj_AI_Hero> enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy && x.IsValidTarget()).ToList();
-                foreach (var enemy in enemies)
-                {
-                    if (enemy.SkinName == target.SkinName || !cast)
-                        continue;
-                    PredictionOutput prediction = R.GetPrediction(enemy);
-                    Vector3 predictedPosition = prediction.CastPosition;
-                    Vector3 v = output.CastPosition - Player.ServerPosition;
-                    Vector3 w = predictedPosition - Player.ServerPosition;
-                    double c1 = Vector3.Dot(w, v);
-                    double c2 = Vector3.Dot(v, v);
-                    double b = c1 / c2;
-                    Vector3 pb = Player.ServerPosition + ((float)b * v);
-                    float length = Vector3.Distance(predictedPosition, pb);
-                    if (length < (120 + enemy.BoundingRadius) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
-                    {
-                        cast = false;
-                        collisionTarget = enemy;
-                    }
-                }
-                if (cast
-                    && Rdmg > predictedHealth
-                    && target.IsValidTarget(R.Range)
-                    && (!Orbwalking.InAutoAttackRange(target) || ObjectManager.Player.Health < ObjectManager.Player.MaxHealth * 0.6))
+                double rDmg = OktwCommon.GetKsDamage(target,R);
+
+                if (rDmg < target.Health)
+                    continue;
+
+                double rDmg2 = rDmg * 0.8;
+                
+                bool collision = OktwCommon.IsSpellHeroCollision(target, R);
+                if(target.IsValidTarget(R.Range) && !collision && rDmg > target.Health)
                 {
                     Program.CastSpell(R, target);
                     Program.debug("Rdmg");
                 }
-                else if (cast
-                    && Rdmg * secoundDmgR > predictedHealth
-                    && target.IsValidTarget(R1.Range)
-                    && target.CountAlliesInRange(300) == 0 && (!Orbwalking.InAutoAttackRange(target) || ObjectManager.Player.Health < ObjectManager.Player.MaxHealth * 0.6))
+                else if (rDmg2 > target.Health)
                 {
                     Program.CastSpell(R, target);
-                    Program.debug("Rdmg 0.7");
+                    Program.debug("Rdmg2");
                 }
-                else if (!cast && Rdmg * secoundDmgR > predictedHealth && target.IsValidTarget(Player.Distance(collisionTarget.Position) + 700))
-                {
-                    Program.CastSpell(R, target);
-                    Program.debug("Rdmg 0.7 collision");
-                }
-                else if (cast && Config.Item("fastR", true).GetValue<bool>() && Rdmg > predictedHealth && Orbwalking.InAutoAttackRange(target) && Program.Combo)
-                {
-                    Program.CastSpell(R, target);
-                    Program.debug("R fast");
-                }
-                
             }
         }
 

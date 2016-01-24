@@ -202,6 +202,24 @@ namespace OneKeyToWin_AIO_Sebby
                 args.Process = false;
             }
         }
+        public static bool IsSpellHeroCollision(Obj_AI_Hero t, Spell QWER, int extraWith = 50)
+        {
+            foreach (var hero in HeroManager.Enemies.FindAll( hero => hero.IsValidTarget(QWER.Range + QWER.Width, true, QWER.RangeCheckFrom) && t.NetworkId != hero.NetworkId))
+            {
+                var prediction = QWER.GetPrediction(hero);
+                var powCalc = Math.Pow((QWER.Width + extraWith + hero.BoundingRadius), 2);
+                if (prediction.UnitPosition.To2D().Distance(QWER.From.To2D(), QWER.GetPrediction(t).CastPosition.To2D(), true, true) <= powCalc)
+                {
+                    return true;
+                }
+                else if (prediction.UnitPosition.To2D().Distance(QWER.From.To2D(), t.ServerPosition.To2D(), true, true) <= powCalc)
+                {
+                    return true;
+                }
+                   
+            }
+            return false;
+        }
 
         public static bool CollisionYasuo(Vector3 from, Vector3 to)
         {
