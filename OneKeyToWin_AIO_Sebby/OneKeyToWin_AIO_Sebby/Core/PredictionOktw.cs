@@ -451,7 +451,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 200 && GetAngle(input.From, input.Unit) < angleMove)
+            if (distanceFromToWaypoint > 200 && input.Unit.Path.Count() == 1 && GetAngle(input.From, input.Unit) < angleMove)
             {
                 Program.debug(GetAngle(input.From, input.Unit) +  " PRED: RUN IN LANE DETECTION " + angleMove);
                 result.Hitchance = HitChance.VeryHigh;
@@ -505,18 +505,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
 
-            // ANGLE HIT CHANCE ///////////////////////////////////////////////////////////////////////////////////
-
-            if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() == 1)
-            {
-                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > 200)
-                {
-                    Program.debug("PRED: ANGLE HIT CHANCE " + angleMove + " > " + GetAngle(input.From, input.Unit));
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-
-                }
-            }
 
             // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
 
