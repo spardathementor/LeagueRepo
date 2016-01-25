@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             DashSpell = qwer;
             
-            Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("DashMode", "Dash MODE", true).SetValue(new StringList(new[] { "Game Cursor", "Side", "Safe position" }, 1)));
+            Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("DashMode", "Dash MODE", true).SetValue(new StringList(new[] { "Game Cursor", "Side", "Safe position" }, 2)));
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("EnemyCheck", "Block dash in x enemies ", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("WallCheck", "Block dash in wall", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("TurretCheck", "Block dash under turret", true).SetValue(true));
