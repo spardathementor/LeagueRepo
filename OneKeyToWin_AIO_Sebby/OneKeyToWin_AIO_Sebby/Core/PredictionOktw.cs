@@ -453,9 +453,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (distanceFromToWaypoint > 200 && input.Unit.Path.Count() == 1 && GetAngle(input.From, input.Unit) < angleMove)
             {
-                Program.debug(GetAngle(input.From, input.Unit) +  " PRED: RUN IN LANE DETECTION " + angleMove);
-                result.Hitchance = HitChance.VeryHigh;
-                return result;
+                if (!input.Unit.IsFacing(ObjectManager.Player))
+                {
+                    Program.debug(GetAngle(input.From, input.Unit) + " PRED: RUN IN LANE DETECTION " + angleMove);
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
+                else if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+                {
+                    Program.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
             }
 
             // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
@@ -1106,7 +1115,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < input.Unit.BoundingRadius + input.Radius)
+                                else if (minion.ServerPosition.Distance(position) < input.Radius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
