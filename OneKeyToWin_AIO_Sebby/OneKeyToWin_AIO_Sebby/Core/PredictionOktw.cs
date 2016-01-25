@@ -388,7 +388,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 17) - (totalDelay * 2);
+            double angleMove = 30 + (input.Radius / 20) - (totalDelay * 2.5);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 900f;
 
@@ -398,6 +398,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
+                pathMinLen = 700;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -431,7 +432,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 300 || distanceFromToWaypoint < 200)
+            if (distanceFromToUnit < 300 + input.Radius || distanceFromToWaypoint < 200 + input.Radius)
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -450,7 +451,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > fixRange  && GetAngle(input.From, input.Unit) < angleMove)
+            if (distanceFromToWaypoint > 200 && GetAngle(input.From, input.Unit) < angleMove)
             {
                 Program.debug(GetAngle(input.From, input.Unit) +  " PRED: RUN IN LANE DETECTION " + angleMove);
                 result.Hitchance = HitChance.VeryHigh;
@@ -506,9 +507,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // ANGLE HIT CHANCE ///////////////////////////////////////////////////////////////////////////////////
 
-            if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() > 0 && input.Unit.IsMoving)
+            if (input.Type == SkillshotType.SkillshotLine && input.Unit.Path.Count() == 1)
             {
-                if (GetAngle(input.From, input.Unit) < angleMove && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d && distanceUnitToWaypoint > moveArea * 0.6)
+                if (GetAngle(input.From, input.Unit) < angleMove && distanceUnitToWaypoint > 200)
                 {
                     Program.debug("PRED: ANGLE HIT CHANCE " + angleMove + " > " + GetAngle(input.From, input.Unit));
                     result.Hitchance = HitChance.VeryHigh;
@@ -1117,7 +1118,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < input.Unit.BoundingRadius)
+                                else if (minion.ServerPosition.Distance(position) < input.Unit.BoundingRadius + input.Radius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
@@ -1131,7 +1132,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                     if (minion.IsMoving)
                                     {
                                         minionPos = Prediction.GetPrediction(input, false, false).CastPosition;
-                                        bonusRadius = 100;
+                                        bonusRadius = 60 + (int)input.Radius;
                                     }
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
