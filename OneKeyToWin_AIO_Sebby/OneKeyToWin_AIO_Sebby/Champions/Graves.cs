@@ -64,7 +64,8 @@ namespace OneKeyToWin_AIO_Sebby
             Dash = new Core.OKTWdash(E);
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("fastR", "Fast R ks Combo", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("fastR", "Fast R ks Combo", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("overkillR", "Overkill protection", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
@@ -174,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby
                         OverKill = Game.Time;
                         Program.debug("Q ks");
                     }
-                    else if (qDmg + rDmg > t.Health && R.IsReady())
+                    else if (qDmg + rDmg > t.Health && R.IsReady() && Player.Mana > RMANA + QMANA)
                     {
                         Program.CastSpell(Q, t);
                         if (Config.Item("fastR", true).GetValue<bool>() && rDmg < t.Health)
@@ -242,6 +243,14 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (rDmg < target.Health)
                     continue;
+
+                if (Config.Item("overkillR", true).GetValue<bool>() && target.Health < Player.Health)
+                {
+                    if(Orbwalking.InAutoAttackRange(target))
+                        continue;
+                    if (target.CountAlliesInRange(400) > 0)
+                        continue;
+                }
 
                 double rDmg2 = rDmg * 0.8;
                 
