@@ -32,6 +32,7 @@ namespace OneKeyToWin_AIO_Sebby
     {
         private static int LastAATick = Utils.GameTimeTickCount;
         public static bool YasuoInGame = false;
+        public static bool Thunderlord = false;
 
         public static bool 
             blockMove = false,
@@ -54,6 +55,7 @@ namespace OneKeyToWin_AIO_Sebby
                     YasuoInGame = true;
             }
 
+            Thunderlord = ObjectManager.Player.Masteries.Any(x => x.Id == 146);
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell +=Spellbook_OnCastSpell;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -269,7 +271,8 @@ namespace OneKeyToWin_AIO_Sebby
                     totalDmg -= t.Mana / 2f;
                 }
             }
-
+            if (Thunderlord && !Player.HasBuff( "masterylordsdecreecooldown"))
+                totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 10 * Player.Level + 0.1 * Player.FlatMagicDamageMod + 0.3 * Player.FlatPhysicalDamageMod);
             totalDmg += (float)GetIncomingDamage(t);
             return totalDmg;
         }
