@@ -271,8 +271,8 @@ namespace OneKeyToWin_AIO_Sebby
                     totalDmg -= t.Mana / 2f;
                 }
             }
-            if (Thunderlord && !Player.HasBuff( "masterylordsdecreecooldown"))
-                totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 10 * Player.Level + 0.1 * Player.FlatMagicDamageMod + 0.3 * Player.FlatPhysicalDamageMod);
+            //if (Thunderlord && !Player.HasBuff( "masterylordsdecreecooldown"))
+                //totalDmg += (float)Player.CalcDamage(t, Damage.DamageType.Magical, 10 * Player.Level + 0.1 * Player.FlatMagicDamageMod + 0.3 * Player.FlatPhysicalDamageMod);
             totalDmg += (float)GetIncomingDamage(t);
             return totalDmg;
         }
