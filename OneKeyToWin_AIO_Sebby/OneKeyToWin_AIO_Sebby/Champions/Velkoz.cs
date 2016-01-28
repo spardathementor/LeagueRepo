@@ -56,7 +56,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRexploit", "R exploit in combo", true).SetValue(false));
 
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -76,16 +75,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Spellbook.OnUpdateChargedSpell += Spellbook_OnUpdateChargedSpell;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
 
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if(sender.IsMe && Program.Combo && Config.Item("autoRexploit", true).GetValue<bool>() && R.IsReady() && args.SData.IsAutoAttack() )
-            {
-                Utility.DelayAction.Add(20, () => R.Cast(args.Target.Position));
-            }
-        }
 
         private void Spellbook_OnUpdateChargedSpell(Spellbook sender, SpellbookUpdateChargedSpellEventArgs args)
         {
@@ -137,15 +128,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (t.IsValidTarget() && OktwCommon.ValidUlt(t))
                     {
                         Player.Spellbook.UpdateChargedSpell(SpellSlot.R, R.GetPrediction(t, true).CastPosition, false, false);
-                    }
-                }
-                if (Config.Item("autoRexploit", true).GetValue<bool>())
-                {
-                    Player.Spellbook.UpdateChargedSpell(SpellSlot.R, Game.CursorPos, false, false);
-
-                    if (Program.LagFree(4))
-                    {
-                        R.Cast(Game.CursorPos);
                     }
                 }
             }
