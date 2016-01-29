@@ -27,8 +27,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 950);
             R = new Spell(SpellSlot.R, 600);
 
-            Q.SetSkillshot(0.25f, 100, 1600, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 70, 1600, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 90, 1550, false, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.2f, 70, 1550, true, SkillshotType.SkillshotLine);
 
             missileManager = new Core.MissileReturn("AhriOrbMissile", "AhriOrbReturn", Q);
 
