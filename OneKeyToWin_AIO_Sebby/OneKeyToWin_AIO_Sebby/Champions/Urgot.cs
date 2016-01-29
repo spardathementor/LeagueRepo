@@ -54,19 +54,22 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Items").AddItem(new MenuItem("mura", "Auto Muramana", true).SetValue(true));
             Config.SubMenu("Items").AddItem(new MenuItem("stack", "Stack Tear if full mana", true).SetValue(false));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E config").AddItem(new MenuItem("autoE", "Auto E haras", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Waa", "Auto W befor AA", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGC", "AntiGapcloserW", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoR", "Auto R under turrent", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("inter", "OnPossibleToInterrupt R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("Rhp", "dont R if under % hp", true).SetValue(new Slider(50, 100, 0)));
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E haras", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R under turrent", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("inter", "OnPossibleToInterrupt R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rhp", "dont R if under % hp", true).SetValue(new Slider(50, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("R option").SubMenu("GapCloser R").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName, true).SetValue(false));
+                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser R").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName, true).SetValue(false));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").AddItem(new MenuItem("Waa", "Auto W befor AA", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").AddItem(new MenuItem("AGC", "AntiGapcloserW", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Shield Config").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LC", "LaneClear", true).SetValue(true));
@@ -75,7 +78,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void OnInterruptableSpell(Obj_AI_Hero unit, InterruptableSpell spell)
         {
-            if (Config.Item("inter", true).GetValue<bool>() && R.IsReady() && unit.IsValidTarget(R.Range) && Player.HealthPercentage() >= Config.Item("Rhp", true).GetValue<Slider>().Value)
+            if (Config.Item("inter", true).GetValue<bool>() && R.IsReady() && unit.IsValidTarget(R.Range))
                 R.Cast(unit);
         }
 
@@ -83,10 +86,10 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (R.IsReady())
             {
-                var Target = (Obj_AI_Hero)gapcloser.Sender;
-                if (Config.Item("GapCloser" + Target.ChampionName).GetValue<bool>() && Target.IsValidTarget(R.Range))
+                var t = gapcloser.Sender;
+                if (Config.Item("GapCloser" + t.ChampionName).GetValue<bool>() && t.IsValidTarget(R.Range))
                 {
-                    R.Cast(Target, true);
+                    R.Cast(t);
                 }
             }
             if (Config.Item("AGC", true).GetValue<bool>() && W.IsReady() && Player.Mana > RMANA + WMANA)
@@ -167,7 +170,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ2()
         {
-            if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA * 3)
+            if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
                 farmQ();
             else if (Config.Item("stack", true).GetValue<bool>() && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
                 Q.Cast(Player.ServerPosition);
@@ -196,18 +199,20 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget())
             {
-                if (t.IsValidTarget(W.Range) && Q.GetDamage(t) + E.GetDamage(t) > t.Health)
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Combo && Player.Mana > RMANA + QMANA)
-                    Program.CastSpell(Q, t);
-                else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && !Player.UnderTurret(true))
+                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)))
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("harras" + t.ChampionName).GetValue<bool>()))
                         Program.CastSpell(Q, enemy);
                 }
-                else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + QMANA + EMANA)
+                else if (OktwCommon.GetKsDamage(t, Q) * 2 > t.Health)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
+                    Program.CastSpell(Q, t);
+                }
+                if (!Program.None && Player.Mana > RMANA + QMANA)
+                {
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true);
                 }
             }
@@ -245,7 +250,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Program.CastSpell(E, t);
                 else if (Program.Combo && Player.Mana > EMANA + QMANA * 2 && qCd < 0.5f)
                     Program.CastSpell(E, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA * 5 && Config.Item("autoE", true).GetValue<bool>())
+                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA * 5 && Config.Item("autoE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>())
                     Program.CastSpell(E, t);
                 else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
                 {
@@ -274,14 +279,13 @@ namespace OneKeyToWin_AIO_Sebby
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
             foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
             {
-                Program.CastSpell(Q, minion);
-                FarmId = minion.NetworkId;
+                Q.Cast(minion);
             }
 
-            if (Program.LaneClear && !Orbwalking.CanAttack() && (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value || ObjectManager.Player.UnderTurret(false)))
+            if (Program.LaneClear && !Orbwalking.CanAttack() && (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value || Player.UnderTurret(false)))
             {
                 foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion) * 0.8 && minion.Health > minion.FlatPhysicalDamageMod))
-                    Program.CastSpell(Q, minion);
+                    Q.Cast(minion);
             }
         }
 
