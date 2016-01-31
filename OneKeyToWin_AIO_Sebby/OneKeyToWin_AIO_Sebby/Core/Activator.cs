@@ -621,7 +621,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Program.Combo && FrostQueen.IsReady() && Config.Item("FrostQueen").GetValue<bool>() && Player.CountEnemiesInRange(1000) > 0)
+            if (Program.Combo && FrostQueen.IsReady() && Config.Item("FrostQueen").GetValue<bool>() && Player.CountEnemiesInRange(800) > 0)
             {
                 FrostQueen.Cast();
             }
