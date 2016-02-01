@@ -82,8 +82,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LC", "LaneClear", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCP", "LaneClear passiv stack & E,R CD", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(50, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCP", "FAST LaneClear", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -483,26 +483,32 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
-            foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+            var orbTarget = Orbwalker.GetTarget();
+
+            foreach (var minion in minions.Where(minion => orbTarget.NetworkId != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
             {
                 Q.Cast(minion);
-                FarmId = minion.NetworkId;
             }
-            if (Config.Item("LC", true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && !Orbwalking.CanAttack() && (Player.ManaPercent> Config.Item("Mana", true).GetValue<Slider>().Value || Player.UnderTurret(false)))
-            {
-                foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && Orbwalker.InAutoAttackRange(minion)))
-                {
-                    if (minion.Health < Q.GetDamage(minion) * 0.8 && minion.Health > minion.FlatPhysicalDamageMod)
-                    {
-                        Q.Cast(minion);
-                    }
 
-                }
-                if (Config.Item("LCP", true).GetValue<bool>() && ((!E.IsReady() || Game.Time - GetPassiveTime() > -1.5)) && !Player.UnderTurret(false))
+            if (Config.Item("LC", true).GetValue<bool>() && Program.LaneClear && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
+            {
+                var LCP = Config.Item("LCP", true).GetValue<bool>();
+                var PT = Game.Time - GetPassiveTime() > -1.5 || !E.IsReady();
+
+                foreach (var minion in minions.Where(minion => Orbwalker.InAutoAttackRange(minion) && orbTarget.NetworkId != minion.NetworkId))
                 {
-                    foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && minion.Health > Q.GetDamage(minion) * 1.5 && Orbwalker.InAutoAttackRange(minion)))
+                    var hpPred = HealthPrediction.GetHealthPrediction(minion, 300);
+                    var dmgMinion = minion.GetAutoAttackDamage(minion);
+                    var qDmg = Q.GetDamage(minion);
+                    if (hpPred < qDmg)
                     {
-                        Q.Cast(minion);
+                        if(hpPred > dmgMinion)
+                            Q.Cast(minion);
+                    }
+                    else if (PT || LCP)
+                    {
+                        if(hpPred > dmgMinion + qDmg)
+                            Q.Cast(minion);
                     }
                 }
             }
