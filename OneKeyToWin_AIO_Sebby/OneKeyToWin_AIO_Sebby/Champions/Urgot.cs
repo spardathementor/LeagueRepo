@@ -74,6 +74,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LC", "LaneClear", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCP", "FAST LaneClear", true).SetValue(true));
         }
 
         private void OnInterruptableSpell(Obj_AI_Hero unit, InterruptableSpell spell)
@@ -276,16 +277,34 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Config.Item("farmQ", true).GetValue<bool>())
                 return;
 
-            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
-            foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+            var orbTarget = Orbwalker.GetTarget();
+
+            foreach (var minion in minions.Where(minion => orbTarget.NetworkId != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
             {
                 Q.Cast(minion);
             }
 
-            if (Program.LaneClear && !Orbwalking.CanAttack() && (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value || Player.UnderTurret(false)))
+            if (Config.Item("LC", true).GetValue<bool>() && Program.LaneClear && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
-                foreach (var minion in minions.Where(minion => FarmId != minion.NetworkId && Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion) * 0.8 && minion.Health > minion.FlatPhysicalDamageMod))
-                    Q.Cast(minion);
+                var LCP = Config.Item("LCP", true).GetValue<bool>();
+
+                foreach (var minion in minions.Where(minion => Orbwalker.InAutoAttackRange(minion) && orbTarget.NetworkId != minion.NetworkId))
+                {
+                    var hpPred = HealthPrediction.GetHealthPrediction(minion, 300);
+                    var dmgMinion = minion.GetAutoAttackDamage(minion);
+                    var qDmg = Q.GetDamage(minion);
+                    if (hpPred < qDmg)
+                    {
+                        if (hpPred > dmgMinion)
+                            Q.Cast(minion);
+                    }
+                    else if (LCP)
+                    {
+                        if (hpPred > dmgMinion + qDmg)
+                            Q.Cast(minion);
+                    }
+                }
             }
         }
 
