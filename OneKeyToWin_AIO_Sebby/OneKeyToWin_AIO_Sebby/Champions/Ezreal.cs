@@ -338,14 +338,14 @@ namespace OneKeyToWin_AIO_Sebby
                     var wDmg = W.GetDamage(target);
                     if (Rdmg > predictedHealth && target.CountAlliesInRange(400) == 0)
                     {
-                        castR(target);
+                        Program.CastSpell(R,target);
                         Program.debug("R normal");
                     }
                     if (!OktwCommon.CanMove(target) && Config.Item("Rcc", true).GetValue<bool>() &&
                         target.IsValidTarget(Q.Range + E.Range) && Rdmg + qDmg * 4 > predictedHealth)
                     {
                         R.CastIfWillHit(target, 2, true);
-                        R.Cast(target, true);
+                        Program.CastSpell(R, target);
                     }
                     else if ( Program.Combo && Config.Item("Raoe", true).GetValue<bool>())
                     {
@@ -359,19 +359,6 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private void castR(Obj_AI_Hero target)
-        {
-            if (Config.Item("hitchanceR", true).GetValue<bool>())
-            {
-                List<Vector2> waypoints = target.GetWaypoints();
-                if (target.Path.Count() < 2 && (Player.Distance(waypoints.Last<Vector2>().To3D()) - Player.Distance(target.Position)) > 400)
-                {
-                    R.CastIfHitchanceEquals(target, HitChance.High, true);
-                }
-            }
-            else
-                R.Cast(target, true);
-        }
 
         private bool DashCheck(Vector3 dash)
         {
