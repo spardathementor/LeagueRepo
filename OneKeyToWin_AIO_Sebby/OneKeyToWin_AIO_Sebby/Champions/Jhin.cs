@@ -48,9 +48,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qminion", "Q on minion", true).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Use on:").AddItem(new MenuItem("Quse" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
-
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E on hard CC", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Espell", "E on special spell detection", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EmodeCombo", "E combo mode", true).SetValue(new StringList(new[] { "always", "run - cheese" }, 1)));
@@ -61,9 +58,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wstun", "W stun only", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wstun", "W stun only", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R 3 x dmg R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R if can kill in 3 hits", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MaxRangeR", "Max R range", true).SetValue(new Slider(3000, 3500, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MinRangeR", "Min R range", true).SetValue(new Slider(1000, 3500, 0)));
@@ -171,7 +168,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 if (!IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value && !OktwCommon.IsSpellHeroCollision(t, R))
                 {
-                    if (GetRdmg(t)  * 3 > t.Health)
+                    if (GetRdmg(t)  * 4 > t.Health)
                     {
                         R.Cast(Rtarget); 
                     }
@@ -204,14 +201,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (Program.Combo && Player.Mana > RMANA + WMANA)
                         Program.CastSpell(W, t);
                     else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>()
-                        && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                        && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
                         Program.CastSpell(W, t);
                 }
 
                 if (!Program.None && Player.Mana > RMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
-                        W.Cast(enemy, true);
+                        W.Cast(enemy);
                 }
             }
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
@@ -228,7 +225,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Config.Item("autoE", true).GetValue<bool>())
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
-                    E.Cast(enemy, true);
+                    E.Cast(enemy.ServerPosition);
 
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
@@ -279,16 +276,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     t = TargetSelector.GetTarget(Q.Range + 400, TargetSelector.DamageType.Physical);
                     if (t.IsValidTarget())
                     {
-                        var minion = MinionManager.GetMinions(t.Position, 400, MinionTypes.All , MinionTeam.Enemy, MinionOrderTypes.MaxHealth).Where(minion2 => minion2.IsValidTarget(Q.Range)).FirstOrDefault();
+                        
+                        var minion = MinionManager.GetMinions(Prediction.GetPrediction(t, 0.4f).CastPosition, 350, MinionTypes.All , MinionTeam.Enemy, MinionOrderTypes.MaxHealth).Where(minion2 => minion2.IsValidTarget(Q.Range)).FirstOrDefault();
                         if (minion.IsValidTarget())
                         {
                             if (t.Health < GetQdmg(t))
                                 Q.CastOnUnit(minion);
-                            if (!Config.Item("Quse" + t.ChampionName, true).GetValue<bool>())
-                                return;
                             if (Program.Combo && Player.Mana > RMANA + EMANA)
                                 Q.CastOnUnit(minion);
-                            else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                            else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harras" + t.ChampionName).GetValue<bool>())
                                 Q.CastOnUnit(minion);
                         }
                     }
@@ -299,11 +295,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (t.Health < GetQdmg(t) + GetWdmg(t))
                     Q.CastOnUnit(t);
-                if (!Config.Item("Quse" + t.ChampionName, true).GetValue<bool>())
-                    return;
-                if (Program.Combo && Player.Mana > RMANA + EMANA)
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Q.CastOnUnit(t);
-                else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("harras" + t.ChampionName).GetValue<bool>())
                     Q.CastOnUnit(t);
             }
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>())
