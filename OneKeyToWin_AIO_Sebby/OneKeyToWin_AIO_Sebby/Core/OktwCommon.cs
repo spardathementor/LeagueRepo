@@ -66,7 +66,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnWndProc(WndEventArgs args)
         {
-            if(args.Msg == 123)
+
+            if(args.Msg == 123 && blockMove)
             {
                 blockMove = false;
                 blockAttack = false;
