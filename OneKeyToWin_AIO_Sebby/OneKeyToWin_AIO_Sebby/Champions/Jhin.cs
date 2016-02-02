@@ -69,7 +69,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R if can kill in 3 hits", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Enable R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rks", "Auto R if can kill in 3 hits", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MaxRangeR", "Max R range", true).SetValue(new Slider(3000, 3500, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MinRangeR", "Min R range", true).SetValue(new Slider(1000, 3500, 0)));
@@ -197,13 +198,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(rPosLast);
                     rTargetLast = t;
                 }
-                if (!IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value && !Player.UnderTurret(true) && !OktwCommon.IsSpellHeroCollision(t, R))
+                if (!IsCastingR && Config.Item("Rks", true).GetValue<bool>() 
+                    && GetRdmg(t) * 4 > t.Health && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 
+                    && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value
+                    && !Player.UnderTurret(true) && !OktwCommon.IsSpellHeroCollision(t, R))
                 {
-                    if (GetRdmg(t)  * 4 > t.Health)
-                    {
-                        R.Cast(rPosLast);
-                        rTargetLast = t;
-                    }
+                    R.Cast(rPosLast);
+                    rTargetLast = t;
                 }
                 if (IsCastingR)
                 {
