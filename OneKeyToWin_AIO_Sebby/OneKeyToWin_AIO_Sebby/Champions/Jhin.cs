@@ -57,6 +57,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wstun", "W stun only", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Waoe", "W aoe (above 2 enemy)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("MaxRangeW", "Max W range", true).SetValue(new Slider(2500, 2500, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E on hard CC", true).SetValue(true));
@@ -224,10 +225,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (wDmg > t.Health - OktwCommon.GetIncomingDamage(t))
                     Program.CastSpell(W, t);
 
-                if (Player.CountEnemiesInRange(450) > 1 || Player.CountEnemiesInRange(250) > 0)
+                if (Player.CountEnemiesInRange(400) > 1 || Player.CountEnemiesInRange(250) > 0)
                     return;
 
-                if (t.HasBuff("jhinespotteddebuff") || !Config.Item("Wstun", true).GetValue<bool>())
+                if (t.HasBuff("jhinespotteddebuff") || !Config.Item("Wstun", true).GetValue<bool>() )
                 {
                     if (Player.Distance(t) < Config.Item("MaxRangeW", true).GetValue<Slider>().Value)
                     {
@@ -241,6 +242,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (!Program.None && Player.Mana > RMANA + WMANA)
                 {
+                    if(Config.Item("Waoe", true).GetValue<bool>())
+                        W.CastIfWillHit(t, 2);
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy);
                 }
@@ -382,7 +385,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private double GetWdmg(Obj_AI_Base target)
         {
-            var damage = 15 + W.Level * 35 + 0.7 * Player.FlatPhysicalDamageMod;
+            var damage = 55 + W.Level * 35 + 0.7 * Player.FlatPhysicalDamageMod;
 
             return Player.CalcDamage(target, Damage.DamageType.Physical, damage);
         }
