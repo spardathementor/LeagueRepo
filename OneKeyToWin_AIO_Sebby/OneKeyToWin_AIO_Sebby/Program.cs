@@ -270,6 +270,8 @@ namespace OneKeyToWin_AIO_Sebby
             Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
             Drawing.OnDraw += OnDraw;
             Game.OnWndProc += Game_OnWndProc;
+
+            Game.PrintChat("<font color='#881df2'>OneKeyToWin by Sebby</font> NEW champion: Jhin");
         }
 
         private static void Game_OnWndProc(WndEventArgs args)
