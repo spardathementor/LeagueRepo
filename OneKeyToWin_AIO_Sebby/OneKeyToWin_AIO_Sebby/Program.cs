@@ -221,6 +221,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Velkoz":
                         new Champions.Velkoz().LoadOKTW();
                         break;
+                    case "Jhin":
+                        new Champions.Jhin().LoadOKTW();
+                        break;
                 }
             }
 
