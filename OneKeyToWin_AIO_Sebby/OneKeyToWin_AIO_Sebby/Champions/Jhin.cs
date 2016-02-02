@@ -35,7 +35,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             W.SetSkillshot(0.75f, 40, float.MaxValue, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(1.3f, 200, 1600, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.15f, 80, 500, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.15f, 80, 5000, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -58,7 +58,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eaoe", "Auto E x enemies", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position", "My hero position" }, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
-                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R if can kill in 3 hits", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -175,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 if (IsCastingR)
                 {
-                    R.Cast(Rtarget);
+                    R.CastIfHitchanceEquals(t);
                 }
             }
             else if (IsCastingR)
