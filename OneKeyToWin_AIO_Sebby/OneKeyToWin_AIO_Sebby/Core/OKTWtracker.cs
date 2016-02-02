@@ -97,6 +97,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         ChampionInfoOne.NetworkId = enemy.NetworkId;
                         ChampionInfoOne.LastVisablePos = EnemySpawn;
                         ChampionInfoOne.LastVisableTime = Game.Time;
+                        ChampionInfoOne.PredictedPos = EnemySpawn;
                     }
                 }
                 else if (enemy.IsVisible)
