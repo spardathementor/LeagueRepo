@@ -193,7 +193,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (wDmg > t.Health - OktwCommon.GetIncomingDamage(t))
                     Program.CastSpell(W, t);
 
-                if (Player.CountEnemiesInRange(450) > 1)
+                if (Player.CountEnemiesInRange(450) > 1 || Player.CountEnemiesInRange(300) > 0)
                     return;
 
                 if (t.HasBuff("jhinespotteddebuff") || !Config.Item("Wstun", true).GetValue<bool>())
