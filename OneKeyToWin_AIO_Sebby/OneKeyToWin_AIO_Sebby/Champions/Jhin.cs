@@ -175,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 if (IsCastingR)
                 {
-                    R.Cast(t);
+                    R.Cast(Rtarget);
                 }
             }
             else if (IsCastingR)
