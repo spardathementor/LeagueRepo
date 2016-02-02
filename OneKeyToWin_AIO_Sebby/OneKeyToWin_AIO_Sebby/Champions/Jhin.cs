@@ -60,6 +60,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("MaxRangeW", "Max W range", true).SetValue(new Slider(2500, 2500, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E on hard CC", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("bushE", "Auto E bush", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Espell", "E on special spell detection", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EmodeCombo", "E combo mode", true).SetValue(new StringList(new[] { "always", "run - cheese" }, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eaoe", "Auto E x enemies", true).SetValue(new Slider(3, 5, 0)));
@@ -195,7 +196,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(rPosLast);
                     rTargetLast = t;
                 }
-                if (!IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value && !OktwCommon.IsSpellHeroCollision(t, R))
+                if (!IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value && !Player.UnderTurret(true) && !OktwCommon.IsSpellHeroCollision(t, R))
                 {
                     if (GetRdmg(t)  * 4 > t.Health)
                     {
@@ -374,7 +375,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private double GetRdmg(Obj_AI_Base target)
         {
-            var damage = (new double[] { 50, 125, 200 }[R.Level] + 0.2 * Player.FlatPhysicalDamageMod) * (1 + (100 - target.HealthPercent) * 0.02);
+            var damage = ( -25 + 75 * R.Level + 0.2 * Player.FlatPhysicalDamageMod) * (1 + (100 - target.HealthPercent) * 0.02);
 
             return Player.CalcDamage(target, Damage.DamageType.Physical, damage);
         }
