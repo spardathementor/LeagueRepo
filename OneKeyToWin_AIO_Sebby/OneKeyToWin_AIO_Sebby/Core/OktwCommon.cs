@@ -61,12 +61,19 @@ namespace OneKeyToWin_AIO_Sebby
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate += OnUpdate;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
-            Orbwalking.AfterAttack += afterAttack;
+            Game.OnWndProc += Game_OnWndProc;
         }
 
-        private void afterAttack(AttackableUnit unit, AttackableUnit target)
+        private void Game_OnWndProc(WndEventArgs args)
         {
-            
+            if(args.Msg == 123)
+            {
+                blockMove = false;
+                blockAttack = false;
+                Orbwalking.Attack = true;
+                Orbwalking.Move = true;
+                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            }
         }
 
         private void OnUpdate(EventArgs args)

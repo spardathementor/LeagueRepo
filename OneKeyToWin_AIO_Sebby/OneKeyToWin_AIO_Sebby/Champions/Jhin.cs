@@ -18,7 +18,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private bool Ractive = false;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        private Vector3 Rtarget;
+        private Vector3 rPosLast;
+        private Obj_AI_Hero rTargetLast;
+
+
+        private Items.Item
+                    FarsightOrb = new Items.Item(3342, 4000f),
+                    ScryingOrb = new Items.Item(3363, 3500f);
 
         private static string[] Spells =
         {
@@ -51,6 +57,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wstun", "W stun only", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("MaxRangeW", "Max W range", true).SetValue(new Slider(2500, 2500, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E on hard CC", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Espell", "E on special spell detection", true).SetValue(true));
@@ -64,6 +71,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MaxRangeR", "Max R range", true).SetValue(new Slider(3000, 3500, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MinRangeR", "Min R range", true).SetValue(new Slider(1000, 3500, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("trinkiet", "Auto blue trinkiet", true).SetValue(true));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -82,6 +90,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Drawing.OnEndScene += Drawing_OnEndScene;
+            Spellbook.OnCastSpell += Spellbook_OnCastSpell;
+        }
+
+        private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
+        {
+            if (args.Slot == SpellSlot.R)
+            {
+                if (Config.Item("trinkiet", true).GetValue<bool>() && !IsCastingR)
+                {
+                    if (Player.Level < 9)
+                        ScryingOrb.Range = 2500;
+                    else
+                        ScryingOrb.Range = 3500;
+
+                    if (ScryingOrb.IsReady())
+                        ScryingOrb.Cast(rPosLast);
+                    if (FarsightOrb.IsReady())
+                        FarsightOrb.Cast(rPosLast);
+                }
+            }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -161,16 +189,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (t.IsValidTarget())
             {
                 Program.debug("dmg" + GetRdmg(t));
-                Rtarget = R.GetPrediction(t).CastPosition;
+                rPosLast = R.GetPrediction(t).CastPosition;
                 if (Config.Item("useR", true).GetValue<KeyBind>().Active && !IsCastingR)
                 {
-                    R.Cast(Rtarget);
+                    R.Cast(rPosLast);
+                    rTargetLast = t;
                 }
                 if (!IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value && !OktwCommon.IsSpellHeroCollision(t, R))
                 {
                     if (GetRdmg(t)  * 4 > t.Health)
                     {
-                        R.Cast(Rtarget); 
+                        R.Cast(rPosLast);
+                        rTargetLast = t;
                     }
                 }
                 if (IsCastingR)
@@ -178,9 +208,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(t);
                 }
             }
-            else if (IsCastingR)
+            else if (IsCastingR && rTargetLast != null && !rTargetLast.IsDead)
             {
-                R.Cast(Rtarget);
+                R.Cast(rPosLast);
             }
         }
 
@@ -198,11 +228,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (t.HasBuff("jhinespotteddebuff") || !Config.Item("Wstun", true).GetValue<bool>())
                 {
-                    if (Program.Combo && Player.Mana > RMANA + WMANA)
-                        Program.CastSpell(W, t);
-                    else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>()
-                        && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
-                        Program.CastSpell(W, t);
+                    if (Player.Distance(t) < Config.Item("MaxRangeW", true).GetValue<Slider>().Value)
+                    {
+                        if (Program.Combo && Player.Mana > RMANA + WMANA)
+                            Program.CastSpell(W, t);
+                        else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>()
+                            && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                            Program.CastSpell(W, t);
+                    }
                 }
 
                 if (!Program.None && Player.Mana > RMANA + WMANA)
