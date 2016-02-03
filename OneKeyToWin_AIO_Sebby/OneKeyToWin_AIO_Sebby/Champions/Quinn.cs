@@ -47,6 +47,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R in shop", true).SetValue(true));
 
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
 
@@ -138,7 +141,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Program.CastSpell(Q, t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && Config.Item("harrasQ", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true))
+                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                 {
                     Program.CastSpell(Q, t);
                 }
@@ -154,7 +157,7 @@ namespace OneKeyToWin_AIO_Sebby
                     E.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + EMANA)
                     E.Cast(t);
-                else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA) && Config.Item("harrasE", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true))
+                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && !t.UnderTurret(true) && OktwCommon.CanHarras())
                 {
                     E.Cast(t);
                 }
