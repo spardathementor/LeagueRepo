@@ -70,6 +70,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public void CastDash()
         {
             int DashMode = Config.Item("DashMode", true).GetValue<StringList>().SelectedIndex;
+            if (Player.CountEnemiesInRange(800) == 0)
+                return;
             if (DashMode == 0)
             {
                 var bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
