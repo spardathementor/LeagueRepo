@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("twitchdeadlyvenom")))
             {
-                if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) + passiveDmg(enemy) > enemy.Health)
+                if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) > enemy.Health)
                     E.Cast();
                 if (Player.Mana > RMANA + EMANA)
                 {
