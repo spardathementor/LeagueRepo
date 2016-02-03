@@ -70,6 +70,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("E Gap Closer").AddItem(new MenuItem("EGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Enable R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rvisable", "Don't shot if enemy is not visable", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rks", "Auto R if can kill in 3 hits", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MaxRangeR", "Max R range", true).SetValue(new Slider(3000, 3500, 0)));
@@ -213,7 +214,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (IsCastingR && rTargetLast != null && !rTargetLast.IsDead)
             {
-                R.Cast(rPosLast);
+                if(!Config.Item("Rvisable", true).GetValue<bool>())
+                    R.Cast(rPosLast);
             }
         }
 
@@ -329,7 +331,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
 
             }
-            else
+            else if(!Orbwalking.CanAttack() && !Player.IsWindingUp)
             {
                 if (t.Health < GetQdmg(t) + GetWdmg(t))
                     Q.CastOnUnit(t);
