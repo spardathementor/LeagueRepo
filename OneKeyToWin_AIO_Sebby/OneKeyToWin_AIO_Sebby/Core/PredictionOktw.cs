@@ -432,7 +432,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 200 + input.Radius || distanceFromToWaypoint < 200 + input.Radius)
+            if (distanceFromToUnit < 200  || distanceFromToWaypoint < 200 )
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
