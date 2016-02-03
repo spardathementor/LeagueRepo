@@ -390,7 +390,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float fixRange = moveArea * 0.5f;
             double angleMove = 30 + (input.Radius / 20) - totalDelay - input.Delay;
             float backToFront = moveArea * 1.5f;
-            float pathMinLen = 1000f;
+            float pathMinLen = 1100f;
 
             if (angleMove < 31)
                 angleMove = 31;
@@ -398,7 +398,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
-                pathMinLen = 800;
+                pathMinLen = 900;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -432,7 +432,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 300 + input.Radius || distanceFromToWaypoint < 200 + input.Radius)
+            if (distanceFromToUnit < 200 + input.Radius || distanceFromToWaypoint < 200 + input.Radius)
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
