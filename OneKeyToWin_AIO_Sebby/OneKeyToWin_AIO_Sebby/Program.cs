@@ -43,6 +43,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("0", "OneKeyToWin© by Sebby"));
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("1", "visit joduska.me"));
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("2", "DONATE: kaczor.sebastian@gmail.com"));
+            Config.SubMenu("About OKTW©").AddItem(new MenuItem("print", "OKTW NEWS in chat").SetValue(true));
             #endregion
 
             Config.AddItem(new MenuItem("AIOmode", "AIO mode", true).SetValue(new StringList(new[] { "Utility and champion", "Only Champion", "Only Utility" }, 0)));
@@ -271,7 +272,13 @@ namespace OneKeyToWin_AIO_Sebby
             Drawing.OnDraw += OnDraw;
             Game.OnWndProc += Game_OnWndProc;
 
-            Game.PrintChat("<font color='#881df2'>OneKeyToWin by Sebby</font> NEW champion: Jhin");
+            if (Config.Item("print").GetValue<bool>())
+            {
+                Game.PrintChat("-------------------------------------------------------------");
+                Game.PrintChat("<font color='#00c0ff'>OneKeyToWin by Sebby</font> NEW champion: Jhin");
+                Game.PrintChat("<font color='#00c0ff'>FIXED: </font> Syndra W double cast");
+                Game.PrintChat("-------------------------------------------------------------");
+            }
         }
 
         private static void Game_OnWndProc(WndEventArgs args)
