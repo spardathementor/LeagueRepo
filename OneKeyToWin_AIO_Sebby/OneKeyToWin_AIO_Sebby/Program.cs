@@ -278,7 +278,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("print").GetValue<bool>())
             {
                 Game.PrintChat("-------------------------------------------------------------");
-                Game.PrintChat("<font color='#00c0ff'>OneKeyToWin by Sebby</font> NEW champion: Jhin");
+                Game.PrintChat("<font color='#00c0ff'>OneKeyToWin by Sebby</font> NEW champions: Jhin, Kindred");
                 Game.PrintChat("<font color='#00c0ff'>FIXED: </font> Syndra W double cast");
                 Game.PrintChat("-------------------------------------------------------------");
             }
