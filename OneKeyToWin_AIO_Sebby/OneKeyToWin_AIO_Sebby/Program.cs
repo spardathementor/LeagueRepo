@@ -225,6 +225,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Jhin":
                         new Champions.Jhin().LoadOKTW();
                         break;
+                    case "Kindred":
+                        new Champions.Kindred().LoadOKTW();
+                        break;
                 }
             }
 
