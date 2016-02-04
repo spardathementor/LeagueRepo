@@ -237,18 +237,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (t.IsValidTarget())
                 {
                     if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
-                        CatchW();
+                        CatchW(t);
                     else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasW", true).GetValue<bool>()
                         && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
                     {
-                        CatchW();
+                        CatchW(t);
                     }
                     else if (OktwCommon.GetKsDamage(t, W) > t.Health)
-                        CatchW();
+                        CatchW(t);
                     else if (Player.Mana > RMANA + WMANA)
                     {
                         foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
-                            CatchW();
+                            CatchW(t);
                     }
                 }
                 else if (Program.LaneClear && !Q.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
@@ -257,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
 
                     if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
-                        CatchW(true);
+                        CatchW(allMinions.FirstOrDefault());
                 }
             }
             else
@@ -475,7 +475,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void CatchW(bool onlyMinin = false)
+        private void CatchW(Obj_AI_Base t, bool onlyMinin = false)
         {
             var catchRange = 925;
             Obj_AI_Base obj = null;
@@ -483,7 +483,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 obj = BallsList.Find(ball => ball.Distance(Player) < catchRange);
             }
-
             if (obj == null)
             {
                 obj = MinionManager.GetMinions(Player.ServerPosition, catchRange, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.MaxHealth).FirstOrDefault();
@@ -491,6 +490,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (obj != null)
             {
+                foreach (var minion in MinionManager.GetMinions(Player.ServerPosition, catchRange, MinionTypes.All, MinionTeam.NotAlly, MinionOrderTypes.MaxHealth))
+                {
+                    if (t.Distance(minion) < t.Distance(obj))
+                        obj = minion;
+                }
+
                 W.Cast(obj.Position);
             }
         }
