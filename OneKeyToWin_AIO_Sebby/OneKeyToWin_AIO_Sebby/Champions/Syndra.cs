@@ -477,6 +477,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void CatchW(Obj_AI_Base t, bool onlyMinin = false)
         {
+
+            if (Utils.TickCount - W.LastCastAttemptT < 150)
+                return;
+
             var catchRange = 925;
             Obj_AI_Base obj = null;
             if (BallsList.Count > 0 && !onlyMinin)
@@ -495,7 +499,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (t.Distance(minion) < t.Distance(obj))
                         obj = minion;
                 }
-
+                
                 W.Cast(obj.Position);
             }
         }
