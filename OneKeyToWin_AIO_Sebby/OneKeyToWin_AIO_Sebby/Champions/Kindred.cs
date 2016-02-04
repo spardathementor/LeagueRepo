@@ -167,7 +167,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Config.Item("Ruse" + ally.ChampionName, true).GetValue<bool>() && Player.Distance(ally.ServerPosition) < R.Range))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < R.Range && Config.Item("Ruse" + ally.ChampionName, true).GetValue<bool>() ))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
                 var enemys = ally.CountEnemiesInRange(700);
