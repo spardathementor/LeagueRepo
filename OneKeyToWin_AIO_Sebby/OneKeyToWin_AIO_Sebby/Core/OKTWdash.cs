@@ -67,14 +67,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
         }
-        public void CastDash()
+        public Vector3 CastDash()
         {
             int DashMode = Config.Item("DashMode", true).GetValue<StringList>().SelectedIndex;
-            if (Player.CountEnemiesInRange(800) == 0)
-                return;
+
+            Vector3 bestpoint = Vector3.Zero;
             if (DashMode == 0)
             {
-                var bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
+                bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
                 if (IsGoodPosition(bestpoint))
                     DashSpell.Cast(bestpoint);
             }
@@ -96,13 +96,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                     if (Game.CursorPos.Distance(rEndPos) < Game.CursorPos.Distance(lEndPos))
                     {
-                        var bestpoint = Player.Position.Extend(rEndPos, DashSpell.Range);
+                        bestpoint = Player.Position.Extend(rEndPos, DashSpell.Range);
                         if (IsGoodPosition(bestpoint))
                             DashSpell.Cast(bestpoint);
                     }
                     else
                     {
-                        var bestpoint = Player.Position.Extend(lEndPos, DashSpell.Range);
+                        bestpoint = Player.Position.Extend(lEndPos, DashSpell.Range);
                         if (IsGoodPosition(bestpoint))
                             DashSpell.Cast(bestpoint);
                     }
@@ -111,7 +111,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             else if (DashMode == 2)
             {
                 var points = OktwCommon.CirclePoints(12, DashSpell.Range, Player.Position);
-                var bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
+                bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
                 int enemies = bestpoint.CountEnemiesInRange(400);
                 foreach (var point in points)
                 {
@@ -130,6 +130,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 if(IsGoodPosition(bestpoint))
                     DashSpell.Cast(bestpoint);
             }
+
+            if (Player.CountEnemiesInRange(Player.BoundingRadius + DashSpell.Range + Player.AttackRange) == 0)
+                return Vector3.Zero;
+
+            return bestpoint;
         }
 
         public bool IsGoodPosition(Vector3 dashPos)

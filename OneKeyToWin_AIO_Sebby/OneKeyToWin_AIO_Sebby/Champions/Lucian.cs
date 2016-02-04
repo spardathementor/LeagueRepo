@@ -37,8 +37,6 @@ namespace OneKeyToWin_AIO_Sebby
             R.SetSkillshot(0.1f, 110, 2800, true, SkillshotType.SkillshotLine);
             R1.SetSkillshot(0.1f, 110, 2800, false, SkillshotType.SkillshotLine);
 
-            
-
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -245,7 +243,11 @@ namespace OneKeyToWin_AIO_Sebby
             if ( Player.Mana < RMANA + EMANA || !Program.Combo || !Config.Item("autoE", true).GetValue<bool>() || passRdy || SpellLock)
                 return;
 
-            Dash.CastDash();
+            var dashPos = Dash.CastDash();
+            if (!dashPos.IsZero)
+            {
+                E.Cast(dashPos);
+            }
         }
 
 

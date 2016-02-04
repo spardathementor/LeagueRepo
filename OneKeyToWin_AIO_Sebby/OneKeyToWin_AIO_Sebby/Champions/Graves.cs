@@ -231,7 +231,11 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo2"))
             {
-                Dash.CastDash();
+                var dashPos = Dash.CastDash();
+                if (!dashPos.IsZero)
+                {
+                    E.Cast(dashPos);
+                }
             }
         }
 
