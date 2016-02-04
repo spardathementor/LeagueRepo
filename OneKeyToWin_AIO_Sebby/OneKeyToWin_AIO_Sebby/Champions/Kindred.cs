@@ -48,8 +48,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Config.SubMenu(Player.ChampionName).SubMenu("Haras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(50, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(3, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
@@ -128,7 +128,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            var t = TargetSelector.GetTarget(650, TargetSelector.DamageType.Magical);
+            var t = TargetSelector.GetTarget(650, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && !Q.IsReady())
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
@@ -136,7 +136,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("haras" + t.ChampionName).GetValue<bool>())
                     W.Cast();
             }
-            var tks = TargetSelector.GetTarget(1600, TargetSelector.DamageType.Magical);
+            var tks = TargetSelector.GetTarget(1600, TargetSelector.DamageType.Physical);
             if (tks.IsValidTarget())
             {
                 if (W.GetDamage(tks) * 3 > t.Health - OktwCommon.GetIncomingDamage(t))
@@ -153,15 +153,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            var t = TargetSelector.GetTarget(600, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget(E.Range))
+            var torb = Orbwalker.GetTarget();
+            if (torb == null || torb.Type != GameObjectType.obj_AI_Hero)
+                return;
+            else
             {
-                if (!Config.Item("Euse" + t.ChampionName, true).GetValue<bool>())
-                    return;
-                if (Program.Combo && Player.Mana > RMANA + EMANA)
-                    E.CastOnUnit(t);
-                else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("haras" + t.ChampionName).GetValue<bool>())
-                    E.CastOnUnit(t);
+                var t = torb as Obj_AI_Hero;
+
+                if (t.IsValidTarget(E.Range))
+                {
+                    if (!Config.Item("Euse" + t.ChampionName, true).GetValue<bool>())
+                        return;
+                    if (Program.Combo && Player.Mana > RMANA + EMANA)
+                        E.CastOnUnit(t);
+                    else if (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("haras" + t.ChampionName).GetValue<bool>())
+                        E.CastOnUnit(t);
+                }
             }
         }
 
