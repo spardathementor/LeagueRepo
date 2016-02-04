@@ -51,6 +51,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(50, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(3, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
@@ -120,7 +121,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
             {
                 var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, 400);
-                if (allMinionsQ.Count > 2)
+                if (allMinionsQ.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     Q.Cast(Game.CursorPos);
             }
         }
@@ -145,7 +146,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
             {
                 var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, 600);
-                if (allMinionsQ.Count > 2)
+                if (allMinionsQ.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     W.Cast();
             }
         }
