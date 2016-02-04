@@ -202,7 +202,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (!IsCastingR && Config.Item("Rks", true).GetValue<bool>() 
                     && GetRdmg(t) * 4 > t.Health && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(900) == 0 
                     && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value
-                    && !Player.UnderTurret(true) && !OktwCommon.IsSpellHeroCollision(t, R))
+                    && !Player.UnderTurret(true) && OktwCommon.ValidUlt(t) && !OktwCommon.IsSpellHeroCollision(t, R))
                 {
                     R.Cast(rPosLast);
                     rTargetLast = t;
