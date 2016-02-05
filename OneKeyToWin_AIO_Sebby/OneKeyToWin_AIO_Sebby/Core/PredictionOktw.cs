@@ -451,15 +451,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 200 && input.Unit.Path.Count() == 1 && GetAngle(input.From, input.Unit) < angleMove)
+            if (distanceFromToWaypoint > 200 && input.Unit.Path.Count() > 0)
             {
-                if (!input.Unit.IsFacing(ObjectManager.Player))
+                if (!input.Unit.IsFacing(ObjectManager.Player) && GetAngle(input.From, input.Unit) < angleMove + 2)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: RUN IN LANE DETECTION " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                else if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+                else if (GetAngle(input.From, input.Unit) < angleMove)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
