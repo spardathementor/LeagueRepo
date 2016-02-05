@@ -278,18 +278,22 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
 
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
-            var orbTarget = Orbwalker.GetTarget();
 
-            foreach (var minion in minions.Where(minion => orbTarget.NetworkId != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+            int orbTarget = 0;
+            if (Orbwalker.GetTarget() != null)
+                orbTarget = Orbwalker.GetTarget().NetworkId;
+
+            foreach (var minion in minions.Where(minion => orbTarget != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
             {
-                Q.Cast(minion);
+                if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
+                    return;
             }
 
             if (Config.Item("LC", true).GetValue<bool>() && Program.LaneClear && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
                 var LCP = Config.Item("LCP", true).GetValue<bool>();
 
-                foreach (var minion in minions.Where(minion => Orbwalker.InAutoAttackRange(minion) && orbTarget.NetworkId != minion.NetworkId))
+                foreach (var minion in minions.Where(minion => Orbwalker.InAutoAttackRange(minion) && orbTarget != minion.NetworkId))
                 {
                     var hpPred = HealthPrediction.GetHealthPrediction(minion, 300);
                     var dmgMinion = minion.GetAutoAttackDamage(minion);
@@ -297,12 +301,18 @@ namespace OneKeyToWin_AIO_Sebby
                     if (hpPred < qDmg)
                     {
                         if (hpPred > dmgMinion)
-                            Q.Cast(minion);
+                        {
+                            if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
+                                return;
+                        }
                     }
                     else if (LCP)
                     {
                         if (hpPred > dmgMinion + qDmg)
-                            Q.Cast(minion);
+                        {
+                            if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
+                                return;
+                        }
                     }
                 }
             }
