@@ -358,6 +358,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
+
+
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall"))
@@ -392,7 +394,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 17) - totalDelay - input.Delay;
+            double angleMove = 30 + (input.Radius / 20) - totalDelay - (input.Delay * 2);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 1000f;
 
@@ -427,7 +429,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPAM POSITION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (UnitTracker.SpamSamePlace(input.Unit))
+            if (distanceFromToWaypoint > 150 && UnitTracker.SpamSamePlace(input.Unit))
             {
                 Program.debug("PRED: SPAM POSITION");
                 if (distanceFromToUnit < input.Range - fixRange)
@@ -438,7 +440,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 200  || distanceFromToWaypoint < 200 || input.Unit.MoveSpeed < 200 )
+            if (distanceFromToUnit < 200 || distanceFromToWaypoint < 200 || input.Unit.MoveSpeed < 200 )
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -456,7 +458,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 400 && input.Unit.Path.Count() > 0)
+            if (distanceFromToWaypoint > 250 && input.Unit.Path.Count() > 0 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 if (!input.Unit.IsFacing(ObjectManager.Player) && GetAngle(input.From, input.Unit) < angleMove + 1)
                 {
@@ -481,7 +483,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-           
             // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
@@ -1308,10 +1309,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f 
-                && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time  
-                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 150
-                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 150)
+            if (TrackerUnit.PathBank[1].Time - TrackerUnit.PathBank[0].Time < 0.25f 
+                && TrackerUnit.PathBank[1].Time + 0.1f < Game.Time  
+                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 100)
             {
                 return true;
             }
