@@ -388,7 +388,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 20) - totalDelay - input.Delay;
+            double angleMove = 30 + (input.Radius / 15) - totalDelay - input.Delay;
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 1100f;
 
@@ -481,14 +481,22 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
                 if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.6 + (input.Radius * 0.001))
+                {
+                    Program.debug("PRED: AUTO ATTACK DETECTION 1");
                     result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
                 else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.7 + (input.Radius * 0.001))
+                {
+                    Program.debug("PRED: AUTO ATTACK DETECTION 2");
                     result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
                 else
+                {
                     result.Hitchance = HitChance.High;
-
-                Program.debug("PRED: AUTO ATTACK DETECTION");
-                return result;
+                    Program.debug("PRED: AUTO ATTACK DETECTION HIGH");
+                } 
             }
 
             // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
@@ -1292,7 +1300,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.35f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.30f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
             {
                 return true;
             }
