@@ -402,7 +402,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
-                pathMinLen = 800;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -410,18 +409,21 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 fixRange -= input.Radius / 2;
             }
 
+            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
+            {
+                //debug("PRED: FIX RANGE");
+                result.Hitchance = HitChance.Medium;
+                return result;
+            }
+
             // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.PathCalc(input.Unit))
             {
                 Program.debug("PRED: SPAM CLICK");
-                if (distanceFromToUnit < input.Range - fixRange)
-                {
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
-
-                result.Hitchance = HitChance.High;
+                result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
 
@@ -430,16 +432,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (distanceFromToWaypoint > 200 && UnitTracker.SpamSamePlace(input.Unit))
             {
                 Program.debug("PRED: SPAM POSITION");
-                if (distanceFromToUnit < input.Range - fixRange)
-                {
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
             }
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 200 || distanceFromToWaypoint < 200 || input.Unit.MoveSpeed < 200 )
+            if (distanceFromToUnit < 250 ||  input.Unit.MoveSpeed < 150 )
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -453,6 +452,28 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 Program.debug("PRED: LONG CLICK DETECTION");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
+            }
+
+            if (backToFront > 400 && GetAngle(input.From, input.Unit) < 32)
+            {
+                if (ObjectManager.Player.Position.Distance(input.Unit.ServerPosition) > ObjectManager.Player.Position.Distance(input.Unit.Position))
+                {
+                    if (input.Unit.Position.Distance(ObjectManager.Player.ServerPosition) < input.Unit.Position.Distance(ObjectManager.Player.Position))
+                    {
+                        Program.debug(" PRED:TRY CATCH");
+                        result.Hitchance = HitChance.VeryHigh;
+                        return result;
+                    }
+                }
+                else
+                {
+                    if (input.Unit.Position.Distance(ObjectManager.Player.ServerPosition) > input.Unit.Position.Distance(ObjectManager.Player.Position))
+                    {
+                        Program.debug(" PRED:TRY CATCH 2");
+                        result.Hitchance = HitChance.VeryHigh;
+                        return result;
+                    }
+                }
             }
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
@@ -471,15 +492,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-            }
-
-            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
-
-            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
-            {
-                //debug("PRED: FIX RANGE");
-                result.Hitchance = HitChance.Medium;
-                return result;
             }
 
             // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
@@ -518,7 +530,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     if (distanceFromToUnit > input.Range - fixRange)
                         result.Hitchance = HitChance.Medium;
-                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) > 0.8d)
+                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.8d)
                         result.Hitchance = HitChance.High;
                     else
                     {
@@ -1309,9 +1321,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[1].Time - TrackerUnit.PathBank[0].Time < 0.20f 
-                && TrackerUnit.PathBank[1].Time + 0.1f < Game.Time  
-                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 50)
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f 
+                && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time  
+                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 100
+                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 100)
             {
                 return true;
             }
@@ -1325,7 +1338,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.35f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.3f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
             {
                 return true;
             }
