@@ -352,23 +352,27 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         internal static PredictionOutput WayPointAnalysis(PredictionOutput result, PredictionInput input)
         {
-
             if (!input.Unit.IsValid<Obj_AI_Hero>() || input.Radius == 1)
             {
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
 
-            //Program.debug("PRED: FOR CHAMPION " + input.Unit.BaseSkinName);
-
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall"))
             {
-
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
+            }
 
+            // NEW VISABLE ///////////////////////////////////////////////////////////////////////////////////
+
+            if (UnitTracker.GetLastVisableTime(input.Unit) < 0.1d)
+            {
+                Program.debug("PRED: NEW VISABLE");
+                result.Hitchance = HitChance.Medium;
+                return result;
             }
 
             // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
@@ -388,7 +392,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 15) - totalDelay - input.Delay;
+            double angleMove = 30 + (input.Radius / 17) - totalDelay - input.Delay;
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 1000f;
 
@@ -421,23 +425,24 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            // NEW VISABLE ///////////////////////////////////////////////////////////////////////////////////
+            // SPAM POSITION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (UnitTracker.GetLastVisableTime(input.Unit) < 0.1d)
+            if (UnitTracker.SpamSamePlace(input.Unit))
             {
-                Program.debug("PRED: NEW VISABLE");
-                result.Hitchance = HitChance.Medium;
-                return result;
+                Program.debug("PRED: SPAM POSITION");
+                if (distanceFromToUnit < input.Range - fixRange)
+                {
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
             }
-
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 200  || distanceFromToWaypoint < 200 )
+            if (distanceFromToUnit < 200  || distanceFromToWaypoint < 200 || input.Unit.MoveSpeed < 200 )
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
-
             }
 
             // LONG CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
@@ -451,9 +456,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 200 && input.Unit.Path.Count() > 0)
+            if (distanceFromToWaypoint > 400 && input.Unit.Path.Count() > 0)
             {
-                if (!input.Unit.IsFacing(ObjectManager.Player) && GetAngle(input.From, input.Unit) < angleMove + 2)
+                if (!input.Unit.IsFacing(ObjectManager.Player) && GetAngle(input.From, input.Unit) < angleMove + 1)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: RUN IN LANE DETECTION " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
@@ -476,17 +481,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
+           
             // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
             {
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.6 + (input.Radius * 0.001))
+                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.4 + (input.Radius * 0.002))
                 {
                     Program.debug("PRED: AUTO ATTACK DETECTION 1");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.7 + (input.Radius * 0.001))
+                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.002))
                 {
                     Program.debug("PRED: AUTO ATTACK DETECTION 2");
                     result.Hitchance = HitChance.VeryHigh;
@@ -1243,15 +1249,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
             spells.Add(new Spells() { name = "lucianq", duration = 0.5 }); //Lucian Q
             spells.Add(new Spells() { name = "caitlynpiltoverpeacemaker", duration = 0.5 }); //Caitlyn Q
             spells.Add(new Spells() { name = "velkozr", duration = 0.5 }); //Velkoz R 
+            spells.Add(new Spells() { name = "jhinr", duration = 2 }); //Velkoz R 
 
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
             {
                 Champion.Add(hero);
                 UnitTrackerInfoList.Add(new UnitTrackerInfo() { NetworkId = hero.NetworkId, AaTick = Utils.TickCount, StopMoveTick = Utils.TickCount, NewPathTick = Utils.TickCount, SpecialSpellFinishTick = Utils.TickCount, LastInvisableTick = Utils.TickCount });
             }
+
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnNewPath += Obj_AI_Hero_OnNewPath;
-            Obj_AI_Base.OnEnterLocalVisiblityClient += Obj_AI_Base_OnEnterLocalVisiblityClient;
+            AttackableUnit.OnEnterLocalVisiblityClient += Obj_AI_Base_OnEnterLocalVisiblityClient;
         }
 
         private static void Obj_AI_Base_OnEnterLocalVisiblityClient(AttackableUnit sender, EventArgs args)
@@ -1294,13 +1302,30 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
         }
 
+        public static bool SpamSamePlace(Obj_AI_Base unit)
+        {
+            var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
+            if (TrackerUnit.PathBank.Count < 3)
+                return false;
+
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f 
+                && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time  
+                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 150
+                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 150)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
         public static bool PathCalc(Obj_AI_Base unit)
         {
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.30f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.35f && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
             {
                 return true;
             }
