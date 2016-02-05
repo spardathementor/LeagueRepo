@@ -358,8 +358,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-
-
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall"))
@@ -394,7 +392,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.5f;
-            double angleMove = 30 + (input.Radius / 20) - totalDelay - (input.Delay * 2);
+            double angleMove = 30 + (input.Radius / 17) - totalDelay - (input.Delay * 2);
             float backToFront = moveArea * 1.5f;
             float pathMinLen = 1000f;
 
@@ -429,7 +427,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPAM POSITION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 150 && UnitTracker.SpamSamePlace(input.Unit))
+            if (distanceFromToWaypoint > 200 && UnitTracker.SpamSamePlace(input.Unit))
             {
                 Program.debug("PRED: SPAM POSITION");
                 if (distanceFromToUnit < input.Range - fixRange)
@@ -438,6 +436,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     return result;
                 }
             }
+
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
             if (distanceFromToUnit < 200 || distanceFromToWaypoint < 200 || input.Unit.MoveSpeed < 200 )
@@ -522,13 +521,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     else if (UnitTracker.GetLastStopMoveTime(input.Unit) > 0.8d)
                         result.Hitchance = HitChance.High;
                     else
+                    {
+                        Program.debug("PRED: STOP LOGIC");
                         result.Hitchance = HitChance.VeryHigh;
+                    }
 
-                    Program.debug("PRED: STOP LOGIC");
+                    
                     return result;
                 }
             }
-
 
             // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
 
@@ -542,7 +543,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
             //Program.debug("PRED: NO DETECTION");
-            
             return result;
         }
 
@@ -1309,9 +1309,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[1].Time - TrackerUnit.PathBank[0].Time < 0.25f 
+            if (TrackerUnit.PathBank[1].Time - TrackerUnit.PathBank[0].Time < 0.20f 
                 && TrackerUnit.PathBank[1].Time + 0.1f < Game.Time  
-                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 100)
+                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 50)
             {
                 return true;
             }
