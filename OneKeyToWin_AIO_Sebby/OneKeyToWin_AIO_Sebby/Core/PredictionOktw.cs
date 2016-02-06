@@ -383,7 +383,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
             var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
             var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
-
+            var getAngle = GetAngle(input.From, input.Unit);
             float speedDelay = distanceFromToUnit / input.Speed;
 
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
@@ -411,7 +411,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint <= input.Unit.Distance(input.From) && distanceFromToUnit > input.Range - fixRange)
+            if (distanceFromToWaypoint <= distanceFromToUnit && distanceFromToUnit > input.Range - fixRange)
             {
                 //debug("PRED: FIX RANGE");
                 result.Hitchance = HitChance.Medium;
@@ -454,7 +454,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            if (backToFront > 400 && GetAngle(input.From, input.Unit) < 32)
+            if (backToFront > 400 && getAngle < 32)
             {
                 if (ObjectManager.Player.Position.Distance(input.Unit.ServerPosition) > ObjectManager.Player.Position.Distance(input.Unit.Position))
                 {
@@ -480,13 +480,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (distanceFromToWaypoint > 250 && input.Unit.Path.Count() > 0 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
-                if (!input.Unit.IsFacing(ObjectManager.Player) && GetAngle(input.From, input.Unit) < angleMove + 1)
+                if (!input.Unit.IsFacing(ObjectManager.Player) && getAngle < angleMove + 1)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: RUN IN LANE DETECTION " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                else if (GetAngle(input.From, input.Unit) < angleMove)
+                else if (getAngle < angleMove)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
