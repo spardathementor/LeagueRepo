@@ -478,7 +478,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 250 && input.Unit.Path.Count() > 0 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+            if (distanceFromToWaypoint > 300 && input.Unit.Path.Count() == 1 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 if (!input.Unit.IsFacing(ObjectManager.Player) && getAngle < angleMove + 1)
                 {
