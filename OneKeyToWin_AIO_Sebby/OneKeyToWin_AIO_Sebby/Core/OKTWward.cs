@@ -136,7 +136,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         E.Cast(Player.Position.Extend(need.PredictedPos, 800));
                     }
 
-                    if (!Player.IsWindingUp && PPDistance < 800 && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f && Config.Item("bushW", true).GetValue<bool>())
+                    if (!Player.IsWindingUp && PPDistance < 800 && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f && Config.Item("bushW", true).GetValue<bool>() && Utils.TickCount - W.LastCastAttemptT > 2000)
                     {
                         W.Cast(need.PredictedPos);
                     }
