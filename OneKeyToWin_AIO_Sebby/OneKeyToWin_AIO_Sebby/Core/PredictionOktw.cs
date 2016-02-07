@@ -530,15 +530,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     if (distanceFromToUnit > input.Range - fixRange)
                         result.Hitchance = HitChance.Medium;
-                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.8d)
+                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
                         result.Hitchance = HitChance.High;
                     else
                     {
                         Program.debug("PRED: STOP LOGIC");
                         result.Hitchance = HitChance.VeryHigh;
                     }
-
-                    
                     return result;
                 }
             }
