@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 475);
             R = new Spell(SpellSlot.R, 600);
 
-            Q.SetSkillshot(0.25f, 90f, 2200f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 90f, 2100f, true, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
@@ -40,7 +40,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts1", "ON - only one target"));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts2", "OFF - all grab-able targets"));
-
+            
+            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qTur", "Auto Q under turret", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qCC", "Auto Q cc & dash enemy", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("minGrab", "Min range grab", true).SetValue(new Slider(250, 125, (int)Q.Range)));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("maxGrab", "Max range grab", true).SetValue(new Slider((int)Q.Range, 125, (int)Q.Range)));
@@ -157,22 +158,28 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             float maxGrab = Config.Item("maxGrab", true).GetValue<Slider>().Value;
             float minGrab =  Config.Item("minGrab", true).GetValue<Slider>().Value;
+            var ts = Config.Item("ts", true).GetValue<bool>();
+            var qTur = Player.UnderAllyTurret() && Config.Item("qTur", true).GetValue<bool>();
+            var qCC = Config.Item("qCC", true).GetValue<bool>();
 
-            if (Program.Combo && Config.Item("ts", true).GetValue<bool>())
+            if (Program.Combo && ts)
             {
                 var t = TargetSelector.GetTarget(maxGrab, TargetSelector.DamageType.Physical);
 
                 if (t.IsValidTarget(maxGrab) && !t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) && Config.Item("grab" + t.ChampionName).GetValue<bool>() && Player.Distance(t.ServerPosition) > minGrab)
                     Program.CastSpell(Q, t);
             }
+
             foreach (var t in Program.Enemies.Where(t => t.IsValidTarget(maxGrab) && Config.Item("grab" + t.ChampionName).GetValue<bool>()))
             {
                 if (!t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) && Player.Distance(t.ServerPosition) > minGrab)
                 {
-                    if (Program.Combo && !Config.Item("ts", true).GetValue<bool>())
+                    if (Program.Combo && !ts)
                         Program.CastSpell(Q,t);
+                    else if (qTur)
+                        Program.CastSpell(Q, t);
 
-                    if (Config.Item("qCC", true).GetValue<bool>() )
+                    if (qCC)
                     {
                         if(!OktwCommon.CanMove(t))
                             Q.Cast(t, true);
