@@ -140,7 +140,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         W.Cast(need.PredictedPos);
                     }
-                    if (!Player.IsWindingUp && PPDistance < 760 && Player.ChampionName == "Jhin" && W.IsReady() && Player.Mana > 200f && Config.Item("bushE", true).GetValue<bool>())
+                    if (!Player.IsWindingUp && PPDistance < 760 && Player.ChampionName == "Jhin" && W.IsReady() && Player.Mana > 200f && Config.Item("bushE", true).GetValue<bool>() && Utils.TickCount - E.LastCastAttemptT > 2000)
                     {
                         E.Cast(need.PredictedPos);
                     }
