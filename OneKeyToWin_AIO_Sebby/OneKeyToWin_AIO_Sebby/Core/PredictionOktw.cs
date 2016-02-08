@@ -438,7 +438,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 250 ||  input.Unit.MoveSpeed < 150 )
+            if (distanceFromToUnit < 300 ||  input.Unit.MoveSpeed < 150 || distanceFromToWaypoint < 200)
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -454,11 +454,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            if (backToFront > 400 && getAngle < 32)
+            if (distanceUnitToWaypoint > 400 && getAngle < 33 && ObjectManager.Player.IsMoving && input.Unit.IsMoving)
             {
-                if (ObjectManager.Player.Position.Distance(input.Unit.ServerPosition) > ObjectManager.Player.Position.Distance(input.Unit.Position))
+                if (ObjectManager.Player.IsFacing(input.Unit))
                 {
-                    if (input.Unit.Position.Distance(ObjectManager.Player.ServerPosition) < input.Unit.Position.Distance(ObjectManager.Player.Position))
+                    if (!input.Unit.IsFacing(ObjectManager.Player))
                     {
                         Program.debug(" PRED:TRY CATCH");
                         result.Hitchance = HitChance.VeryHigh;
@@ -467,7 +467,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
                 else
                 {
-                    if (input.Unit.Position.Distance(ObjectManager.Player.ServerPosition) > input.Unit.Position.Distance(ObjectManager.Player.Position))
+                    if (input.Unit.IsFacing(ObjectManager.Player))
                     {
                         Program.debug(" PRED:TRY CATCH 2");
                         result.Hitchance = HitChance.VeryHigh;
