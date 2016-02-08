@@ -458,7 +458,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceUnitToWaypoint > 150 && getAngle < angleMove)
+            if (distanceUnitToWaypoint > 400 && getAngle < angleMove)
             {
                 if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
                 {
