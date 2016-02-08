@@ -402,6 +402,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
+                pathMinLen = 800f;
+                getAngle -= 1;
+                angleMove += 1;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -429,7 +432,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPAM POSITION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 200 && UnitTracker.SpamSamePlace(input.Unit))
+            if (distanceFromToWaypoint > 100 && UnitTracker.SpamSamePlace(input.Unit))
             {
                 Program.debug("PRED: SPAM POSITION");
                 result.Hitchance = HitChance.VeryHigh;
@@ -438,7 +441,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 250 ||  input.Unit.MoveSpeed < 150 || distanceFromToWaypoint < 100)
+            if (distanceFromToUnit < 250 ||  input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 100)
             {
                 Program.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -1336,10 +1339,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.3f 
-                && TrackerUnit.PathBank[1].Time + 0.1f < Game.Time 
-                && TrackerUnit.PathBank[2].Time + 0.2f > Game.Time 
-                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.3f
+                && Game.Time - TrackerUnit.PathBank[2].Time < 0.15
+                && Game.Time - TrackerUnit.PathBank[2].Time > 0.08
+                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position)
+                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
             {
                 return true;
             }
