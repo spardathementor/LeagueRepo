@@ -394,7 +394,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float fixRange = moveArea * 0.5f;
             double angleMove = 30 + (input.Radius / 17) - totalDelay - (input.Delay * 2);
             float backToFront = moveArea * 1.5f;
-            float pathMinLen = 1000f;
+            float pathMinLen = 1100f;
 
             if (angleMove < 31)
                 angleMove = 31;
@@ -402,7 +402,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
-                pathMinLen = 700f;
+                pathMinLen = 900f;
                 getAngle -= 0.5;
                 angleMove += 0.5;
                 fixRange = moveArea * 0.4f;
