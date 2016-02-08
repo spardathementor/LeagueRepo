@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
                 farmQ();
-            else if (Config.Item("stack", true).GetValue<bool>() && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
+            else if (Config.Item("stack", true).GetValue<bool>() && Utils.TickCount - Q.LastCastAttemptT > 4000 && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
                 Q.Cast(Player.ServerPosition);
         }
         private void LogicQ()
