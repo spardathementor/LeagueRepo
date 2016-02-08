@@ -279,7 +279,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 Game.PrintChat("-------------------------------------------------------------");
                 Game.PrintChat("<font color='#00c0ff'>OneKeyToWin by Sebby</font> NEW champions: Jhin, Kindred");
-                Game.PrintChat("<font color='#00c0ff'>FIXED: </font> Prediction rework");
+                Game.PrintChat("<font color='#00c0ff'>NEWS: </font> Ezreal code rework + AP mode");
                 Game.PrintChat("-------------------------------------------------------------");
             }
         }
