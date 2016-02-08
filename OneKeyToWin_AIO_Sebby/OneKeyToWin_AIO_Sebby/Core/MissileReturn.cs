@@ -99,7 +99,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (Missile != null && Missile.IsValid && Target.IsValidTarget())
             {
-                Program.debug(Missile.SData.Name);
                 var finishPosition = Missile.Position;
                 if (Missile.SData.Name == MissileName)
                 {
@@ -122,7 +121,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         {
                             if (Config.Item("drawHelper", true).GetValue<bool>())
                                 Utility.DrawCircle(ext, 100, System.Drawing.Color.White, 1, 1);
-                            Program.debug(Missile.SData.Name);
                             return ext;
                         }
                     }
