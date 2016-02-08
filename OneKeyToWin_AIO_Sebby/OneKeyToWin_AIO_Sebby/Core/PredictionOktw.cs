@@ -460,7 +460,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 200 && getAngle < angleMove)
+            if (distanceUnitToWaypoint > 350 && getAngle < angleMove)
             {
                 if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
                 {
@@ -468,7 +468,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                else if (ObjectManager.Player.IsMoving)
+                if (ObjectManager.Player.IsMoving)
                 {
                     if (ObjectManager.Player.IsFacing(input.Unit))
                     {
