@@ -402,9 +402,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
-                pathMinLen = 800f;
-                getAngle -= 1;
-                angleMove += 1;
+                pathMinLen = 700f;
+                getAngle -= 0.5;
+                angleMove += 0.5;
+                fixRange = moveArea * 0.4f;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -457,43 +458,36 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return result;
             }
 
-            if (distanceUnitToWaypoint > 400 && getAngle < 33 && ObjectManager.Player.IsMoving && input.Unit.IsMoving)
-            {
-                if (ObjectManager.Player.IsFacing(input.Unit))
-                {
-                    if (!input.Unit.IsFacing(ObjectManager.Player))
-                    {
-                        Program.debug(" PRED:TRY CATCH");
-                        result.Hitchance = HitChance.VeryHigh;
-                        return result;
-                    }
-                }
-                else
-                {
-                    if (input.Unit.IsFacing(ObjectManager.Player))
-                    {
-                        Program.debug(" PRED:TRY CATCH 2");
-                        result.Hitchance = HitChance.VeryHigh;
-                        return result;
-                    }
-                }
-            }
-
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 300 && input.Unit.Path.Count() == 1 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+            if (distanceFromToWaypoint > 200 && getAngle < angleMove)
             {
-                if (!input.Unit.IsFacing(ObjectManager.Player) && getAngle < angleMove + 1)
-                {
-                    Program.debug(GetAngle(input.From, input.Unit) + " PRED: RUN IN LANE DETECTION " + angleMove);
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
-                else if (getAngle < angleMove)
+                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
+                }
+                else if (ObjectManager.Player.IsMoving)
+                {
+                    if (ObjectManager.Player.IsFacing(input.Unit))
+                    {
+                        if (!input.Unit.IsFacing(ObjectManager.Player))
+                        {
+                            Program.debug(" PRED:TRY CATCH");
+                            result.Hitchance = HitChance.VeryHigh;
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        if (input.Unit.IsFacing(ObjectManager.Player))
+                        {
+                            Program.debug(" PRED:TRY CATCH 2");
+                            result.Hitchance = HitChance.VeryHigh;
+                            return result;
+                        }
+                    }
                 }
             }
 
@@ -522,26 +516,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
-            else
+            else if (input.Unit.Path.Count() == 0 || !input.Unit.IsMoving)
             {
-                if(input.Unit.IsWindingUp)
-                {
+                if (input.Unit.IsWindingUp)
                     result.Hitchance = HitChance.High;
-                    return result;
-                }
-                else if (input.Unit.Path.Count() == 0 && !input.Unit.IsMoving)
+                else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
+                    result.Hitchance = HitChance.High;
+                else
                 {
-                    if (distanceFromToUnit > input.Range - fixRange)
-                        result.Hitchance = HitChance.Medium;
-                    else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
-                        result.Hitchance = HitChance.High;
-                    else
-                    {
-                        Program.debug("PRED: STOP LOGIC");
-                        result.Hitchance = HitChance.VeryHigh;
-                    }
-                    return result;
+                    Program.debug("PRED: STOP LOGIC");
+                    result.Hitchance = HitChance.VeryHigh;
                 }
+                return result;
             }
 
             // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
@@ -1323,7 +1309,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 return false;
 
             if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f 
-                && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time  
+                && TrackerUnit.PathBank[2].Time + 0.15f < Game.Time  
                 && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 100
                 && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 100)
             {
@@ -1339,13 +1325,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.3f
-                && Game.Time - TrackerUnit.PathBank[2].Time < 0.15
-                && Game.Time - TrackerUnit.PathBank[2].Time > 0.08
-                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > unit.Distance(TrackerUnit.PathBank[2].Position)
-                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) > unit.Distance(TrackerUnit.PathBank[2].Position))
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.3f && Game.Time - TrackerUnit.PathBank[2].Time < 0.15 && Game.Time - TrackerUnit.PathBank[2].Time > 0.08)
             {
-                return true;
+                var dis = unit.Distance(TrackerUnit.PathBank[2].Position);
+                if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > dis && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) > dis)
+                    return true;
+                else
+                    return false;
             }
             else
                 return false;
