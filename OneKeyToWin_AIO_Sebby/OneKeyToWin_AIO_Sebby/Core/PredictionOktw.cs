@@ -399,7 +399,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (angleMove < 31)
                 angleMove = 31;
 
-            if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+            if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.05d)
             {
                 result.Hitchance = HitChance.High;
                 pathMinLen = 700f;
