@@ -49,7 +49,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW3", "Auto W shield big dmg", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW2", "Auto W if Q succesfull", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("wCount", "Auto W if x enemies near ally", true).SetValue(new Slider(2, 0, 5)));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("wCount", "Auto W if x enemies near ally", true).SetValue(new Slider(3, 0, 5)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("pushE", "Auto push", true).SetValue(true));
