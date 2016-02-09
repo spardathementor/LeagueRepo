@@ -260,12 +260,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
 
                 
-                if (!Program.None && Player.Mana > RMANA + WMANA && Config.Item("autoWcc", true).GetValue<bool>())
+                if (!Program.None && Player.Mana > RMANA + WMANA)
                 {
                     if(Config.Item("Waoe", true).GetValue<bool>())
                         W.CastIfWillHit(t, 2);
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && (!OktwCommon.CanMove(enemy) || enemy.HasBuff("jhinespotteddebuff"))))
-                        W.Cast(enemy);
+                    if (Config.Item("autoWcc", true).GetValue<bool>())
+                    {
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && (!OktwCommon.CanMove(enemy) || enemy.HasBuff("jhinespotteddebuff"))))
+                            W.Cast(enemy);
+                    }
                 }
             }
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
