@@ -304,7 +304,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
                 target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Knockback) ||
                 target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) ||
-                target.IsStunned || (target.IsChannelingImportantSpell() && !target.IsMoving) || target.MoveSpeed < 10 || Prediction.GetPrediction(target,0.75f).Hitchance > HitChance.VeryHigh)
+                target.IsStunned || (target.IsChannelingImportantSpell() && !target.IsMoving) || target.MoveSpeed < 50 || Prediction.GetPrediction(target,0.5f).Hitchance > HitChance.Dashing)
             {
                 return false;
             }
