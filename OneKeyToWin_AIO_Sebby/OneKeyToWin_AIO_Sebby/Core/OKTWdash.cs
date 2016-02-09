@@ -131,7 +131,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     DashSpell.Cast(bestpoint);
             }
 
-            if (Player.CountEnemiesInRange(Player.BoundingRadius + DashSpell.Range + Player.AttackRange) == 0)
+            if (!bestpoint.IsZero && bestpoint.CountEnemiesInRange(Player.BoundingRadius + Player.AttackRange + 100) == 0)
                 return Vector3.Zero;
 
             return bestpoint;
