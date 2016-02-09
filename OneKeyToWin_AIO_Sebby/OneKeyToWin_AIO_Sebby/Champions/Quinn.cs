@@ -148,15 +148,21 @@ namespace OneKeyToWin_AIO_Sebby
         private void LogicQ()
         {
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-            if (t.IsValidTarget(Q.Range))
+            if (t.IsValidTarget())
             {
-                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
-                    Program.CastSpell(Q, t);
-                else if (Program.Combo && Player.Mana > RMANA + QMANA)
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
                 else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                 {
                     Program.CastSpell(Q, t);
+                }
+                else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
+                    Program.CastSpell(Q, t);
+
+                if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
+                {
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                        Q.Cast(enemy);
                 }
             }
         }
