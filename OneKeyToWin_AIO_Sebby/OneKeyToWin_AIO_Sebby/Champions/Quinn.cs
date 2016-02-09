@@ -104,11 +104,24 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!unit.IsMe)
-                return;
-            if(Config.Item("autoE", true).GetValue<bool>())
-                LogicE();
-
+            if (E.IsReady() && target.Type == GameObjectType.obj_AI_Hero)
+            {
+                if (Config.Item("autoE", true).GetValue<bool>())
+                {
+                    var t = target as Obj_AI_Hero;
+                    if (t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW") && t.CountEnemiesInRange(800) < 3)
+                    {
+                        if (OktwCommon.GetKsDamage(t, E) > t.Health)
+                            E.Cast(t);
+                        else if (Program.Combo && Player.Mana > RMANA + EMANA)
+                            E.Cast(t);
+                        else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
+                        {
+                            E.Cast(t);
+                        }
+                    }
+                }
+            }
             Jungle();
         }
 
@@ -148,21 +161,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private void LogicE()
-        {
-            var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-            if ( t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW") && t.CountEnemiesInRange(800) <3)
-            {
-                if (OktwCommon.GetKsDamage(t, E) > t.Health)
-                    E.Cast(t);
-                else if (Program.Combo && Player.Mana > RMANA + EMANA)
-                    E.Cast(t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && !t.UnderTurret(true) && OktwCommon.CanHarras())
-                {
-                    E.Cast(t);
-                }
-            }
-        }
+
 
         private void SetMana()
         {
