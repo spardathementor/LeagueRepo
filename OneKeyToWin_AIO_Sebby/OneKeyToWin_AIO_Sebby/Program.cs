@@ -277,10 +277,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Config.Item("print").GetValue<bool>())
             {
-                Game.PrintChat("-------------------------------------------------------------");
-                Game.PrintChat("<font color='#00c0ff'>OneKeyToWin by Sebby</font> NEW champions: Jhin, Kindred");
-                Game.PrintChat("<font color='#00c0ff'>NEWS: </font> Ezreal code rework + AP mode");
-                Game.PrintChat("-------------------------------------------------------------");
+                Game.PrintChat("<font size='30'>OneKeyToWin</font> <font color='#b756c5'>by Sebby</font>");
+                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font> Ezreal code rework + AP mode");
             }
         }
 
