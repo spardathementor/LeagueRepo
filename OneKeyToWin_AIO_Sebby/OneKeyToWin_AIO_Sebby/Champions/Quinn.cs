@@ -134,36 +134,33 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if ( target.Type == GameObjectType.obj_AI_Hero)
             {
-                if (Config.Item("autoE", true).GetValue<bool>())
+                var t = target as Obj_AI_Hero;
+                if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && t.IsValidTarget(E.Range) && t.CountEnemiesInRange(800) < 3)
                 {
-                    var t = target as Obj_AI_Hero;
-                    if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && t.IsValidTarget(E.Range) && t.CountEnemiesInRange(800) < 3)
+                    if (Program.Combo && Player.Mana > RMANA + EMANA)
+                        E.Cast(t);
+                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                     {
-                        if (Program.Combo && Player.Mana > RMANA + EMANA)
-                            E.Cast(t);
-                        else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
-                        {
-                            E.Cast(t);
-                        }
-                        else if (OktwCommon.GetKsDamage(t, E) > t.Health)
-                            E.Cast(t);
+                        E.Cast(t);
                     }
-                    if (Q.IsReady() && t.IsValidTarget(Q.Range))
+                    else if (OktwCommon.GetKsDamage(t, E) > t.Health)
+                        E.Cast(t);
+                }
+                if (Q.IsReady() && t.IsValidTarget(Q.Range))
+                {
+                    if (Program.Combo && Player.Mana > RMANA + QMANA)
+                        Program.CastSpell(Q, t);
+                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                     {
-                        if (Program.Combo && Player.Mana > RMANA + QMANA)
-                            Program.CastSpell(Q, t);
-                        else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
-                        {
-                            Program.CastSpell(Q, t);
-                        }
-                        else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
-                            Program.CastSpell(Q, t);
+                        Program.CastSpell(Q, t);
+                    }
+                    else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
+                        Program.CastSpell(Q, t);
 
-                        if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
-                        {
-                            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
-                                Q.Cast(enemy);
-                        }
+                    if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
+                    {
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                            Q.Cast(enemy);
                     }
                 }
             }
