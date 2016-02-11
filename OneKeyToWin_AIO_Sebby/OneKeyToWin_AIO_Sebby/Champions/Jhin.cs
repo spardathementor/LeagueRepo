@@ -119,7 +119,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            Program.debug(args.SData.Name);
             if(sender.IsMe && args.SData.Name == "JhinR")
             {
                 rPosCast = args.End;
@@ -198,7 +197,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
-                Program.debug("dmg" + GetRdmg(t));
                 rPosLast = R.GetPrediction(t).CastPosition;
                 if (Config.Item("useR", true).GetValue<KeyBind>().Active && !IsCastingR)
                 {
@@ -328,13 +326,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-            if (!t.IsValidTarget())
+            var torb = Orbwalker.GetTarget();
+
+            if (torb == null || torb.Type != GameObjectType.obj_AI_Hero)
             {
                 if (Config.Item("Qminion", true).GetValue<bool>())
                 {
-                    t = TargetSelector.GetTarget(Q.Range + 400, TargetSelector.DamageType.Physical);
-                    if (t.IsValidTarget())
+                    var t = TargetSelector.GetTarget(Q.Range + 400, TargetSelector.DamageType.Physical);
+                    if (t.IsValidTarget() )
                     {
                         
                         var minion = MinionManager.GetMinions(Prediction.GetPrediction(t, 0.4f).CastPosition, 350, MinionTypes.All , MinionTeam.Enemy, MinionOrderTypes.MaxHealth).Where(minion2 => minion2.IsValidTarget(Q.Range)).FirstOrDefault();
@@ -353,6 +352,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if(!Orbwalking.CanAttack() && !Player.IsWindingUp)
             {
+                var t = torb as Obj_AI_Hero;
                 if (t.Health < GetQdmg(t) + GetWdmg(t))
                     Q.CastOnUnit(t);
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
