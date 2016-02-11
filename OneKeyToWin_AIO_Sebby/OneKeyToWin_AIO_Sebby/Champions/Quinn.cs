@@ -74,7 +74,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var orbTarget = args.Target as Obj_AI_Hero;
                 if (!orbTarget.HasBuff("quinnw"))
                 {
-                    var best = Program.Enemies.First(enemy => enemy.IsValidTarget() && Orbwalking.InAutoAttackRange(enemy) && enemy.HasBuff("quinnw"));
+                    var best = Program.Enemies.FirstOrDefault(enemy => enemy.IsValidTarget() && Orbwalking.InAutoAttackRange(enemy) && enemy.HasBuff("quinnw"));
                     if(best != null)
                         Orbwalker.ForceTarget(best);
                 }
