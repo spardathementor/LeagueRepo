@@ -98,7 +98,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (flash.IsReady())
                     realRange = FR.Range;
 
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(realRange) && enemy.Health - OktwCommon.GetIncomingDamage(enemy) > 0 && OktwCommon.ValidUlt(enemy)))
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(realRange) && OktwCommon.ValidUlt(enemy)))
                 {
                     if (enemy.IsValidTarget(R.Range))
                     {

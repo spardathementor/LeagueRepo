@@ -241,7 +241,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicR()
         {
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R1.Range) && target.Health - OktwCommon.GetIncomingDamage(target) > 0 && OktwCommon.ValidUlt(target)))
+            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R1.Range) && OktwCommon.ValidUlt(target)))
             {
                 double rDmg = OktwCommon.GetKsDamage(target,R);
 

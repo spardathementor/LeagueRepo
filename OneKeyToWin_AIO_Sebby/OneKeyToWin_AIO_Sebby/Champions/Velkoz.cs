@@ -175,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     rDmg = rDmg * adjust;
                 }
 
-                if(rDmg > t.Health && OktwCommon.ValidUlt(t) && t.Health - OktwCommon.GetIncomingDamage(t) > 0)
+                if(rDmg > t.Health && OktwCommon.ValidUlt(t))
                 {
                     R.Cast(t);
                 }

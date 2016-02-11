@@ -167,14 +167,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             var targetR = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.True);
-            if (targetR.IsValidTarget() && Config.Item("autoRbuff", true).GetValue<bool>())
+            if (targetR.IsValidTarget() && OktwCommon.ValidUlt(targetR) && Config.Item("autoRbuff", true).GetValue<bool>())
             {
                 var buffTime = OktwCommon.GetPassiveTime(Player, "dariusexecutemulticast");
                 if((buffTime < 2 || (Player.HealthPercent < 10 && Config.Item("autoRdeath", true).GetValue<bool>())) && buffTime > 0)
                     R.Cast(targetR, true);
             }
 
-            foreach (var target in Program.Enemies.Where(target => OktwCommon.ValidUlt(target) && target.IsValidTarget(R.Range) ))
+            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) ))
             {
 
                 var dmgR = OktwCommon.GetKsDamage(target, R);
