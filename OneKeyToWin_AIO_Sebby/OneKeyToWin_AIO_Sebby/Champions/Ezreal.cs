@@ -291,7 +291,7 @@ namespace OneKeyToWin_AIO_Sebby
                         dmgCombo += W.GetDamage(t);
                     }
 
-                    if (dmgCombo > t.Health)
+                    if (dmgCombo > t.Health && OktwCommon.ValidUlt(t))
                     {
                         E.Cast(dashPosition);
                         OverKill = Game.Time;
