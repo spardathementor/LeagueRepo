@@ -306,34 +306,34 @@ namespace OneKeyToWin_AIO_Sebby
             if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
                 return;
 
-            if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(800) == 0 && (Game.Time - OverKill > 0.6))
+            if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(800) == 0 && Game.Time - OverKill > 0.6)
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
                 {
-                    float predictedHealth = target.Health + target.HPRegenRate * 2;
+                    var predictionDamage = OktwCommon.GetIncomingDamage(target);
+                    double predictedHealth = target.Health - predictionDamage;
+
+                    if (predictedHealth < 1)
+                        continue;
+
+                    if ( Config.Item("Rcc", true).GetValue<bool>() && target.IsValidTarget(Q.Range + E.Range) && target.Health < Player.MaxHealth && !OktwCommon.CanMove(target))
+                    {
+                        R.Cast(target, true, true);
+                    }
+
                     double Rdmg = R.GetDamage(target);
+
                     if (Rdmg > predictedHealth)
                         Rdmg = getRdmg(target);
-                    var qDmg = Q.GetDamage(target);
-                    var wDmg = W.GetDamage(target);
-                    if (Rdmg > predictedHealth && target.CountAlliesInRange(400) == 0)
+
+                    if (Rdmg > predictedHealth && target.CountAlliesInRange(500) == 0)
                     {
                         Program.CastSpell(R,target);
                         Program.debug("R normal");
                     }
-                    if (!OktwCommon.CanMove(target) && Config.Item("Rcc", true).GetValue<bool>() &&
-                        target.IsValidTarget(Q.Range + E.Range) && Rdmg + qDmg * 4 > predictedHealth)
-                    {
-                        R.CastIfWillHit(target, 2, true);
-                        Program.CastSpell(R, target);
-                    }
-                    else if ( Program.Combo && Config.Item("Raoe", true).GetValue<bool>())
+                    if ( Program.Combo && Config.Item("Raoe", true).GetValue<bool>() && Player.CountEnemiesInRange(1000) == 0)
                     {
                         R.CastIfWillHit(target, 3, true);
-                    }
-                    else if (target.IsValidTarget(Q.Range + E.Range) && Rdmg + qDmg + wDmg > predictedHealth && Program.Combo && Config.Item("Raoe", true).GetValue<bool>())
-                    {
-                        R.CastIfWillHit(target, 2, true);
                     }
                 }
             }
