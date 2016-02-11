@@ -310,11 +310,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
                 {
-                    var predictionDamage = OktwCommon.GetIncomingDamage(target);
-                    double predictedHealth = target.Health - predictionDamage;
-
-                    if (predictedHealth < 1)
-                        continue;
+                    double predictedHealth = target.Health - OktwCommon.GetIncomingDamage(target);
 
                     if ( Config.Item("Rcc", true).GetValue<bool>() && target.IsValidTarget(Q.Range + E.Range) && target.Health < Player.MaxHealth && !OktwCommon.CanMove(target))
                     {
