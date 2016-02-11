@@ -92,7 +92,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LagFree(1))
                 SetMana();
-            if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
+            if (Program.LagFree(2) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
 
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
@@ -132,12 +132,12 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (E.IsReady() && target.Type == GameObjectType.obj_AI_Hero)
+            if ( target.Type == GameObjectType.obj_AI_Hero)
             {
                 if (Config.Item("autoE", true).GetValue<bool>())
                 {
                     var t = target as Obj_AI_Hero;
-                    if (t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW") && t.CountEnemiesInRange(800) < 3)
+                    if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && t.IsValidTarget(E.Range) && t.CountEnemiesInRange(800) < 3)
                     {
                         if (Program.Combo && Player.Mana > RMANA + EMANA)
                             E.Cast(t);
@@ -147,6 +147,23 @@ namespace OneKeyToWin_AIO_Sebby
                         }
                         else if (OktwCommon.GetKsDamage(t, E) > t.Health)
                             E.Cast(t);
+                    }
+                    if (Q.IsReady() && t.IsValidTarget(Q.Range))
+                    {
+                        if (Program.Combo && Player.Mana > RMANA + QMANA)
+                            Program.CastSpell(Q, t);
+                        else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
+                        {
+                            Program.CastSpell(Q, t);
+                        }
+                        else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
+                            Program.CastSpell(Q, t);
+
+                        if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
+                        {
+                            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                                Q.Cast(enemy);
+                        }
                     }
                 }
             }
@@ -178,6 +195,8 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
+                if (Orbwalking.InAutoAttackRange(t) && t.HasBuff("quinnw"))
+                    return;
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
                 else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
