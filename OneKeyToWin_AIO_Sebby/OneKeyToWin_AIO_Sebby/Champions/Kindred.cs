@@ -140,7 +140,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var tks = TargetSelector.GetTarget(1600, TargetSelector.DamageType.Physical);
             if (tks.IsValidTarget())
             {
-                if (W.GetDamage(tks) * 3 > t.Health - OktwCommon.GetIncomingDamage(t))
+                if (W.GetDamage(tks) * 3 > tks.Health - OktwCommon.GetIncomingDamage(tks))
                     W.Cast();
             }
 
