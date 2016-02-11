@@ -383,11 +383,13 @@ namespace OneKeyToWin_AIO_Sebby
             }
             //if (Config.Item("debug", true).GetValue<bool>())
             //    Game.PrintChat("R collision" + dmg);
-
-            if (dmg > 7)
+            if (dmg == 0)
+                return rDmg;
+            else if (dmg > 7)
                 return rDmg * 0.7;
             else
                 return rDmg - (rDmg * 0.1 * dmg);
+
         }
 
         private float GetPassiveTime()
