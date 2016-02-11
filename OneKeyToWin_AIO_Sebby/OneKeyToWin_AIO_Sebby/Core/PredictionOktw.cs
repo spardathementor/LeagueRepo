@@ -431,7 +431,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // SPAM POSITION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToWaypoint > 100 && UnitTracker.SpamSamePlace(input.Unit))
+            if (UnitTracker.SpamSamePlace(input.Unit))
             {
                 Program.debug("PRED: SPAM POSITION");
                 result.Hitchance = HitChance.VeryHigh;
@@ -458,9 +458,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceUnitToWaypoint > fixRange && getAngle < angleMove)
+            if ( getAngle < angleMove)
             {
-                if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+                if (distanceUnitToWaypoint > fixRange && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
                 {
                     Program.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
