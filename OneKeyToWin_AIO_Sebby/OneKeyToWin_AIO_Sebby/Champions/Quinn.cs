@@ -47,17 +47,45 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R in shop", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("focusP", "Focus marked enemy", true).SetValue(true));
+
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmP", "Attack marked minion first", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
 
             Game.OnUpdate += Game_OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
             Orbwalking.AfterAttack += afterAttack;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
+            Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+        }
+
+        private void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        {
+            if(args.Target.Type == GameObjectType.obj_AI_Hero && Config.Item("focusP", true).GetValue<bool>() && args.Target.HealthPercent > 40)
+            {
+                var orbTarget = args.Target as Obj_AI_Hero;
+                if (!orbTarget.HasBuff("quinnw"))
+                {
+                    var best = Program.Enemies.First(enemy => enemy.IsValidTarget() && Orbwalking.InAutoAttackRange(enemy) && enemy.HasBuff("quinnw"));
+                    if(best != null)
+                        Orbwalker.ForceTarget(best);
+                }
+            }
+            else if(Program.LaneClear && args.Target.Type == GameObjectType.obj_AI_Minion && Config.Item("farmP", true).GetValue<bool>())
+            {
+                var bestMinion = MinionManager.GetMinions(Player.Position, Player.AttackRange).FirstOrDefault(minion => minion.IsValidTarget() && Orbwalking.InAutoAttackRange(minion) && minion.HasBuff("quinnw"));
+
+                if (bestMinion != null)
+                    Orbwalker.ForceTarget(bestMinion);
+            }
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -165,9 +193,14 @@ namespace OneKeyToWin_AIO_Sebby
                         Q.Cast(enemy);
                 }
             }
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
+            {
+                var minionList = MinionManager.GetMinions(Player.ServerPosition, Q.Range - 150, MinionTypes.All);
+                var farmPosition = Q.GetCircularFarmLocation(minionList, 150);
+                if (farmPosition.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                    Q.Cast(farmPosition.Position);
+            }
         }
-
-
 
         private void SetMana()
         {
