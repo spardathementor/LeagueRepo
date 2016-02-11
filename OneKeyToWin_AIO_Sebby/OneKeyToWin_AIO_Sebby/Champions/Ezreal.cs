@@ -203,7 +203,10 @@ namespace OneKeyToWin_AIO_Sebby
                     var qDmg = OktwCommon.GetKsDamage(t, Q);
                     var wDmg = W.GetDamage(t);
                     if (qDmg > t.Health)
+                    {
                         Program.CastSpell(Q, t);
+                        OverKill = Game.Time;
+                    }
                     else if (t.IsValidTarget(W.Range) && qDmg + wDmg > t.Health)
                     {
                         Program.CastSpell(Q, t);
@@ -247,7 +250,9 @@ namespace OneKeyToWin_AIO_Sebby
                         OverKill = Game.Time;
                     }
                     else if (wDmg + qDmg > t.Health && Q.IsReady())
+                    {
                         Program.CastSpell(W, t);
+                    }
                 }
 
                 if (!Program.None && Player.Mana > RMANA + WMANA + EMANA)
