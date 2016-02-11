@@ -139,14 +139,14 @@ namespace OneKeyToWin_AIO_Sebby
                     var t = target as Obj_AI_Hero;
                     if (t.IsValidTarget(E.Range) && !t.HasBuff("QuinnW") && t.CountEnemiesInRange(800) < 3)
                     {
-                        if (OktwCommon.GetKsDamage(t, E) > t.Health)
-                            E.Cast(t);
-                        else if (Program.Combo && Player.Mana > RMANA + EMANA)
+                        if (Program.Combo && Player.Mana > RMANA + EMANA)
                             E.Cast(t);
                         else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harrasE", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                         {
                             E.Cast(t);
                         }
+                        else if (OktwCommon.GetKsDamage(t, E) > t.Health)
+                            E.Cast(t);
                     }
                 }
             }

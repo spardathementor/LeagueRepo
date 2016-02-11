@@ -285,7 +285,7 @@ namespace OneKeyToWin_AIO_Sebby
             return totalDmg;
         }
 
-        public static bool ValidUlt(Obj_AI_Base target)
+        public static bool ValidUlt(Obj_AI_Hero target)
         {
             if (target.HasBuffOfType(BuffType.PhysicalImmunity)
                 || target.HasBuffOfType(BuffType.SpellImmunity)
@@ -293,6 +293,7 @@ namespace OneKeyToWin_AIO_Sebby
                 || target.IsInvulnerable
                 || target.HasBuffOfType(BuffType.Invulnerability)
                 || target.HasBuffOfType(BuffType.SpellShield)
+                || target.Health - GetIncomingDamage(target) < 1
                 )
                 return false;
             else
