@@ -180,9 +180,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < R.Range && Config.Item("Ruse" + ally.ChampionName, true).GetValue<bool>() ))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-                var enemys = ally.CountEnemiesInRange(700);
+                var enemys = ally.CountEnemiesInRange(800);
 
-                if (dmg == 0 && enemys == 0)
+                if (dmg == 0 && enemys == 0 && ally.Health > ally.Level * 10)
                     continue;
 
                 if (ally.CountEnemiesInRange(500) < rEnemy)
