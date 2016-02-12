@@ -370,5 +370,14 @@ namespace OneKeyToWin_AIO_Sebby
                 return 0;
         }
 
+
+        public static float GetPassiveTime(Obj_AI_Base target, String buffName)
+        {
+            return
+                target.Buffs.OrderByDescending(buff => buff.EndTime - Game.Time)
+                    .Where(buff => buff.Name == buffName)
+                    .Select(buff => buff.EndTime)
+                    .FirstOrDefault() - Game.Time;
+        }
     }
 }
