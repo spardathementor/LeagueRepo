@@ -43,7 +43,7 @@
       <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="SebbyLib">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\SebbyLib.dll</HintPath>
+      <HintPath>..\..\SebbyLib\SebbyLib\obj\Release\SebbyLib.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
       <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\SharpDX.dll</HintPath>
