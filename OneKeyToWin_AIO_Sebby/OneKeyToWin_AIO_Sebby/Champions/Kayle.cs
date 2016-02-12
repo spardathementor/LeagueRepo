@@ -64,7 +64,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Jungle();
             }
 
-            if (Program.LagFree(1) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+            if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
                 LogicR();
 
             if (Program.LagFree(2) && W.IsReady() && !Player.IsWindingUp && Config.Item("autoW", true).GetValue<bool>())
@@ -81,7 +81,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>() ))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-                var enemys = ally.CountEnemiesInRange(700);
+                var enemys = ally.CountEnemiesInRange(800);
                
                 if (dmg == 0 && enemys == 0)
                     continue;
