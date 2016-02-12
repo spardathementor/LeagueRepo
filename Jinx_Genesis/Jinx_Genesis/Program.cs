@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
-using SebbyLib;
 
 namespace Jinx_Genesis
 {
@@ -41,8 +40,6 @@ namespace Jinx_Genesis
         private static void Game_OnGameLoad(EventArgs args)
         {
             if (Player.ChampionName != ChampionName) return;
-
-            OktwCommon.Load();
 
             LoadMenu();
 
