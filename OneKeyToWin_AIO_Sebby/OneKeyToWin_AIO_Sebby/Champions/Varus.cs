@@ -129,12 +129,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (!OktwCommon.CanCombo())
-            {
-                Program.debug("dupa");
-                return;
-            }
-
             if (R.IsReady())
             {
                 if (Config.Item("useR", true).GetValue<KeyBind>().Active)
