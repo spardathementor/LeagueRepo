@@ -4,6 +4,7 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+
 namespace OneKeyToWin_AIO_Sebby
 {
     class YasuoWall
@@ -40,7 +41,6 @@ namespace OneKeyToWin_AIO_Sebby
             blockSpells = false;
 
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private static YasuoWall yasuoWall = new YasuoWall();
 
         private static List<UnitIncomingDamage> IncomingDamageList = new List<UnitIncomingDamage>();
@@ -84,11 +84,6 @@ namespace OneKeyToWin_AIO_Sebby
                 float time = Game.Time - 2;
                 IncomingDamageList.RemoveAll(damage => time < damage.Time);
             }
-        }
-
-        public static bool CanCombo()
-        {
-            return !Player.IsWindingUp;
         }
 
         public static double GetIncomingDamage(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true )
@@ -212,6 +207,7 @@ namespace OneKeyToWin_AIO_Sebby
                 args.Process = false;
             }
         }
+
         public static bool IsSpellHeroCollision(Obj_AI_Hero t, Spell QWER, int extraWith = 50)
         {
             foreach (var hero in HeroManager.Enemies.FindAll( hero => hero.IsValidTarget(QWER.Range + QWER.Width, true, QWER.RangeCheckFrom) && t.NetworkId != hero.NetworkId))
@@ -249,15 +245,6 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 return true;
             }
-            return false;
-        }
-
-        public static bool IsFaced(Obj_AI_Hero target)
-        {
-            Vector2 LastWaypoint = target.GetWaypoints().Last();
-            if (LastWaypoint.Distance(Player.Position) < target.Distance(Player.Position))
-                return true;
-
             return false;
         }
 
@@ -311,18 +298,6 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else
                 return true;
-        }
-
-        public static int CountEnemiesInRangeDeley(Vector3 position, float range, float delay)
-        {
-            int count = 0;
-            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget()))
-            {
-                Vector3 prepos = Prediction.GetPrediction(t, delay).CastPosition;
-                if (position.Distance(prepos) < range)
-                    count++;
-            }
-            return count;
         }
 
         public static void DrawLineRectangle(Vector3 start2, Vector3 end2, int radius, float width, System.Drawing.Color color)
@@ -395,14 +370,5 @@ namespace OneKeyToWin_AIO_Sebby
                 return 0;
         }
 
-
-        public static float GetPassiveTime(Obj_AI_Base target, String buffName)
-        {
-            return
-                target.Buffs.OrderByDescending(buff => buff.EndTime - Game.Time)
-                    .Where(buff => buff.Name == buffName)
-                    .Select(buff => buff.EndTime)
-                    .FirstOrDefault() - Game.Time;
-        }
     }
 }

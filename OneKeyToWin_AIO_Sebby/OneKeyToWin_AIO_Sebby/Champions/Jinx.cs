@@ -270,7 +270,8 @@ namespace OneKeyToWin_AIO_Sebby
                     var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
                     if (t.IsValidTarget(E.Range) && E.GetPrediction(t).CastPosition.Distance(t.Position) > 200 && (int)E.GetPrediction(t).Hitchance == 5)
                     {
-                        if (t.HasBuffOfType(BuffType.Slow) || OktwCommon.CountEnemiesInRangeDeley(E.GetPrediction(t).CastPosition, 250, E.Delay) > 1)
+                        E.CastIfWillHit(t, 2);
+                        if (t.HasBuffOfType(BuffType.Slow))
                         {
                             Program.CastSpell(E, t);
                         }
