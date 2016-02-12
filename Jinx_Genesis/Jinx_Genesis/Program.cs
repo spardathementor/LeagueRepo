@@ -7,6 +7,7 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 using SebbyLib;
+
 namespace Jinx_Genesis
 {
     class Program
