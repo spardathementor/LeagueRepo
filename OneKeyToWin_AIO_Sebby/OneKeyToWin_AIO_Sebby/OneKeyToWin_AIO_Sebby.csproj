@@ -37,22 +37,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="clipper_library">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\clipper_library.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\LeagueSharp\System\clipper_library.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\LeagueSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\LeagueSharp\System\LeagueSharp.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Common">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\SharpDX.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\SharpDX.Direct3D9.dll</HintPath>
-    </Reference>
-    <Reference Include="SPrediction">
-      <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\LeagueSharp\System\SPrediction.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\LeagueSharp\System\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -124,6 +121,23 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource1.resx</DependentUpon>
     </Compile>
+    <Compile Include="SPrediction\ArcPrediction.cs" />
+    <Compile Include="SPrediction\CirclePrediction.cs" />
+    <Compile Include="SPrediction\ClipperWrapper.cs" />
+    <Compile Include="SPrediction\Collision.cs" />
+    <Compile Include="SPrediction\ConePrediction.cs" />
+    <Compile Include="SPrediction\ConfigMenu.cs" />
+    <Compile Include="SPrediction\Drawings.cs" />
+    <Compile Include="SPrediction\Geometry.cs" />
+    <Compile Include="SPrediction\LinePrediction.cs" />
+    <Compile Include="SPrediction\Obj_AI_HeroExtensions.cs" />
+    <Compile Include="SPrediction\PathTracker.cs" />
+    <Compile Include="SPrediction\Prediction.cs" />
+    <Compile Include="SPrediction\RingPrediction.cs" />
+    <Compile Include="SPrediction\SpellExtensions.cs" />
+    <Compile Include="SPrediction\StasisPrediction.cs" />
+    <Compile Include="SPrediction\Utility.cs" />
+    <Compile Include="SPrediction\VectorPrediction.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
