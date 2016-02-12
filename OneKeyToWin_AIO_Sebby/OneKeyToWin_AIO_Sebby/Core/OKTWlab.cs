@@ -15,6 +15,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private float time = 0;
         private Vector3 from;
         private float castTime;
+        private Vector3 endPosG = Game.CursorPos;
+
         public void LoadOKTW()
         {
             Obj_AI_Base.OnDelete += Obj_AI_Base_OnDelete;
@@ -26,6 +28,14 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Game.OnSendPacket += Game_OnSendPacket;
             Game.OnProcessPacket += Game_OnProcessPacket;
             Obj_AI_Base.OnBuffAdd += Obj_AI_Base_OnBuffAdd;
+            Obj_AI_Hero.OnDamage += Obj_AI_Hero_OnDamage;
+        }
+
+        private void Obj_AI_Hero_OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            return;
+            if(ObjectManager.Player.NetworkId == args.SourceNetworkId)
+                Program.debug(sender.Name + " " + ObjectManager.Player.NetworkId + " SourceNetworkId " + args.SourceNetworkId + " TargetNetworkId " + args.TargetNetworkId + args.Type);
         }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -57,20 +67,58 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
         {
-            return;
-            if (sender.IsMe)
+           return;
+            if (!sender.IsMe)
                 Program.debug(args.Buff.Name);
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-                // foreach (var buff in ObjectManager.Player.Buffs)
-                // Program.debug(buff.Name);
+            return;
+            foreach (var mast in ObjectManager.Player.Masteries)
+            {
+                //Program.debug(" " + mast.Id + " " + mast.Page + " " + mast.Points);
+            }
+
+            //Program.debug("count minions: " + ObjectManager.Player.FlatPhysicalDamageMod);
+            //return;
+            foreach (var buff in ObjectManager.Player.Buffs)
+            {
+                if ("masterylordsdecreecooldown" == buff.Name)
+                    Program.debug(buff.Name);
+            }
         }
+
+        private void GetConeTarget(Vector2 end)
+        {
+            var angle = 60f * (float)Math.PI / 180;
+            var range = 3500;
+            var end2 = end - ObjectManager.Player.Position.To2D();
+            var edge1 = end2.Rotated(-angle / 2);
+            var edge2 = edge1.Rotated(angle);
+
+
+            var point = Game.CursorPos.To2D() - ObjectManager.Player.Position.To2D();
+            if (point.Distance(new Vector2(), true) < range * range)
+            {
+                
+                if (edge1.CrossProduct(point) > 0)
+                {
+                    if (point.CrossProduct(edge2) > 0)
+                    {
+                        Program.debug("dupa " + edge1);
+                        Render.Circle.DrawCircle(Game.CursorPos, 50, System.Drawing.Color.Orange, 1);
+                    }
+                }
+            }
+        }
+
 
         private void Drawing_OnDraw(EventArgs args)
         {
             return;
+            GetConeTarget(endPosG.To2D());
+            Render.Circle.DrawCircle(endPosG, 50, System.Drawing.Color.Red, 1);
             //OktwCommon.DrawLineRectangle(Game.CursorPos, ObjectManager.Player.Position, 75, 1, System.Drawing.Color.DimGray);
             //drawText("Range " + ObjectManager.Player.Distance(Game.CursorPos), ObjectManager.Player.Position.Extend(Game.CursorPos, 400), System.Drawing.Color.Gray);
 
@@ -113,12 +161,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            //return;
+            return;
             if (sender.IsMe && !args.SData.IsAutoAttack())
             {
                 castTime = Game.Time;
                 //Program.debug("speed: " +args.SData.MissileSpeed);
-                //Program.debug("name: " + args.SData.Name);
+                Program.debug("name: " + args.SData.Name);
                 //Program.debug("" + args.SData.DelayTotalTimePercent);
                 //time = Game.Time;
             }
@@ -126,18 +174,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
         {
-            //return;
-            if (sender.IsValid && sender.IsAlly && ObjectManager.Player.Distance(sender.Position) < 200)
+            return;
+            if (sender.IsValid && sender.IsAlly )
             {
                 //obj = sender;
-
+                
                 if (!sender.IsValid<MissileClient>())
                     return;
 
                 MissileClient missile = (MissileClient)sender;
                 if (missile.SData.LineWidth == 0)
                     return;
-                Program.debug(" " + missile.SData.LineWidth + " " + missile.SData.MissileSpeed + " " + (Game.Time - castTime));
+                Program.debug(missile.SData.Name + " " + missile.SData.LineWidth + " " + missile.SData.MissileSpeed + " " + (Game.Time - castTime));
                 if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && (missile.SData.Name == "SivirQMissile" || missile.SData.Name == "SivirQMissileReturn"))
                 {
                     
