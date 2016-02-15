@@ -290,7 +290,6 @@ namespace SebbyLib
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team && sender.IsMelee)
                 {
-                    Console.WriteLine("Damage2 " + sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name));
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }
@@ -302,7 +301,6 @@ namespace SebbyLib
                     if (castArea.Distance(champion.ServerPosition) < champion.BoundingRadius / 2)
                     {
                         IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
-                        Console.WriteLine("Damage " + sender.GetSpellDamage(champion, args.SData.Name));
                     }
                 }
 
