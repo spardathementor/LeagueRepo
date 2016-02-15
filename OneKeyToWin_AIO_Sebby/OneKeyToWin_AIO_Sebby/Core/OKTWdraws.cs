@@ -4,6 +4,7 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 using SharpDX.Direct3D9;
+using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Core
 {
@@ -251,18 +252,18 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     if (obj.type == 1)
                     {
-                        OktwCommon.DravTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.Yellow);
+                        OktwCommon.DrawTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.Yellow);
                         DrawFontTextMap(Tahoma13, "" + (int)(obj.endTime - Game.Time), obj.pos, SharpDX.Color.Yellow);
                     }
 
                     if (obj.type == 2)
                     {
-                        OktwCommon.DravTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.HotPink);
+                        OktwCommon.DrawTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.HotPink);
                         DrawFontTextMap(Tahoma13, "VW", obj.pos, SharpDX.Color.HotPink);
                     }
                     if (obj.type == 3)
                     {
-                        OktwCommon.DravTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.Orange);
+                        OktwCommon.DrawTriangleOKTW(circleSize, obj.pos, System.Drawing.Color.Orange);
                         DrawFontTextMap(Tahoma13, "! " + (int)(obj.endTime - Game.Time), obj.pos, SharpDX.Color.Orange);
                     }
                 }

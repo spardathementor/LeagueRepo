@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
@@ -27,7 +26,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             W = new Spell(SpellSlot.W, 1075);
             E = new Spell(SpellSlot.E, 1075);
             R = new Spell(SpellSlot.R, 3000);
-
             Qcol.SetSkillshot(0.25f, 70f, 1200f, true, SkillshotType.SkillshotLine);
             Q.SetSkillshot(0.25f, 70f, 1200f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.25f, 110f, 1200f, false, SkillshotType.SkillshotLine);
@@ -152,7 +150,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead  && Config.Item("damage" + ally.ChampionName, true).GetValue<bool>() && Player.ServerPosition.Distance(ally.ServerPosition) < W.Range))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally);
-
+                if(dmg > 0)
+                    Program.debug("Damage" + dmg);
                 if (dmg == 0)
                     continue;
 
@@ -163,7 +162,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Config.Item("HardCC" + ally.ChampionName, true).GetValue<bool>() && nearEnemys > 0 && HardCC(ally))
                 {
-                    W.CastOnUnit(ally);
+                    W.Cast(ally);
                 }
                 else if (Config.Item("Poison" + ally.ChampionName, true).GetValue<bool>() && ally.HasBuffOfType(BuffType.Poison))
                 {

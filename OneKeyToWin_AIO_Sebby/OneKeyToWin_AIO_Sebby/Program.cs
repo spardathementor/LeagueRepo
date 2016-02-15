@@ -6,6 +6,7 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 using SPrediction;
+using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby
 {
@@ -18,7 +19,7 @@ namespace OneKeyToWin_AIO_Sebby
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
         public static Obj_SpawnPoint enemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy);
-        public static Core.PredictionOutput DrawSpellPos;
+        public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
         public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>() , Allies = new List<Obj_AI_Hero>();
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static bool SPredictionLoad = false;
@@ -30,6 +31,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void GameOnOnGameLoad(EventArgs args)
         {
+
             Q = new Spell(SpellSlot.Q);
             E = new Spell(SpellSlot.E);
             W = new Spell(SpellSlot.W);
@@ -259,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby
                 new Core.OKTWdraws().LoadOKTW();
             }
 
-            new OktwCommon().LoadOKTW();
+            
             new Core.OKTWtracker().LoadOKTW();
 
             Config.AddItem(new MenuItem("aiomodes", "!!! PRESS F5 TO RELOAD MODE !!!" ));
@@ -367,7 +369,14 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnUpdate(EventArgs args)
         {
-            if (AIOmode != 2)
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid))
+            {
+                double dmg = OktwCommon.GetIncomingDamage(ally);
+                if(dmg > 0)
+                    Program.debug(ally.Name + dmg);
+            }
+
+                if (AIOmode != 2)
             {
                 PositionHelper();
             }
@@ -445,19 +454,19 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
-                Core.SkillshotType CoreType2 = Core.SkillshotType.SkillshotLine;
+                SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
 
                 if (QWER.Type == SkillshotType.SkillshotCircle)
                 {
-                    CoreType2 = Core.SkillshotType.SkillshotCircle;
+                    CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotCircle;
                     aoe2 = true;
                 }
 
                 if (QWER.Width > 80 && !QWER.Collision)
                     aoe2 = true;
 
-                var predInput2 = new Core.PredictionInput
+                var predInput2 = new SebbyLib.Prediction.PredictionInput
                 {
                     Aoe = aoe2,
                     Collision = QWER.Collision,
@@ -469,7 +478,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Unit = target,
                     Type = CoreType2
                 };
-                var poutput2 = Core.Prediction.GetPrediction(predInput2);
+                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
 
                 //var poutput2 = QWER.GetPrediction(target);
 
@@ -478,9 +487,9 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
                 {
-                    if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                    if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
                         QWER.Cast(poutput2.CastPosition);
-                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= Core.HitChance.High)
+                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                     {
                         QWER.Cast(poutput2.CastPosition);
                     }
@@ -488,13 +497,13 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
                 {
-                    if (poutput2.Hitchance >= Core.HitChance.High)
+                    if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                         QWER.Cast(poutput2.CastPosition);
 
                 }
                 else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
                 {
-                    if (poutput2.Hitchance >= Core.HitChance.Medium)
+                    if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.Medium)
                         QWER.Cast(poutput2.CastPosition);
                 }
                 if (Game.Time - DrawSpellTime > 0.5)
