@@ -73,16 +73,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Drawing.OnDraw += Drawing_OnDraw;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Spellbook.OnUpdateChargedSpell += Spellbook_OnUpdateChargedSpell;
-        }
-
-
-        private void Spellbook_OnUpdateChargedSpell(Spellbook sender, SpellbookUpdateChargedSpellEventArgs args)
-        {
-            if (sender.Owner.IsMe)
-            {
-                args.Process = !Config.Item("autoR", true).GetValue<bool>();
-            }
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -129,9 +119,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Player.Spellbook.UpdateChargedSpell(SpellSlot.R, R.GetPrediction(t, true).CastPosition, false, false);
                     }
                 }
+                OktwCommon.blockMove = true;
+                OktwCommon.blockAttack = true;
+                Orbwalking.Attack = false;
+                Orbwalking.Move = false;
             }
             else if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
-                LogicR(); 
+            {
+                LogicR();
+                OktwCommon.blockMove = false;
+                OktwCommon.blockAttack = false;
+                Orbwalking.Attack = true;
+                Orbwalking.Move = true;
+            }
 
             if (Program.LagFree(4))
             {
