@@ -32,7 +32,7 @@ namespace SebbyLib
                 if (hero.IsEnemy && hero.ChampionName == "Yasuo")
                     YasuoInGame = true;
             }
-
+            Console.WriteLine("DUPA");
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -283,7 +283,7 @@ namespace SebbyLib
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team && sender.IsMelee)
                 {
-
+                    
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }

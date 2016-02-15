@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
-using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
@@ -347,9 +348,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void CastQE(Obj_AI_Base target)
         {
-            SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
+            Core.SkillshotType CoreType2 = Core.SkillshotType.SkillshotLine;
 
-            var predInput2 = new SebbyLib.Prediction.PredictionInput
+            var predInput2 = new Core.PredictionInput
             {
                 Aoe = false,
                 Collision = EQ.Collision,
@@ -362,7 +363,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Type = CoreType2
             };
 
-            var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
+            var poutput2 = Core.Prediction.GetPrediction(predInput2);
 
             if (OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
                 return;
@@ -374,7 +375,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
             {
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
+                if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
                 {
                     EQcastNow = true;
                     Q.Cast(castQpos);
@@ -383,7 +384,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
             {
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
+                if (poutput2.Hitchance >= Core.HitChance.High)
                 {
                     EQcastNow = true;
                     Q.Cast(castQpos);
@@ -392,7 +393,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
             {
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.Medium)
+                if (poutput2.Hitchance >= Core.HitChance.Medium)
                 {
                     EQcastNow = true;
                     Q.Cast(castQpos);
