@@ -258,11 +258,12 @@ namespace OneKeyToWin_AIO_Sebby
 
             var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range - 50);
 
-            foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range) && minion.HealthPercent < 95 && minion.HasBuff("kalistaexpungemarker")))
+            foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range) && minion.HealthPercent < 80))
             {
-                if (minion.Health < E.GetDamage(minion) - minion.HPRegenRate)
+                var eDmg = E.GetDamage(minion);
+                if (minion.Health < eDmg - minion.HPRegenRate && eDmg > 0)
                 {
-                    if (GetPassiveTime(minion) > 0.5 && HealthPrediction.GetHealthPrediction(minion, 500, 250) > Player.GetAutoAttackDamage(minion))
+                    if (GetPassiveTime(minion) > 0.5 && HealthPrediction.GetHealthPrediction(minion, 300, 50) > minion.GetAutoAttackDamage(minion))
                     {
                         count++;
                         if (!Orbwalking.InAutoAttackRange(minion))
@@ -280,7 +281,8 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
             }
-            
+
+            bool near700 = Player.CountEnemiesInRange(700) == 0;
 
             foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && target.HasBuff("kalistaexpungemarker") && OktwCommon.ValidUlt(target)))
             {
@@ -294,7 +296,7 @@ namespace OneKeyToWin_AIO_Sebby
                     CastE();
 
                 }
-                if (GetEStacks(target) >= countE && (GetPassiveTime(target) < 1 || Player.CountEnemiesInRange(700) == 0) && Player.Mana > RMANA + EMANA)
+                if (GetEStacks(target) >= countE && (GetPassiveTime(target) < 1 || near700) && Player.Mana > RMANA + EMANA)
                 {
                     CastE();
                 }
