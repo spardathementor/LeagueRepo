@@ -258,7 +258,7 @@ namespace SebbyLib.Prediction
             {
                 result = GetDashingPrediction(input);
             }
-            else
+            else if (!input.Unit.IsMoving)
             {
                 //Unit is immobile.
                 var remainingImmobileT = UnitIsImmobileUntil(input.Unit);
@@ -344,7 +344,7 @@ namespace SebbyLib.Prediction
 
             if (UnitTracker.GetLastVisableTime(input.Unit) < 0.1d)
             {
-                //Program.debug("PRED: NEW VISABLE");
+                OktwCommon.debug("PRED: NEW VISABLE");
                 result.Hitchance = HitChance.Medium;
                 return result;
             }
@@ -389,7 +389,6 @@ namespace SebbyLib.Prediction
 
             if (distanceFromToWaypoint <= distanceFromToUnit && distanceFromToUnit > input.Range - fixRange)
             {
-                //debug("PRED: FIX RANGE");
                 result.Hitchance = HitChance.Medium;
                 return result;
             }
@@ -398,7 +397,7 @@ namespace SebbyLib.Prediction
 
             if (UnitTracker.PathCalc(input.Unit))
             {
-                //Program.debug("PRED: SPAM CLICK");
+                OktwCommon.debug("PRED: SPAM CLICK");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -407,7 +406,7 @@ namespace SebbyLib.Prediction
 
             if (UnitTracker.SpamSamePlace(input.Unit))
             {
-                //Program.debug("PRED: SPAM POSITION");
+                OktwCommon.debug("PRED: SPAM POSITION");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -416,7 +415,7 @@ namespace SebbyLib.Prediction
 
             if (distanceFromToUnit < 250 || input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 100)
             {
-                //Program.debug("PRED: SPECIAL CASES");
+                OktwCommon.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -425,7 +424,7 @@ namespace SebbyLib.Prediction
 
             if (distanceUnitToWaypoint > pathMinLen)
             {
-                //Program.debug("PRED: LONG CLICK DETECTION");
+                OktwCommon.debug("PRED: LONG CLICK DETECTION");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -436,7 +435,7 @@ namespace SebbyLib.Prediction
             {
                 if (distanceUnitToWaypoint > fixRange && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
                 {
-                    //Program.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
+                    OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
@@ -446,7 +445,7 @@ namespace SebbyLib.Prediction
                     {
                         if (!input.Unit.IsFacing(ObjectManager.Player))
                         {
-                            //Program.debug(" PRED:TRY CATCH");
+                            OktwCommon.debug(" PRED:TRY CATCH");
                             result.Hitchance = HitChance.VeryHigh;
                             return result;
                         }
@@ -455,7 +454,7 @@ namespace SebbyLib.Prediction
                     {
                         if (input.Unit.IsFacing(ObjectManager.Player))
                         {
-                            //Program.debug(" PRED:TRY CATCH 2");
+                            OktwCommon.debug(" PRED:TRY CATCH 2");
                             result.Hitchance = HitChance.VeryHigh;
                             return result;
                         }
@@ -469,20 +468,20 @@ namespace SebbyLib.Prediction
             {
                 if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.4 + (input.Radius * 0.002))
                 {
-                    //Program.debug("PRED: AUTO ATTACK DETECTION 1");
+                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 1");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
                 else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.002))
                 {
-                    //Program.debug("PRED: AUTO ATTACK DETECTION 2");
+                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 2");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
                 else
                 {
                     result.Hitchance = HitChance.High;
-                    //Program.debug("PRED: AUTO ATTACK DETECTION HIGH");
+                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION HIGH");
                 }
             }
 
@@ -496,7 +495,7 @@ namespace SebbyLib.Prediction
                     result.Hitchance = HitChance.High;
                 else
                 {
-                    //Program.debug("PRED: STOP LOGIC");
+                    OktwCommon.debug("PRED: STOP LOGIC");
                     result.Hitchance = HitChance.VeryHigh;
                 }
                 return result;
@@ -508,7 +507,7 @@ namespace SebbyLib.Prediction
             {
                 if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d && distanceUnitToWaypoint > fixRange)
                 {
-                    //Program.debug("PRED: CIRCLE NEW PATH");
+                    OktwCommon.debug("PRED: CIRCLE NEW PATH");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
