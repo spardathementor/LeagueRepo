@@ -2,7 +2,6 @@
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
-using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {

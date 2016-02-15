@@ -32,9 +32,9 @@ namespace SebbyLib
                 if (hero.IsEnemy && hero.ChampionName == "Yasuo")
                     YasuoInGame = true;
             }
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate += OnUpdate;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
             Game.OnWndProc += Game_OnWndProc;
@@ -256,6 +256,14 @@ namespace SebbyLib
         private static void Game_OnWndProc(WndEventArgs args)
         {
 
+            if (args.Msg == 123 && blockMove)
+            {
+                blockMove = false;
+                blockAttack = false;
+                Orbwalking.Attack = true;
+                Orbwalking.Move = true;
+                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            }
         }
 
         private static void Obj_AI_Base_OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -282,7 +290,7 @@ namespace SebbyLib
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team && sender.IsMelee)
                 {
-                    
+                    Console.WriteLine("Damage2 " + sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name));
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }
@@ -292,7 +300,10 @@ namespace SebbyLib
                 {
                     var castArea = champion.Distance(args.End) * (args.End - champion.ServerPosition).Normalized() + champion.ServerPosition;
                     if (castArea.Distance(champion.ServerPosition) < champion.BoundingRadius / 2)
+                    {
                         IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
+                        Console.WriteLine("Damage " + sender.GetSpellDamage(champion, args.SData.Name));
+                    }
                 }
 
                 if (!YasuoInGame)
