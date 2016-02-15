@@ -101,8 +101,8 @@ namespace SebbyLib
             else
             {
                 return
-                    MinionManager.GetMinions(Player.AttackRange + 300, MinionTypes.All, MinionTeam.Enemy).Any(minion =>
-                               minion.IsValidTarget() && HealthPrediction.LaneClearHealthPrediction(minion, 400, 50) <= Player.GetAutoAttackDamage(minion));
+                    MinionManager.GetMinions(Player.AttackRange + 300).Any(minion =>
+                               minion.IsValidTarget() && minion.HealthPercent < 60 && HealthPrediction.LaneClearHealthPrediction(minion, 400, 50) <= Player.GetAutoAttackDamage(minion));
             }
         }
 
