@@ -162,11 +162,12 @@ namespace SebbyLib
 
         public static bool CanMove(Obj_AI_Hero target)
         {
-            if (Player.IsMoving)
+            if(target.MoveSpeed < 50)
+                return false;
+            else if (Player.IsMoving)
                 return true;
             else if (!Player.CanMove || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
-                target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression)  || 
-                (target.IsChannelingImportantSpell() && !target.IsMoving) || target.MoveSpeed < 50 )
+                target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) || target.IsChannelingImportantSpell())
             {
                 return false;
             }
