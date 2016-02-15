@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using SharpDX;
 using LeagueSharp;
 using LeagueSharp.Common;

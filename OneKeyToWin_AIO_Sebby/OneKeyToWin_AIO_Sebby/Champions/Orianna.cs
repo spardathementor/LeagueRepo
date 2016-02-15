@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby
 {
@@ -368,7 +366,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 //var prepos5 = Core.Prediction.GetPrediction(target, delay, Q.Width);
 
-                var predInput2 = new Core.PredictionInput
+                var predInput2 = new SebbyLib.Prediction.PredictionInput
                 {
                     Aoe = true,
                     Collision = Q.Collision,
@@ -378,9 +376,9 @@ namespace OneKeyToWin_AIO_Sebby
                     From = BallPos,
                     Radius = Q.Width,
                     Unit = target,
-                    Type = Core.SkillshotType.SkillshotCircle
+                    Type = SebbyLib.Prediction.SkillshotType.SkillshotCircle
                 };
-                var prepos5 = Core.Prediction.GetPrediction(predInput2);
+                var prepos5 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
 
                 if ((int)prepos5.Hitchance > 5 - Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex)
                 {

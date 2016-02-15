@@ -45,6 +45,9 @@
     <Reference Include="LeagueSharp.Common">
       <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
+    <Reference Include="SebbyLib">
+      <HintPath>..\..\..\LeagueSharp\System\SebbyLib.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX">
       <HintPath>C:\Users\Sebby\Documents\LeagueSharp\LeagueSharp\System\SharpDX.dll</HintPath>
     </Reference>
@@ -100,14 +103,12 @@
     <Compile Include="Core\AfkMode.cs" />
     <Compile Include="Core\AutoLvlUp.cs" />
     <Compile Include="Core\MissileReturn.cs" />
-    <Compile Include="Core\OktwCommon.cs" />
     <Compile Include="Core\OKTWdash.cs" />
     <Compile Include="Core\OKTWdraws.cs" />
     <Compile Include="Core\OKTWlab.cs" />
     <Compile Include="Core\OktwTs.cs" />
     <Compile Include="Core\OKTWward.cs" />
     <Compile Include="Core\OKTWtracker.cs" />
-    <Compile Include="Core\PredictionOktw.cs" />
     <Compile Include="Champions\MissFortune.cs" />
     <Compile Include="Champions\Orianna.cs" />
     <Compile Include="Champions\Lucian.cs" />

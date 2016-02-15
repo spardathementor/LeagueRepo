@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -24,9 +22,17 @@ namespace SebbyLib
 
         private static List<UnitIncomingDamage> IncomingDamageList = new List<UnitIncomingDamage>();
         private static List<Obj_AI_Hero> ChampionList = new List<Obj_AI_Hero>();
+        private static YasuoWall yasuoWall = new YasuoWall();
 
         public static void Load()
         {
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
+            {
+                ChampionList.Add(hero);
+                if (hero.IsEnemy && hero.ChampionName == "Yasuo")
+                    YasuoInGame = true;
+            }
+
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -143,7 +149,7 @@ namespace SebbyLib
             if (target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
                 target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Knockback) ||
                 target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) || target.IsStunned || 
-                (target.IsChannelingImportantSpell() && !target.IsMoving) || target.MoveSpeed < 50 || LeagueSharp.Common.Prediction.GetPrediction(target, 0.5f).Hitchance > HitChance.Dashing)
+                (target.IsChannelingImportantSpell() && !target.IsMoving) || target.MoveSpeed < 50 )
             {
                 return false;
             }
@@ -179,6 +185,73 @@ namespace SebbyLib
                     .Where(buff => buff.Name == buffName)
                     .Select(buff => buff.EndTime)
                     .FirstOrDefault() - Game.Time;
+        }
+
+        public static bool CollisionYasuo(Vector3 from, Vector3 to)
+        {
+            if (!YasuoInGame)
+                return false;
+
+            if (Game.Time - yasuoWall.CastTime > 4)
+                return false;
+
+            var level = yasuoWall.WallLvl;
+            var wallWidth = (350 + 50 * level);
+            var wallDirection = (yasuoWall.CastPosition.To2D() - yasuoWall.YasuoPosition.To2D()).Normalized().Perpendicular();
+            var wallStart = yasuoWall.CastPosition.To2D() + wallWidth / 2f * wallDirection;
+            var wallEnd = wallStart - wallWidth * wallDirection;
+
+            if (wallStart.Intersection(wallEnd, to.To2D(), from.To2D()).Intersects)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static void DrawTriangleOKTW(float radius, Vector3 position, System.Drawing.Color color, float bold = 1)
+        {
+            var positionV2 = Drawing.WorldToScreen(position);
+            Vector2 a = new Vector2(positionV2.X + radius, positionV2.Y + radius / 2);
+            Vector2 b = new Vector2(positionV2.X - radius, positionV2.Y + radius / 2);
+            Vector2 c = new Vector2(positionV2.X, positionV2.Y - radius);
+            Drawing.DrawLine(a[0], a[1], b[0], b[1], bold, color);
+            Drawing.DrawLine(b[0], b[1], c[0], c[1], bold, color);
+            Drawing.DrawLine(c[0], c[1], a[0], a[1], bold, color);
+        }
+
+        public static void DrawLineRectangle(Vector3 start2, Vector3 end2, int radius, float width, System.Drawing.Color color)
+        {
+            Vector2 start = start2.To2D();
+            Vector2 end = end2.To2D();
+            var dir = (end - start).Normalized();
+            var pDir = dir.Perpendicular();
+
+            var rightStartPos = start + pDir * radius;
+            var leftStartPos = start - pDir * radius;
+            var rightEndPos = end + pDir * radius;
+            var leftEndPos = end - pDir * radius;
+
+            var rStartPos = Drawing.WorldToScreen(new Vector3(rightStartPos.X, rightStartPos.Y, ObjectManager.Player.Position.Z));
+            var lStartPos = Drawing.WorldToScreen(new Vector3(leftStartPos.X, leftStartPos.Y, ObjectManager.Player.Position.Z));
+            var rEndPos = Drawing.WorldToScreen(new Vector3(rightEndPos.X, rightEndPos.Y, ObjectManager.Player.Position.Z));
+            var lEndPos = Drawing.WorldToScreen(new Vector3(leftEndPos.X, leftEndPos.Y, ObjectManager.Player.Position.Z));
+
+            Drawing.DrawLine(rStartPos, rEndPos, width, color);
+            Drawing.DrawLine(lStartPos, lEndPos, width, color);
+            Drawing.DrawLine(rStartPos, lStartPos, width, color);
+            Drawing.DrawLine(lEndPos, rEndPos, width, color);
+        }
+
+        public static List<Vector3> CirclePoints(float CircleLineSegmentN, float radius, Vector3 position)
+        {
+            List<Vector3> points = new List<Vector3>();
+            for (var i = 1; i <= CircleLineSegmentN; i++)
+            {
+                var angle = i * 2 * Math.PI / CircleLineSegmentN;
+                var point = new Vector3(position.X + radius * (float)Math.Cos(angle), position.Y + radius * (float)Math.Sin(angle), position.Z);
+                points.Add(point);
+            }
+            return points;
         }
 
         private static void Game_OnWndProc(WndEventArgs args)
@@ -222,6 +295,20 @@ namespace SebbyLib
                     if (castArea.Distance(champion.ServerPosition) < champion.BoundingRadius / 2)
                         IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
                 }
+
+                if (!YasuoInGame)
+                    return;
+
+                if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || sender.Type != GameObjectType.obj_AI_Hero)
+                    return;
+
+                if (args.SData.Name == "YasuoWMovingWall")
+                {
+                    yasuoWall.CastTime = Game.Time;
+                    yasuoWall.CastPosition = sender.Position.Extend(args.End, 400);
+                    yasuoWall.YasuoPosition = sender.Position;
+                    yasuoWall.WallLvl = sender.Spellbook.Spells[1].Level;
+                }
             }
         }
 
@@ -255,5 +342,18 @@ namespace SebbyLib
         public float Time { get; set; }
         public double Damage { get; set; }
         public bool Skillshot { get; set; }
+    }
+
+    class YasuoWall
+    {
+        public Vector3 YasuoPosition { get; set; }
+        public float CastTime { get; set; }
+        public Vector3 CastPosition { get; set; }
+        public float WallLvl { get; set; }
+
+        public YasuoWall()
+        {
+            CastTime = 0;
+        }
     }
 }
