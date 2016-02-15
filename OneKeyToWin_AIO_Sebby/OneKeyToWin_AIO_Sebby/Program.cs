@@ -369,14 +369,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnUpdate(EventArgs args)
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid))
-            {
-                double dmg = OktwCommon.GetIncomingDamage(ally);
-                if(dmg > 0)
-                    Program.debug(ally.Name + dmg);
-            }
-
-                if (AIOmode != 2)
+            if (AIOmode != 2)
             {
                 PositionHelper();
             }
