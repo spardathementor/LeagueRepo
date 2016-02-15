@@ -24,7 +24,7 @@ namespace SebbyLib
         private static List<Obj_AI_Hero> ChampionList = new List<Obj_AI_Hero>();
         private static YasuoWall yasuoWall = new YasuoWall();
 
-        public static void Load()
+        static OktwCommon()
         {
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
             {
