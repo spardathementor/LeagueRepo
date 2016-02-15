@@ -96,9 +96,14 @@ namespace SebbyLib
 
         private static bool ShouldWait()
         {
-            return
-                MinionManager.GetMinions(Player.AttackRange + 300, MinionTypes.All, MinionTeam.Enemy).Any(minion =>
-                           minion.IsValidTarget() && HealthPrediction.LaneClearHealthPrediction(minion, 400, 50) <= Player.GetAutoAttackDamage(minion));
+            if (!Orbwalking.CanAttack())
+                return false;
+            else
+            {
+                return
+                    MinionManager.GetMinions(Player.AttackRange + 300, MinionTypes.All, MinionTeam.Enemy).Any(minion =>
+                               minion.IsValidTarget() && HealthPrediction.LaneClearHealthPrediction(minion, 400, 50) <= Player.GetAutoAttackDamage(minion));
+            }
         }
 
         public static bool IsSpellHeroCollision(Obj_AI_Hero t, Spell QWER, int extraWith = 50)
