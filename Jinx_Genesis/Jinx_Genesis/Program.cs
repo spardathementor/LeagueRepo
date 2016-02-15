@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
-using SebbyLib;
 
 namespace Jinx_Genesis
 {
@@ -43,7 +42,6 @@ namespace Jinx_Genesis
             if (Player.ChampionName != ChampionName) return;
 
             LoadMenu();
-            OktwCommon.Load();
             Q = new Spell(SpellSlot.Q, Player.AttackRange);
             W = new Spell(SpellSlot.W, 1490f);
             E = new Spell(SpellSlot.E, 900f);
