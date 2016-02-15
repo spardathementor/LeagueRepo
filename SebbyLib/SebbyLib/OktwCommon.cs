@@ -40,6 +40,18 @@ namespace SebbyLib
             Game.OnWndProc += Game_OnWndProc;
         }
 
+        public static void debug(string msg)
+        {
+            if (true)
+            {
+                Console.WriteLine(msg);
+            }
+            if (false)
+            {
+                Game.PrintChat(msg);
+            }
+        }
+
         public static double GetIncomingDamage(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true)
         {
             double totalDamage = 0;
@@ -86,7 +98,7 @@ namespace SebbyLib
         {
             return
                 MinionManager.GetMinions(Player.AttackRange + 300, MinionTypes.All, MinionTeam.Enemy).Any(minion =>
-                           minion.IsValidTarget() && HealthPrediction.LaneClearHealthPrediction(minion, 300, 50) <= Player.GetAutoAttackDamage(minion));
+                           minion.IsValidTarget() && HealthPrediction.LaneClearHealthPrediction(minion, 400, 50) <= Player.GetAutoAttackDamage(minion));
         }
 
         public static bool IsSpellHeroCollision(Obj_AI_Hero t, Spell QWER, int extraWith = 50)
