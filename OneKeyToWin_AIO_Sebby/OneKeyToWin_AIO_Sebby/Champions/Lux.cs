@@ -113,6 +113,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void Game_OnGameUpdate(EventArgs args)
         {
 
+            if(OktwCommon.GetIncomingDamage(Player) > 0)
+            {
+                Program.debug("DAMAGE "+OktwCommon.GetIncomingDamage(Player));
+            }
+
+
             if (R.IsReady() )
             {
                 if (Config.Item("Rjungle", true).GetValue<bool>())
@@ -136,14 +142,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SetMana();
                 Jungle();
             }
+
+            if ((Program.LagFree(4) || Program.LagFree(1) || Program.LagFree(3)) && W.IsReady() && !Player.IsRecalling())
+                LogicW();
             if (Program.LagFree(1) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
             if (Program.LagFree(2) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
             if (Program.LagFree(3) && R.IsReady())
                 LogicR();
-            if (Program.LagFree(4) && W.IsReady() && !Player.IsRecalling())
-                LogicW();
         }
 
         private void LogicW()
@@ -152,11 +159,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally);
 
-                if (dmg == 0)
+
+                int nearEnemys = ally.CountEnemiesInRange(800);
+
+                if (dmg == 0 && nearEnemys == 0)
                     continue;
 
                 int sensitivity = 20;
-                int nearEnemys = ally.CountEnemiesInRange(900);
+                
                 double HpPercentage = (dmg * 100) / ally.Health;
                 double shieldValue = 65 + W.Level * 25 + 0.35 * Player.FlatMagicDamageMod;
 
