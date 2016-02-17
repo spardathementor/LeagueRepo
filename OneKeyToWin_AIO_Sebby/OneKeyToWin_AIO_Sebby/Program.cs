@@ -17,7 +17,7 @@ namespace OneKeyToWin_AIO_Sebby
         public static float JungleTime, DrawSpellTime=0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
-        public static Obj_SpawnPoint enemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy);
+        public static Obj_SpawnPoint enemySpawn;
         public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
         public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>() , Allies = new List<Obj_AI_Hero>();
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -30,6 +30,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void GameOnOnGameLoad(EventArgs args)
         {
+            enemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy);
             Q = new Spell(SpellSlot.Q);
             E = new Spell(SpellSlot.E);
             W = new Spell(SpellSlot.W);
@@ -387,7 +388,6 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (jungler.IsDead)
                 {
-                    
                     timer = (int)(enemySpawn.Position.Distance(Player.Position) / 370);
                 }
                 else if (jungler.IsVisible)
