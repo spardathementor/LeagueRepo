@@ -258,7 +258,7 @@ namespace SebbyLib.Prediction
             {
                 result = GetDashingPrediction(input);
             }
-            else if (!input.Unit.IsMoving)
+            else
             {
                 //Unit is immobile.
                 var remainingImmobileT = UnitIsImmobileUntil(input.Unit);
