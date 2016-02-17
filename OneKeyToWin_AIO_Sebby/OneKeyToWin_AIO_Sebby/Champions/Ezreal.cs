@@ -80,8 +80,8 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MaxRangeR", "Max R range", true).SetValue(new Slider(3000, 5000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MinRangeR", "Min R range", true).SetValue(new Slider(900, 5000, 0)));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LC", "LaneClear", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("FQ", "Farm Q out range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(50, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCP", "FAST LaneClear", true).SetValue(true));
 
@@ -432,21 +432,21 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (!Config.Item("farmQ", true).GetValue<bool>())
-                return;
-            
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
             int orbTarget = 0;
             if (Orbwalker.GetTarget() != null)
                 orbTarget = Orbwalker.GetTarget().NetworkId;
 
-            foreach (var minion in minions.Where(minion => minion.IsValidTarget() && orbTarget != minion.NetworkId && minion.HealthPercent < 70 && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+            if (Config.Item("FQ", true).GetValue<bool>())
             {
-                if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
-                    return;
+                foreach (var minion in minions.Where(minion => minion.IsValidTarget() && orbTarget != minion.NetworkId && minion.HealthPercent < 70 && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+                {
+                    if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
+                        return;
+                }
             }
 
-            if (Config.Item("LC", true).GetValue<bool>() && Program.LaneClear && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
+            if (Config.Item("farmQ", true).GetValue<bool>() && Program.LaneClear && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
                 var LCP = Config.Item("LCP", true).GetValue<bool>();
                 var PT = Game.Time - GetPassiveTime() > -1.5 || !E.IsReady();
