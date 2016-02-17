@@ -64,12 +64,12 @@ namespace LeeSin_GENESIS
             W = new Spell(SpellSlot.W, 700);
             E = new Spell(SpellSlot.E, 330);
             R = new Spell(SpellSlot.R, 375);
-            R.SetTargetted(0.25f,1300);
+            R.SetTargetted(0.20f,float.MaxValue);
 
             Rnormal = new Spell(SpellSlot.R, 700);
 
             Q.SetSkillshot(0.25f, 60f, 1800f, true, SkillshotType.SkillshotLine);
-            Rnormal.SetSkillshot(0f, 90f, 1500f, false, SkillshotType.SkillshotLine);
+            Rnormal.SetSkillshot(0f, 70f, 1500f, false, SkillshotType.SkillshotLine);
 
             PredictionRnormal = new SebbyLib.Prediction.PredictionInput
             {
@@ -285,7 +285,7 @@ namespace LeeSin_GENESIS
         {
             foreach (var t in HeroManager.Enemies.Where(x => x.IsValidTarget(1000)))
             {
-                PredictionRnormal.From = R.GetPrediction(t).CastPosition;
+                PredictionRnormal.From = Prediction.GetPrediction(t, 0.40f).CastPosition;
 
                 foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget() && x.NetworkId != t.NetworkId && x.Distance(t) < Rnormal.Range))
                 {
@@ -317,9 +317,9 @@ namespace LeeSin_GENESIS
 
                     var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(PredictionRnormal);
                     var castPos = poutput2.CastPosition;
-                    var ext = castPos.Extend(PredictionRnormal.From, castPos.Distance(PredictionRnormal.From) + 200);
+                    var ext = castPos.Extend(PredictionRnormal.From, castPos.Distance(PredictionRnormal.From) + 280);
 
-                    if (Player.Distance(ext) < 100)
+                    if (Player.Distance(ext) < 120)
                     {
                         Orbwalker.SetOrbwalkingPoint(ext);
                         R.Cast(t);
