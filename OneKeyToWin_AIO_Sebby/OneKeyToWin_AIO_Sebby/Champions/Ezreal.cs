@@ -440,7 +440,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Orbwalker.GetTarget() != null)
                 orbTarget = Orbwalker.GetTarget().NetworkId;
 
-            foreach (var minion in minions.Where(minion => minion.IsValidTarget() && orbTarget != minion.NetworkId && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+            foreach (var minion in minions.Where(minion => minion.IsValidTarget() && orbTarget != minion.NetworkId && minion.HealthPercent < 70 && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
             {
                 if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
                     return;
@@ -451,16 +451,16 @@ namespace OneKeyToWin_AIO_Sebby
                 var LCP = Config.Item("LCP", true).GetValue<bool>();
                 var PT = Game.Time - GetPassiveTime() > -1.5 || !E.IsReady();
 
-                foreach (var minion in minions.Where(minion => minion.IsValidTarget() && Orbwalker.InAutoAttackRange(minion) && orbTarget != minion.NetworkId))
+                foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.HealthPercent < 70 && Orbwalker.InAutoAttackRange(minion) && orbTarget != minion.NetworkId))
                 {
                     var hpPred = HealthPrediction.GetHealthPrediction(minion, 300);
                     if (hpPred < 10)
                         continue;
-                    var dmgMinion = minion.GetAutoAttackDamage(minion);
+                    
                     var qDmg = Q.GetDamage(minion);
                     if (hpPred < qDmg)
                     {
-                        if (hpPred > dmgMinion)
+                        if (hpPred > minion.GetAutoAttackDamage(minion))
                         {
                             if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
                                 return;
@@ -468,7 +468,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else if (PT || LCP)
                     {
-                        if(hpPred > dmgMinion + qDmg)
+                        if (hpPred > minion.GetAutoAttackDamage(minion) + qDmg)
                         {
                             if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
                                 return;
