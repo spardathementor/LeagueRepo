@@ -26,8 +26,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Q.SetSkillshot(0.5f, 80, 1900f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.2f, 10, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 100, 2000, false, SkillshotType.SkillshotLine);
-            Epush.SetSkillshot(0f, 90, float.MaxValue, false, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 50, 2000, false, SkillshotType.SkillshotLine);
+            Epush.SetSkillshot(0f, 50, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts1", "ON - only one target"));
@@ -125,7 +125,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Marked.IsValidTarget())
                 {
-                    if (OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.2)
+                    if (OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.3)
                         Q.Cast();
 
                     if (W.IsReady() && Config.Item("autoW2", true).GetValue<bool>())
