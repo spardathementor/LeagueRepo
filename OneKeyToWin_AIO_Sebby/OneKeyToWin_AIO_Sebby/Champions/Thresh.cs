@@ -11,17 +11,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     {
         private Menu Config = Program.Config;
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-
         private Spell E, Epush, Q, R, W;
-
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-
-        private int grab = 0, grabS = 0;
-
-        private float grabW = 0;
         private static Obj_AI_Base Marked;
-
-
+        
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         public void LoadOKTW()
@@ -71,7 +63,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw when skill rdy", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("AACombo", "Disable AA if can use E", true).SetValue(true));
-
 
             Game.OnUpdate += Game_OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
@@ -257,15 +248,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally) < W.Range ))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally) < W.Range + 400))
             {
-
                 int nearEnemys = ally.CountEnemiesInRange(900);
 
                 if (nearEnemys >= Config.Item("wCount", true).GetValue<Slider>().Value && Config.Item("wCount", true).GetValue<Slider>().Value > 0)
                     CastW(W.GetPrediction(ally).CastPosition);
 
-                if (Config.Item("autoW", true).GetValue<bool>())
+                if (Config.Item("autoW", true).GetValue<bool>() && Player.Distance(ally) < W.Range + 100)
                 {
                     double dmg = OktwCommon.GetIncomingDamage(ally);
                     if (dmg == 0)
