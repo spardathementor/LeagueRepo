@@ -40,7 +40,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts1", "ON - only one target"));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts2", "OFF - all grab-able targets"));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qCC", "Auto Q cc & dash enemy", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qCC", "Auto Q cc", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qDash", "Auto Q dash", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("minGrab", "Min range grab", true).SetValue(new Slider(250, 125, (int)Q.Range)));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("maxGrab", "Max range grab", true).SetValue(new Slider((int)Q.Range, 125, (int)Q.Range)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
@@ -200,8 +201,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            
-            
             float maxGrab = Config.Item("maxGrab", true).GetValue<Slider>().Value;
             float minGrab = Config.Item("minGrab", true).GetValue<Slider>().Value;
 
@@ -213,9 +212,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(Q, t);
             }
 
-            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget(maxGrab) && Config.Item("grab" + t.ChampionName).GetValue<bool>()))
+            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget(maxGrab) && Config.Item("grab" + t.ChampionName).GetValue<bool>() && Player.Distance(t.ServerPosition) > minGrab))
             {
-                if (!t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) && Player.Distance(t.ServerPosition) > minGrab)
+                if (!t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) )
                 {
                     if (Program.Combo && !Config.Item("ts", true).GetValue<bool>())
                         Program.CastSpell(Q, t);
@@ -223,9 +222,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (Config.Item("qCC", true).GetValue<bool>())
                     {
                         if (!OktwCommon.CanMove(t))
-                            Q.Cast(t, true);
-                        Q.CastIfHitchanceEquals(t, HitChance.Dashing);
+                            Q.Cast(t);
+
                         Q.CastIfHitchanceEquals(t, HitChance.Immobile);
+                    }
+                    if (Config.Item("qDash", true).GetValue<bool>())
+                    {
+                        Q.CastIfHitchanceEquals(t, HitChance.Dashing);
                     }
                 }
             }
