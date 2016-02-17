@@ -131,9 +131,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Q.Instance.Name == "threshqleap")
             {
-                if (Program.Combo && Marked.IsValidTarget() && OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.3)
-                    Q.Cast();
+                if (Program.Combo && Marked.IsValidTarget())
+                {
+                    if (OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.2)
+                        Q.Cast();
 
+                    if (W.IsReady() && Config.Item("autoW2", true).GetValue<bool>())
+                    {
+                        var allyW = Player;
+                        foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 500))
+                        {
+                            if (Marked.Distance(ally.ServerPosition) > 800 && Player.Distance(ally.ServerPosition) > 600)
+                            {
+                                CastW(Prediction.GetPrediction(ally, 1f).CastPosition);
+                            }
+                        }
+                    }
+                }
             }
             else
             {
@@ -186,26 +200,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range + 300) && enemy.HasBuff("ThreshQ")))
-                {
-                    if (Program.Combo)
-                    {
-                        if (W.IsReady() && Config.Item("autoW2", true).GetValue<bool>())
-                        {
-                            var allyW = Player;
-                            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 500))
-                            {
-                                if (enemy.Distance(ally.ServerPosition) > 800 && Player.Distance(ally.ServerPosition) > 600)
-                                {
-                                    CastW(Prediction.GetPrediction(ally, 1f).CastPosition);
-                                }
-                            }
-                        }
-
-                        
-                    }
-                    return;
-                }
+            
             
             float maxGrab = Config.Item("maxGrab", true).GetValue<Slider>().Value;
             float minGrab = Config.Item("minGrab", true).GetValue<Slider>().Value;
