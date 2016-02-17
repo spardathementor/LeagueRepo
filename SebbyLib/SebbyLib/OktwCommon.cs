@@ -153,7 +153,7 @@ namespace SebbyLib
         {
             if (target.HasBuffOfType(BuffType.PhysicalImmunity) || target.HasBuffOfType(BuffType.SpellImmunity)
                 || target.IsZombie || target.IsInvulnerable || target.HasBuffOfType(BuffType.Invulnerability)
-                || target.HasBuffOfType(BuffType.SpellShield)|| target.Health - GetIncomingDamage(target) < 1
+                || target.HasBuffOfType(BuffType.SpellShield) || target.Health - GetIncomingDamage(target) < 1
                 )
                 return false;
             else
@@ -162,10 +162,8 @@ namespace SebbyLib
 
         public static bool CanMove(Obj_AI_Hero target)
         {
-            if(target.MoveSpeed < 50)
-                return false;
-            else if (!Player.CanMove || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
-                target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) || target.IsChannelingImportantSpell())
+            if (target.MoveSpeed < 50 || !Player.CanMove || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
+                target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) || target.IsChannelingImportantSpell())
             {
                 return false;
             }
