@@ -153,8 +153,7 @@ namespace SebbyLib
         {
             if (target.HasBuffOfType(BuffType.PhysicalImmunity) || target.HasBuffOfType(BuffType.SpellImmunity)
                 || target.IsZombie || target.IsInvulnerable || target.HasBuffOfType(BuffType.Invulnerability)
-                || target.HasBuffOfType(BuffType.SpellShield) || target.Health - GetIncomingDamage(target) < 1
-                )
+                || target.HasBuffOfType(BuffType.SpellShield) || target.Health - GetIncomingDamage(target) < 1)
                 return false;
             else
                 return true;
