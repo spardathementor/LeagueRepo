@@ -270,6 +270,8 @@ namespace LeeSin_GENESIS
         {
             if (W.IsReady())
             {
+                if(Utils.TickCount - LastTimeWardPlace < 250)
+                    return true;
                 if (TrinketN.IsReady() || SightStone.IsReady() || WardN.IsReady() || EOTOasis.IsReady() || EOTEquinox.IsReady() || EOTWatchers.IsReady())
                     return true;
                 else
