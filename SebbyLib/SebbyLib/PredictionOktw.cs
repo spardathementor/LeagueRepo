@@ -433,7 +433,7 @@ namespace SebbyLib.Prediction
 
             if (getAngle < angleMove)
             {
-                if (distanceUnitToWaypoint > fixRange && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+                if (distanceUnitToWaypoint > fixRange * 0.3 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
                 {
                     OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
                     result.Hitchance = HitChance.VeryHigh;
