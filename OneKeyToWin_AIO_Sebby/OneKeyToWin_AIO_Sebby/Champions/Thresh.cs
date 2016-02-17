@@ -12,7 +12,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private Menu Config = Program.Config;
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
 
-        private Spell E, Q, R, W;
+        private Spell E, Epush, Q, R, W;
 
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
 
@@ -28,12 +28,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             Q = new Spell(SpellSlot.Q, 1075);
             W = new Spell(SpellSlot.W, 950);
-            E = new Spell(SpellSlot.E, 450);
+            E = new Spell(SpellSlot.E, 460);
             R = new Spell(SpellSlot.R, 420);
+            Epush = new Spell(SpellSlot.E, 450);
 
             Q.SetSkillshot(0.5f, 80, 1900f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.2f, 10, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 50, float.MaxValue, false, SkillshotType.SkillshotLine);  
+            E.SetSkillshot(0.25f, 100, 2000, false, SkillshotType.SkillshotLine);
+            Epush.SetSkillshot(0f, 90, float.MaxValue, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts", "Use common TargetSelector", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("ts1", "ON - only one target"));
@@ -55,6 +57,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("pushE", "Auto push", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("inter", "OnPossibleToInterrupt" , true)).SetValue(true);
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("Gap", "OnEnemyGapcloser", true)).SetValue(true);
+            Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("Emin", "Min pull range E", true).SetValue(new Slider(200, 0, (int)E.Range)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if x enemies in range", true).SetValue(new Slider(2, 0, 5)));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rKs", "R ks", true).SetValue(false));
@@ -128,15 +131,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Q.Instance.Name == "threshqleap")
             {
-                if (Marked.IsValidTarget() && OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.3)
+                if (Program.Combo && Marked.IsValidTarget() && OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.3)
                     Q.Cast();
-                return;
-            }
-            else if (Program.LagFree(1) && Q.IsReady())
-                LogicQ();
 
-            if (Program.LagFree(2) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
-                LogicE();
+            }
+            else
+            {
+                if (Program.LagFree(1) && Q.IsReady())
+                    LogicQ();
+
+                if (Program.LagFree(2) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
+                    LogicE();
+            }
+
             if (Program.LagFree(3) && W.IsReady())
                 LogicW();
             if (Program.LagFree(4) && R.IsReady())
@@ -146,17 +153,34 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicE()
         {
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-            if (t.IsValidTarget() && !t.HasBuff("ThreshQ") && OktwCommon.CanMove(t))
+            if (t.IsValidTarget()  && OktwCommon.CanMove(t))
             {
-                var revertPosition = t.ServerPosition;
+                
                 if (Program.Combo)
                 {
+                    if (Player.Distance(t) > Config.Item("Emin", true).GetValue<Slider>().Value)
                     CastE(false, t);
                 }
                 else if (Config.Item("pushE", true).GetValue<bool>())
                 {
                     CastE(true, t);
                 }
+            }
+        }
+
+        private void CastE(bool push, Obj_AI_Base target)
+        {
+            if (push)
+            {
+                var eCastPosition = E.GetPrediction(target).CastPosition;
+                E.Cast(eCastPosition);
+            }
+            else
+            {
+                var eCastPosition = Epush.GetPrediction(target).CastPosition;
+                var distance = Player.Distance(eCastPosition);
+                var ext = Player.Position.Extend(eCastPosition, -distance);
+                E.Cast(ext);
             }
         }
 
@@ -224,7 +248,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 R.Cast();
             if (Config.Item("comboR", true).GetValue<bool>())
             {
-                var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+                var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget() && ((Player.UnderTurret(false) && !Player.UnderTurret(true)) || Program.Combo))
                 {
                     if (Player.Distance(t.ServerPosition) > Player.Distance(t.Position))
@@ -274,21 +298,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 W.Cast(pos);
             else
                 W.Cast(Player.Position.Extend(pos, W.Range));
-        }
-
-
-        private void CastE(bool pull, Obj_AI_Base target)
-        {
-            var eCastPosition = E.GetPrediction(target).CastPosition;
-            if (pull)
-            {
-                E.Cast(eCastPosition);
-            }
-            else
-            {
-                var position = Player.ServerPosition - (eCastPosition - Player.ServerPosition);
-                E.Cast(position);
-            }
         }
 
         private void Drawing_OnDraw(EventArgs args)
