@@ -483,13 +483,14 @@ namespace OneKeyToWin_AIO_Sebby
             var mobs = MinionManager.GetMinions(Player.ServerPosition, float.MaxValue, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
             foreach (var mob in mobs)
             {
+                if (mob.Health == mob.MaxHealth)
+                    continue;
                 //debug(mob.SkinName);
                 if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
                     && (mob.CountAlliesInRange(1000) == 0 || Config.Item("Rally", true).GetValue<bool>())
-                    && mob.Health < mob.MaxHealth
                     && mob.Distance(Player.Position) > 1000
                     )
                 {
@@ -516,11 +517,9 @@ namespace OneKeyToWin_AIO_Sebby
                             //Program.debug("timeTravel " + timeTravel + "timeR " + timeR + "d " + R.GetDamage(mob));
                             if (timeTravel > timeR)
                                 R.Cast(mob.Position);
-                            
                         }
                         else
                             DragonDmg = mob.Health;
-                        
                         //Program.debug("" + GetUltTravelTime(ObjectManager.Player, R.Speed, R.Delay, mob.Position));
                     }
                 }
