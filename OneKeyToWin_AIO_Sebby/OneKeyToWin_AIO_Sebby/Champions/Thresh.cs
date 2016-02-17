@@ -19,6 +19,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private int grab = 0, grabS = 0;
 
         private float grabW = 0;
+        private static Obj_AI_Base Marked;
+
 
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
@@ -71,7 +73,24 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter2.OnInterruptableTarget += Interrupter2_OnInterruptableTarget;
             Drawing.OnDraw += Drawing_OnDraw;
-            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Obj_AI_Base.OnBuffAdd += Obj_AI_Base_OnBuffAdd;
+            Obj_AI_Base.OnBuffRemove += Obj_AI_Base_OnBuffRemove;
+        }
+
+        private void Obj_AI_Base_OnBuffRemove(Obj_AI_Base sender, Obj_AI_BaseBuffRemoveEventArgs args)
+        {
+            if (sender.IsEnemy && args.Buff.Name == "ThreshQ")
+            {
+                Marked = null;
+            }
+        }
+
+        private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
+        {
+            if (sender.IsEnemy && args.Buff.Name == "ThreshQ")
+            {
+                Marked = sender;
+            }
         }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
@@ -94,11 +113,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-           
-        }
-
         private void Game_OnGameUpdate(EventArgs args)
         {
             if (Program.Combo && Config.Item("AACombo", true).GetValue<bool>())
@@ -112,9 +126,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else
                 Orbwalking.Attack = true;
 
-
-            if (Program.LagFree(1) && Q.IsReady())
+            if (Q.Instance.Name == "threshqleap")
+            {
+                if (Marked.IsValidTarget() && OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.3)
+                    Q.Cast();
+                return;
+            }
+            else if (Program.LagFree(1) && Q.IsReady())
                 LogicQ();
+
             if (Program.LagFree(2) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
             if (Program.LagFree(3) && W.IsReady())
@@ -143,26 +163,26 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicQ()
         {
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range + 300) && enemy.HasBuff("ThreshQ")))
-            {
-                if (Program.Combo)
                 {
-                    if (W.IsReady() && Config.Item("autoW2", true).GetValue<bool>())
+                    if (Program.Combo)
                     {
-                        var allyW = Player;
-                        foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 500))
+                        if (W.IsReady() && Config.Item("autoW2", true).GetValue<bool>())
                         {
-                            if (enemy.Distance(ally.ServerPosition) > 800 && Player.Distance(ally.ServerPosition) > 600)
+                            var allyW = Player;
+                            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < W.Range + 500))
                             {
-                                CastW(Prediction.GetPrediction(ally, 1f).CastPosition);
+                                if (enemy.Distance(ally.ServerPosition) > 800 && Player.Distance(ally.ServerPosition) > 600)
+                                {
+                                    CastW(Prediction.GetPrediction(ally, 1f).CastPosition);
+                                }
                             }
                         }
+
+                        
                     }
-                    
-                    if (OktwCommon.GetPassiveTime(enemy, "ThreshQ") < 0.4)
-                        Q.Cast();
+                    return;
                 }
-                return;
-            }
+            
             float maxGrab = Config.Item("maxGrab", true).GetValue<Slider>().Value;
             float minGrab = Config.Item("minGrab", true).GetValue<Slider>().Value;
 
