@@ -121,9 +121,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else
                 Orbwalking.Attack = true;
 
-            if (Q.Instance.Name == "threshqleap")
+            if (Marked.IsValidTarget())
             {
-                if (Program.Combo && Marked.IsValidTarget())
+                if (Program.Combo)
                 {
                     if (OktwCommon.GetPassiveTime(Marked, "ThreshQ") < 0.3)
                         Q.Cast();
