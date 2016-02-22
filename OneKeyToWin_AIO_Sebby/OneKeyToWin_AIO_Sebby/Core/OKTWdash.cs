@@ -123,17 +123,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
 
-           
-
             if (!bestpoint.IsZero && IsGoodPosition(bestpoint))
             {
                 bool targetInDashRange = false;
                 if (Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero)
                 {
-                    if (bestpoint.Distance(Orbwalker.GetTarget().Position) < Player.AttackRange)
-                    {
-                        targetInDashRange = true;
-                    }
+                    targetInDashRange = bestpoint.Distance(Orbwalker.GetTarget().Position) < Player.AttackRange;
                 }
                 else
                 {
@@ -143,9 +138,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 if(targetInDashRange)
                     return bestpoint;
             }
-
             return Vector3.Zero;
-
         }
 
         public bool IsGoodPosition(Vector3 dashPos)
