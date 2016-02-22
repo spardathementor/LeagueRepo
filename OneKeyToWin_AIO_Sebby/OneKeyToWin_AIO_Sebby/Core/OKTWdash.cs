@@ -73,8 +73,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (DashMode == 0)
             {
                 bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
-                if (IsGoodPosition(bestpoint))
-                    DashSpell.Cast(bestpoint);
             }
             else if (DashMode == 1)
             {
@@ -101,8 +99,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     else
                     {
                         bestpoint = Player.Position.Extend(lEndPos, DashSpell.Range);
-                        if (IsGoodPosition(bestpoint))
-                            DashSpell.Cast(bestpoint);
                     }
                 }
             }
@@ -125,14 +121,35 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         bestpoint = point;
                     }
                 }
-                if(IsGoodPosition(bestpoint))
-                    DashSpell.Cast(bestpoint);
             }
 
-            if (!bestpoint.IsZero && bestpoint.CountEnemiesInRange(Player.BoundingRadius + Player.AttackRange + 100) == 0)
-                return Vector3.Zero;
+           
 
-            return bestpoint;
+            if (!bestpoint.IsZero && IsGoodPosition(bestpoint))
+            {
+                bool targetInDashRange = false;
+                if (Orbwalker.GetTarget() != null)
+                {
+                    var orbT = Orbwalker.GetTarget();
+                    if (orbT.Type == GameObjectType.obj_AI_Hero)
+                    {
+                        if (bestpoint.Distance(orbT.Position) < Player.AttackRange)
+                        {
+                            targetInDashRange = true;
+                        }
+                    }
+                }
+                else
+                {
+                    targetInDashRange = bestpoint.CountEnemiesInRange(Player.AttackRange) > 0;
+                }
+
+                if(targetInDashRange)
+                    return bestpoint;
+            }
+
+            return Vector3.Zero;
+
         }
 
         public bool IsGoodPosition(Vector3 dashPos)

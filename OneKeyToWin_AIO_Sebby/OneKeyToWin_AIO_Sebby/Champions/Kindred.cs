@@ -77,7 +77,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var dashPos = Dash.CastDash();
                     if (!dashPos.IsZero && dashPos.CountEnemiesInRange(500) > 0)
                     {
-                        E.Cast(dashPos);
+                        Q.Cast(dashPos);
                     }
                 }
             }
@@ -110,14 +110,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Orbwalker.GetTarget() != null)
                     return;
-                var t = TargetSelector.GetTarget(Q.Range + Player.AttackRange, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget() )
+                var dashPos = Dash.CastDash();
+                if (!dashPos.IsZero && dashPos.CountEnemiesInRange(500) > 0)
                 {
-                    var dashPos = Dash.CastDash();
-                    if (!dashPos.IsZero && dashPos.CountEnemiesInRange(500) > 0)
-                    {
-                        E.Cast(dashPos);
-                    }
+                    Q.Cast(dashPos);
                 }
             }
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)

@@ -127,7 +127,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var dashPos = Dash.CastDash();
                 if (!dashPos.IsZero)
                 {
-                    E.Cast(dashPos);
+                    Q.Cast(dashPos);
                 }
             }
             else if (Program.Farm && Config.Item("farmQ", true).GetValue<bool>())
@@ -180,7 +180,11 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Config.Item("autoQR", true).GetValue<bool>() && Player.HasBuff("vayneinquisition")  && Player.CountEnemiesInRange(1500) > 0 && Player.CountEnemiesInRange(670) != 1)
                 {
-                    Dash.CastDash();
+                    var dashPos = Dash.CastDash();
+                    if (!dashPos.IsZero)
+                    {
+                        Q.Cast(dashPos);
+                    }
                 }
                 if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && !Config.Item("Qonly", true).GetValue<bool>())
                 {
@@ -188,7 +192,11 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (t.IsValidTarget() && !Orbwalking.InAutoAttackRange(t) && t.Position.Distance(Game.CursorPos) < t.Position.Distance(Player.Position) &&  !t.IsFacing(Player))
                     {
-                        Dash.CastDash();
+                        var dashPos = Dash.CastDash();
+                        if (!dashPos.IsZero)
+                        {
+                            Q.Cast(dashPos);
+                        }
                     }
                 }
             }
@@ -201,7 +209,13 @@ namespace OneKeyToWin_AIO_Sebby
                     if (target.IsValidTarget(270) && target.IsMelee)
                     {
                         if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
-                            Dash.CastDash();
+                        {
+                            var dashPos = Dash.CastDash();
+                            if (!dashPos.IsZero)
+                            {
+                                Q.Cast(dashPos);
+                            }
+                        }
                         else if (E.IsReady() && Player.Health < Player.MaxHealth * 0.5)
                         {
                             E.Cast(target);
