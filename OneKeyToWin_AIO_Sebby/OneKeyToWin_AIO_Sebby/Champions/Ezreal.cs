@@ -334,7 +334,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(R,target);
                         Program.debug("R normal");
                     }
-                    if ( Program.Combo && Config.Item("Raoe", true).GetValue<bool>() && Player.CountEnemiesInRange(1000) == 0)
+                    if ( Program.Combo && Config.Item("Raoe", true).GetValue<bool>() && Player.CountEnemiesInRange(1200) == 0)
                     {
                         R.CastIfWillHit(target, 3, true);
                     }
