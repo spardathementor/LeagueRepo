@@ -93,8 +93,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     if (Game.CursorPos.Distance(rEndPos) < Game.CursorPos.Distance(lEndPos))
                     {
                         bestpoint = Player.Position.Extend(rEndPos, DashSpell.Range);
-                        if (IsGoodPosition(bestpoint))
-                            DashSpell.Cast(bestpoint);
                     }
                     else
                     {
@@ -104,7 +102,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
             else if (DashMode == 2)
             {
-                var points = OktwCommon.CirclePoints(12, DashSpell.Range, Player.Position);
+                var points = OktwCommon.CirclePoints(15, DashSpell.Range, Player.Position);
                 bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
                 int enemies = bestpoint.CountEnemiesInRange(400);
                 foreach (var point in points)
