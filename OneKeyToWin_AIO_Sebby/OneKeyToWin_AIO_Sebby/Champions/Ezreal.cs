@@ -269,7 +269,7 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(1300, TargetSelector.DamageType.Physical);
             var dashPosition = Player.Position.Extend(Game.CursorPos, E.Range);
 
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(270) && target.IsMelee))
+            if (Program.Enemies.Any(target => target.IsValidTarget(270) && target.IsMelee))
             {
                 var dashPos = Dash.CastDash();
                 if (!dashPos.IsZero)

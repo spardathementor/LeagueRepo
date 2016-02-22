@@ -238,13 +238,24 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-            if ( Player.Mana < RMANA + EMANA || !Program.Combo || !Config.Item("autoE", true).GetValue<bool>() || passRdy || SpellLock)
-                return;
-
-            var dashPos = Dash.CastDash();
-            if (!dashPos.IsZero)
+            if (Program.Enemies.Any(target => target.IsValidTarget(270) && target.IsMelee))
             {
-                E.Cast(dashPos);
+                var dashPos = Dash.CastDash();
+                if (!dashPos.IsZero)
+                {
+                    E.Cast(dashPos);
+                }
+            }
+            else
+            {
+                if (Player.Mana < RMANA + EMANA || !Program.Combo || !Config.Item("autoE", true).GetValue<bool>() || passRdy || SpellLock)
+                    return;
+
+                var dashPos = Dash.CastDash();
+                if (!dashPos.IsZero)
+                {
+                    E.Cast(dashPos);
+                }
             }
         }
 
