@@ -22,6 +22,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("EnemyCheck", "Block dash in x enemies ", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("WallCheck", "Block dash in wall", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("TurretCheck", "Block dash under turret", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").AddItem(new MenuItem("AAcheck", "Dash only in AA range", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu(qwer.Slot + " Config").SubMenu("Gapcloser").AddItem(new MenuItem("GapcloserMode", "Gapcloser MODE", true).SetValue(new StringList(new[] { "Game Cursor", "Away - safe position" }, 1)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -65,6 +66,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
         }
+
         public Vector3 CastDash()
         {
             int DashMode = Config.Item("DashMode", true).GetValue<StringList>().SelectedIndex;
@@ -108,6 +110,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 foreach (var point in points)
                 {
                     int count = point.CountEnemiesInRange(400);
+                    if (!InAARange(point))
+                        continue;
                     if (count < enemies)
                     {
                         enemies = count;
@@ -121,22 +125,25 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
 
-            if (!bestpoint.IsZero && IsGoodPosition(bestpoint))
+            if (!bestpoint.IsZero && IsGoodPosition(bestpoint) && InAARange(bestpoint))
             {
-                bool targetInDashRange = false;
-                if (Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero)
-                {
-                    targetInDashRange = bestpoint.Distance(Orbwalker.GetTarget().Position) < Player.AttackRange;
-                }
-                else
-                {
-                    targetInDashRange = bestpoint.CountEnemiesInRange(Player.AttackRange) > 0;
-                }
-
-                if(targetInDashRange)
-                    return bestpoint;
+                return bestpoint;
             }
             return Vector3.Zero;
+        }
+
+        public bool InAARange(Vector3 point)
+        {
+            if (!Config.Item("AAcheck", true).GetValue<bool>())
+                return true;
+            else if (Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero)
+            {
+                return point.Distance(Orbwalker.GetTarget().Position) < Player.AttackRange;
+            }
+            else
+            {
+                return point.CountEnemiesInRange(Player.AttackRange) > 0;
+            }
         }
 
         public bool IsGoodPosition(Vector3 dashPos)
