@@ -128,15 +128,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (!bestpoint.IsZero && IsGoodPosition(bestpoint))
             {
                 bool targetInDashRange = false;
-                if (Orbwalker.GetTarget() != null)
+                if (Orbwalker.GetTarget() != null && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero)
                 {
-                    var orbT = Orbwalker.GetTarget();
-                    if (orbT.Type == GameObjectType.obj_AI_Hero)
+                    if (bestpoint.Distance(Orbwalker.GetTarget().Position) < Player.AttackRange)
                     {
-                        if (bestpoint.Distance(orbT.Position) < Player.AttackRange)
-                        {
-                            targetInDashRange = true;
-                        }
+                        targetInDashRange = true;
                     }
                 }
                 else
