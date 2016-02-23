@@ -79,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             else if (DashMode == 1)
             {
                 var orbT = Orbwalker.GetTarget();
-                if(orbT != null && orbT.Type == GameObjectType.obj_AI_Hero)
+                if(orbT != null && orbT is Obj_AI_Hero)
                 {
                     Vector2 start = Player.Position.To2D();
                     Vector2 end = orbT.Position.To2D();
@@ -106,10 +106,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 var points = OktwCommon.CirclePoints(15, DashSpell.Range, Player.Position);
                 bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
-                int enemies = bestpoint.CountEnemiesInRange(400);
+                int enemies = bestpoint.CountEnemiesInRange(380);
                 foreach (var point in points)
                 {
-                    int count = point.CountEnemiesInRange(400);
+                    int count = point.CountEnemiesInRange(380);
                     if (!InAARange(point))
                         continue;
                     if (count < enemies)
