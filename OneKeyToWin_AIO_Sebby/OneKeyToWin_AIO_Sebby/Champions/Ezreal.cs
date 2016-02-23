@@ -68,7 +68,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcc", "R cc", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "R aoe 3 enemy", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "Max R range", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rjungle", "R Jungle stealer", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
@@ -334,9 +334,9 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(R,target);
                         Program.debug("R normal");
                     }
-                    if ( Program.Combo && Config.Item("Raoe", true).GetValue<bool>() && Player.CountEnemiesInRange(1200) == 0)
+                    if (Program.Combo && Player.CountEnemiesInRange(1200) == 0)
                     {
-                        R.CastIfWillHit(target, 3, true);
+                        R.CastIfWillHit(target, Config.Item("Raoe", true).GetValue<Slider>().Value, true);
                     }
                 }
             }
