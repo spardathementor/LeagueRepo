@@ -27,7 +27,7 @@ namespace Sebby_Ban_War
             Config.AddItem(new MenuItem("ClickTime", "Minimum Click Time (120)").SetValue(new Slider(150, 300, 0)));
             Config.AddItem(new MenuItem("Info", "0 - 120 scripter"));
             Config.AddItem(new MenuItem("Info2", "120 - 200 pro player"));
-            Config.AddItem(new MenuItem("Info2", "200 + normal player"));
+            Config.AddItem(new MenuItem("Info3", "200 + normal player"));
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Obj_AI_Base.OnNewPath += Obj_AI_Base_OnNewPath;
@@ -46,7 +46,7 @@ namespace Sebby_Ban_War
             if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
                 return;
             var screenPos = Drawing.WorldToScreen(args.EndPosition);
-            if (Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 10)
+            if (Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 10 + 50)
             {
                 Console.WriteLine("BLOCK SPELL");
                 args.Process = false;
@@ -60,12 +60,7 @@ namespace Sebby_Ban_War
         private static void Obj_AI_Base_OnIssueOrder(Obj_AI_Base sender, GameObjectIssueOrderEventArgs args)
         {
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
-            
-            if (!Render.OnScreen(screenPos))
-            {
-                //args.Process = false;
-                //return;
-            }
+           
             //Console.WriteLine(args.Order);
             if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 10))
             {
