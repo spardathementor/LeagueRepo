@@ -46,7 +46,7 @@ namespace Sebby_Ban_War
             if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
                 return;
             var screenPos = Drawing.WorldToScreen(args.EndPosition);
-            if (Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 10 + 50)
+            if (Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 10)
             {
                 Console.WriteLine("BLOCK SPELL");
                 args.Process = false;
