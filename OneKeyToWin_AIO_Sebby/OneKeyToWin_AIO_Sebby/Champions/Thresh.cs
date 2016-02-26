@@ -47,6 +47,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW4", "Auto W vs Blitz Hook", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW5", "Auto W if jungler pings", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW6", "Auto W on gapCloser", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW7", "Auto W on Slows/Stuns", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("wCount", "Auto W if x enemies near ally", true).SetValue(new Slider(3, 0, 5)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
@@ -73,6 +74,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnBuffAdd += Obj_AI_Base_OnBuffAdd;
             Obj_AI_Base.OnBuffRemove += Obj_AI_Base_OnBuffRemove;
+            
             Game.OnPing += Game_OnPing;
         }
 
@@ -82,7 +84,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             //give him lantern for easy gank
             if(!Config.Item("autoW5",true).GetValue<bool>())return;
             var jungler = args.Source as Obj_AI_Hero;
-            if (jungler != null && args.Position.Distance(Player.Position)<=W.Range+500)
+            if (jungler != null && jungler.Distance(Player.Position)<=W.Range+500)
             {
                 if (jungler.Spellbook.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("smite") ||
                     jungler.Spellbook.GetSpell(SpellSlot.Summoner2).Name.ToLower().Contains("smite"))
@@ -124,6 +126,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
+            if(gapcloser.Sender.IsAlly)return;
+
             if (Config.Item("autoW6",true).GetValue<bool>())
             {
                 var allyHero =
@@ -152,9 +156,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Config.Item("autoW4",true).GetValue<bool>())
+            if (Config.Item("autoW7", true).GetValue<bool>())
             {
-                var saveAlly = HeroManager.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2"));
+                foreach (var ally in HeroManager.Allies)
+                {
+                    if(ally.IsMe)continue;
+                    if (ally.Distance(Player) <= W.Range)
+                    {
+                        if (ally.IsMovementImpaired() || ally.IsStunned || ally.IsRooted)
+                        {
+                            W.Cast(ally.Position);
+                        }
+                    }
+                }
+            }
+
+
+            if (Config.Item("autoW4", true).GetValue<bool>())
+            {
+                var saveAlly = HeroManager.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
                 if (saveAlly != null && saveAlly.GetBuff("rocketgrab2")!= null)
                 {
                     var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
