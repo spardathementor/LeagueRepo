@@ -160,7 +160,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe && args.SData.Name == "jayceshockblast" )
+            if (sender.IsMe && args.SData.Name.ToLower() == "jayceshockblast" )
             {
                 if (Range && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 {
@@ -568,7 +568,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E2cd = SetPlus(E2cdt - Game.Time);
         }
 
-        private bool Range { get { return Q.Instance.Name.Contains("jayceshockblast"); } }
+        private bool Range { get { return Q.Instance.Name.ToLower() == "jayceshockblast"; } }
 
         public static void drawLine(Vector3 pos1, Vector3 pos2, int bold, System.Drawing.Color color)
         {
