@@ -238,8 +238,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-            if (Player.Mana < RMANA + EMANA && !Config.Item("autoE", true).GetValue<bool>())
+            if (Player.Mana < RMANA + EMANA || !Config.Item("autoE", true).GetValue<bool>())
                 return;
+
             if (Program.Enemies.Any(target => target.IsValidTarget(270) && target.IsMelee))
             {
                 var dashPos = Dash.CastDash();
