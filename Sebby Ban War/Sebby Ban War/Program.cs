@@ -30,17 +30,7 @@ namespace Sebby_Ban_War
             Config.AddItem(new MenuItem("Info3", "200 + normal player"));
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
-            Obj_AI_Base.OnNewPath += Obj_AI_Base_OnNewPath;
         }
-
-        private static void Obj_AI_Base_OnNewPath(Obj_AI_Base sender, GameObjectNewPathEventArgs args)
-        {
-            if(sender.IsMe)
-            {
-                NewPathTime = Utils.TickCount;
-            }
-        }
-
         private static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
             if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
@@ -68,14 +58,14 @@ namespace Sebby_Ban_War
             //Console.WriteLine(args.Order);
             if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 10))
             {
-                Console.WriteLine("BLOCK " + (Utils.TickCount - LastMouseTime));
+                Console.WriteLine("BLOCK " + args.Order);
                 args.Process = false;
                 return;
                 
             }
 
             //Console.WriteLine("DIS " + LastMousePos.Distance(screenPos) + " TIME " + (Utils.TickCount - LastMouseTime));
-            if (args.IsAttackMove)
+            if (args.Order == GameObjectOrder.AttackUnit)
                 LastType = 1;
             else
                 LastType = 0;
