@@ -34,6 +34,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("countQ", "Auto Q if x enemies are going in your direction 0-disable", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q in combo", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("recallSafe", "Safe Q recall", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "AutoW", true).SetValue(true));
 
@@ -46,11 +47,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rks", "R KS out range AA", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("countR", "Auto R if x enemies (combo)", true).SetValue(new Slider(3, 5, 0)));
 
+
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             //AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             // Interrupter.OnPossibleToInterrupt += Interrupter_OnPossibleToInterrupt;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Spellbook.OnCastSpell += Spellbook_OnCastSpell;
+        }
+
+        private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
+        {
+            if (args.Slot == SpellSlot.Recall && Q.IsReady() && Config.Item("recallSafe", true).GetValue<bool>())
+            {
+                ObjectManager.Player.Spellbook.CastSpell(SpellSlot.Q);
+                Utility.DelayAction.Add(200, () => ObjectManager.Player.Spellbook.CastSpell(SpellSlot.Recall));
+                args.Process = false;
+                return;
+            }
+
         }
 
         private void Game_OnUpdate(EventArgs args)
