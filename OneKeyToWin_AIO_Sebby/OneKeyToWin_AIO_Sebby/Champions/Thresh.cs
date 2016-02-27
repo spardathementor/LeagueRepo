@@ -92,7 +92,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (args.PingType == PingCategory.OnMyWay)
                     {
                         int random = new Random().Next(350, 750); // so it wont happen too fast
-                        Utility.DelayAction.Add(random,() => W.Cast(args.Position));
+                        Utility.DelayAction.Add(random,() => CastW(args.Position.To3D()));
                     }
 
                 }
@@ -136,10 +136,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         .FirstOrDefault();
                 if (allyHero != null)
                 {
-                    if (allyHero.Distance(Player) <= W.Range)
-                        W.Cast(allyHero.Position);
-                    else
-                        W.Cast(Player.Position.Extend(allyHero.Position, W.Range));
+                    CastW(allyHero.Position);
                 }
             }
             if (E.IsReady() && Config.Item("Gap", true).GetValue<bool>() && gapcloser.Sender.IsValidTarget(E.Range))
@@ -156,6 +153,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Config.Item("autoW4", true).GetValue<bool>())
+            {
+                var saveAlly = HeroManager.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
+                if (saveAlly != null)
+                {
+                    var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
+                    if (Player.Distance(blitz.Position) <= W.Range + 550 && W.IsReady())
+                    {
+
+                        CastW(blitz.Position);
+                    }
+                }
+            }
+
             if (Config.Item("autoW7", true).GetValue<bool>())
             {
                 foreach (var ally in HeroManager.Allies)
@@ -163,33 +174,17 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if(ally.IsMe)continue;
                     if (ally.Distance(Player) <= W.Range)
                     {
-                        if (ally.IsMovementImpaired() || ally.IsStunned || ally.IsRooted)
+                        if (ally.IsStunned || ally.IsRooted)
                         {
-                            W.Cast(ally.Position);
+                            Utility.DelayAction.Add(100,() => W.Cast(ally.Position));
+                            
                         }
                     }
                 }
             }
 
 
-            if (Config.Item("autoW4", true).GetValue<bool>())
-            {
-                var saveAlly = HeroManager.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
-                if (saveAlly != null && saveAlly.GetBuff("rocketgrab2")!= null)
-                {
-                    var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
-                    if (Player.Distance(blitz.Position) <= W.Range + 550 && W.IsReady())
-                    {
 
-                        if (blitz.Position.Distance(Player.Position) <= W.Range)
-                            W.Cast(blitz.Position);
-                        else
-                            W.Cast(Player.Position.Extend(blitz.Position, W.Range));
-
-                    }
-                }
-
-            }
             if (Program.Combo && Config.Item("AACombo", true).GetValue<bool>())
             {
                 if (!E.IsReady())
