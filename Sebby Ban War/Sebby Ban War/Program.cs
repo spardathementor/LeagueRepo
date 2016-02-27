@@ -43,10 +43,10 @@ namespace Sebby_Ban_War
             var spell = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(x => x.Slot == args.Slot);
 
             // LINE CUT SPELL RANGE
-            if (spell != null && spell.SData.LineWidth != 0 && args.EndPosition.Distance(ObjectManager.Player.Position) > 700)
+            if (spell != null && spell.SData.LineWidth != 0 && args.EndPosition.Distance(args.StartPosition) > 700)
             {
                 Random rnd = new Random();
-                ObjectManager.Player.Spellbook.CastSpell(args.Slot, ObjectManager.Player.Position.Extend(args.EndPosition, rnd.Next(400, 600)));
+                ObjectManager.Player.Spellbook.CastSpell(args.Slot, args.StartPosition.Extend(args.EndPosition, rnd.Next(400, 600)));
                 Console.WriteLine("CUT SPELL");
                 args.Process = false;
                 return;
