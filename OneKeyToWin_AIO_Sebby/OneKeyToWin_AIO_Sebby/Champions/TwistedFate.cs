@@ -176,22 +176,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
                         FindCard = 1;
-                        if (wName == "goldcardlock")
+                        if (wName == "GoldCardLock")
                             W.Cast();
                     }
                     else if (FindCard == 1)
                     {
-                        if (wName == "goldcardlock")
+                        if (wName == "GoldCardLock")
                             W.Cast();
                     }
                     else if (FindCard == 2)
                     {
-                        if (wName == "bluecardlock")
+                        if (wName == "BlueCardLock")
                             W.Cast();
                     }
                     else if (FindCard == 3)
                     {
-                        if (wName == "redcardlock")
+                        if (wName == "RedCardLock")
                             W.Cast();
                     }
                 }
@@ -202,7 +202,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var wName = W.Instance.Name;
             var t = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
-            
+            Program.debug(wName);
             if (wName == "PickACard" && Utils.TickCount - W.LastCastAttemptT > 150)
             {
                 if(!Program.None)
@@ -241,7 +241,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
                         FindCard = 1;
-                        if (wName == "goldcardlock")
+                        if (wName == "GoldCardLock")
                             W.Cast();
                     }
                     else if (Program.Combo && orbTarget.IsValidTarget() &&  W.GetDamage(orbTarget) + Player.GetAutoAttackDamage(orbTarget) > orbTarget.Health)
@@ -252,31 +252,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else if ( Player.Mana < RMANA + QMANA + WMANA)
                     {
                         FindCard = 2;
-                        if (wName == "bluecardlock")
+                        if (wName == "BlueCardLock")
                             W.Cast();
                     }
                     else if (Program.Farm && orbTarget.IsValidTarget())
                     {
                         FindCard = 1;
-                        if (wName == "goldcardlock")
+                        if (wName == "GoldCardLock")
                             W.Cast();
                     }
                     else if (Player.ManaPercent > Config.Item("WredFarm", true).GetValue<Slider>().Value && Program.LaneClear && Config.Item("farmW", true).GetValue<bool>())
                     {
                         FindCard = 3;
-                        if (wName == "redcardlock")
+                        if (wName == "RedCardLock   ")
                             W.Cast();
                     }
                     else if ((Program.LaneClear || Player.Mana < RMANA + QMANA) && Config.Item("farmW", true).GetValue<bool>())
                     {
                         FindCard = 2;
-                        if (wName == "bluecardlock")
+                        if (wName == "BlueCardLock")
                             W.Cast();
                     }
                     else if(Program.Combo)
                     {
                         FindCard = 1;
-                        if (wName == "goldcardlock")
+                        if (wName == "GoldCardLock")
                             W.Cast();
                     }
                 }
