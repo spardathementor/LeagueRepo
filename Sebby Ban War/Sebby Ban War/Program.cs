@@ -33,6 +33,7 @@ namespace Sebby_Ban_War
         }
         private static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
+            // TARGETED SPELLS
             if (args.EndPosition.IsZero)
                 return;
 
@@ -41,6 +42,7 @@ namespace Sebby_Ban_War
 
             var spell = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(x => x.Slot == args.Slot);
 
+            // LINE CUT SPELL RANGE
             if (spell != null && spell.SData.LineWidth != 0 && args.EndPosition.Distance(ObjectManager.Player.Position) > 700)
             {
                 Random rnd = new Random();
@@ -65,14 +67,13 @@ namespace Sebby_Ban_War
         private static void Obj_AI_Base_OnIssueOrder(Obj_AI_Base sender, GameObjectIssueOrderEventArgs args)
         {
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
-           
+          
             //Console.WriteLine(args.Order);
             if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 10))
             {
                 Console.WriteLine("BLOCK " + args.Order);
                 args.Process = false;
                 return;
-                
             }
 
             //Console.WriteLine("DIS " + LastMousePos.Distance(screenPos) + " TIME " + (Utils.TickCount - LastMouseTime));
