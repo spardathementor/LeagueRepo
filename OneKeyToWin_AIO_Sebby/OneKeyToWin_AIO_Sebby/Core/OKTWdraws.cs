@@ -436,10 +436,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     if (ShowKDA)
                     {
                         var fSlot = enemy.Spellbook.Spells[4];
-                        if (fSlot.Name != "summonerflash")
+   
+                        if (fSlot.Name != "SummonerFlash")
                             fSlot = enemy.Spellbook.Spells[5];
 
-                        if (fSlot.Name == "summonerflash")
+                        if (fSlot.Name == "SummonerFlash")
                         {
                             var fT = fSlot.CooldownExpires - Game.Time;
                             if (fT < 0)

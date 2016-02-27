@@ -33,13 +33,24 @@ namespace Sebby_Ban_War
         }
         private static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
-                return;
-
             if (args.EndPosition.IsZero)
                 return;
 
-            var screenPos = Drawing.WorldToScreen(args.EndPosition);
+            if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
+                return;
+
+            var spell = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(x => x.Slot == args.Slot);
+
+            if (spell != null && spell.SData.LineWidth != 0 && args.EndPosition.Distance(ObjectManager.Player.Position) > 700)
+            {
+                Random rnd = new Random();
+                ObjectManager.Player.Spellbook.CastSpell(args.Slot, ObjectManager.Player.Position.Extend(args.EndPosition, rnd.Next(400, 600)));
+                Console.WriteLine("CUT SPELL");
+                args.Process = false;
+                return;
+            }
+            
+            var screenPos = Drawing.WorldToScreen(args.EndPosition);    
             if (Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 10)
             {
                 Console.WriteLine("BLOCK SPELL");
