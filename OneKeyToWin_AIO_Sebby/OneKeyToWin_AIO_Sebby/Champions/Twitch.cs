@@ -163,16 +163,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("twitchdeadlyvenom")))
+            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
                 if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) > enemy.Health)
                     E.Cast();
                 if (Player.Mana > RMANA + EMANA)
                 {
-                    int buffsNum = OktwCommon.GetBuffCount(enemy, "twitchdeadlyvenom");
+                    int buffsNum = OktwCommon.GetBuffCount(enemy, "TwitchDeadlyVenom");
                     if (Config.Item("5e", true).GetValue<bool>() && buffsNum == 6)
                         E.Cast();
-                    float buffTime = OktwCommon.GetPassiveTime(enemy, "twitchdeadlyvenom");
+                    float buffTime = OktwCommon.GetPassiveTime(enemy, "TwitchDeadlyVenom");
                 
                     if (!Orbwalking.InAutoAttackRange(enemy) && (Player.ServerPosition.Distance(enemy.ServerPosition) > 950 || buffTime < 1) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
                         E.Cast();
@@ -183,7 +183,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private float passiveDmg(Obj_AI_Base target)
         {
-            if (!target.HasBuff("twitchdeadlyvenom"))
+            if (!target.HasBuff("TwitchDeadlyVenom"))
                 return 0;
             float dmg = 6;
             if (Player.Level < 17)
@@ -194,8 +194,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 dmg = 3;
             if (Player.Level < 5)
                 dmg = 2;
-            float buffTime = OktwCommon.GetPassiveTime(target, "twitchdeadlyvenom");
-            return (dmg * OktwCommon.GetBuffCount(target, "twitchdeadlyvenom") * buffTime) - target.HPRegenRate * buffTime;
+            float buffTime = OktwCommon.GetPassiveTime(target, "TwitchDeadlyVenom");
+            return (dmg * OktwCommon.GetBuffCount(target, "TwitchDeadlyVenom") * buffTime) - target.HPRegenRate * buffTime;
         }
 
         private void JungleE()
@@ -264,7 +264,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             }
 
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(2000) && enemy.HasBuff("twitchdeadlyvenom")))
+            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(2000) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
                 if (passiveDmg(enemy) > enemy.Health)
                     drawText("IS DEAD", enemy, System.Drawing.Color.Yellow);
