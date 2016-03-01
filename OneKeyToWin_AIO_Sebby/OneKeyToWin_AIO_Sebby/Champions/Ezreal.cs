@@ -15,8 +15,8 @@ namespace OneKeyToWin_AIO_Sebby
         public Spell Q, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        Vector3 CursorPosition = Vector3.Zero;
 
+        Vector3 CursorPosition = Vector3.Zero;
         public double lag = 0;
         public double WCastTime = 0;
         public double QCastTime = 0;
@@ -30,8 +30,6 @@ namespace OneKeyToWin_AIO_Sebby
         public int Muramana = 3042;
         public int Tear = 3070;
         public int Manamune = 3004;
-
-        public string MsgDebug = "wait";
         public double NotTime = 0;
 
         public static Core.OKTWdash Dash;
@@ -53,9 +51,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
-
-            Config.SubMenu(Player.ChampionName).SubMenu("Items").AddItem(new MenuItem("mura", "Auto Muramana", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Items").AddItem(new MenuItem("stack", "Stack Tear if full mana", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("wPush", "W ally (push tower)", true).SetValue(true));
@@ -91,6 +86,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("debug", "Debug", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("apEz", "AP Ezreal", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("stack", "Stack Tear if full mana", true).SetValue(false));
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -99,9 +95,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!unit.IsMe)
-                return;
-
             if (W.IsReady() && Config.Item("wPush", true).GetValue<bool>() && target.IsValid<Obj_AI_Turret>() && Player.Mana > RMANA + EMANA + QMANA + WMANA + WMANA + RMANA)
             {
                 foreach (var ally in Program.Allies)
@@ -172,17 +165,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            if (Config.Item("mura", true).GetValue<bool>())
-            {
-                int Mur = Items.HasItem(Muramana) ? 3042 : 3043;
-                if (Program.Combo && Items.HasItem(Mur) && Items.CanUseItem(Mur) && Player.Mana > RMANA + EMANA + QMANA + WMANA)
-                {
-                    if (!Player.HasBuff("Muramana"))
-                        Items.UseItem(Mur);
-                }
-                else if (Player.HasBuff("Muramana") && Items.HasItem(Mur) && Items.CanUseItem(Mur))
-                    Items.UseItem(Mur);
-            }
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (Player.CountEnemiesInRange(900) > 0)
                 t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
@@ -228,7 +210,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (Config.Item("stack", true).GetValue<bool>()&& Utils.TickCount - Q.LastCastAttemptT > 4000 && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Program.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
             {
-                Q.Cast(Player.ServerPosition);
+                Q.Cast(Player.Position.Extend(Game.CursorPos, 500));
             }
         }
 
@@ -342,10 +324,9 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-
         private bool DashCheck(Vector3 dash)
         {
-            if ((!dash.UnderTurret(true) || Program.Combo))
+            if (!dash.UnderTurret(true) || Program.Combo)
                 return true;
             else
                 return false;
@@ -407,13 +388,6 @@ namespace OneKeyToWin_AIO_Sebby
                     .Select(buff => buff.EndTime)
                     .FirstOrDefault();
         }
-        public void debug(string msg)
-        {
-            MsgDebug = msg;
-            NotTime = Game.Time;
-            if (Config.Item("debug", true).GetValue<bool>())
-                Console.WriteLine(msg);
-        }
 
         private bool Farm
         {
@@ -434,6 +408,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
             int orbTarget = 0;
+
             if (Orbwalker.GetTarget() != null)
                 orbTarget = Orbwalker.GetTarget().NetworkId;
 
@@ -485,7 +460,6 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (mob.Health == mob.MaxHealth)
                     continue;
-                //debug(mob.SkinName);
                 if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
@@ -511,7 +485,7 @@ namespace OneKeyToWin_AIO_Sebby
                         //Program.debug("DS  " + DmgSec);
                         if (DragonDmg - mob.Health > 0)
                         {
-                            debug(mob.SkinName + " " + (DmgSec / 3) + " dmg per sec");
+                            
                             var timeTravel = GetUltTravelTime(Player, R.Speed, R.Delay, mob.Position);
                             var timeR = (mob.Health - R.GetDamage(mob)) / (DmgSec / 3);
                             //Program.debug("timeTravel " + timeTravel + "timeR " + timeR + "d " + R.GetDamage(mob));
@@ -607,15 +581,6 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Config.Item("noti", true).GetValue<bool>())
             {
-                if (Game.Time - NotTime < 10)
-                {
-                    Drawing.DrawText(Drawing.Width * 0.01f, Drawing.Height * 0.5f, System.Drawing.Color.Red, MsgDebug);
-                }
-                else
-                {
-                    MsgDebug = "wait";
-                    Drawing.DrawText(Drawing.Width * 0.01f, Drawing.Height * 0.5f, System.Drawing.Color.GreenYellow, MsgDebug);
-                }
 
                 var target = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
                 if (target.IsValidTarget())
