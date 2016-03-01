@@ -332,11 +332,18 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
+            if (input.Unit.HealthPercent < 20 || ObjectManager.Player.HealthPercent < 20)
+            {
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+            }
+
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall"))
             {
                 result.Hitchance = HitChance.VeryHigh;
+                result.CastPosition = input.Unit.Position;
                 return result;
             }
 
@@ -393,6 +400,47 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
+            // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
+
+            if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
+            {
+                result.CastPosition = input.Unit.Position;
+                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.4 + (input.Radius * 0.002))
+                {
+                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 1");
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
+                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.002))
+                {
+                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 2");
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
+                else
+                {
+                    result.Hitchance = HitChance.High;
+                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION HIGH");
+                    return result;
+                }
+            }
+
+            // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
+
+            else if (input.Unit.Path.Count() == 0 || !input.Unit.IsMoving)
+            {
+                if (input.Unit.IsWindingUp)
+                    result.Hitchance = HitChance.High;
+                else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
+                    result.Hitchance = HitChance.High;
+                else
+                {
+                    OktwCommon.debug("PRED: STOP LOGIC");
+                    result.Hitchance = HitChance.VeryHigh;
+                }
+                return result;
+            }
+
             // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.PathCalc(input.Unit))
@@ -439,7 +487,7 @@ namespace SebbyLib.Prediction
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                if (ObjectManager.Player.IsMoving)
+                if (ObjectManager.Player.IsMoving)  
                 {
                     if (ObjectManager.Player.IsFacing(input.Unit))
                     {
@@ -460,45 +508,6 @@ namespace SebbyLib.Prediction
                         }
                     }
                 }
-            }
-
-            // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
-
-            if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
-            {
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.4 + (input.Radius * 0.002))
-                {
-                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 1");
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.002))
-                {
-                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 2");
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
-                else
-                {
-                    result.Hitchance = HitChance.High;
-                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION HIGH");
-                }
-            }
-
-            // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
-
-            else if (input.Unit.Path.Count() == 0 || !input.Unit.IsMoving)
-            {
-                if (input.Unit.IsWindingUp)
-                    result.Hitchance = HitChance.High;
-                else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
-                    result.Hitchance = HitChance.High;
-                else
-                {
-                    OktwCommon.debug("PRED: STOP LOGIC");
-                    result.Hitchance = HitChance.VeryHigh;
-                }
-                return result;
             }
 
             // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
