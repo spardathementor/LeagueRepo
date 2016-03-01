@@ -12,8 +12,8 @@ namespace OneKeyToWin_AIO_Sebby
         private Menu Config = Program.Config;
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        public int Muramana = 3042;
-        public int Manamune = 3004;
+
+
         //private int [] SmiteDamage = { 390, 410, 430, 450, 480, 510, 540, 570, 600, 640, 680, 720, 760, 800, 850, 900, 950, 1000};
         private SpellSlot heal, barrier, ignite, exhaust, flash, smite , teleport;
 
@@ -126,8 +126,6 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Hydra").AddItem(new MenuItem("Hydra", "Hydra").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("HydraTitanic").AddItem(new MenuItem("HydraTitanic", "Hydra Titanic").SetValue(true));
-
-            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Muramana").AddItem(new MenuItem("Muramana", "Muramana").SetValue(true));
 
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("FrostQueen").AddItem(new MenuItem("FrostQueen", "FrostQueen").SetValue(true));
 
@@ -336,21 +334,6 @@ namespace OneKeyToWin_AIO_Sebby
             if (args.Slot == SpellSlot.Q && (Player.ChampionName == "Ashe" ))
             {
                 Youmuus.Cast();
-            }
-        }
-
-        private void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
-        {
-            if (Config.Item("Muramana").GetValue<bool>())
-            {
-                int Mur = Items.HasItem(Muramana) ? 3042 : 3043;
-                if (Items.HasItem(Mur) && args.Target.IsEnemy && args.Target.IsValid<Obj_AI_Hero>() && Items.CanUseItem(Mur) && Player.Mana > Player.MaxMana * 0.3)
-                {
-                    if (!ObjectManager.Player.HasBuff("Muramana"))
-                        Items.UseItem(Mur);
-                }
-                else if (ObjectManager.Player.HasBuff("Muramana") && Items.HasItem(Mur) && Items.CanUseItem(Mur))
-                    Items.UseItem(Mur);
             }
         }
 
