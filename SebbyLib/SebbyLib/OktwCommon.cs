@@ -161,7 +161,7 @@ namespace SebbyLib
 
         public static bool CanMove(Obj_AI_Hero target)
         {
-            if (target.MoveSpeed < 50 || !Player.CanMove || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
+            if (target.MoveSpeed < 50 || !target.CanMove || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
                 target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) || (target.IsChannelingImportantSpell() && !target.IsMoving))
             {
                 return false;
@@ -170,9 +170,9 @@ namespace SebbyLib
                 return true;
         }
 
-        public static int GetBuffCount(Obj_AI_Base target, String buffName)
+        public static int GetBuffCount(Obj_AI_Base target, string buffName)
         {
-            foreach (var buff in target.Buffs.Where(buff => buff.Name == buffName))
+            foreach (var buff in target.Buffs.Where(buff => buff.Name.ToLower() == buffName.ToLower()))
             {
                 if (buff.Count == 0)
                     return 1;
@@ -191,11 +191,11 @@ namespace SebbyLib
                 return 0;
         }
 
-        public static float GetPassiveTime(Obj_AI_Base target, String buffName)
+        public static float GetPassiveTime(Obj_AI_Base target, string buffName)
         {
             return
                 target.Buffs.OrderByDescending(buff => buff.EndTime - Game.Time)
-                    .Where(buff => buff.Name == buffName)
+                    .Where(buff => buff.Name.ToLower() == buffName.ToLower())
                     .Select(buff => buff.EndTime)
                     .FirstOrDefault() - Game.Time;
         }
@@ -269,7 +269,6 @@ namespace SebbyLib
 
         private static void Game_OnWndProc(WndEventArgs args)
         {
-
             if (args.Msg == 123 && blockMove)
             {
                 blockMove = false;
