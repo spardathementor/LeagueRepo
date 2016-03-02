@@ -181,10 +181,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-
-            
-            
-
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
@@ -265,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Program.Enemies.Any(target => target.IsValidTarget(270) && target.IsMelee))
             {
-                var dashPos = Dash.CastDash();
+                var dashPos = Dash.CastDash(true);
                 if (!dashPos.IsZero)
                 {
                     E.Cast(dashPos);

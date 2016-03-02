@@ -67,7 +67,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             }
         }
 
-        public Vector3 CastDash()
+        public Vector3 CastDash(bool asap = false)
         {
             int DashMode = Config.Item("DashMode", true).GetValue<StringList>().SelectedIndex;
 
@@ -124,8 +124,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                 }
             }
-
-            if (!bestpoint.IsZero && IsGoodPosition(bestpoint) && InAARange(bestpoint))
+            if(asap)
+            {
+                return bestpoint;
+            }
+            else if (!bestpoint.IsZero && IsGoodPosition(bestpoint) && InAARange(bestpoint))
             {
                 return bestpoint;
             }

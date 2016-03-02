@@ -136,7 +136,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Program.LagFree(1))
             {
-
                 var lvl = 7 * (Player.Level - 1);
 
                 E.Range = 620 + lvl;
@@ -151,6 +150,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp)
                 LogicW();
         }
+
         private void LogicW()
         {
             if (Config.Item("Wks", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
@@ -177,18 +177,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Program.CastSpell(W, enemy);
                 }
             }
-
-            if (Program.Combo && Config.Item("nktdE", true).GetValue<bool>())
-            {
-                var dashPosition = Player.Position.Extend(Game.CursorPos, W.Range);
-
-                if (Game.CursorPos.Distance(Player.Position) > Player.AttackRange + Player.BoundingRadius * 2 &&  Player.Mana > RMANA + WMANA)
-                {
-                    W.Cast(dashPosition);
-                }
-            }
         }
-
 
         private void LogicR()
         {
@@ -238,6 +227,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 R.Cast(bestEnemy);
             }
         }
+
         private void Jungle()
         {
             if (!Config.Item("jungle", true).GetValue<bool>() || !Program.LaneClear)
@@ -331,14 +321,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (enemy.HasBuff("tristanaechargesound"))
                         drawText2("E:  " + String.Format("{0:0.0}", OktwCommon.GetPassiveTime(enemy, "tristanaechargesound")), enemy.Position, System.Drawing.Color.Yellow);
                 }
-            }
-            if (Config.Item("nktdE", true).GetValue<bool>())
-            {
-
-                if (Game.CursorPos.Distance(Player.Position) > Player.AttackRange + Player.BoundingRadius * 2)
-                    drawText2("dash: ON ", Player.Position, System.Drawing.Color.Red);
-                else
-                    drawText2("dash: OFF ", Player.Position, System.Drawing.Color.GreenYellow);
             }
 
             if (Config.Item("wRange", true).GetValue<bool>())

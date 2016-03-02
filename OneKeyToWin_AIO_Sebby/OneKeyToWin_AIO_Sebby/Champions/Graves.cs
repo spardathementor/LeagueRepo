@@ -227,6 +227,14 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
+            if (Program.Enemies.Any(target => target.IsValidTarget(270) && target.IsMelee))
+            {
+                var dashPos = Dash.CastDash(true);
+                if (!dashPos.IsZero)
+                {
+                    E.Cast(dashPos);
+                }
+            }
             if (Program.Combo && Player.Mana > RMANA + EMANA && !Player.HasBuff("gravesbasicattackammo2"))
             {
                 var dashPos = Dash.CastDash();
