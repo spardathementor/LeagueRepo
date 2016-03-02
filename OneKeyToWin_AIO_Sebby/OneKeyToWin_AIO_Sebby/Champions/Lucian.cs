@@ -46,6 +46,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("ignoreCol", "Ignore collision", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("wInAaRange", "Cast only in AA range", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("slowE", "Auto SlowBuff E", true).SetValue(true));
@@ -180,6 +181,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
+
+            
+            
+
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
@@ -190,16 +195,33 @@ namespace OneKeyToWin_AIO_Sebby
 
                 var qDmg = Q.GetDamage(t);
                 var wDmg = OktwCommon.GetKsDamage(t, W);
+
                 if (Orbwalking.InAutoAttackRange(t))
                 {
                     qDmg += (float)AaDamage(t);
                     wDmg += (float)AaDamage(t);
                 }
+
                 if (wDmg > t.Health) 
                     Program.CastSpell(W, t);
                 else if (wDmg + qDmg > t.Health && Q.IsReady() && Player.Mana > RMANA + WMANA + QMANA)
                     Program.CastSpell(W, t);
-                else if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && Player.Mana > RMANA + WMANA + EMANA + QMANA)
+
+                var orbT = Orbwalker.GetTarget() as Obj_AI_Hero;
+                if (orbT == null)
+                {
+                    if (Config.Item("wInAaRange", true).GetValue<bool>())
+                    {
+                        return;
+                    }
+                }
+                else if (orbT.IsValidTarget())
+                {
+                    t = orbT;
+                }
+
+                
+                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                     Program.CastSpell(W, t);
                 else if (Program.Farm && Config.Item("harras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > Player.MaxMana * 0.8 && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA)
                     Program.CastSpell(W, t);

@@ -106,10 +106,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 var points = OktwCommon.CirclePoints(15, DashSpell.Range, Player.Position);
                 bestpoint = Player.Position.Extend(Game.CursorPos, DashSpell.Range);
-                int enemies = bestpoint.CountEnemiesInRange(380);
+                int enemies = bestpoint.CountEnemiesInRange(350);
                 foreach (var point in points)
                 {
-                    int count = point.CountEnemiesInRange(380);
+                    int count = point.CountEnemiesInRange(350);
                     if (!InAARange(point))
                         continue;
                     if (count < enemies)
