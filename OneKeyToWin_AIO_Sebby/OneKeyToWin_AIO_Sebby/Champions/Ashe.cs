@@ -173,29 +173,45 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (Player.CountEnemiesInRange(700) > 0)
                 t = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                var poutput = W.GetPrediction(t);
-                var col = poutput.CollisionObjects.Count(ColObj => ColObj.IsEnemy && ColObj.IsMinion && !ColObj.IsDead);
-                if (t.IsDead || col > 0 || t.Path.Count() > 1 || (int)poutput.Hitchance < 5)
-                    return;
-                if (Program.Combo && Player.Mana > RMANA + WMANA)
-                    W.Cast(t, true, true);
-                else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
-                    W.Cast(t, true, true);
-                else if(OktwCommon.GetKsDamage(t, W) > t.Health)
+                SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
+
+                var predInput2 = new SebbyLib.Prediction.PredictionInput
                 {
-                    W.Cast(t, true);
+                    Aoe = false,
+                    Collision = W.Collision,
+                    Speed = W.Speed,
+                    Delay = W.Delay,
+                    Range = W.Range,
+                    From = Player.ServerPosition,
+                    Radius = W.Width,
+                    Unit = t,
+                    Type = CoreType2
+                };
+                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
+
+                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
+                {
+                    if (Program.Combo && Player.Mana > RMANA + WMANA)
+                        W.Cast(poutput2.CastPosition);
+                    else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                        W.Cast(poutput2.CastPosition);
+                }
+                
+                if(OktwCommon.GetKsDamage(t, W) > t.Health)
+                {
+                    W.Cast(t);
+                    W.Cast(poutput2.CastPosition);
                 }
 
                 if (!Program.None && Player.Mana > RMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
-                        W.Cast(t, true, true);
+                        W.Cast(t);
                 }
             }
         }
