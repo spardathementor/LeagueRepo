@@ -129,7 +129,7 @@ namespace Sebby_Ban_War
             }
             
             var screenPos = Drawing.WorldToScreen(args.EndPosition);    
-            if (Config.Item("skill").GetValue<bool>() && Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 10)
+            if (Config.Item("skill").GetValue<bool>() && Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 15)
             {
                 Console.WriteLine("BLOCK SPELL");
                 args.Process = false;
@@ -153,9 +153,9 @@ namespace Sebby_Ban_War
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
           
             //Console.WriteLine(args.Order);
-            if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 10))
+            if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 15))
             {
-                Console.WriteLine("BLOCK " + args.Order);
+                //Console.WriteLine("BLOCK " + args.Order);
                 args.Process = false;
                 return;
             }
