@@ -124,11 +124,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                 }
             }
-            if(asap)
+
+            if (bestpoint.IsZero)
+                return Vector3.Zero;
+
+            var isGoodPos = IsGoodPosition(bestpoint);
+
+            if (asap && isGoodPos)
             {
                 return bestpoint;
             }
-            else if (!bestpoint.IsZero && IsGoodPosition(bestpoint) && InAARange(bestpoint))
+            else if (isGoodPos && InAARange(bestpoint))
             {
                 return bestpoint;
             }

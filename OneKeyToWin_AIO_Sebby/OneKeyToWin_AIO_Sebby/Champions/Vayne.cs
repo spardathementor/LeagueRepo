@@ -124,7 +124,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget() && (Program.Combo || Program.Farm) && Config.Item("autoQ", true).GetValue<bool>() &&  (GetWStacks(t) == 1 || Player.HasBuff("vayneinquisition")))
             {
-                var dashPos = Dash.CastDash();
+                var dashPos = Dash.CastDash(true);
                 if (!dashPos.IsZero)
                 {
                     Q.Cast(dashPos);
@@ -210,7 +210,7 @@ namespace OneKeyToWin_AIO_Sebby
                     {
                         if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                         {
-                            var dashPos = Dash.CastDash();
+                            var dashPos = Dash.CastDash(true);
                             if (!dashPos.IsZero)
                             {
                                 Q.Cast(dashPos);
