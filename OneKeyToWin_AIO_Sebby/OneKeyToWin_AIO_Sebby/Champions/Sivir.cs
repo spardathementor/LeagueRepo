@@ -47,9 +47,9 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("harasW", "Harras W", true).SetValue(true));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("Harras Q").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -57,14 +57,13 @@ namespace OneKeyToWin_AIO_Sebby
                     if (spell.SData.TargettingType == SpellDataTargetType.Unit)
                         Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Targeted Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(true));
                 }
-                    
             }
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("Edmg", "E dmg % hp", true).SetValue(new Slider(0, 100, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("Edmg", "Block under % hp", true).SetValue(new Slider(90, 100, 0)));
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -75,36 +74,31 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (!unit.IsMe && Orbwalker.GetTarget().IsValidTarget())
-                return;
-            
-            if (W.IsReady())
+            if (W.IsReady() && !Program.None && target.IsValidTarget())
             {
-                var t = TargetSelector.GetTarget(800, TargetSelector.DamageType.Physical);
-                if (Program.Combo && target is Obj_AI_Hero && Player.Mana > RMANA + WMANA)
-                    W.Cast();
-                else if (Config.Item("harasW", true).GetValue<bool>() && !Player.UnderTurret(true) && (target is Obj_AI_Hero || t.IsValidTarget()) && Player.Mana > RMANA + WMANA + QMANA)
-                    W.Cast();
-                else if (Config.Item("farmW", true).GetValue<bool>() && Program.Farm && Player.Mana > RMANA + WMANA + QMANA && !Player.UnderTurret(true))
+                if (target is Obj_AI_Hero)
                 {
-                    if (farmW() && Program.LaneClear)
+                    var t = target as Obj_AI_Hero;
+                    if (Program.Combo && Player.Mana > RMANA + WMANA)
                         W.Cast();
-                    else if (Program.Farm)
+                    else if (Config.Item("harasW", true).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && Config.Item("haras" + t.ChampionName).GetValue<bool>())
                     {
-                        var minions = MinionManager.GetMinions(Player.Position, Player.AttackRange, MinionTypes.All);
+                        W.Cast();
+                    }
+                }
+                else
+                {
+                    var t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
+                    if (t.IsValidTarget() && Config.Item("harasW", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t.Distance(target.Position) < 400)
+                        W.Cast();
 
-                        if (minions == null || minions.Count == 0)
-                            return;
-
-                        int countMinions = 0;
-
-                        foreach (var minion in minions.Where(minion => minion.Health < Player.GetAutoAttackDamage(minion) + W.GetDamage(minion)))
+                    if (target is Obj_AI_Minion && Program.LaneClear && Config.Item("farmW", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && !Player.UnderTurret(true))
+                    {
+                        var minions = MinionManager.GetMinions(target.Position, 500);
+                        if (minions.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                         {
-                            countMinions++;
-                        }
-
-                        if (countMinions > 1)
                             W.Cast();
+                        }
                     }
                 }
             }
@@ -112,26 +106,19 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-
-            if (!E.IsReady() || !sender.IsEnemy || sender.IsMinion || args.Target == null  || !args.Target.IsMe || !sender.IsValid<Obj_AI_Hero>() || args.SData.Name == "TormentedSoil")
+            if (!E.IsReady() || args.SData.IsAutoAttack() || Player.HealthPercent > Config.Item("Edmg", true).GetValue<Slider>().Value || !Config.Item("autoE", true).GetValue<bool>()
+                || !sender.IsEnemy || sender.IsMinion || args.Target == null  || !args.Target.IsMe || !sender.IsValid<Obj_AI_Hero>() || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
             if (Config.Item("spell" + args.SData.Name) != null && !Config.Item("spell" + args.SData.Name).GetValue<bool>())
                 return;
 
-            var dmg = sender.GetSpellDamage(ObjectManager.Player, args.SData.Name);
-            double HpLeft = ObjectManager.Player.Health - dmg;
-            double HpPercentage = (dmg * 100) / Player.Health;
-
-            if ( HpPercentage >= Config.Item("Edmg", true).GetValue<Slider>().Value && sender.IsEnemy && args.Target.IsMe && !args.SData.IsAutoAttack() && Config.Item("autoE", true).GetValue<bool>() )
-            {
-                E.Cast();
-            }
+             E.Cast();
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            var Target = (Obj_AI_Hero)gapcloser.Sender;
+            var Target = gapcloser.Sender;
             if (Config.Item("AGC", true).GetValue<bool>() && E.IsReady() && Target.IsValidTarget(5000))
                 E.Cast();
             return;
@@ -196,7 +183,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 var minionList = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
                 var farmPosition = Q.GetLineFarmLocation(minionList, Q.Width);
-                if (farmPosition.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
+                if (farmPosition.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     Q.Cast(farmPosition.Position);
             }
         }
@@ -229,20 +216,6 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
             }
-        }
-
-        private bool farmW()
-        {
-            var allMinions = MinionManager.GetMinions(Player.ServerPosition, 1300, MinionTypes.All);
-            int num = 0;
-            foreach (var minion in allMinions)
-            {
-                num++;
-            }
-            if (num > 4)
-                return true;
-            else
-                return false;
         }
 
         private void SetMana()
