@@ -249,11 +249,11 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
-            if (Player.Mana > RMANA + EMANA && Config.Item("autoE", true).GetValue<bool>())
+            if (Player.Mana > RMANA + EMANA && Config.Item("autoE", true).GetValue<bool>() && Game.Time - grabTime > 1)
             {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy) && Game.Time - grabTime > 1))
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                 {
-                    E.Cast(enemy.Position, true);
+                    E.Cast(enemy);
                     return;
                 }
 
@@ -507,6 +507,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Drawing_OnDraw(EventArgs args)
         {
+
             if (Config.Item("qRange", true).GetValue<bool>())
             {
                 if (FishBoneActive)

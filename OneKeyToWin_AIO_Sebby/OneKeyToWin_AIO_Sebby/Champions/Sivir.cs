@@ -89,8 +89,10 @@ namespace OneKeyToWin_AIO_Sebby
                 else
                 {
                     var t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
-                    if (t.IsValidTarget() && Config.Item("harasW", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t.Distance(target.Position) < 400)
+                    if (t.IsValidTarget() && Config.Item("harasW", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t.Distance(target.Position) < 500)
+                    {
                         W.Cast();
+                    }
 
                     if (target is Obj_AI_Minion && Program.LaneClear && Config.Item("farmW", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && !Player.UnderTurret(true))
                     {
