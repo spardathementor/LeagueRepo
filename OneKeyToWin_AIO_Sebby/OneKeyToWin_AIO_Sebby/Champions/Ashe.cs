@@ -32,8 +32,9 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("Harras W").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
-
+            
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rkscombo", "R KS combo R + W + AA", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRaoe", "Auto R aoe", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRinter", "Auto R OnPossibleToInterrupt", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -112,44 +113,24 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoR", true).GetValue<bool>())
             {
-                bool cast = false;
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
                 {
-                    if (Config.Item("autoRinter", true).GetValue<bool>() && target.IsChannelingImportantSpell())
-                        R.Cast(target);
-                    if (target.CountEnemiesInRange(250) > 2 && Config.Item("autoRaoe", true).GetValue<bool>() && Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+                    var rDmg = OktwCommon.GetKsDamage(target, R);
+                    if (Program.Combo && target.CountEnemiesInRange(250) > 2 && Config.Item("autoRaoe", true).GetValue<bool>())
                         Program.CastSpell(R, target);
-                    if (OktwCommon.GetKsDamage(target, R) > target.Health - OktwCommon.GetIncomingDamage(target) && target.CountAlliesInRange(600) == 0 && target.Distance(Player.Position) > 1000)
+                    if(Program.Combo && target.IsValidTarget(W.Range)  && Config.Item("Rkscombo", true).GetValue<bool>() &&  Player.GetAutoAttackDamage(target) * 5 + rDmg + W.GetDamage(target) > target.Health && target.HasBuffOfType(BuffType.Slow) && !OktwCommon.IsSpellHeroCollision(target, R))
+                        Program.CastSpell(R, target);
+                    if (rDmg > target.Health && target.CountAlliesInRange(600) == 0 && target.Distance(Player.Position) > 1000)
                     {
-                        cast = true;
-                        PredictionOutput output = R.GetPrediction(target);
-                        Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
-                        direction.Normalize();
-                        List<Obj_AI_Hero> enemies = Program.Enemies.Where(x => x.IsValidTarget()).ToList();
-                        foreach (var enemy in enemies)
-                        {
-                            if (enemy.SkinName == target.SkinName || !cast)
-                                continue;
-                            PredictionOutput prediction = R.GetPrediction(enemy);
-                            Vector3 predictedPosition = prediction.CastPosition;
-                            Vector3 v = output.CastPosition - Player.ServerPosition;
-                            Vector3 w = predictedPosition - Player.ServerPosition;
-                            double c1 = Vector3.Dot(w, v);
-                            double c2 = Vector3.Dot(v, v);
-                            double b = c1 / c2;
-                            Vector3 pb = Player.ServerPosition + ((float)b * v);
-                            float length = Vector3.Distance(predictedPosition, pb);
-                            if (length < (R.Width + 150 + enemy.BoundingRadius / 2) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
-                                cast = false;
-                        }
-                        if (cast)
+                        if (!OktwCommon.IsSpellHeroCollision(target, R))
                             Program.CastSpell(R, target);
                     }
                 }
             }
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && !OktwCommon.ValidUlt(enemy)))
+
+            if (Player.HealthPercent < 50)
             {
-                if (Player.Health < Player.MaxHealth * 0.4 && enemy.IsValidTarget(270) && enemy.IsMelee && Config.Item("GapCloser" + enemy.ChampionName).GetValue<bool>())
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(300) && enemy.IsMelee && Config.Item("GapCloser" + enemy.ChampionName).GetValue<bool>() && !OktwCommon.ValidUlt(enemy)))
                 {
                     R.Cast(enemy);
                     Program.debug("R Meele");
