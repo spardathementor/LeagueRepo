@@ -264,7 +264,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else if (Player.ManaPercent > Config.Item("WredFarm", true).GetValue<Slider>().Value && Program.LaneClear && Config.Item("farmW", true).GetValue<bool>())
                     {
                         FindCard = 3;
-                        if (wName == "RedCardLock   ")
+                        if (wName == "RedCardLock")
                             W.Cast();
                     }
                     else if ((Program.LaneClear || Player.Mana < RMANA + QMANA) && Config.Item("farmW", true).GetValue<bool>())
