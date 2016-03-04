@@ -288,7 +288,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                if (Program.Combo)
+                if (Program.Combo && !Player.IsWindingUp)
                 {
                     if (Config.Item("EmodeCombo", true).GetValue<StringList>().SelectedIndex == 1)
                     {
