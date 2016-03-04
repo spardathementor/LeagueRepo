@@ -154,9 +154,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-            var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
-            if (Player.CountEnemiesInRange(700) > 0)
-                t = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
+            var t = Orbwalker.GetTarget() as Obj_AI_Hero;
+            if (t == null)
+                t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
 
