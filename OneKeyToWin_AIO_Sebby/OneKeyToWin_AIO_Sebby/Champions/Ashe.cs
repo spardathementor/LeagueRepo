@@ -159,34 +159,17 @@ namespace OneKeyToWin_AIO_Sebby
                 t = TargetSelector.GetTarget(700, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
 
-                var predInput2 = new SebbyLib.Prediction.PredictionInput
+                if (Program.Combo && Player.Mana > RMANA + WMANA)
+                    CastW(t);
+                else if (Program.Farm  && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
                 {
-                    Aoe = false,
-                    Collision = W.Collision,
-                    Speed = W.Speed,
-                    Delay = W.Delay,
-                    Range = W.Range,
-                    From = Player.ServerPosition,
-                    Radius = W.Width,
-                    Unit = t,
-                    Type = CoreType2
-                };
-                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
-
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
-                {
-                    if (Program.Combo && Player.Mana > RMANA + WMANA)
-                        W.Cast(poutput2.CastPosition);
-                    else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
-                        W.Cast(poutput2.CastPosition);
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && Config.Item("haras" + t.ChampionName).GetValue<bool>()))
+                        CastW(t);
                 }
-                
-                if(OktwCommon.GetKsDamage(t, W) > t.Health)
+                else if (OktwCommon.GetKsDamage(t, W) > t.Health)
                 {
-                    W.Cast(t);
-                    W.Cast(poutput2.CastPosition);
+                    CastW(t);
                 }
 
                 if (!Program.None && Player.Mana > RMANA + WMANA)
@@ -194,6 +177,29 @@ namespace OneKeyToWin_AIO_Sebby
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(t);
                 }
+            }
+        }
+
+        private void CastW(Obj_AI_Base t)
+        {
+            SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
+
+            var predInput2 = new SebbyLib.Prediction.PredictionInput
+            {
+                Aoe = false,
+                Collision = W.Collision,
+                Speed = W.Speed,
+                Delay = W.Delay,
+                Range = W.Range,
+                From = Player.ServerPosition,
+                Radius = W.Width,
+                Unit = t,
+                Type = CoreType2
+            };
+            var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
+            if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
+            {
+                W.Cast(poutput2.CastPosition);
             }
         }
 
