@@ -246,7 +246,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            var bounceRange = 460;
+            var bounceRange = 430;
             var t2 = TargetSelector.GetTarget(R.Range + bounceRange, TargetSelector.DamageType.Magical);
 
             if (t2.IsValidTarget(R.Range) && t2.CountEnemiesInRange(bounceRange) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
