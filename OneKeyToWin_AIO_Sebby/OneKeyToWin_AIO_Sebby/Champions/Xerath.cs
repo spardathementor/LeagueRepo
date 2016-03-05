@@ -79,8 +79,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Orbwalking.AfterAttack +=Orbwalking_AfterAttack;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
         }
-     
+
+        private void Obj_AI_Base_OnIssueOrder(Obj_AI_Base sender, GameObjectIssueOrderEventArgs args)
+        {
+            if (args.Order == GameObjectOrder.AttackUnit && Q.IsCharging)
+            {
+                Program.debug("BADDDD");
+                args.Process = false;
+            }
+        }
+
         private void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             if (unit.IsMe)
