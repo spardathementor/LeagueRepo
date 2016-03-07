@@ -129,8 +129,7 @@ namespace SebbyLib
         {
             if (args.Target == null  && target.IsValid)
             {
-                Console.WriteLine(" DDD " + target.Name );
-                var pred = Prediction.Prediction.GetPrediction(target, 0.25f, 50).CastPosition;
+                var pred = Prediction.Prediction.GetPrediction(target, 0.25f).CastPosition;
                 if (pred == null)
                     return false;
                 if (args.SData.LineWidth > 0)
