@@ -46,29 +46,23 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsValid && enemy.Spellbook != null))
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
             {
-                if (enemy.Spellbook.Spells.Count() > 3)
+                for (int i = 0; i < 4; i++)
                 {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        if (enemy.Spellbook.Spells[i] != null)
+                    var spell2 = enemy.Spellbook.Spells[i];
+                    if (spell2.SData.TargettingType != SpellDataTargetType.Self && spell2.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
+                    { 
+                        var spell = Damage.Spells[enemy.ChampionName].FirstOrDefault(s => s.Slot == enemy.Spellbook.Spells[i].Slot);
+                        if (spell != null)
                         {
-                            var spell2 = enemy.Spellbook.Spells[i];
-                            if (spell2.SData != null && spell2.SData.Name != null && spell2.Name != null)
-                            {
-                                var spell = Damage.Spells[enemy.ChampionName].FirstOrDefault(s => s.Slot == enemy.Spellbook.Spells[i].Slot);
-                                if (spell != null)
-                                {
-                                    if (spell.DamageType == Damage.DamageType.Physical || spell.DamageType == Damage.DamageType.True)
-                                        Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell2.SData.Name, spell2.Name, true).SetValue(false));
-                                    else
-                                        Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell2.SData.Name, spell2.Name, true).SetValue(true));
-                                }
-                                else
-                                    Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell2.SData.Name, spell2.Name, true).SetValue(true));
-                            }
+                            if (spell.DamageType == Damage.DamageType.Physical || spell.DamageType == Damage.DamageType.True)
+                                Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell2.SData.Name, spell2.Name, true).SetValue(false));
+                            else
+                                Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell2.SData.Name, spell2.Name, true).SetValue(true));
                         }
+                        else
+                            Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell2.SData.Name, spell2.Name, true).SetValue(true));
                     }
                 }
             }
@@ -120,11 +114,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (Config.Item("skillshot" + ally.ChampionName ,true).GetValue<bool>())
                 {
-                    var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
-                    if (castArea.Distance(ally.ServerPosition) > ally.BoundingRadius / 2)
+                    if (!OktwCommon.CanHitSkillShot(ally, args))
                         continue;
-
-                        
                     //dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                     E.CastOnUnit(ally);
                     return;

@@ -125,6 +125,32 @@ namespace SebbyLib
             return false;
         }
 
+        public static bool CanHitSkillShot(Obj_AI_Base target, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (args.Target == null)
+            {
+                if (args.SData.LineWidth > 0)
+                {
+                    var powCalc = Math.Pow(args.SData.LineWidth + target.BoundingRadius, 2);
+                    var pred = Prediction.Prediction.GetPrediction(target, 0.25f);
+                    Console.WriteLine("det");
+                    if (pred.CastPosition.To2D().Distance(args.End.To2D(), args.Start.To2D(), true, true) <= powCalc)
+                    {
+                        return true;
+                    } 
+                }
+                else
+                {
+                    var pred = Prediction.Prediction.GetPrediction(target, 0.3f);
+                    if (target.Distance(args.End) < 50 + target.BoundingRadius)
+                    {
+                        return true;
+                    }  
+                }
+            }
+            return false;
+        }
+
         public static float GetKsDamage(Obj_AI_Hero t, Spell QWER)
         {
             var totalDmg = QWER.GetDamage(t);
@@ -310,8 +336,7 @@ namespace SebbyLib
             {
                 foreach (var champion in ChampionList.Where(champion => champion.IsValid && !champion.IsDead && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                 {
-                    var castArea = champion.Distance(args.End) * (args.End - champion.ServerPosition).Normalized() + champion.ServerPosition;
-                    if (castArea.Distance(champion.ServerPosition) < champion.BoundingRadius / 2)
+                    if (CanHitSkillShot(champion,args))
                     {
                         IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
                     }

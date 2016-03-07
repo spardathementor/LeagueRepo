@@ -54,8 +54,13 @@ namespace OneKeyToWin_AIO_Sebby
                 for (int i = 0; i < 4; i++)
                 {
                     var spell = enemy.Spellbook.Spells[i];
-                    if (spell.SData.TargettingType == SpellDataTargetType.Unit)
-                        Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Targeted Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(true));
+                    if (spell.SData.TargettingType != SpellDataTargetType.Self && spell.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
+                    {
+                        if (spell.SData.TargettingType == SpellDataTargetType.Unit)
+                            Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(true));
+                        else
+                            Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(false));
+                    }
                 }
             }
 
@@ -109,13 +114,21 @@ namespace OneKeyToWin_AIO_Sebby
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             if (!E.IsReady() || args.SData.IsAutoAttack() || Player.HealthPercent > Config.Item("Edmg", true).GetValue<Slider>().Value || !Config.Item("autoE", true).GetValue<bool>()
-                || !sender.IsEnemy || sender.IsMinion || args.Target == null  || !args.Target.IsMe || !sender.IsValid<Obj_AI_Hero>() || args.SData.Name.ToLower() == "tormentedsoil")
+                || !sender.IsEnemy || sender.IsMinion || !sender.IsValid<Obj_AI_Hero>() || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
             if (Config.Item("spell" + args.SData.Name) != null && !Config.Item("spell" + args.SData.Name).GetValue<bool>())
                 return;
 
-             E.Cast();
+            if (args.Target != null)
+            {
+                if (args.Target.IsMe)
+                    E.Cast();
+            }
+            else if (OktwCommon.CanHitSkillShot(Player, args))
+            {
+                E.Cast();
+            }
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
