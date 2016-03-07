@@ -127,21 +127,22 @@ namespace SebbyLib
 
         public static bool CanHitSkillShot(Obj_AI_Base target, GameObjectProcessSpellCastEventArgs args)
         {
-            if (args.Target == null)
+            if (args.Target == null  && target.IsValid)
             {
+                Console.WriteLine(" DDD " + target.Name );
+                var pred = Prediction.Prediction.GetPrediction(target, 0.25f, 50).CastPosition;
+                if (pred == null)
+                    return false;
                 if (args.SData.LineWidth > 0)
                 {
                     var powCalc = Math.Pow(args.SData.LineWidth + target.BoundingRadius, 2);
-                    var pred = Prediction.Prediction.GetPrediction(target, 0.25f);
-                    Console.WriteLine("det");
-                    if (pred.CastPosition.To2D().Distance(args.End.To2D(), args.Start.To2D(), true, true) <= powCalc)
+                    if (pred.To2D().Distance(args.End.To2D(), args.Start.To2D(), true, true) <= powCalc)
                     {
                         return true;
                     } 
                 }
                 else
                 {
-                    var pred = Prediction.Prediction.GetPrediction(target, 0.3f);
                     if (target.Distance(args.End) < 50 + target.BoundingRadius)
                     {
                         return true;
@@ -334,7 +335,7 @@ namespace SebbyLib
             }
             else
             {
-                foreach (var champion in ChampionList.Where(champion => champion.IsValid && !champion.IsDead && champion.Team != sender.Team && champion.Distance(sender) < 2000))
+                foreach (var champion in ChampionList.Where(champion => champion.IsValid<Obj_AI_Hero>() && !champion.IsDead && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                 {
                     if (CanHitSkillShot(champion,args))
                     {
