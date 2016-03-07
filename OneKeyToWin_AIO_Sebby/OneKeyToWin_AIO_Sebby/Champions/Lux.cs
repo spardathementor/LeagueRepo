@@ -112,13 +112,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-
-            if(OktwCommon.GetIncomingDamage(Player) > 0)
-            {
-                Program.debug("DAMAGE "+OktwCommon.GetIncomingDamage(Player));
-            }
-
-
             if (R.IsReady() )
             {
                 if (Config.Item("Rjungle", true).GetValue<bool>())
