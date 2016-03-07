@@ -137,7 +137,7 @@ namespace SebbyLib
                 if (args.SData.LineWidth > 0)
                 {
                     var powCalc = Math.Pow(args.SData.LineWidth + target.BoundingRadius, 2);
-                    if (pred.To2D().Distance(args.End.To2D(), args.Start.To2D(), true, true) <= powCalc)
+                    if (pred.To2D().Distance(args.End.To2D(), args.Start.To2D(), true, true) <= powCalc || target.ServerPosition.To2D().Distance(args.End.To2D(), args.Start.To2D(), true, true) <= powCalc)
                     {
                         return true;
                     } 
@@ -324,6 +324,7 @@ namespace SebbyLib
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
             /////////////////  HP prediction
+            
             if (args.Target != null)
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team && sender.IsMelee)
@@ -333,7 +334,7 @@ namespace SebbyLib
             }
             else
             {
-                foreach (var champion in ChampionList.Where(champion => champion.IsValid<Obj_AI_Hero>() && !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
+                foreach (var champion in ChampionList.Where(champion => !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                 {
                     if (CanHitSkillShot(champion,args))
                     {
