@@ -237,8 +237,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                         CatchW(t);
-                    else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harrasW", true).GetValue<bool>()
-                        && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
+                    else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() 
+                        && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                     {
                         CatchW(t);
                     }
