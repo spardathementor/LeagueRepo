@@ -232,7 +232,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (W.Instance.ToggleState == 1)
             {
-                var t = TargetSelector.GetTarget(W.Range - 100, TargetSelector.DamageType.Magical);
+                var t = TargetSelector.GetTarget(W.Range - 150, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget())
                 {
                     if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
