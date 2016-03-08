@@ -43,7 +43,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Waoe", "Cast if 2 targets", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("Rdmg", "R dmg % hp", true).SetValue(new Slider(20, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if enemies in range", true).SetValue(new Slider(3, 0, 5)));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
@@ -83,7 +82,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoR", true).GetValue<bool>())
             {
-                if (Program.LagFree(4) && RMissile != null && RMissile.IsValid)
+                if (Program.LagFree(4) && Program.Combo && RMissile != null && RMissile.IsValid)
                 {
                     if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                         R.Cast();
@@ -114,11 +113,11 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (dmg > 0 || enemys > 0)
                 {
-                    if (dmg > Player.Level * 40)
+                    if (dmg > Player.Level * 50)
                     {
                         R.Cast();
                     }
-                    else if (Player.Health - dmg < enemys * Player.Level * 25)
+                    else if (Player.Health - dmg < enemys * Player.Level * 20)
                     {
                         R.Cast();
 
