@@ -126,7 +126,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
 
                 if(R.IsReady() && t.IsValidTarget())
-                    Utility.DelayAction.Add(50, () => Rtime = Game.Time);
+                     Rtime = Game.Time;
                 
             }
         }
