@@ -69,7 +69,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (missile.SData.Name != null)
             {
-                if (missile.SData.Name == MissileName || missile.SData.Name == MissileReturnName)
+                if (missile.SData.Name.ToLower() == MissileName.ToLower() || missile.SData.Name.ToLower() == MissileReturnName.ToLower())
                 {
                     Missile = missile;
                 }
@@ -85,7 +85,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (missile.SData.Name != null)
             {
-                if (missile.SData.Name == MissileReturnName)
+                if (missile.SData.Name.ToLower() == MissileReturnName.ToLower())
                 {
                     Missile = null;
                 }

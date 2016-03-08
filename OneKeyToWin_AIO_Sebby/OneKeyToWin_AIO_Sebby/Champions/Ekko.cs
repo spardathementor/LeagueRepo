@@ -38,14 +38,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("Qhelp", "Show Q,W helper", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
-                Config.SubMenu(Player.ChampionName).SubMenu("Haras Q").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Farm W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
-
+            
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Waoe", "Cast if 2 targets", true).SetValue(false));
 
@@ -53,36 +46,20 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("Rdmg", "R dmg % hp", true).SetValue(new Slider(20, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("rCount", "Auto R if enemies in range", true).SetValue(new Slider(3, 0, 5)));
 
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));                            
+
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Farm W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", " LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
+
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
 
-        }
-
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
-        {
-            if ( !sender.IsEnemy || R.IsReady() || !Config.Item("autoR", true).GetValue<bool>())
-                return;
-
-            double dmg = 0;
-
-            if (args.Target != null && args.Target.IsMe)
-            {
-                dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
-            }
-            else
-            {
-                var castArea = Player.Distance(args.End) * (args.End - Player.ServerPosition).Normalized() + Player.ServerPosition;
-                if (castArea.Distance(Player.ServerPosition) < Player.BoundingRadius / 2)
-                {
-                    dmg = dmg + sender.GetSpellDamage(Player, args.SData.Name);
-                }
-            }
-
-            if (Player.Health - dmg < (Player.CountEnemiesInRange(600) * Player.Level * 20) + (Player.Level * 20))
-            {
-                R.Cast();
-            }
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -114,41 +91,44 @@ namespace OneKeyToWin_AIO_Sebby
 
                     foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Range && RMissile.Position.Distance(t.ServerPosition) < R.Range))
                     {
-                        var comboDmg = R.GetDamage(t) + GetWdmg(t) + Q.GetDamage(t) * 2 + E.GetDamage(t);
+                        var comboDMG = OktwCommon.GetKsDamage(t, R);
 
-                        if (t.Health < comboDmg)
+                        if (Q.IsReady())
+                            comboDMG += Q.GetDamage(t);
+
+                        if (E.IsReady())
+                            comboDMG += E.GetDamage(t);
+
+                        if (W.IsReady())
+                            comboDMG += W.GetDamage(t);
+
+                        if (t.Health < comboDMG && OktwCommon.ValidUlt(t))
                             R.Cast();
+
                         Program.debug("ks");
 
                     }
-
-                }
-                if (Player.Health < Player.CountEnemiesInRange(600) * Player.Level * 15)
-                {
-                    R.Cast();
                 }
 
-                if (Player.HealthPercent < 60)
+                double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+                var enemys = Player.CountEnemiesInRange(800);
+
+                if (dmg > 0 || enemys > 0)
                 {
-                    double dmg = OktwCommon.GetIncomingDamage(Player, 1);
-                    var enemys = Player.CountEnemiesInRange(700);
-                    if (dmg > 0 || enemys > 0)
+                    if (dmg > Player.Level * 40)
                     {
-                        if (dmg > Player.Level * 40)
-                        {
-                            R.Cast();
-                        }
-                        else if (Player.Health - dmg < enemys * Player.Level * 25)
-                        {
-                            R.Cast();
-
-                        }
-                        else if (Player.Health - dmg < Player.Level * 10)
-                        {
-                            R.Cast();
-                        }
+                        R.Cast();
                     }
-                }
+                    else if (Player.Health - dmg < enemys * Player.Level * 25)
+                    {
+                        R.Cast();
+
+                    }
+                    else if (Player.Health - dmg < Player.Level * 10)
+                    {
+                        R.Cast();
+                    }
+                } 
             }
         }
 
@@ -164,24 +144,24 @@ namespace OneKeyToWin_AIO_Sebby
 
             var t = TargetSelector.GetTarget(800, TargetSelector.DamageType.Magical);
 
-            if (E.IsReady() && ObjectManager.Player.Mana > RMANA + EMANA
-                 && ObjectManager.Player.CountEnemiesInRange(260) > 0
-                 && ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(500) < 3
-                 && t.Position.Distance(Game.CursorPos) > t.Position.Distance(ObjectManager.Player.Position))
+            if (E.IsReady() && Player.Mana > RMANA + EMANA
+                 && Player.CountEnemiesInRange(260) > 0
+                 && Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(500) < 3
+                 && t.Position.Distance(Game.CursorPos) > t.Position.Distance(Player.Position))
             {
-                E.Cast(ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range), true);
+                E.Cast(Player.Position.Extend(Game.CursorPos, E.Range), true);
             }
-            else if (Program.Combo && ObjectManager.Player.Health > ObjectManager.Player.MaxHealth * 0.4
-                && ObjectManager.Player.Mana > RMANA + EMANA
-                && !ObjectManager.Player.UnderTurret(true)
-                && ObjectManager.Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(700) < 3)
+            else if (Program.Combo && Player.Health > Player.MaxHealth * 0.4
+                && Player.Mana > RMANA + EMANA
+                && !Player.UnderTurret(true)
+                && Player.Position.Extend(Game.CursorPos, E.Range).CountEnemiesInRange(700) < 3)
             {
                 if (t.IsValidTarget() && Player.Mana > QMANA + EMANA + WMANA && t.Position.Distance(Game.CursorPos) + 300 < t.Position.Distance(Player.Position))
                 {
                     E.Cast(Player.Position.Extend(Game.CursorPos, E.Range), true);
                 }
             }
-            else if (t.IsValidTarget() && Program.Combo  && GetEdmg(t) + GetWdmg(t) > t.Health)
+            else if (t.IsValidTarget() && Program.Combo  && E.GetDamage(t) + W.GetDamage(t) > t.Health)
             {
                 E.Cast(Player.Position.Extend(t.Position, E.Range), true);
             }
@@ -230,47 +210,43 @@ namespace OneKeyToWin_AIO_Sebby
         private void LogicQ()
         {
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            var t1 = TargetSelector.GetTarget(Q1.Range, TargetSelector.DamageType.Physical);
+            var t1 = TargetSelector.GetTarget(Q1.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 missileManager.Target = t;
-                var qDmg = GetQdmg(t);
-                if (qDmg > t.Health)
-                    Q.Cast(t, true);
-                else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA)
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
+                else if (Program.Farm && Config.Item("haras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
                         Program.CastSpell(Q, t);
+                else if (OktwCommon.GetKsDamage(t, Q) * 2 > t.Health)
+                    Program.CastSpell(Q, t);
                 if (Player.Mana > RMANA + QMANA + WMANA )
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
-                        Q.Cast(enemy, true);
+                        Q.Cast(enemy,true,true);
                 }
 
             }
             else if (t1.IsValidTarget())
             {
                 missileManager.Target = t;
-                Program.debug("" + Q.GetDamage(t1));
-                var qDmg = GetQdmg(t1);
-                if (qDmg > t1.Health)
-                    Q1.Cast(t1, true);
-                else if (Program.Combo && ObjectManager.Player.Mana > RMANA + QMANA)
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q1, t1);
-                else if (Program.Farm && Config.Item("haras" + t1.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
+                else if (Program.Farm && Config.Item("haras" + t1.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
                     Program.CastSpell(Q1, t1);
+                else if (OktwCommon.GetKsDamage(t, Q1) * 2 > t.Health)
+                    Program.CastSpell(Q1, t);
                 if (Player.Mana > RMANA + QMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q1.Range) && !OktwCommon.CanMove(enemy)))
-                        Q1.Cast(enemy, true);
+                        Q1.Cast(enemy, true, true);
                 }
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)
             {
-
                 var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q1.Range, MinionTypes.All);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, 100);
-                if (Qfarm.MinionsHit > 5 && Q1.IsReady())
+                if (Qfarm.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     Q.Cast(Qfarm.Position);
             }
             
@@ -296,10 +272,10 @@ namespace OneKeyToWin_AIO_Sebby
                 if (Program.Combo  && W.GetPrediction(t).CastPosition.Distance(t.Position) > 200)
                     Program.CastSpell(W, t);
             }
-            if ((Program.Combo || Program.Farm))
+            if (!Program.None)
             {
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
-                    W.Cast(enemy, true);
+                    W.Cast(enemy, true, true);
             }
         }
         private void SetMana()
@@ -321,36 +297,6 @@ namespace OneKeyToWin_AIO_Sebby
                 RMANA = QMANA - Player.PARRegenRate * Q.Instance.Cooldown;
             else
                 RMANA = R.Instance.ManaCost;
-        }
-
-        private double GetQdmg( Obj_AI_Base t)
-        {
-            double dmg = 90 + (30 * Q.Level) + Player.FlatMagicDamageMod * 0.8;
-            return Player.CalcDamage(t, Damage.DamageType.Magical, dmg);
-        }
-        private double GetEdmg(Obj_AI_Base t)
-        {
-            double dmg = 20 + (30 * E.Level) + (Player.FlatMagicDamageMod * 0.2);
-            return Player.CalcDamage(t, Damage.DamageType.Magical, dmg);
-        }
-        private double GetWdmg(Obj_AI_Base t)
-        {
-            if (t.Health < t.MaxHealth * 0.3)
-            {
-                double hp = t.MaxHealth - t.Health;
-                double dmg = ((Player.FlatMagicDamageMod / 45) + 5) * 0.01;
-                double dmg2 = hp * dmg;
-                return Player.CalcDamage(t, Damage.DamageType.Magical, dmg2);
-
-            }
-            else
-                return 0;
-
-        }
-        private double GetRdmg(Obj_AI_Base t)
-        {
-            double dmg = 50 + (150 * R.Level) + Player.FlatMagicDamageMod * 1.3;
-            return Player.CalcDamage(t, Damage.DamageType.Magical, dmg);
         }
 
         public static void drawLine(Vector3 pos1, Vector3 pos2, int bold, System.Drawing.Color color)
