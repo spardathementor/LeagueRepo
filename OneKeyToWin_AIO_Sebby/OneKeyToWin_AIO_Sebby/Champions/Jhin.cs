@@ -193,7 +193,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else
                 R.Range = 3500;
 
-            var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
+            var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
                 rPosLast = R.GetPrediction(t).CastPosition;
