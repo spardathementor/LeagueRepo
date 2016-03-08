@@ -15,7 +15,7 @@ namespace OneKeyToWin_AIO_Sebby
 
 
         //private int [] SmiteDamage = { 390, 410, 430, 450, 480, 510, 540, 570, 600, 640, 680, 720, 760, 800, 850, 900, 950, 1000};
-        private SpellSlot heal, barrier, ignite, exhaust, flash, smite , teleport;
+        private SpellSlot heal, barrier, ignite, exhaust, flash, smite , teleport, cleanse;
 
         public static Items.Item
 
@@ -58,8 +58,9 @@ namespace OneKeyToWin_AIO_Sebby
             ignite = Player.GetSpellSlot("summonerdot");
             exhaust = Player.GetSpellSlot("summonerexhaust");
             flash = Player.GetSpellSlot("summonerflash");
-
+            cleanse = Player.GetSpellSlot("SummonerBoost");
             smite = Player.GetSpellSlot("summonersmite");
+
             if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("itemsmiteaoe"); }
             if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("s5_summonersmiteplayerganker"); }
             if (smite == SpellSlot.Unknown) { smite = Player.GetSpellSlot("s5_summonersmitequick"); }
@@ -102,6 +103,10 @@ namespace OneKeyToWin_AIO_Sebby
             if (ignite != SpellSlot.Unknown)
             {
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").AddItem(new MenuItem("Ignite", "Ignite").SetValue(true));
+            }
+            if (cleanse != SpellSlot.Unknown)
+            {
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").AddItem(new MenuItem("Cleanse", "Cleanse").SetValue(true));
             }
 
             Config.SubMenu("Activator OKTW©").AddItem(new MenuItem("pots", "Potion, ManaPotion, Flask, Biscuit").SetValue(true));
@@ -501,7 +506,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Cleansers()
         {
-            if (!Quicksilver.IsReady() && !Mikaels.IsReady() && !Mercurial.IsReady() && !Dervish.IsReady())
+            if (!Quicksilver.IsReady() && !Mikaels.IsReady() && !Mercurial.IsReady() && !Dervish.IsReady() && !cleanse.IsReady())
                 return;
 
             if (Player.HealthPercent >= (float)Config.Item("cleanHP").GetValue<Slider>().Value || !Config.Item("Clean").GetValue<bool>())
@@ -563,6 +568,8 @@ namespace OneKeyToWin_AIO_Sebby
                 Utility.DelayAction.Add(Config.Item("CSSdelay").GetValue<Slider>().Value, () => Mercurial.Cast());
             else if (Dervish.IsReady())
                 Utility.DelayAction.Add(Config.Item("CSSdelay").GetValue<Slider>().Value, () => Dervish.Cast());
+            else if(cleanse.IsReady() && Config.Item("Cleanse").GetValue<bool>())
+                Utility.DelayAction.Add(Config.Item("CSSdelay").GetValue<Slider>().Value, () => Player.Spellbook.CastSpell(cleanse, Player));
         }
 
         private void Defensive()
