@@ -59,7 +59,6 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             Drawing.OnDraw += Drawing_OnDraw;
-
         }
 
         private void Game_OnGameUpdate(EventArgs args)
@@ -76,7 +75,7 @@ namespace OneKeyToWin_AIO_Sebby
                 LogicW();
             if (Program.LagFree(3) && E.IsReady() )
                 LogicE();
-            if (Program.LagFree(4) && R.IsReady() )
+            if ( R.IsReady() )
                 LogicR();
         }
 
@@ -84,7 +83,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoR", true).GetValue<bool>())
             {
-                if (RMissile != null && RMissile.IsValid)
+                if (Program.LagFree(4) && RMissile != null && RMissile.IsValid)
                 {
                     if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                         R.Cast();
