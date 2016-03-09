@@ -278,7 +278,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("print").GetValue<bool>())
             {
                 Game.PrintChat("<font size='30'>OneKeyToWin</font> <font color='#b756c5'>by Sebby</font>");
-                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font> Sivir W rework, Ashe W improve");
+                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font> Vayne Q fix, Jinx faster E, Thresh new options");
             }
         }
 
