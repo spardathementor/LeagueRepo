@@ -147,15 +147,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 Q.Cast(gapcloser.Sender);
             }
-
-
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
             if (Config.Item("autoW4", true).GetValue<bool>())
             {
-                var saveAlly = HeroManager.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
+                var saveAlly = Program.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
                 if (saveAlly != null)
                 {
                     var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
