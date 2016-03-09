@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
@@ -44,6 +44,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW3", "Auto W shield big dmg", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW2", "Auto W if Q succesfull", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW4", "Auto W vs Blitz Hook", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW5", "Auto W if jungler pings", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW6", "Auto W on gapCloser", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("autoW7", "Auto W on Slows/Stuns", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W option").AddItem(new MenuItem("wCount", "Auto W if x enemies near ally", true).SetValue(new Slider(3, 0, 5)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
@@ -70,7 +74,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnBuffAdd += Obj_AI_Base_OnBuffAdd;
             Obj_AI_Base.OnBuffRemove += Obj_AI_Base_OnBuffRemove;
+            
+            Game.OnPing += Game_OnPing;
         }
+
+        void Game_OnPing(GamePingEventArgs args)
+        {
+            //if jungler pings OnMyWay
+            //give him lantern for easy gank
+            if(!Config.Item("autoW5",true).GetValue<bool>())return;
+            var jungler = args.Source as Obj_AI_Hero;
+            if (jungler != null && jungler.Distance(Player.Position)<=W.Range+500)
+            {
+                if (jungler.Spellbook.GetSpell(SpellSlot.Summoner1).Name.ToLower().Contains("smite") ||
+                    jungler.Spellbook.GetSpell(SpellSlot.Summoner2).Name.ToLower().Contains("smite"))
+                {
+                    if (args.PingType == PingCategory.OnMyWay)
+                    {
+                        int random = new Random().Next(350, 750); // so it wont happen too fast
+                        Utility.DelayAction.Add(random,() => CastW(args.Position.To3D()));
+                    }
+
+                }
+            }
+        }
+
 
         private void Obj_AI_Base_OnBuffRemove(Obj_AI_Base sender, Obj_AI_BaseBuffRemoveEventArgs args)
         {
@@ -98,6 +126,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
+            if(gapcloser.Sender.IsAlly)return;
+
+            if (Config.Item("autoW6",true).GetValue<bool>())
+            {
+                var allyHero =
+                    HeroManager.Allies.Where(ally => ally.Distance(Player) <= W.Range + 550 && !ally.IsMe)
+                        .OrderBy(ally => ally.Distance(gapcloser.End))
+                        .FirstOrDefault();
+                if (allyHero != null)
+                {
+                    CastW(allyHero.Position);
+                }
+            }
             if (E.IsReady() && Config.Item("Gap", true).GetValue<bool>() && gapcloser.Sender.IsValidTarget(E.Range))
             {
                 E.Cast(gapcloser.Sender);
@@ -106,10 +147,44 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 Q.Cast(gapcloser.Sender);
             }
+
+
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Config.Item("autoW4", true).GetValue<bool>())
+            {
+                var saveAlly = HeroManager.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
+                if (saveAlly != null)
+                {
+                    var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
+                    if (Player.Distance(blitz.Position) <= W.Range + 550 && W.IsReady())
+                    {
+
+                        CastW(blitz.Position);
+                    }
+                }
+            }
+
+            if (Config.Item("autoW7", true).GetValue<bool>())
+            {
+                foreach (var ally in HeroManager.Allies)
+                {
+                    if(ally.IsMe)continue;
+                    if (ally.Distance(Player) <= W.Range)
+                    {
+                        if (ally.IsStunned || ally.IsRooted)
+                        {
+                            Utility.DelayAction.Add(100,() => W.Cast(ally.Position));
+                            
+                        }
+                    }
+                }
+            }
+
+
+
             if (Program.Combo && Config.Item("AACombo", true).GetValue<bool>())
             {
                 if (!E.IsReady())
