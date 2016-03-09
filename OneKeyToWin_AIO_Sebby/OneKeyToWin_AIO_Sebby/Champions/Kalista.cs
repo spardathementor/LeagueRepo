@@ -135,12 +135,10 @@ namespace OneKeyToWin_AIO_Sebby
                 LogicQ();
             if (Program.LagFree(2) && Program.LaneClear && Q.IsReady() && !Player.IsWindingUp && !Player.IsDashing() && Config.Item("farmQ", true).GetValue<bool>())
                 FarmQ();
-
-            if (Program.LagFree(3) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
-                LogicR();
-
             if (Program.LagFree(4) && W.IsReady() && Program.None && !Player.IsWindingUp && !Player.IsDashing())
                 LogicW();
+            if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                LogicR();
         }
 
         private void SurvivalLogic()
