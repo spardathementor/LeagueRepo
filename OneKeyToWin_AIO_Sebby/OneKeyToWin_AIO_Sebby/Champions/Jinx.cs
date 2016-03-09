@@ -80,6 +80,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (!Q.IsReady() || !Config.Item("autoQ", true).GetValue<bool>() || !(args.Target is Obj_AI_Hero))
                 return;
+
             var t = (Obj_AI_Hero)args.Target;
 
             if (FishBoneActive && t.IsValidTarget())
@@ -219,15 +220,18 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Game.Time - QCastTime > 0.6)
                 {
-                    var comboDmg = OktwCommon.GetKsDamage(t, W);
-                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range)))
                     {
-                        comboDmg += R.GetDamage(t, 1);
-                    }
-                    if (comboDmg > t.Health)
-                    {
-                        Program.CastSpell(W, t);
-                        return;
+                        var comboDmg = OktwCommon.GetKsDamage(t, W);
+                        if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
+                        {
+                            comboDmg += R.GetDamage(t, 1);
+                        }
+                        if (comboDmg > t.Health)
+                        {
+                            Program.CastSpell(W, enemy);
+                            return;
+                        }
                     }
                 }
                 if (Program.Combo && Player.Mana > RMANA + WMANA + 10 && GetRealDistance(t) > bonusRange() - 50)
@@ -239,7 +243,7 @@ namespace OneKeyToWin_AIO_Sebby
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && Config.Item("haras" + enemy.ChampionName).GetValue<bool>()))
                         Program.CastSpell(W, enemy);
                 }
-                else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA && Player.CountEnemiesInRange(GetRealPowPowRange(t)) == 0)
+                if (!Program.None && Player.Mana > RMANA + WMANA && Player.CountEnemiesInRange(GetRealPowPowRange(t)) == 0)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy, true);
