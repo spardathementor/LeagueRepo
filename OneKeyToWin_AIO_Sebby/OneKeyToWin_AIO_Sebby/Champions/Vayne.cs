@@ -289,7 +289,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             foreach (var buff in target.Buffs)
             {
-                if (buff.Name == "vaynesilvereddebuff")
+                if (buff.Name.ToLower() == "vaynesilvereddebuff")
                     return buff.Count;
             }
             return -1;
