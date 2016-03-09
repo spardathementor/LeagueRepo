@@ -13,7 +13,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Spell E, Epush, Q, R, W;
         private static Obj_AI_Base Marked;
-        
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         public void LoadOKTW()
@@ -151,37 +150,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Config.Item("autoW4", true).GetValue<bool>())
-            {
-                var saveAlly = Program.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
-                if (saveAlly != null)
-                {
-                    var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
-                    if (Player.Distance(blitz.Position) <= W.Range + 550 && W.IsReady())
-                    {
-
-                        CastW(blitz.Position);
-                    }
-                }
-            }
-
-            if (Config.Item("autoW7", true).GetValue<bool>())
-            {
-                foreach (var ally in HeroManager.Allies)
-                {
-                    if(ally.IsMe)continue;
-                    if (ally.Distance(Player) <= W.Range)
-                    {
-                        if (ally.IsStunned || ally.IsRooted)
-                        {
-                            Utility.DelayAction.Add(100,() => W.Cast(ally.Position));
-                            
-                        }
-                    }
-                }
-            }
-
-
 
             if (Program.Combo && Config.Item("AACombo", true).GetValue<bool>())
             {
@@ -321,8 +289,33 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
+            if (Config.Item("autoW4", true).GetValue<bool>())
+            {
+                var saveAlly = Program.Allies.FirstOrDefault(ally => ally.HasBuff("rocketgrab2") && !ally.IsMe);
+                if (saveAlly != null)
+                {
+                    var blitz = saveAlly.GetBuff("rocketgrab2").Caster;
+                    if (Player.Distance(blitz.Position) <= W.Range + 550 && W.IsReady())
+                    {
+
+                        CastW(blitz.Position);
+                    }
+                }
+            }
+
             foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally) < W.Range + 400))
             {
+                if (Config.Item("autoW7", true).GetValue<bool>() && !ally.IsMe)
+                {
+                    if (ally.Distance(Player) <= W.Range)
+                    {
+                        if (ally.IsStunned || ally.IsRooted)
+                        {
+                            W.Cast(ally.Position);
+                        }
+                    }
+                }
+
                 int nearEnemys = ally.CountEnemiesInRange(900);
 
                 if (nearEnemys >= Config.Item("wCount", true).GetValue<Slider>().Value && Config.Item("wCount", true).GetValue<Slider>().Value > 0)
