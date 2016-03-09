@@ -568,7 +568,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Utility.DelayAction.Add(Config.Item("CSSdelay").GetValue<Slider>().Value, () => Mercurial.Cast());
             else if (Dervish.IsReady())
                 Utility.DelayAction.Add(Config.Item("CSSdelay").GetValue<Slider>().Value, () => Dervish.Cast());
-            else if(cleanse.IsReady() && Config.Item("Cleanse").GetValue<bool>())
+            else if(cleanse != SpellSlot.Unknown && cleanse.IsReady() && Config.Item("Cleanse").GetValue<bool>())
                 Utility.DelayAction.Add(Config.Item("CSSdelay").GetValue<Slider>().Value, () => Player.Spellbook.CastSpell(cleanse, Player));
         }
 
