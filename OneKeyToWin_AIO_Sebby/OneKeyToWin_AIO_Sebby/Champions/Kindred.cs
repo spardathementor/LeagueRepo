@@ -174,19 +174,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var rEnemy = Config.Item("Renemy", true).GetValue<Slider>().Value;
             
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < R.Range && Config.Item("Ruse" + ally.ChampionName, true).GetValue<bool>() ))
+            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.Distance(ally.ServerPosition) < R.Range && Config.Item("Ruse" + ally.ChampionName, true).GetValue<bool>() ))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-                var enemys = ally.CountEnemiesInRange(800);
+                var enemys = ally.CountEnemiesInRange(900);
 
-                if (dmg == 0 && enemys == 0 && ally.Health > ally.Level * 10)
+                if (dmg == 0 && enemys == 0)
                     continue;
 
                 if (ally.CountEnemiesInRange(500) < rEnemy)
                 {
-                    if (ally.Health - dmg < enemys * ally.Level * 10)
+                    if (ally.Health - dmg < enemys * ally.Level * 15)
                         R.CastOnUnit(ally);
-                    else if (ally.Health - dmg < ally.Level * 10)
+                    else if (ally.Health - dmg < ally.Level * 15)
                         R.CastOnUnit(ally);
                 }
             }
