@@ -42,7 +42,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var spell = enemy.Spellbook.Spells[i];
                     if (spell.SData.TargettingType != SpellDataTargetType.Self && spell.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
                     {
-                        Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(true));
+                        Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(true));
                     }
                 }
             }
@@ -102,6 +102,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (R.IsReady() && Config.Item("Rmode" + t.ChampionName, true).GetValue<StringList>().SelectedIndex == 3)
                  R.Cast(t);
         }
+
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
@@ -177,7 +178,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Config.Item("rCc", true).GetValue<bool>() && !OktwCommon.CanMove(t))
 
-                    Utility.DelayAction.Add(800 - (int)(Player.Distance(t.Position) / 2) , () => R.Cast(t, true, true));
+                    Utility.DelayAction.Add(800 - (int)(Player.Distance(t.Position) / 2) , () => CastRtime(t));
 
                 if (Config.Item("rCombo", true).GetValue<bool>() && Program.Combo)
                 {
@@ -185,6 +186,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 }
             }
+        }
+
+        private void CastRtime(Obj_AI_Hero t)
+        {
+            if (OktwCommon.ValidUlt(t))
+                R.Cast(t, true, true);
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -206,9 +213,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (OktwCommon.CanHitSkillShot(ally, args) || OktwCommon.GetIncomingDamage(ally,1) > ally.Health * Config.Item("Edmg", true).GetValue<Slider>().Value * 0.01)
                     {
-                        W.Cast(ally);
-                        if(E.IsReady())
+                        if (E.IsReady())
                             E.Cast(sender.Position);
+                        W.Cast(ally);
                     }
                 }
             }
