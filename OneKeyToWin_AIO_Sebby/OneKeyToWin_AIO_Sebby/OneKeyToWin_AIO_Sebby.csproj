@@ -70,6 +70,7 @@
     <Compile Include="Champions\Ahri.cs" />
     <Compile Include="Champions\Blitzcrank.cs" />
     <Compile Include="Champions\Brand.cs" />
+    <Compile Include="Champions\Braum.cs" />
     <Compile Include="Champions\Corki.cs" />
     <Compile Include="Champions\Darius.cs" />
     <Compile Include="Champions\Draven.cs" />

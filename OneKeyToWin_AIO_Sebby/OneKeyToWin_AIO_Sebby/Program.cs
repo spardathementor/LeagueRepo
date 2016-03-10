@@ -229,6 +229,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Kindred":
                         new Champions.Kindred().LoadOKTW();
                         break;
+                    case "Braum":
+                        new Champions.Braum().LoadOKTW();
+                        break;
                 }
             }
 
