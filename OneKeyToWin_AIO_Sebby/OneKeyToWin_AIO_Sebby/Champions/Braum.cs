@@ -213,9 +213,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (OktwCommon.CanHitSkillShot(ally, args) || OktwCommon.GetIncomingDamage(ally,1) > ally.Health * Config.Item("Edmg", true).GetValue<Slider>().Value * 0.01)
                     {
-                        if (E.IsReady())
-                            E.Cast(sender.Position);
                         W.Cast(ally);
+                        if (E.IsReady())
+                            Utility.DelayAction.Add(200, () => E.Cast(sender.Position));
+                        
                     }
                 }
             }
