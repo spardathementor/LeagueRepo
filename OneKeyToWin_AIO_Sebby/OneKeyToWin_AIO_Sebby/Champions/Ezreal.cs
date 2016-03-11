@@ -63,7 +63,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rcc", "R cc", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "Max R range", true).SetValue(new Slider(3, 5, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "R AOE", true).SetValue(new Slider(3, 5, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rjungle", "R Jungle stealer", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rdragon", "Dragon", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R Jungle stealer").AddItem(new MenuItem("Rbaron", "Baron", true).SetValue(true));
@@ -74,6 +74,8 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rturrent", "Don't R under turret", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MaxRangeR", "Max R range", true).SetValue(new Slider(3000, 5000, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("MinRangeR", "Min R range", true).SetValue(new Slider(900, 5000, 0)));
+
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("HarassMana", "Harass Mana", true).SetValue(new Slider(30, 100, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("FQ", "Farm Q out range", true).SetValue(true));
@@ -121,7 +123,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (E.IsReady())
             {
-                if (Program.LagFree(1) && Config.Item("autoE", true).GetValue<bool>() && Program.Combo)
+                if (Program.LagFree(0) && Config.Item("autoE", true).GetValue<bool>() && Program.Combo)
                     LogicE();
 
                 if (Config.Item("smartE", true).GetValue<KeyBind>().Active)
@@ -143,7 +145,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Esmart = false;
             }
 
-            if (Program.LagFree(2) && Q.IsReady())
+            if (Q.IsReady())
                 LogicQ();
 
             if (Program.LagFree(3) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
@@ -165,52 +167,42 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-            if (Player.CountEnemiesInRange(900) > 0)
-                t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
-
-            if (t.IsValidTarget())
+            if (Program.LagFree(1))
             {
-                
-                if (Program.Combo && Player.Mana > RMANA + QMANA)
-                    Program.CastSpell(Q, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
-                {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("haras" + enemy.ChampionName).GetValue<bool>()))
-                    {
-                        Program.CastSpell(Q, enemy);
-                    }
-                }
-                else
+                bool cc = !Program.None && Player.Mana > RMANA + QMANA + EMANA;
+                bool harass = Program.Farm && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
+                bool combo = Program.Combo && Player.Mana > RMANA + QMANA;
+                foreach (var t in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(t => t.Health))
                 {
                     var qDmg = OktwCommon.GetKsDamage(t, Q);
                     var wDmg = W.GetDamage(t);
-                    if (qDmg > t.Health)
+                    if (qDmg + wDmg > t.Health)
                     {
                         Program.CastSpell(Q, t);
                         OverKill = Game.Time;
+                        return;
                     }
-                    else if (t.IsValidTarget(W.Range) && qDmg + wDmg > t.Health)
-                    {
-                        Program.CastSpell(Q, t);
-                        OverKill = Game.Time;
-                    }
-                }
 
-                if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
-                {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
-                        Q.Cast(enemy, true);
+                    if (cc && !OktwCommon.CanMove(t))
+                        Q.Cast(t);
+
+                    if (combo)
+                        Program.CastSpell(Q, t);
+                    else if (harass && Config.Item("haras" + t.ChampionName).GetValue<bool>())
+                        Program.CastSpell(Q, t);
                 }
             }
-            if (Farm && Player.Mana > RMANA + EMANA + WMANA + QMANA * 3)
+            else if (Program.LagFree(2))
             {
-                farmQ();
-                lag = Game.Time;
-            }
-            else if (Config.Item("stack", true).GetValue<bool>()&& Utils.TickCount - Q.LastCastAttemptT > 4000 && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Program.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
-            {
-                Q.Cast(Player.Position.Extend(Game.CursorPos, 500));
+                if (Farm && Player.Mana > RMANA + EMANA + WMANA + QMANA * 3)
+                {
+                    farmQ();
+                    lag = Game.Time;
+                }
+                else if (Config.Item("stack", true).GetValue<bool>() && Utils.TickCount - Q.LastCastAttemptT > 4000 && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Program.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
+                {
+                    Q.Cast(Player.Position.Extend(Game.CursorPos, 500));
+                }
             }
         }
 
@@ -221,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA + EMANA)
                     Program.CastSpell(W, t);
-                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && (Player.Mana > Player.MaxMana * 0.8 || Config.Item("apEz", true).GetValue<bool>()) && Player.Mana > RMANA + WMANA + EMANA + QMANA && OktwCommon.CanHarras())
+                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && (Player.Mana > Player.MaxMana * 0.8 || Config.Item("apEz", true).GetValue<bool>()) && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                     Program.CastSpell(W, t);
                 else
                 {
