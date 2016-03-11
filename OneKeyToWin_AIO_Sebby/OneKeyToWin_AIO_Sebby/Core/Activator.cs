@@ -452,15 +452,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (CanUse(ignite) && Config.Item("Ignite").GetValue<bool>())
             {
                 var enemy = TargetSelector.GetTarget(600, TargetSelector.DamageType.True);
-                if (enemy.IsValidTarget())
+                if (enemy.IsValidTarget() && OktwCommon.ValidUlt(enemy))
                 {
                     var pred = enemy.Health - OktwCommon.GetIncomingDamage(enemy);
-                    if (pred < 0)
-                        return;
 
                     var IgnDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) ;
 
-                    if (pred <= IgnDmg && Player.ServerPosition.Distance(enemy.ServerPosition) > 500 && enemy.CountAlliesInRange(500) < 2)
+                    if (pred <= IgnDmg && Player.ServerPosition.Distance(enemy.ServerPosition) > 500 && enemy.CountAlliesInRange(500) < 2 )
                         Player.Spellbook.CastSpell(ignite, enemy);
 
                     if (pred <= 2 * IgnDmg)
