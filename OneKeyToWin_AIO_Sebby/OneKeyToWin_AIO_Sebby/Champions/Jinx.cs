@@ -261,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                 {
-                    E.Cast(enemy);
+                    E.Cast(enemy.Position);
                     return;
                 }
                 if (!Program.LagFree(1))

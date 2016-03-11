@@ -402,16 +402,16 @@ namespace SebbyLib.Prediction
 
             // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
-            if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d)
+            if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d && input.Unit.IsWindingUp)
             {
                 result.CastPosition = input.Unit.Position;
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.4 + (input.Radius * 0.002))
+                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.3 + (input.Radius * 0.002))
                 {
                     OktwCommon.debug("PRED: AUTO ATTACK DETECTION 1");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.6 + (input.Radius * 0.002))
+                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.5 + (input.Radius * 0.002))
                 {
                     OktwCommon.debug("PRED: AUTO ATTACK DETECTION 2");
                     result.Hitchance = HitChance.VeryHigh;
@@ -487,7 +487,8 @@ namespace SebbyLib.Prediction
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                if (ObjectManager.Player.IsMoving)  
+
+                if (ObjectManager.Player.IsMoving && ObjectManager.Player.Distance(input.Unit.GetWaypoints().Last().To3D()) - ObjectManager.Player.Distance(input.Unit.Position) > 400)  
                 {
                     if (ObjectManager.Player.IsFacing(input.Unit))
                     {
