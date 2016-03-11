@@ -394,7 +394,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
-                    Q.Cast(mob, true);
+                    Q.Cast(mob.Position);
                 }
             }
 
