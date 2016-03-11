@@ -129,7 +129,7 @@ namespace SebbyLib
         {
             if (args.Target == null)
             {
-                Console.WriteLine(target.Name);
+
                 var pred = Prediction.Prediction.GetPrediction(target, 0.25f).CastPosition;
                 if (pred == null)
                     return false;

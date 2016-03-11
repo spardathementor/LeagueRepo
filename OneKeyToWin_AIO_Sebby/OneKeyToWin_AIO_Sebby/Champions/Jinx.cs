@@ -220,7 +220,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Game.Time - QCastTime > 0.6)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range)))
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && enemy.Distance(Player) > bonusRange() + 50))
                     {
                         var comboDmg = OktwCommon.GetKsDamage(t, W);
                         if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
@@ -308,19 +308,18 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             if (Game.Time - WCastTime > 0.9 && Config.Item("autoR", true).GetValue<bool>())
             {
-                bool cast = false;
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
                 {
                     var predictedHealth = target.Health - OktwCommon.GetIncomingDamage(target);
                     var Rdmg = R.GetDamage(target, 1);
 
-                    if (Rdmg > predictedHealth && !OktwCommon.IsSpellHeroCollision(target, R))
+                    if (Rdmg > predictedHealth && !OktwCommon.IsSpellHeroCollision(target, R) && GetRealDistance(target) > bonusRange() + 200)
                     {
-                        if (cast && GetRealDistance(target) > bonusRange() + 300 + target.BoundingRadius && target.CountAlliesInRange(600) == 0 && Player.CountEnemiesInRange(400) == 0)
+                        if ( GetRealDistance(target) > bonusRange() + 300 + target.BoundingRadius && target.CountAlliesInRange(600) == 0 && Player.CountEnemiesInRange(400) == 0)
                         {
                             castR(target);
                         }
-                        else if (cast && target.CountEnemiesInRange(200) > 2 && GetRealDistance(target) > bonusRange() + 200 + target.BoundingRadius)
+                        else if (target.CountEnemiesInRange(200) > 2)
                         {
                             R.Cast(target, true, true);
                         }
