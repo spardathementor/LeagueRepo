@@ -40,8 +40,6 @@ namespace SebbyLib
                 }
                 else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
                 {
-                    if (!minion.Name.Contains("Minion"))
-                        Console.WriteLine("WRONG MINION!!! " + minion.Name + " hp: " + minion.Health + " max hp: " + minion.MaxHealth);
                     if (minion.Team != ObjectManager.Player.Team)
                         MinionsListEnemy.Add(minion);
                     else if (minion.Team == ObjectManager.Player.Team)
