@@ -87,6 +87,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (args.Order == GameObjectOrder.AttackUnit && Q.IsCharging)
             {
                 Program.debug("BADDDD");
+                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
                 args.Process = false;
             }
         }
