@@ -62,6 +62,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -169,7 +170,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear && Player.Mana > QMANA + RMANA )
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 500, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 500 , MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -227,13 +228,13 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (t1.IsValidTarget())
             {
-                missileManager.Target = t;
+                missileManager.Target = t1;
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q1, t1);
                 else if (Program.Farm && Config.Item("haras" + t1.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
                     Program.CastSpell(Q1, t1);
-                else if (OktwCommon.GetKsDamage(t, Q1) * 2 > t.Health)
-                    Program.CastSpell(Q1, t);
+                else if (OktwCommon.GetKsDamage(t1, Q1) * 2 > t1.Health)
+                    Program.CastSpell(Q1, t1);
                 if (Player.Mana > RMANA + QMANA + WMANA)
                 {
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q1.Range) && !OktwCommon.CanMove(enemy)))
@@ -242,7 +243,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)
             {
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q1.Range, MinionTypes.All);
+                var allMinionsQ = Cache.GetMinions(Player.ServerPosition, Q1.Range);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, 100);
                 if (Qfarm.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     Q.Cast(Qfarm.Position);
@@ -250,10 +251,8 @@ namespace OneKeyToWin_AIO_Sebby
             
         }
 
-
         private void LogicW()
         {
-            
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() )
             {
