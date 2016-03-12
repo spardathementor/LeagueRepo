@@ -40,6 +40,8 @@ namespace SebbyLib
                 }
                 else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
                 {
+                    if (!minion.Name.Contains("Minion"))
+                        Console.WriteLine("WRONG MINION!!! " + minion.Name + " hp: " + minion.Health + " max hp: " + minion.MaxHealth);
                     if (minion.Team != ObjectManager.Player.Team)
                         MinionsListEnemy.Add(minion);
                     else if (minion.Team == ObjectManager.Player.Team)
@@ -52,17 +54,17 @@ namespace SebbyLib
         {
             if (team == MinionTeam.Enemy)
             {
-                MinionsListEnemy.RemoveAll(minion => !minion.IsValid || minion.Health < 1);
+                MinionsListEnemy.RemoveAll(minion => minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead || minion.IsInvulnerable  || minion.Health < 1);
                 return MinionsListEnemy.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range );
             }
             else if (team == MinionTeam.Ally)
             {
-                MinionsListAlly.RemoveAll(minion => !minion.IsValid || minion.Health < 1);
+                MinionsListAlly.RemoveAll(minion => minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead || minion.IsInvulnerable || minion.Health < 1);
                 return MinionsListAlly.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range);
             }
             else
             {
-                MinionsListNeutral.RemoveAll(minion => !minion.IsValid || minion.Health < 1);
+                MinionsListNeutral.RemoveAll(minion => minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead || minion.IsInvulnerable || minion.Health < 1);
                 return MinionsListNeutral.Where(minion => minion.IsVisible && from.Distance(minion.Position) < range).OrderBy(minion => minion.MaxHealth).ToList();
             }
         }
