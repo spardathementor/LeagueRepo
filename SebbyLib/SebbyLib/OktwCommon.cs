@@ -117,6 +117,8 @@ namespace SebbyLib
         {
             if (args.Target == null)
             {
+                if (target == null || !target.IsValid || !target.IsTargetable || target.IsDead || !target.IsVisible)
+                    return false;
 
                 var pred = Prediction.Prediction.GetPrediction(target, 0.25f).CastPosition;
                 if (pred == null)

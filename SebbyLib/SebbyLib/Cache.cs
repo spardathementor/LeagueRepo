@@ -34,13 +34,16 @@ namespace SebbyLib
         {
             if (minion.MaxHealth >= 225)
             {
+
                 if (minion.Team == GameObjectTeam.Neutral)
                 {
                     MinionsListNeutral.Add(minion);
                 }
                 else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
                 {
-                    if (minion.Team != ObjectManager.Player.Team)
+                    if (minion.Team == GameObjectTeam.Unknown)
+                        return;
+                    else if (minion.Team != ObjectManager.Player.Team)
                         MinionsListEnemy.Add(minion);
                     else if (minion.Team == ObjectManager.Player.Team)
                         MinionsListAlly.Add(minion);
@@ -52,19 +55,26 @@ namespace SebbyLib
         {
             if (team == MinionTeam.Enemy)
             {
-                MinionsListEnemy.RemoveAll(minion => minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead || minion.IsInvulnerable  || minion.Health < 1);
+                MinionsListEnemy.RemoveAll(minion => IsNotValid(minion));
                 return MinionsListEnemy.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range );
             }
             else if (team == MinionTeam.Ally)
             {
-                MinionsListAlly.RemoveAll(minion => minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead || minion.IsInvulnerable || minion.Health < 1);
+                MinionsListAlly.RemoveAll(minion => IsNotValid(minion));
                 return MinionsListAlly.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range);
             }
             else
             {
-                MinionsListNeutral.RemoveAll(minion => minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead || minion.IsInvulnerable || minion.Health < 1);
+                MinionsListNeutral.RemoveAll(minion => IsNotValid(minion));
                 return MinionsListNeutral.Where(minion => minion.IsVisible && from.Distance(minion.Position) < range).OrderBy(minion => minion.MaxHealth).ToList();
             }
+        }
+        private static bool IsNotValid(Obj_AI_Base minion)
+        {
+            if (minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead )
+                return true;
+            else
+                return false;
         }
     }
 }
