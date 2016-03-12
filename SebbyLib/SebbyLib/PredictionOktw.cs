@@ -1097,7 +1097,7 @@ namespace SebbyLib.Prediction
                     switch (objectType)
                     {
                         case CollisionableObjects.Minions:
-                            foreach (var minion in MinionManager.GetMinions(input.From, Math.Min(input.Range + input.Radius + 100, 2000)))
+                            foreach (var minion in  Cache.GetMinions(input.From, Math.Min(input.Range + input.Radius + 100, 2000)))
                             {
                                 input.Unit = minion;
 

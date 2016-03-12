@@ -94,18 +94,6 @@ namespace SebbyLib
             return totalDamage;
         }
 
-        private static bool ShouldWait()
-        {
-            if (!Orbwalking.CanAttack())
-                return false;
-            else
-            {
-                return
-                    MinionManager.GetMinions(Player.AttackRange + 300).Any(minion =>
-                               minion.IsValidTarget() && minion.HealthPercent < 60 && HealthPrediction.LaneClearHealthPrediction(minion, 400, 50) <= Player.GetAutoAttackDamage(minion));
-            }
-        }
-
         public static bool IsSpellHeroCollision(Obj_AI_Hero t, Spell QWER, int extraWith = 50)
         {
             foreach (var hero in HeroManager.Enemies.FindAll(hero => hero.IsValidTarget(QWER.Range + QWER.Width, true, QWER.RangeCheckFrom) && t.NetworkId != hero.NetworkId))
@@ -209,7 +197,7 @@ namespace SebbyLib
 
         public static int CountEnemyMinions(Obj_AI_Base target, float range)
         {
-            var allMinions = MinionManager.GetMinions(target.Position, range);
+            var allMinions = Cache.GetMinions(target.Position, range);
             if (allMinions != null)
                 return allMinions.Count;
             else
