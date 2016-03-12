@@ -66,7 +66,7 @@ namespace SebbyLib
             else
             {
                 MinionsListNeutral.RemoveAll(minion => IsNotValid(minion));
-                return MinionsListNeutral.Where(minion => minion.IsVisible && from.Distance(minion.Position) < range).OrderBy(minion => minion.MaxHealth).ToList();
+                return MinionsListNeutral.Where(minion => minion.IsVisible && from.Distance(minion.Position) < range).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
         }
         private static bool IsNotValid(Obj_AI_Base minion)
