@@ -9,9 +9,9 @@ namespace SebbyLib
 {
     public class Cache
     {
-        public static List<Obj_AI_Minion> MinionsListEnemy = new List<Obj_AI_Minion>();
-        public static List<Obj_AI_Minion> MinionsListAlly= new List<Obj_AI_Minion>();
-        public static List<Obj_AI_Minion> MinionsListNeutral = new List<Obj_AI_Minion>();
+        public static List<Obj_AI_Base> MinionsListEnemy = new List<Obj_AI_Base>();
+        public static List<Obj_AI_Base> MinionsListAlly= new List<Obj_AI_Base>();
+        public static List<Obj_AI_Base> MinionsListNeutral = new List<Obj_AI_Base>();
 
         static Cache()
         {
@@ -48,7 +48,7 @@ namespace SebbyLib
             }
         }
 
-        public static List<Obj_AI_Minion> GetMinions(Vector3 from, float range, MinionTeam team = MinionTeam.Enemy)
+        public static List<Obj_AI_Base> GetMinions(Vector3 from, float range, MinionTeam team = MinionTeam.Enemy)
         {
             if (team == MinionTeam.Enemy)
             {
