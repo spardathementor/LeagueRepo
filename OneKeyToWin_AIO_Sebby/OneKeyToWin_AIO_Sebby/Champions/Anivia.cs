@@ -252,7 +252,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > QMANA + EMANA + WMANA && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
-                var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
+                var minions = Cache.GetMinions(Player.ServerPosition, E.Range);
                 foreach (var minion in minions.Where(minion => minion.Health > Player.GetAutoAttackDamage(minion)))
                 {
                     var eDmg = E.GetDamage(minion) * 2;
@@ -278,7 +278,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmR", true).GetValue<bool>())
                 {
-                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, R.Range);
+                    var allMinions = Cache.GetMinions(Player.ServerPosition, R.Range);
                     var farmPos = R.GetCircularFarmLocation(allMinions, R.Width);
                     if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                         R.Cast(farmPos.Position);
@@ -288,8 +288,8 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Program.LaneClear && Config.Item("farmR", true).GetValue<bool>())
                 {
-                    var allMinions = MinionManager.GetMinions(RMissile.Position, R.Width);
-                    var mobs = MinionManager.GetMinions(RMissile.Position, R.Width, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                    var allMinions = Cache.GetMinions(RMissile.Position, R.Width);
+                    var mobs = Cache.GetMinions(RMissile.Position, R.Width, MinionTeam.Neutral);
                     if (mobs.Count > 0)
                     {
                         if (!Config.Item("jungleR", true).GetValue<bool>())
@@ -319,7 +319,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

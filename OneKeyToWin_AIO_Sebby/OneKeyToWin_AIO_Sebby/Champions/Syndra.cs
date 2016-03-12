@@ -252,7 +252,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (Program.LaneClear && !Q.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
                 {
-                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range);
+                    var allMinions = Cache.GetMinions(Player.ServerPosition, W.Range);
                     var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
 
                     if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
@@ -268,7 +268,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (Program.LaneClear && Config.Item("farmW", true).GetValue<bool>())
                 {
-                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range);
+                    var allMinions = Cache.GetMinions(Player.ServerPosition, W.Range);
                     var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
 
                     if (farmPos.MinionsHit > 1)
@@ -300,7 +300,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (!Program.None && !Program.Combo && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                var allMinions = Cache.GetMinions(Player.ServerPosition, Q.Range);
 
                 if (Config.Item("farmQout", true).GetValue<bool>())
                 {
@@ -327,7 +327,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + QMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, Q.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

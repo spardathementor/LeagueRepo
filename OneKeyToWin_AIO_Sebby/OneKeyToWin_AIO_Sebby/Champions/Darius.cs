@@ -106,7 +106,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (!Player.IsWindingUp && Config.Item("farmW", true).GetValue<bool>() && Program.Farm)
             {
-                var minions = MinionManager.GetMinions(Player.Position, Player.AttackRange, MinionTypes.All);
+                var minions = Cache.GetMinions(Player.Position, Player.AttackRange);
 
                 int countMinions = 0;
 
@@ -154,7 +154,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             
             else if (Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + EMANA + WMANA && Program.LaneClear)
             {
-                var minionsList = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                var minionsList = Cache.GetMinions(Player.ServerPosition, Q.Range);
 
                 if (minionsList.Any(x => Player.Distance(x.ServerPosition) > 300 && x.Health < Q.GetDamage(x) * 0.6))
                     Q.Cast();

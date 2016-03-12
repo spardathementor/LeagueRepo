@@ -211,7 +211,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA)
             {
-                var minionList = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All);
+                var minionList = Cache.GetMinions(Player.ServerPosition, E.Range);
                 var farmPosition = E.GetCircularFarmLocation(minionList, E.Width);
 
                 if (farmPosition.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
@@ -246,7 +246,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
             {
-                var minionList = MinionManager.GetMinions(Player.ServerPosition, W.Range, MinionTypes.All);
+                var minionList = Cache.GetMinions(Player.ServerPosition, W.Range);
                 var farmPosition = W.GetLineFarmLocation(minionList, W.Width);
 
                 if (farmPosition.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
@@ -430,7 +430,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + QMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

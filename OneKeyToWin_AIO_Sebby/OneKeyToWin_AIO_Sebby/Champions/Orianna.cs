@@ -298,7 +298,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Program.Farm)
                 return;
 
-            var allMinions = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All);
+            var allMinions = Cache.GetMinions(Player.ServerPosition, Q.Range);
             if (Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA + EMANA)
             {
                 foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion) && minion.Health > minion.FlatPhysicalDamageMod))
@@ -310,7 +310,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Program.LaneClear || Player.Mana < RMANA + QMANA)
                 return;
 
-            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, 800, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, 800, MinionTeam.Neutral);
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];

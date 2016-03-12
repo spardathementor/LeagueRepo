@@ -261,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
                 {
-                    var minionList = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All);
+                    var minionList = Cache.GetMinions(Player.ServerPosition, E.Range);
                     var farmPosition = E.GetCircularFarmLocation(minionList, E.Width);
 
                     if (farmPosition.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
@@ -379,7 +379,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -399,7 +399,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void KsJungle()
         {
-            var mobs = MinionManager.GetMinions(Player.ServerPosition, R.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, R.Range, MinionTeam.Neutral);
             foreach (var mob in mobs)
             {
                 //debug(mob.SkinName);

@@ -329,7 +329,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (length < (R.Width + 100 + enemy.BoundingRadius / 2) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
                     dmg++;
             }
-            var allMinionsR = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, R.Range, MinionTypes.All);
+            var allMinionsR = Cache.GetMinions(Player.ServerPosition, R.Range);
             foreach (var minion in allMinionsR)
             {
                 PredictionOutput prediction = R.GetPrediction(minion);

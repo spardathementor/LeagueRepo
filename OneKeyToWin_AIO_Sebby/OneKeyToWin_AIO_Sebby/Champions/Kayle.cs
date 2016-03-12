@@ -156,7 +156,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -176,7 +176,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private bool FarmE()
         {
-            return (MinionManager.GetMinions(Player.ServerPosition, 600).Count > 0);
+            return (Cache.GetMinions(Player.ServerPosition, 600).Count > 0);
         }
 
         private void SetMana()

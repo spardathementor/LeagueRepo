@@ -199,7 +199,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private float GetQDamage(Obj_AI_Base t)
         {
-            var minions = MinionManager.GetMinions(t.Position, Q.Width + 20);
+            var minions = Cache.GetMinions(t.Position, Q.Width + 20);
 
             if(minions.Count > 1)
                 return Q.GetDamage(t, 1);
@@ -229,7 +229,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (!Program.None && !Program.Combo && Player.Mana > RMANA + QMANA * 2)
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                var allMinions = Cache.GetMinions(Player.ServerPosition, Q.Range);
 
                 if (Config.Item("farmQout", true).GetValue<bool>())
                 {
@@ -331,7 +331,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + QMANA )
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, Q.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

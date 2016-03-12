@@ -129,7 +129,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value)
                 return;
-            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, Q.Range, MinionTeam.Neutral);
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];

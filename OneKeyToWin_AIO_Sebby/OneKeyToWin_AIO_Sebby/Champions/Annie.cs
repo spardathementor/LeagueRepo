@@ -234,7 +234,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if(Program.LaneClear)
             { 
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, Q.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -245,7 +245,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            var minionsList = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+            var minionsList = Cache.GetMinions(Player.ServerPosition, Q.Range);
             if (Q.IsReady())
             {
                 var minion = minionsList.Where(x => HealthPrediction.LaneClearHealthPrediction(x, 250, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();

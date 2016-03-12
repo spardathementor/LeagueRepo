@@ -32,13 +32,13 @@ namespace SebbyLib
 
         private static void AddMinionObject(Obj_AI_Minion minion)
         {
-            if (minion.MaxHealth > 200)
+            if (minion.MaxHealth >= 225)
             {
                 if (minion.Team == GameObjectTeam.Neutral)
                 {
                     MinionsListNeutral.Add(minion);
                 }
-                else if (minion.MaxMana == 0)
+                else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
                 {
                     if (minion.Team != ObjectManager.Player.Team)
                         MinionsListEnemy.Add(minion);

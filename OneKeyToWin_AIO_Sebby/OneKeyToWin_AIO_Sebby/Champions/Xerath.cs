@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Orbwalker.ForceTarget(null);
                 if (Program.Combo && Config.Item("force", true).GetValue<bool>() && Player.Mana < Player.MaxMana && Player.HasBuff("xerathascended2onhit") && !Orbwalker.GetTarget().IsValidTarget())
                 {
-                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2, MinionTypes.All);
+                    var allMinions = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2);
                     foreach (var minion in allMinions)
                     {
                         Orbwalker.ForceTarget(minion);
@@ -252,7 +252,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
             {
-                var minionList = MinionManager.GetMinions(Player.ServerPosition, W.Range, MinionTypes.All);
+                var minionList = Cache.GetMinions(Player.ServerPosition, W.Range);
                 var farmPosition = W.GetCircularFarmLocation(minionList, W.Width);
                 
                 if (farmPosition.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
@@ -298,7 +298,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Q.Range > 1000 && Player.CountEnemiesInRange(1450) == 0 && (Q.IsCharging || (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)))
             {
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
+                var allMinionsQ = Cache.GetMinions(Player.ServerPosition, Q.Range);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
                 if (Qfarm.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value || (Q.IsCharging && Qfarm.MinionsHit > 0))
                     Q.Cast(Qfarm.Position);
@@ -339,7 +339,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

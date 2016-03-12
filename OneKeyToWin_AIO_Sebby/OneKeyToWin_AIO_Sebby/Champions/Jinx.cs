@@ -95,7 +95,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LaneClear && !FishBoneActive && Config.Item("farmQ", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Player.Mana > RMANA + EMANA + WMANA + 30)
             {
 
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, bonusRange());
+                var allMinionsQ = Cache.GetMinions(Player.ServerPosition, bonusRange());
                 foreach (var minion in allMinionsQ.Where(
                     minion => args.Target.NetworkId != minion.NetworkId && minion.Distance(args.Target.Position) < 200 && (5 - Q.Level) * Player.GetAutoAttackDamage(minion) < args.Target.Health && (5 - Q.Level) * Player.GetAutoAttackDamage(minion) < minion.Health))
                 {
@@ -180,7 +180,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.Farm && (Game.Time - lag > 0.1) && !FishBoneActive  && !Player.IsWindingUp && Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
             {
-                foreach (var minion in MinionManager.GetMinions(bonusRange() + 30).Where(
+                foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(
                 minion => !Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
                 {
                     Orbwalker.ForceTarget(minion);
@@ -405,7 +405,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void KsJungle()
         {
-            var mobs = MinionManager.GetMinions(Player.ServerPosition, float.MaxValue, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, float.MaxValue, MinionTeam.Neutral);
             foreach (var mob in mobs)
             {
                 //debug(mob.SkinName);

@@ -196,7 +196,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent> Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA)
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range, MinionTypes.All);
+                var allMinions = Cache.GetMinions(Player.ServerPosition, W.Range);
                 var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
                 if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     W.Cast(farmPos.Position);
@@ -228,14 +228,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if ((Program.Combo && Player.Mana > RMANA + EMANA) || (Program.Farm && Config.Item("harrasE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA ))
                     {
-                        foreach (var minion in MinionManager.GetMinions(E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.CountEnemiesInRange(300) > 0 && minion.HasBuff("brandablaze")))
+                        foreach (var minion in Cache.GetMinions(Player.Position, E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.CountEnemiesInRange(300) > 0 && minion.HasBuff("brandablaze")))
                         {
                             E.CastOnUnit(minion);
                         }
                     }
                     if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA)
                     {
-                        foreach (var minion in MinionManager.GetMinions(E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.HasBuff("brandablaze") && CountMinionsInRange(400,minion.Position) >= Config.Item("LCminions", true).GetValue<Slider>().Value))
+                        foreach (var minion in Cache.GetMinions(Player.Position, E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.HasBuff("brandablaze") && CountMinionsInRange(400,minion.Position) >= Config.Item("LCminions", true).GetValue<Slider>().Value))
                         {
                             E.CastOnUnit(minion);
                         }
@@ -324,7 +324,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             }
                             else
                             {
-                                var minions = MinionManager.GetMinions(Player.Position, R.Range, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
+                                var minions = Cache.GetMinions(Player.Position, R.Range);
                                 foreach (var minion in minions.Where(minion => minion.IsValidTarget(R.Range) && minion.Distance(prepos) < bounceRange))
                                 {
                                     R.CastOnUnit(minion);
@@ -340,7 +340,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -367,7 +367,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private int CountMinionsInRange(float range, Vector3 pos)
         {
-            var minions = MinionManager.GetMinions(pos, range);
+            var minions = Cache.GetMinions(pos, range);
             int count = 0;
             foreach (var minion in minions)
             {

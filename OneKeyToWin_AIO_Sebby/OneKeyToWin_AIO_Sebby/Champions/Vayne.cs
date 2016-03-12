@@ -136,7 +136,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (!Dash.IsGoodPosition(dashPosition))
                     return;
 
-                var minions = MinionManager.GetMinions(dashPosition, Player.AttackRange, MinionTypes.All);
+                var minions = Cache.GetMinions(dashPosition, Player.AttackRange);
                 
                 if (minions == null || minions.Count == 0)
                     return;

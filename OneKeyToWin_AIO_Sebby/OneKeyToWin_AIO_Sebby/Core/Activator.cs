@@ -391,7 +391,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (CanUse(smite) )
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 520, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.Health);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 520, MinionTeam.Neutral);
                 if (mobs.Count == 0 && (Player.GetSpellSlot("s5_summonersmiteplayerganker") != SpellSlot.Unknown || Player.GetSpellSlot("s5_summonersmiteduel") != SpellSlot.Unknown))
                 {
                     var enemy = TargetSelector.GetTarget(500, TargetSelector.DamageType.True);

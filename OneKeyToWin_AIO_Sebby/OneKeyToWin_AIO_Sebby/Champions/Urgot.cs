@@ -263,7 +263,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 800, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 800, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -275,7 +275,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Config.Item("farmQ", true).GetValue<bool>())
                 return;
 
-            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+            var minions = Cache.GetMinions(Player.ServerPosition, Q.Range);
 
             int orbTarget = 0;
             if (Orbwalker.GetTarget() != null)

@@ -147,7 +147,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (bonusR)
                     rSplash = 290f;
                 
-                var minions = MinionManager.GetMinions(Player.ServerPosition, R.Range - rSplash, MinionTypes.All, MinionTeam.Enemy, MinionOrderTypes.MaxHealth);
+                var minions = Cache.GetMinions(Player.ServerPosition, R.Range - rSplash);
                 foreach (var minion in minions.Where(minion => minion.Distance(poutput.CastPosition) < rSplash))
                 {
                     R.Cast(minion);
@@ -198,7 +198,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && !Player.IsWindingUp && Sheen())
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, Q.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0 && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                 {
                     var mob = mobs[0];
@@ -217,7 +217,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if ( Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
                 {
-                    var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                    var minions = Cache.GetMinions(Player.ServerPosition, Q.Range);
 
                     if (R.IsReady() && Config.Item("farmR", true).GetValue<bool>() && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("RammoLC", true).GetValue<Slider>().Value)
                     {

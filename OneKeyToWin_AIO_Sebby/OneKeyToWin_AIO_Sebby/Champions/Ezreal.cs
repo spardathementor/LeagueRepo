@@ -346,7 +346,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (length < (R.Width + 100 + enemy.BoundingRadius / 2) && Player.Distance(predictedPosition) < Player.Distance(target.ServerPosition))
                     dmg++;
             }
-            var allMinionsR = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, R.Range, MinionTypes.All);
+            var allMinionsR = Cache.GetMinions(ObjectManager.Player.ServerPosition, R.Range);
             foreach (var minion in allMinionsR)
             {
                 PredictionOutput prediction = R.GetPrediction(minion);
@@ -390,7 +390,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 800, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 800, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -398,7 +398,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+            var minions = Cache.GetMinions(Player.ServerPosition, Q.Range);
             int orbTarget = 0;
 
             if (Orbwalker.GetTarget() != null)
@@ -447,7 +447,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void KsJungle()
         {
-            var mobs = MinionManager.GetMinions(Player.ServerPosition, float.MaxValue, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, float.MaxValue, MinionTeam.Neutral);
             foreach (var mob in mobs)
             {
                 if (mob.Health == mob.MaxHealth)

@@ -203,7 +203,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (!Config.Item("jungleE", true).GetValue<bool>() || Player.Mana < RMANA + EMANA)
                 return;
 
-            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];

@@ -79,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if(Program.LaneClear && args.Target.Type == GameObjectType.obj_AI_Minion && Config.Item("farmP", true).GetValue<bool>())
             {
-                var bestMinion = MinionManager.GetMinions(Player.Position, Player.AttackRange).FirstOrDefault(minion => minion.IsValidTarget() && Orbwalking.InAutoAttackRange(minion) && minion.HasBuff("quinnw"));
+                var bestMinion = Cache.GetMinions(Player.Position, Player.AttackRange).FirstOrDefault(minion => minion.IsValidTarget() && Orbwalking.InAutoAttackRange(minion) && minion.HasBuff("quinnw"));
 
                 if (bestMinion != null)
                     Orbwalker.ForceTarget(bestMinion);
@@ -100,7 +100,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + RMANA + WMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 700, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 700, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -209,7 +209,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
             {
-                var minionList = MinionManager.GetMinions(Player.ServerPosition, Q.Range - 150, MinionTypes.All);
+                var minionList = Cache.GetMinions(Player.ServerPosition, Q.Range - 150);
                 var farmPosition = Q.GetCircularFarmLocation(minionList, 150);
                 if (farmPosition.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     Q.Cast(farmPosition.Position);

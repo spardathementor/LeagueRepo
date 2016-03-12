@@ -224,7 +224,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() )
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+                var allMinions = Cache.GetMinions(Player.ServerPosition, Q.Range);
                 var farmPos = Q.GetCircularFarmLocation(allMinions, 150);
                 if (farmPos.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
                     Q.Cast(farmPos.Position);
@@ -257,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() )
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, W.Range);
+                var allMinions = Cache.GetMinions(Player.ServerPosition, W.Range);
                 var farmPos = W.GetCircularFarmLocation(allMinions, W.Width);
                 if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     W.Cast(farmPos.Position);
@@ -285,7 +285,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>())
             {
-                var allMinions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
+                var allMinions = Cache.GetMinions(Player.ServerPosition, E.Range);
                 if (allMinions.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion) && !minion.HasBuff("AlZaharMaleficVisions")))
@@ -299,7 +299,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var te = TargetSelector.GetTarget(E.Range + 400, TargetSelector.DamageType.Magical);
                 if (te.IsValidTarget())
                 {
-                    var allMinions = MinionManager.GetMinions(Player.ServerPosition, E.Range);
+                    var allMinions = Cache.GetMinions(Player.ServerPosition, E.Range);
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(E.Range) && minion.Health < E.GetDamage(minion) && te.Distance(minion.Position) < 500 && !minion.HasBuff("AlZaharMaleficVisions")))
                     {
                         E.CastOnUnit(minion);
@@ -339,7 +339,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + EMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

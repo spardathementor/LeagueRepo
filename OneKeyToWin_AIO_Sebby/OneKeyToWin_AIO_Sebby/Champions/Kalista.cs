@@ -212,7 +212,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void FarmQ()
         {
-            var minions = MinionManager.GetMinions(Player.ServerPosition, Q.Range);
+            var minions = Cache.GetMinions(Player.ServerPosition, Q.Range);
             int countMinion = 0;
             Obj_AI_Base bestMinion = null;
 
@@ -254,7 +254,7 @@ namespace OneKeyToWin_AIO_Sebby
             int outRange = 0;
 
 
-            var minions = MinionManager.GetMinions(Player.ServerPosition, E.Range - 50);
+            var minions = Cache.GetMinions(Player.ServerPosition, E.Range - 50);
 
             foreach (var minion in minions.Where(minion => minion.IsValidTarget(E.Range) && minion.HealthPercent < 80))
             {
@@ -377,7 +377,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Config.Item("jungleE", true).GetValue<bool>())
                 return;
 
-            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];
@@ -539,7 +539,7 @@ namespace OneKeyToWin_AIO_Sebby
                     drawText("KILL E", enemy, System.Drawing.Color.Red);
             }
 
-            var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+            var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
             if (mobs.Count > 0)
             {
                 var mob = mobs[0];

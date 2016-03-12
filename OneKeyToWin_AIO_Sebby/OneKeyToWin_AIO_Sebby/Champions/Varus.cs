@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && E.IsReady() && Config.Item("farmE", true).GetValue<bool>())
             {
-                var mobs = MinionManager.GetMinions(ObjectManager.Player.ServerPosition, E.Range, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
                 if (mobs.Count > 0 && Player.Mana > RMANA + EMANA + QMANA && OktwCommon.GetBuffCount(mobs[0], "varuswdebuff") == 3)
                 {
                     E.Cast(mobs[0]);
@@ -182,7 +182,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value)
                 {
-                    var allMinionsE = MinionManager.GetMinions(Player.ServerPosition, E.Range, MinionTypes.All);
+                    var allMinionsE = Cache.GetMinions(Player.ServerPosition, E.Range);
                     var Efarm = Q.GetCircularFarmLocation(allMinionsE, E.Width);
                     if (Efarm.MinionsHit > 3)
                     {
@@ -268,7 +268,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LaneClear && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA && Q.Range > 1500 && Player.CountEnemiesInRange(1450) == 0 &&  (Q.IsCharging || (Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value)))
             {
-                var allMinionsQ = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
+                var allMinionsQ = Cache.GetMinions(Player.ServerPosition, Q.Range);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, Q.Width);
                 if (Qfarm.MinionsHit > 3 || (Q.IsCharging && Qfarm.MinionsHit > 0))
                     Q.Cast(Qfarm.Position);

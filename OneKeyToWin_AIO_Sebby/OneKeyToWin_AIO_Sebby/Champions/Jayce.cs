@@ -238,7 +238,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Q2.IsReady())
                 {
-                    var mobs = MinionManager.GetMinions(Player.ServerPosition, Q2.Range);
+                    var mobs = Cache.GetMinions(Player.ServerPosition, Q2.Range);
                     
 
                     if (mobs.Count > 0)
@@ -388,7 +388,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Range && Q.IsReady() && E.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
             {
-                var minionList = MinionManager.GetMinions(Player.ServerPosition, Q.Range, MinionTypes.All);
+                var minionList = Cache.GetMinions(Player.ServerPosition, Q.Range);
                 var farmPosition = QextCol.GetCircularFarmLocation(minionList, 150);
 
                 if (farmPosition.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value)
@@ -400,7 +400,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (Range)
                 {
                     Program.debug("csa");
-                    var mobs = MinionManager.GetMinions(Player.ServerPosition, 550);
+                    var mobs = Cache.GetMinions(Player.ServerPosition, 550);
                     if (mobs.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     {
                         W.Cast();
@@ -408,7 +408,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else
                 {
-                    var mobs = MinionManager.GetMinions(Player.ServerPosition, 300);
+                    var mobs = Cache.GetMinions(Player.ServerPosition, 300);
                     if (mobs.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                     {
                         W.Cast();
@@ -421,7 +421,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + WMANA)
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 700, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 700, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];

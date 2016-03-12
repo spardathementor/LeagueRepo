@@ -130,7 +130,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LaneClear && Player.Mana > RMANA + WMANA + QMANA )
             {
-                var mobs = MinionManager.GetMinions(Player.ServerPosition, 600, MinionTypes.All, MinionTeam.Neutral, MinionOrderTypes.MaxHealth);
+                var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
@@ -257,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Config.Item("qMinionMove", true).GetValue<bool>())
                 {
-                    var minions = MinionManager.GetMinions(Player.ServerPosition, Q1.Range);
+                    var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
 
                     if (minions.Exists(x => x.IsMoving))
                         return;
