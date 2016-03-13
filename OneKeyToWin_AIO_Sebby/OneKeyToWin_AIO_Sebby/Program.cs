@@ -236,6 +236,22 @@ namespace OneKeyToWin_AIO_Sebby
             }
 
             #endregion
+            foreach (var hero in HeroManager.Enemies)
+            {
+                if (hero.IsEnemy && hero.Team != Player.Team)
+                {
+                    Enemies.Add(hero);
+                    if (IsJungler(hero))
+                        jungler = hero;
+                }
+            }
+            foreach (var hero in HeroManager.Allies)
+            {
+                if (hero.IsAlly && hero.Team == Player.Team)
+                    Allies.Add(hero);
+            }
+            
+
 
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
             {
@@ -245,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby
                     if (IsJungler(hero))
                         jungler = hero;
                 }
-                if (hero.IsAlly)
+                else if (hero.IsAlly)
                     Allies.Add(hero);
             }
 
