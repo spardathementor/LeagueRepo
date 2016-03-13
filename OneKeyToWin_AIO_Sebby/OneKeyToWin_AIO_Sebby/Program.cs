@@ -245,23 +245,10 @@ namespace OneKeyToWin_AIO_Sebby
                         jungler = hero;
                 }
             }
+
             foreach (var hero in HeroManager.Allies)
             {
                 if (hero.IsAlly && hero.Team == Player.Team)
-                    Allies.Add(hero);
-            }
-            
-
-
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
-            {
-                if (hero.IsEnemy)
-                {
-                    Enemies.Add(hero);
-                    if (IsJungler(hero))
-                        jungler = hero;
-                }
-                else if (hero.IsAlly)
                     Allies.Add(hero);
             }
 
