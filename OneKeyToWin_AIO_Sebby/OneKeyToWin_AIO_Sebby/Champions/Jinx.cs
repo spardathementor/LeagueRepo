@@ -218,22 +218,21 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
-                if (Game.Time - QCastTime > 0.6)
+ 
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && enemy.Distance(Player) > bonusRange() + 50))
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && enemy.Distance(Player) > bonusRange() + 50))
+                    var comboDmg = OktwCommon.GetKsDamage(enemy, W);
+                    if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
                     {
-                        var comboDmg = OktwCommon.GetKsDamage(t, W);
-                        if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
-                        {
-                            comboDmg += R.GetDamage(t, 1);
-                        }
-                        if (comboDmg > t.Health)
-                        {
-                            Program.CastSpell(W, enemy);
-                            return;
-                        }
+                        comboDmg += R.GetDamage(enemy, 1);
+                    }
+                    if (comboDmg > enemy.Health && OktwCommon.ValidUlt(enemy))
+                    {
+                        Program.CastSpell(W, enemy);
+                        return;
                     }
                 }
+                
 
                 if (Player.CountEnemiesInRange(bonusRange() + 50) == 0)
                 {
