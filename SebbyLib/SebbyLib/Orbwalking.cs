@@ -863,7 +863,10 @@ namespace SebbyLib
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
                 {
                     var jminions =
-                        Cache.GetMinions(Player.Position,1000, MinionTeam.Neutral).Where( mob => InAutoAttackRange(mob));
+                        Cache.GetAllMinions(Player.Position, 900).Where(
+                                mob =>
+                                    mob.IsValidTarget() && mob.Team == GameObjectTeam.Neutral && InAutoAttackRange(mob) &&
+                                    mob.CharData.BaseSkinName != "gangplankbarrel" && mob.Name != "WardCorpse");
 
                     result = _config.Item("Smallminionsprio").GetValue<bool>()
                         ? jminions.MinOrDefault(mob => mob.MaxHealth)

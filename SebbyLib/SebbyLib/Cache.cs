@@ -85,7 +85,7 @@ namespace SebbyLib
 
         private static bool IsNotValid(Obj_AI_Base minion)
         {
-            if (minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead )
+            if (minion == null || !minion.IsValid || minion.IsDead )
                 return true;
             else
                 return false;
