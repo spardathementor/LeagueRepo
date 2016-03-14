@@ -852,7 +852,7 @@ namespace SebbyLib
                 /*Champions*/
                 if (mode != OrbwalkingMode.LastHit)
                 {
-                    if (mode != OrbwalkingMode.LaneClear || !ShouldWait())
+                    if (!ShouldWait())
                     {
                         var target = TargetSelector.GetTarget(-1, TargetSelector.DamageType.Physical);
                         if (target.IsValidTarget() && InAutoAttackRange(target))

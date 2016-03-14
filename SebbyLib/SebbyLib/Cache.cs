@@ -19,7 +19,8 @@ namespace SebbyLib
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValid))
             {
                 AddMinionObject(minion);
-                AllMinionsObj.Add(minion);
+                if(!minion.IsAlly)
+                    AllMinionsObj.Add(minion);
             }
             
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
@@ -31,7 +32,8 @@ namespace SebbyLib
             if (minion != null)
             {
                 AddMinionObject(minion);
-                AllMinionsObj.Add(minion);
+                if (!minion.IsAlly)
+                    AllMinionsObj.Add(minion);
             }
         }
 
