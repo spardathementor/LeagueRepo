@@ -11,7 +11,7 @@ namespace OneKeyToWin_AIO_Sebby
     class Ezreal
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell Q, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -92,7 +92,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Orbwalking.AfterAttack += afterAttack;
+            SebbyLib.Orbwalking.AfterAttack += afterAttack;
         }
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
@@ -254,7 +254,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t.IsValidTarget() && Player.HealthPercent > 40 && !Player.UnderTurret(true) && (Game.Time - OverKill > 0.3) && dashPosition.CountEnemiesInRange(900) < 3)
             {
-                if ( t.Distance(Game.CursorPos) + 300 < t.Position.Distance(Player.Position) && !Orbwalking.InAutoAttackRange(t))
+                if ( t.Distance(Game.CursorPos) + 300 < t.Position.Distance(Player.Position) && !SebbyLib.Orbwalking.InAutoAttackRange(t))
                 {
                     var dmgCombo = 0f;
 
@@ -383,7 +383,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private bool Farm
         {
-            get { return (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear) || (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed) || (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit); }
+            get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear) || (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed) || (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LastHit); }
         }
 
         public void farmQ()
@@ -413,14 +413,15 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Config.Item("farmQ", true).GetValue<bool>() && Program.LaneClear && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
+            if (Config.Item("farmQ", true).GetValue<bool>() && Program.LaneClear && !SebbyLib.Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
                 var LCP = Config.Item("LCP", true).GetValue<bool>();
                 var PT = Game.Time - GetPassiveTime() > -1.5 || !E.IsReady();
 
                 foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.HealthPercent < 70 && Orbwalker.InAutoAttackRange(minion) && orbTarget != minion.NetworkId))
                 {
-                    var hpPred = HealthPrediction.GetHealthPrediction(minion, 300);
+                    
+                    var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 300);
                     if (hpPred < 10)
                         continue;
                     

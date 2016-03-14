@@ -9,7 +9,7 @@ namespace OneKeyToWin_AIO_Sebby
     class KogMaw
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell Q, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
 
@@ -59,8 +59,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Orbwalking.BeforeAttack += BeforeAttack;
-            Orbwalking.AfterAttack += afterAttack;
+            SebbyLib.Orbwalking.BeforeAttack += BeforeAttack;
+            SebbyLib.Orbwalking.AfterAttack += afterAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
         }
 
@@ -85,7 +85,7 @@ namespace OneKeyToWin_AIO_Sebby
             attackNow = true;
         }
 
-        private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             attackNow = false;
         }
@@ -123,7 +123,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     
 
-                    if (Config.Item("Raa", true).GetValue<bool>() && Orbwalking.InAutoAttackRange(target))
+                    if (Config.Item("Raa", true).GetValue<bool>() && SebbyLib.Orbwalking.InAutoAttackRange(target))
                         return;
 
                     var harasStack = Config.Item("harasStack", true).GetValue<Slider>().Value;

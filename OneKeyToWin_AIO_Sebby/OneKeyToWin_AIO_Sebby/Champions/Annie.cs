@@ -9,7 +9,7 @@ namespace OneKeyToWin_AIO_Sebby
     class Annie
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell Q, W, E, R, FR;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private SpellSlot flash;
@@ -248,7 +248,7 @@ namespace OneKeyToWin_AIO_Sebby
             var minionsList = Cache.GetMinions(Player.ServerPosition, Q.Range);
             if (Q.IsReady())
             {
-                var minion = minionsList.Where(x => HealthPrediction.LaneClearHealthPrediction(x, 250, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();
+                var minion = minionsList.Where(x => SebbyLib.HealthPrediction.LaneClearHealthPrediction(x, 250, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();
                 Q.Cast(minion);
             }
             else if (Program.LaneClear && W.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())

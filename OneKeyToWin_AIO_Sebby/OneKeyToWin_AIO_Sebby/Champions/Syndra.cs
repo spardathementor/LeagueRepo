@@ -11,7 +11,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     class Syndra
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private Spell E, Q, R, W, EQ, Eany;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
@@ -306,7 +306,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && (!Orbwalker.InAutoAttackRange(minion) || (!minion.UnderTurret(true) && minion.UnderTurret()))))
                     {
-                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 600);
+                        var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 600);
                         if (hpPred < Q.GetDamage(minion)  && hpPred > minion.Health - hpPred * 2)
                         {
                             Q.Cast(minion);

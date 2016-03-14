@@ -9,6 +9,7 @@ namespace SebbyLib
 {
     public class Cache
     {
+        public static List<Obj_AI_Base> AllMinionsObj = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListEnemy = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListAlly= new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListNeutral = new List<Obj_AI_Base>();
@@ -16,7 +17,10 @@ namespace SebbyLib
         static Cache()
         {
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValid))
+            {
                 AddMinionObject(minion);
+                AllMinionsObj.Add(minion);
+            }
             
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
         }
@@ -27,6 +31,7 @@ namespace SebbyLib
             if (minion != null)
             {
                 AddMinionObject(minion);
+                AllMinionsObj.Add(minion);
             }
         }
 
@@ -69,6 +74,13 @@ namespace SebbyLib
                 return MinionsListNeutral.Where(minion => minion.IsVisible && from.Distance(minion.Position) < range).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
         }
+
+        public static List<Obj_AI_Base> GetAllMinions(Vector3 from, float range)
+        {
+                AllMinionsObj.RemoveAll(minion => IsNotValid(minion));
+                return AllMinionsObj.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range);
+        }
+
         private static bool IsNotValid(Obj_AI_Base minion)
         {
             if (minion == null || !minion.IsValid || !minion.IsTargetable || minion.IsDead )

@@ -10,7 +10,7 @@ namespace OneKeyToWin_AIO_Sebby
     class Graves
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Spell E, Q, Q1, R, W , R1;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
 
@@ -37,7 +37,7 @@ namespace OneKeyToWin_AIO_Sebby
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += Game_OnGameUpdate;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
-            Orbwalking.AfterAttack += Orbwalker_AfterAttack;
+            SebbyLib.Orbwalking.AfterAttack += Orbwalker_AfterAttack;
         }
 
         private void LoadMenuOKTW()
@@ -214,7 +214,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else if (Program.Combo && Player.Mana > RMANA + WMANA + QMANA)
                 {
-                    if (!Orbwalking.InAutoAttackRange(t) || Player.CountEnemiesInRange(300) > 0 || t.CountEnemiesInRange(250) > 1 || Player.HealthPercent < 50)
+                    if (!SebbyLib.Orbwalking.InAutoAttackRange(t) || Player.CountEnemiesInRange(300) > 0 || t.CountEnemiesInRange(250) > 1 || Player.HealthPercent < 50)
                         W.Cast(t, true, true);
                     else if (Player.Mana > RMANA + WMANA + QMANA + EMANA)
                     {
@@ -256,7 +256,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Config.Item("overkillR", true).GetValue<bool>() && target.Health < Player.Health)
                 {
-                    if(Orbwalking.InAutoAttackRange(target))
+                    if(SebbyLib.Orbwalking.InAutoAttackRange(target))
                         continue;
                     if (target.CountAlliesInRange(400) > 0)
                         continue;

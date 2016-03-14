@@ -9,7 +9,7 @@ namespace OneKeyToWin_AIO_Sebby
     class Anivia
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Spell E, Q, R, W;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private float RCastTime = 0;
@@ -128,13 +128,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.Combo && Config.Item("AACombo", true).GetValue<bool>())
             {
                 if (!E.IsReady())
-                    Orbwalking.Attack = true;
+                    SebbyLib.Orbwalking.Attack = true;
 
                 else
-                    Orbwalking.Attack = false;
+                    SebbyLib.Orbwalking.Attack = false;
             }
             else
-                Orbwalking.Attack = true;
+                SebbyLib.Orbwalking.Attack = true;
 
             if (Q.IsReady() && QMissile != null && QMissile.Position.CountEnemiesInRange(230) > 0)
                 Q.Cast();
@@ -250,7 +250,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void farmE()
         {
-            if (Program.LaneClear && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > QMANA + EMANA + WMANA && !Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
+            if (Program.LaneClear && Config.Item("farmE", true).GetValue<bool>() && Player.Mana > QMANA + EMANA + WMANA && !SebbyLib.Orbwalking.CanAttack() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
             {
                 var minions = Cache.GetMinions(Player.ServerPosition, E.Range);
                 foreach (var minion in minions.Where(minion => minion.Health > Player.GetAutoAttackDamage(minion)))

@@ -10,7 +10,7 @@ namespace OneKeyToWin_AIO_Sebby
     class Kalista
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell Q, Q2, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
 
@@ -191,16 +191,16 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (qDmg > t.Health && eDmg < t.Health && Player.Mana > QMANA + EMANA)
                     castQ(cast, t);
-                else if ((qDmg * 1.1) + eDmg > t.Health && eDmg < t.Health && Player.Mana > QMANA + EMANA && Orbwalking.InAutoAttackRange(t))
+                else if ((qDmg * 1.1) + eDmg > t.Health && eDmg < t.Health && Player.Mana > QMANA + EMANA && SebbyLib.Orbwalking.InAutoAttackRange(t))
                     castQ(cast, t);
                 else if (Program.Combo && Player.Mana > RMANA +  QMANA + EMANA )
                 {
                     if(Config.Item("qMode", true).GetValue<StringList>().SelectedIndex == 0)
                         castQ(cast, t);
-                    else if (!Orbwalking.InAutoAttackRange(t) || CountMeleeInRange(400) > 0)
+                    else if (!SebbyLib.Orbwalking.InAutoAttackRange(t) || CountMeleeInRange(400) > 0)
                         castQ(cast, t);
                 }
-                else if (Program.Farm && !Orbwalking.InAutoAttackRange(t) && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.ManaPercent > Config.Item("qMana", true).GetValue<Slider>().Value)
+                else if (Program.Farm && !SebbyLib.Orbwalking.InAutoAttackRange(t) && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.ManaPercent > Config.Item("qMana", true).GetValue<Slider>().Value)
                     castQ(cast, t);
                 if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
                 {
@@ -261,10 +261,10 @@ namespace OneKeyToWin_AIO_Sebby
                 var eDmg = E.GetDamage(minion);
                 if (minion.Health < eDmg - minion.HPRegenRate && eDmg > 0)
                 {
-                    if (GetPassiveTime(minion) > 0.5 && HealthPrediction.GetHealthPrediction(minion, 300, 50) > minion.GetAutoAttackDamage(minion))
+                    if (GetPassiveTime(minion) > 0.5 && SebbyLib.HealthPrediction.GetHealthPrediction(minion, 300, 50) > minion.GetAutoAttackDamage(minion))
                     {
                         count++;
-                        if (!Orbwalking.InAutoAttackRange(minion))
+                        if (!SebbyLib.Orbwalking.InAutoAttackRange(minion))
                         {
                             outRange++;
                         }

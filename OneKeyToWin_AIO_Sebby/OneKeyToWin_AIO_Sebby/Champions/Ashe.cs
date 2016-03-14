@@ -11,7 +11,7 @@ namespace OneKeyToWin_AIO_Sebby
     class Ashe
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell Q, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; }}
@@ -59,7 +59,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Orbwalking.BeforeAttack += BeforeAttack;
+            SebbyLib.Orbwalking.BeforeAttack += BeforeAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter2.OnInterruptableTarget +=Interrupter2_OnInterruptableTarget;
         }
@@ -83,7 +83,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-        private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             LogicQ();
         }

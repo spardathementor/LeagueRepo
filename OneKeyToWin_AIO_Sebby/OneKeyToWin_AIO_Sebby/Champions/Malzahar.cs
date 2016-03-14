@@ -10,7 +10,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     class Malzahar
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Spell Q, Qr, W, E, R;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private float Rtime = 0;
@@ -160,15 +160,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5)
             {
-                Orbwalking.Attack = false;
-                Orbwalking.Move = false;
+                SebbyLib.Orbwalking.Attack = false;
+                SebbyLib.Orbwalking.Move = false;
                 Program.debug("cast R");
                 return;
             }
             else
             {
-                Orbwalking.Attack = true;
-                Orbwalking.Move = true;
+                SebbyLib.Orbwalking.Attack = true;
+                SebbyLib.Orbwalking.Move = true;
             }
 
             if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)

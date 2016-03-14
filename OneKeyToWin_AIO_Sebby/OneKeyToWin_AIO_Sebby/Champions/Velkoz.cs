@@ -11,7 +11,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     class Velkoz
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private Spell E, Q, R, W , QSplit, QDummy;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
@@ -121,16 +121,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 OktwCommon.blockMove = true;
                 OktwCommon.blockAttack = true;
-                Orbwalking.Attack = false;
-                Orbwalking.Move = false;
+                SebbyLib.Orbwalking.Attack = false;
+                SebbyLib.Orbwalking.Move = false;
             }
             else if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
             {
                 LogicR();
                 OktwCommon.blockMove = false;
                 OktwCommon.blockAttack = false;
-                Orbwalking.Attack = true;
-                Orbwalking.Move = true;
+                SebbyLib.Orbwalking.Attack = true;
+                SebbyLib.Orbwalking.Move = true;
             }
 
             if (Program.LagFree(4))

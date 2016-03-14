@@ -10,7 +10,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     class Tristana
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         public Spell Q, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; }}
@@ -59,8 +59,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungle", "Jungle Farm", true).SetValue(true));
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
-            Orbwalking.BeforeAttack += BeforeAttack;
-            Orbwalking.AfterAttack += afterAttack;
+            SebbyLib.Orbwalking.BeforeAttack += BeforeAttack;
+            SebbyLib.Orbwalking.AfterAttack += afterAttack;
             Interrupter2.OnInterruptableTarget +=Interrupter2_OnInterruptableTarget;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
         }
@@ -82,7 +82,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Q.Cast();
         }
 
-        private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             if (E.IsReady() && args.Target is Obj_AI_Hero )
             {
@@ -121,7 +121,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(900) && target.HasBuff("tristanaechargesound")))
                 {
-                    if (Orbwalking.InAutoAttackRange(target))
+                    if (SebbyLib.Orbwalking.InAutoAttackRange(target))
                         Orbwalker.ForceTarget(target);
                 }
             }
@@ -162,14 +162,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     
                     if (dmgCombo > enemy.Health)
                     {
-                        if (Orbwalking.InAutoAttackRange(enemy))
+                        if (SebbyLib.Orbwalking.InAutoAttackRange(enemy))
                         {
-                            if (playerAaDmg * 2 + GetEDmg(enemy) < HealthPrediction.GetHealthPrediction(enemy,700))
+                            if (playerAaDmg * 2 + GetEDmg(enemy) < SebbyLib.HealthPrediction.GetHealthPrediction(enemy,700))
                                 Program.CastSpell(W, enemy);
                         }
                         else
                         {
-                            if (playerAaDmg + GetEDmg(enemy) < HealthPrediction.GetHealthPrediction(enemy, 700))
+                            if (playerAaDmg + GetEDmg(enemy) < SebbyLib.HealthPrediction.GetHealthPrediction(enemy, 700))
                                 Program.CastSpell(W, enemy);
                         }
                     }

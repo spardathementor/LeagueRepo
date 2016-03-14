@@ -12,7 +12,7 @@ namespace OneKeyToWin_AIO_Sebby
     internal class Program
     {
         public static Menu Config;
-        public static Orbwalking.Orbwalker Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker;
         public static Spell Q, W, E, R, DrawSpell;
         public static float JungleTime, DrawSpellTime=0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
@@ -63,7 +63,7 @@ namespace OneKeyToWin_AIO_Sebby
                     new Core.OktwTs().LoadOKTW();
                 }
                 Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-                Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
+                Orbwalker = new SebbyLib.Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
             }
 
             if (AIOmode != 1)
@@ -277,7 +277,7 @@ namespace OneKeyToWin_AIO_Sebby
             //new AfkMode().LoadOKTW();
             Config.AddToMainMenu();
             Game.OnUpdate += OnUpdate;
-            Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
+            SebbyLib.Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
             Drawing.OnDraw += OnDraw;
             Game.OnWndProc += Game_OnWndProc;
 
@@ -348,7 +348,7 @@ namespace OneKeyToWin_AIO_Sebby
                 OktwCommon.blockAttack = false;
         }
 
-        private static void Orbwalking_BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        private static void Orbwalking_BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             if (AIOmode == 2)
                 return;
@@ -365,7 +365,7 @@ namespace OneKeyToWin_AIO_Sebby
                 args.Process = false;
             }
 
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && Config.Item("supportMode",true).GetValue<bool>())
+            if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed && Config.Item("supportMode",true).GetValue<bool>())
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Minion) args.Process = false;
             }
@@ -425,9 +425,9 @@ namespace OneKeyToWin_AIO_Sebby
                 return false;
         }
 
-        public static bool Farm { get { return Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear || Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed; } }
+        public static bool Farm { get { return Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed; } }
 
-        public static bool None { get { return (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.None); } }
+        public static bool None { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None); } }
 
         public static bool Combo { get {
                 if (AIOmode == 2)
@@ -438,11 +438,11 @@ namespace OneKeyToWin_AIO_Sebby
                         return false;
                 }
                 else
-                    return (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo);
+                    return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo);
 
             } }
 
-        public static bool LaneClear { get { return (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear); } }
+        public static bool LaneClear { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear); } }
 
         private static bool IsJungler(Obj_AI_Hero hero) { return hero.Spellbook.Spells.Any(spell => spell.Name.ToLower().Contains("smite")); }
 

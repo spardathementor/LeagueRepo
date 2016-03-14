@@ -10,7 +10,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     class Karthus
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Spell E, Q, R, W;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -101,9 +101,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (Config.Item("autoZombie", true).GetValue<bool>())
                 {
                     if (Player.CountEnemiesInRange(Q.Range) > 0)
-                        Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.Combo;
+                        Orbwalker.ActiveMode = SebbyLib.Orbwalking.OrbwalkingMode.Combo;
                     else
-                        Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.LaneClear;
+                        Orbwalker.ActiveMode = SebbyLib.Orbwalking.OrbwalkingMode.LaneClear;
                 }
                 if (R.IsReady() && Config.Item("autoRzombie", true).GetValue<bool>())
                 {
@@ -127,7 +127,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else
             {
-                Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.None;
+                Orbwalker.ActiveMode = SebbyLib.Orbwalking.OrbwalkingMode.None;
             }
 
             if (Program.LagFree(0))
@@ -235,7 +235,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && (!Orbwalker.InAutoAttackRange(minion) || (!minion.UnderTurret(true) && minion.UnderTurret()))))
                     {
-                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 1100);
+                        var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 1100);
                         if (hpPred < GetQDamage(minion) * 0.9 && hpPred > minion.Health - hpPred * 2)
                         {
                             Q.Cast(minion);
@@ -248,7 +248,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && Orbwalker.InAutoAttackRange(minion)))
                     {    
-                        var hpPred = HealthPrediction.GetHealthPrediction(minion, 1100);
+                        var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 1100);
                         if (hpPred < GetQDamage(minion) * 0.9 && hpPred > minion.Health - hpPred * 2)
                         {
                             Q.Cast(minion);

@@ -11,7 +11,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
     class Draven
     {
         private Menu Config = Program.Config;
-        public static Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
         private Spell E, Q, R, W;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private int axeCatchRange;
@@ -61,7 +61,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             GameObject.OnCreate += SpellMissile_OnCreateOld;
             GameObject.OnDelete += Obj_SpellMissile_OnDelete;
-            Orbwalking.BeforeAttack += BeforeAttack;
+            SebbyLib.Orbwalking.BeforeAttack += BeforeAttack;
             GameObject.OnCreate += GameObjectOnOnCreate;
             GameObject.OnDelete += GameObjectOnOnDelete;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -112,7 +112,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
         }
 
-        private void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             //Program.debug("" + OktwCommon.GetBuffCount(Player, "dravenspinningattack"));
             if (Q.IsReady())
@@ -166,16 +166,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var BuffTime = OktwCommon.GetPassiveTime(Player, "dravenspinningattack");
                     if (BuffTime < 1)
                     {
-                        Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.LaneClear;
+                        Orbwalker.ActiveMode = SebbyLib.Orbwalking.OrbwalkingMode.LaneClear;
                     }
                     else
                     {
-                        Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.None;
+                        Orbwalker.ActiveMode = SebbyLib.Orbwalking.OrbwalkingMode.None;
                     }
                 }
                 else
                 {
-                    Orbwalker.ActiveMode = Orbwalking.OrbwalkingMode.None;
+                    Orbwalker.ActiveMode = SebbyLib.Orbwalking.OrbwalkingMode.None;
                 }
             }
             
@@ -201,7 +201,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !Orbwalking.InAutoAttackRange(enemy) && E.GetDamage(enemy) > enemy.Health))
+            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !SebbyLib.Orbwalking.InAutoAttackRange(enemy) && E.GetDamage(enemy) > enemy.Health))
             {
                 Program.CastSpell(E, enemy);
                 return;
@@ -214,7 +214,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Player.Mana > RMANA + EMANA)
                     {
-                        if (!Orbwalking.InAutoAttackRange(t))
+                        if (!SebbyLib.Orbwalking.InAutoAttackRange(t))
                             Program.CastSpell(E, t);
                         if (Player.Health < Player.MaxHealth * 0.5)
                             Program.CastSpell(E, t);
@@ -261,12 +261,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                     var qDmg = Q.GetDamage(target);
                     var eDmg = E.GetDamage(target);
-                    if (Rdmg > predictedHealth && !Orbwalking.InAutoAttackRange(target))
+                    if (Rdmg > predictedHealth && !SebbyLib.Orbwalking.InAutoAttackRange(target))
                     {
                         castR(target);
                         Program.debug("R normal");
                     }
-                    else if (Program.Combo && Config.Item("comboR", true).GetValue<bool>() && Orbwalking.InAutoAttackRange(target) && Rdmg * 2 + Player.GetAutoAttackDamage(target) > predictedHealth)
+                    else if (Program.Combo && Config.Item("comboR", true).GetValue<bool>() && SebbyLib.Orbwalking.InAutoAttackRange(target) && Rdmg * 2 + Player.GetAutoAttackDamage(target) > predictedHealth)
                     {
                         castR(target);
                         Program.debug("R normal");
