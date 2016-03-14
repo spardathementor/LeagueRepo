@@ -124,7 +124,7 @@ namespace SebbyLib.Prediction
 
         internal float RealRadius
         {
-            get { return UseBoundingRadius ? Radius + Unit.BoundingRadius / 2 : Radius; }
+            get { return UseBoundingRadius ? Radius + Unit.BoundingRadius : Radius; }
         }
     }
 
