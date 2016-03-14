@@ -209,11 +209,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (!sender.IsEnemy || sender.IsAlly )
                 return;
-
-            if (sender is MissileClient)
+            var missile = sender as MissileClient;
+            if (missile != null)
             {
-                var missile = (MissileClient)sender;
-                
                 if ( !missile.SpellCaster.IsVisible)
                 {
 
@@ -221,7 +219,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         AddWard("teemorcast", missile.EndPosition);
                 }
             }
-            else if (sender.Type == GameObjectType.obj_AI_Minion  )
+
+            var minion = sender as Obj_AI_Minion;
+            if (minion != null)
             {
                 if ((sender.Name.ToLower() == "visionward" || sender.Name.ToLower() == "sightward") && !HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100))
                 {
@@ -260,33 +260,34 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void GameObject_OnDelete(GameObject sender, EventArgs args)
         {
-
-            if (!sender.IsEnemy || sender.IsAlly || sender.Type != GameObjectType.obj_AI_Minion)
-                return;
-
-            foreach (var obj in HiddenObjList)
+            var minion = sender as Obj_AI_Minion;
+            if (minion != null && minion.Health < 100)
             {
-                if (obj.pos == sender.Position)
+
+                foreach (var obj in HiddenObjList)
                 {
-                    HiddenObjList.Remove(obj);
-                    return;
-                }
-                else if (obj.type == 3 && obj.pos.Distance(sender.Position) < 100)
-                {
-                    HiddenObjList.Remove(obj);
-                    return;
-                }
-                else if (obj.pos.Distance(sender.Position) < 400)
-                {
-                    if (obj.type == 2 && sender.Name.ToLower() == "visionward")
+                    if (obj.pos == sender.Position)
                     {
                         HiddenObjList.Remove(obj);
                         return;
                     }
-                    else if ((obj.type == 0 || obj.type == 1) && sender.Name.ToLower() == "sightward")
+                    else if (obj.type == 3 && obj.pos.Distance(sender.Position) < 100)
                     {
                         HiddenObjList.Remove(obj);
                         return;
+                    }
+                    else if (obj.pos.Distance(sender.Position) < 400)
+                    {
+                        if (obj.type == 2 && sender.Name.ToLower() == "visionward")
+                        {
+                            HiddenObjList.Remove(obj);
+                            return;
+                        }
+                        else if ((obj.type == 0 || obj.type == 1) && sender.Name.ToLower() == "sightward")
+                        {
+                            HiddenObjList.Remove(obj);
+                            return;
+                        }
                     }
                 }
             }
@@ -294,12 +295,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
        
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsEnemy && !sender.IsMinion && sender.Type == GameObjectType.obj_AI_Hero)
+            if (sender is Obj_AI_Hero && sender.IsEnemy)
             {
                 if(args.Target == null)
                     AddWard(args.SData.Name.ToLower(), args.End);
 
-                if ((OracleLens.IsReady() || VisionWard.IsReady()) && sender.Distance(Player.Position) < 800)
+                if ((OracleLens.IsReady() || VisionWard.IsReady()) && sender.Distance(Player.Position) < 1200)
                 {
                     switch (args.SData.Name.ToLower())
                     {
@@ -321,10 +322,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         case "monkeykingdecoy":
                             CastVisionWards(sender.ServerPosition);
                             break;
-                        case "RengarR":
+                        case "rengarr":
                             CastVisionWards(sender.ServerPosition);
                             break;
-                        case "TwitchHideInShadows":
+                        case "twitchhideinshadows":
                             CastVisionWards(sender.ServerPosition);
                             break;
                     }
