@@ -1103,14 +1103,14 @@ namespace SebbyLib.Prediction
 
                                 var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
 
-                                if (distanceFromToUnit < input.Radius)
+                                if (distanceFromToUnit < input.Radius + minion.BoundingRadius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < input.Radius)
+                                else if (minion.ServerPosition.Distance(position) < input.Radius + minion.BoundingRadius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
