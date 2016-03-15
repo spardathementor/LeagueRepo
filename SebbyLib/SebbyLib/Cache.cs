@@ -24,6 +24,18 @@ namespace SebbyLib
             }
             
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
+            GameObject.OnDelete += GameObject_OnDelete;
+        }
+
+        private static void GameObject_OnDelete(GameObject sender, EventArgs args)
+        {
+            var minion = sender as Obj_AI_Minion;
+            if (minion != null)
+            {
+                RemoveMinionObject(minion);
+                if (!minion.IsAlly)
+                    AllMinionsObj.Remove(minion);
+            }
         }
 
         private static void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
@@ -34,6 +46,27 @@ namespace SebbyLib
                 AddMinionObject(minion);
                 if (!minion.IsAlly)
                     AllMinionsObj.Add(minion);
+            }
+        }
+
+        private static void RemoveMinionObject(Obj_AI_Minion minion)
+        {
+            if (minion.MaxHealth >= 225)
+            {
+
+                if (minion.Team == GameObjectTeam.Neutral)
+                {
+                    MinionsListNeutral.Remove(minion);
+                }
+                else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
+                {
+                    if (minion.Team == GameObjectTeam.Unknown)
+                        return;
+                    else if (minion.Team != ObjectManager.Player.Team)
+                        MinionsListEnemy.Remove(minion);
+                    else if (minion.Team == ObjectManager.Player.Team)
+                        MinionsListAlly.Remove(minion);
+                }
             }
         }
 
