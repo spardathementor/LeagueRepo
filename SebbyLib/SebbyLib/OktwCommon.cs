@@ -115,10 +115,8 @@ namespace SebbyLib
 
         public static bool CanHitSkillShot(Obj_AI_Base target, GameObjectProcessSpellCastEventArgs args)
         {
-            if (args.Target == null)
+            if (args.Target == null && target.IsValidTarget(float.MaxValue,false))
             {
-                if (target == null || !target.IsValid || !target.IsTargetable || target.IsDead || !target.IsVisible)
-                    return false;
 
                 var pred = Prediction.Prediction.GetPrediction(target, 0.25f).CastPosition;
                 if (pred == null)
@@ -370,6 +368,7 @@ namespace SebbyLib
                 args.Process = false;
             }
         }
+
     }
 
     class UnitIncomingDamage

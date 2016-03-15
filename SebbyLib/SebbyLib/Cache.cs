@@ -63,17 +63,17 @@ namespace SebbyLib
             if (team == MinionTeam.Enemy)
             {
                 MinionsListEnemy.RemoveAll(minion => IsNotValid(minion));
-                return MinionsListEnemy.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range );
+                return MinionsListEnemy.FindAll(minion => CanReturn(minion,from,range));
             }
             else if (team == MinionTeam.Ally)
             {
                 MinionsListAlly.RemoveAll(minion => IsNotValid(minion));
-                return MinionsListAlly.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range);
+                return MinionsListAlly.FindAll(minion => CanReturn(minion, from, range));
             }
             else
             {
                 MinionsListNeutral.RemoveAll(minion => IsNotValid(minion));
-                return MinionsListNeutral.Where(minion => minion.IsVisible && from.Distance(minion.Position) < range).OrderByDescending(minion => minion.MaxHealth).ToList();
+                return MinionsListNeutral.Where(minion => CanReturn(minion, from, range)).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
         }
 
@@ -89,6 +89,14 @@ namespace SebbyLib
                 return true;
             else
                 return false;
+        }
+
+        private static bool CanReturn(Obj_AI_Base minion, Vector3 from, float range)
+        {
+            if (!minion.IsVisible || !minion.IsTargetable || minion.IsInvulnerable || Vector2.DistanceSquared((@from).To2D(), minion.Position.To2D()) > range * range)
+                return false;
+            else
+                return true;
         }
     }
 }
