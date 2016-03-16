@@ -100,9 +100,13 @@ namespace Sebby_Ban_War
         {
             if (!Config.Item("enable").GetValue<bool>())
                 return;
+            
             var spellPosition = args.EndPosition;
-            if (args.Target != null && Config.Item("blockOut").GetValue<bool>() && !Render.OnScreen(Drawing.WorldToScreen(args.Target.Position)))
+            if (args.Target != null)
             {
+                if (args.Target.IsMe)
+                    return;
+
                 if (Config.Item("blockOut").GetValue<bool>() && !Render.OnScreen(Drawing.WorldToScreen(args.Target.Position)))
                 {
                     Console.WriteLine("BLOCK SPELL OUT SCREEN");
@@ -131,7 +135,7 @@ namespace Sebby_Ban_War
             }
             
             var screenPos = Drawing.WorldToScreen(spellPosition);    
-            if (Config.Item("skill").GetValue<bool>() && Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 15)
+            if (Config.Item("skill").GetValue<bool>() && Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 20)
             {
                 Console.WriteLine("BLOCK SPELL");
                 args.Process = false;
