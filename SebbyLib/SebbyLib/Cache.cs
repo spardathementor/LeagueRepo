@@ -11,7 +11,7 @@ namespace SebbyLib
     {
         public static List<Obj_AI_Base> AllMinionsObj = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListEnemy = new List<Obj_AI_Base>();
-        public static List<Obj_AI_Base> MinionsListAlly= new List<Obj_AI_Base>();
+        public static List<Obj_AI_Base> MinionsListAlly = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListNeutral = new List<Obj_AI_Base>();
 
         static Cache()
@@ -19,10 +19,10 @@ namespace SebbyLib
             foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(minion => minion.IsValid))
             {
                 AddMinionObject(minion);
-                if(!minion.IsAlly)
+                if (!minion.IsAlly)
                     AllMinionsObj.Add(minion);
             }
-            
+
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
             GameObject.OnDelete += GameObject_OnDelete;
         }
@@ -91,45 +91,60 @@ namespace SebbyLib
             }
         }
 
-        public static List<Obj_AI_Base> GetMinions(Vector3 from, float range, MinionTeam team = MinionTeam.Enemy)
+        public static List<Obj_AI_Base> GetMinions(Vector3 from, float range = float.MaxValue, MinionTeam team = MinionTeam.Enemy)
         {
             if (team == MinionTeam.Enemy)
             {
-                MinionsListEnemy.RemoveAll(minion => IsNotValid(minion));
-                return MinionsListEnemy.FindAll(minion => CanReturn(minion,from,range));
+                MinionsListEnemy.RemoveAll(minion => !IsValidMinion(minion));
+                return MinionsListEnemy.FindAll(minion => CanReturn(minion, from, range));
             }
             else if (team == MinionTeam.Ally)
             {
-                MinionsListAlly.RemoveAll(minion => IsNotValid(minion));
+                MinionsListAlly.RemoveAll(minion => !IsValidMinion(minion));
                 return MinionsListAlly.FindAll(minion => CanReturn(minion, from, range));
             }
             else
             {
-                MinionsListNeutral.RemoveAll(minion => IsNotValid(minion));
+                MinionsListNeutral.RemoveAll(minion => !IsValidMinion(minion));
                 return MinionsListNeutral.Where(minion => CanReturn(minion, from, range)).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
         }
 
-        public static List<Obj_AI_Base> GetAllMinions(Vector3 from, float range)
+        public static List<Obj_AI_Base> GetAllMinions(Vector3 from, float range = float.MaxValue)
         {
-                AllMinionsObj.RemoveAll(minion => IsNotValid(minion));
-                return AllMinionsObj.FindAll(minion => minion.IsVisible && from.Distance(minion.Position) < range);
+            AllMinionsObj.RemoveAll(minion => !IsValidMinion(minion));
+            return AllMinionsObj.FindAll(minion => CanReturn(minion, from, range));
         }
 
-        private static bool IsNotValid(Obj_AI_Base minion)
+        private static bool IsValidMinion(Obj_AI_Base minion)
         {
-            if (minion == null || !minion.IsValid || minion.IsDead )
-                return true;
-            else
+            if (minion == null || !minion.IsValid || minion.IsDead)
                 return false;
+            else
+                return true;
         }
 
         private static bool CanReturn(Obj_AI_Base minion, Vector3 from, float range)
         {
-            if (!minion.IsVisible || !minion.IsTargetable || minion.IsInvulnerable || Vector2.DistanceSquared((@from).To2D(), minion.Position.To2D()) > range * range)
-                return false;
+            
+            if (minion != null && minion.IsValid && !minion.IsDead && minion.IsVisible && minion.IsTargetable)
+            {
+                if (range == float.MaxValue)
+                    return true;
+                else if (range == 0)
+                {
+                    if (Orbwalking.InAutoAttackRange(minion))
+                        return true;
+                    else
+                        return false;
+                }
+                else if (Vector2.DistanceSquared((@from).To2D(), minion.Position.To2D()) < range * range)
+                    return true;
+                else
+                    return false;
+            }
             else
-                return true;
+                return false;
         }
     }
 }
