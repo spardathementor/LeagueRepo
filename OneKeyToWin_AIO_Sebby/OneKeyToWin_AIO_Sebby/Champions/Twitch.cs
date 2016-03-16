@@ -166,16 +166,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
                 if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) > enemy.Health)
+                {
+                    Program.debug("DUPAAA1");
                     E.Cast();
+                }
                 if (Player.Mana > RMANA + EMANA)
                 {
                     int buffsNum = OktwCommon.GetBuffCount(enemy, "TwitchDeadlyVenom");
                     if (Config.Item("5e", true).GetValue<bool>() && buffsNum == 6)
+                    {
+                        Program.debug("DUPAAA2");
                         E.Cast();
+                    }
                     float buffTime = OktwCommon.GetPassiveTime(enemy, "TwitchDeadlyVenom");
                 
                     if (!SebbyLib.Orbwalking.InAutoAttackRange(enemy) && (Player.ServerPosition.Distance(enemy.ServerPosition) > 950 || buffTime < 1) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
+                    {
+                        Program.debug("DUPAAA3 " + buffTime);
                         E.Cast();
+                    }
                 }
             }
             JungleE();
@@ -208,7 +217,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 var mob = mobs[0];
                 if (E.IsKillable(mob))
+                {
+                    Program.debug("DUPAAA");
                     E.Cast();
+                }
             }
         }
 

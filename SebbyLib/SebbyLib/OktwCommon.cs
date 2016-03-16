@@ -294,7 +294,7 @@ namespace SebbyLib
 
         private static void Obj_AI_Base_OnDoCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (args.Target != null)
+            if (args.Target != null && args.SData != null)
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Hero && !sender.IsMelee && args.Target.Team != sender.Team)
                 {
@@ -311,13 +311,18 @@ namespace SebbyLib
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            /////////////////  HP prediction
-            
-            if (args.Target != null)
+            if (args.SData == null)
             {
-                if (args.Target.Type == GameObjectType.obj_AI_Hero && args.Target.Team != sender.Team && sender.IsMelee)
+                return;
+            }
+            /////////////////  HP prediction
+            var targed = args.Target as Obj_AI_Base;
+            
+            if (targed != null)
+            {
+                if (targed.Type == GameObjectType.obj_AI_Hero && targed.Team != sender.Team && sender.IsMelee)
                 {
-                    IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
+                    IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(targed, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }
             else
