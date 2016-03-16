@@ -395,7 +395,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (mobs.Count == 0 && (Player.GetSpellSlot("s5_summonersmiteplayerganker") != SpellSlot.Unknown || Player.GetSpellSlot("s5_summonersmiteduel") != SpellSlot.Unknown))
                 {
                     var enemy = TargetSelector.GetTarget(500, TargetSelector.DamageType.True);
-                    if (enemy.IsValidTarget() && enemy.HealthPercent < 50)
+                    if (enemy.IsValidTarget())
                     {
                         if(enemy.HealthPercent < 50 && Config.Item("SmiteEnemy").GetValue<bool>())
                             Player.Spellbook.CastSpell(smite, enemy);
