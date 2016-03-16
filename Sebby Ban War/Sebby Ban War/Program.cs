@@ -38,7 +38,8 @@ namespace Sebby_Ban_War
             Config.AddItem(new MenuItem("Info2", "100 - 200 pro player"));
             Config.AddItem(new MenuItem("Info3", "200 + normal player"));
             Config.AddItem(new MenuItem("showCPS", "Show action per sec").SetValue(true));
-            Config.AddItem(new MenuItem("showWay", "Show way points").SetValue(true));
+            Config.AddItem(new MenuItem("blockOut", "Block targeted action out screen").SetValue(true));
+
 
             Config.SubMenu("Advance").AddItem(new MenuItem("cut", "CUT SKILLSHOTS").SetValue(true));
             Config.SubMenu("Advance").AddItem(new MenuItem("skill", "BLOCK inhuman skill cast").SetValue(true));
@@ -63,15 +64,6 @@ namespace Sebby_Ban_War
                     color = Color.OrangeRed;
 
                 DrawFontTextScreen(Tahoma13, "SBW Server action per sec: " + PathPerSecInfo, h, w, color);
-            }
-
-            if (Config.Item("showWay").GetValue<bool>())
-            {
-                var lastWaypoint = ObjectManager.Player.GetWaypoints().Last().To3D();
-                if (lastWaypoint.IsValid())
-                {
-                    drawLine(ObjectManager.Player.Position, lastWaypoint, 1, System.Drawing.Color.Red);
-                }
             }
         }
 
@@ -108,34 +100,44 @@ namespace Sebby_Ban_War
         {
             if (!Config.Item("enable").GetValue<bool>())
                 return;
-
+            var spellPosition = args.EndPosition;
+            if (args.Target != null && Config.Item("blockOut").GetValue<bool>() && !Render.OnScreen(Drawing.WorldToScreen(args.Target.Position)))
+            {
+                if (Config.Item("blockOut").GetValue<bool>() && !Render.OnScreen(Drawing.WorldToScreen(args.Target.Position)))
+                {
+                    Console.WriteLine("BLOCK SPELL OUT SCREEN");
+                    args.Process = false;
+                    return;
+                }
+                spellPosition = args.Target.Position;
+            }
             // IGNORE TARGETED SPELLS
-            if (args.EndPosition.IsZero)
-            return;
-
+            if (spellPosition.IsZero)
+                return;
+             
             if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
                 return;
 
             var spell = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(x => x.Slot == args.Slot);
 
             // LINE CUT SPELL RANGE
-            if (Config.Item("cut").GetValue<bool>() && spell != null && spell.SData.LineWidth != 0 && args.EndPosition.Distance(args.StartPosition) > 700)
+            if (Config.Item("cut").GetValue<bool>() && spell != null && spell.SData.LineWidth != 0 && spellPosition.Distance(args.StartPosition) > 700)
             {
                 Random rnd = new Random();
-                ObjectManager.Player.Spellbook.CastSpell(args.Slot, args.StartPosition.Extend(args.EndPosition, rnd.Next(400, 600)));
+                ObjectManager.Player.Spellbook.CastSpell(args.Slot, args.StartPosition.Extend(spellPosition, rnd.Next(400, 600)));
                 Console.WriteLine("CUT SPELL");
                 args.Process = false;
                 return;
             }
             
-            var screenPos = Drawing.WorldToScreen(args.EndPosition);    
+            var screenPos = Drawing.WorldToScreen(spellPosition);    
             if (Config.Item("skill").GetValue<bool>() && Utils.TickCount - LastMouseTime < LastMousePos.Distance(screenPos) / 15)
             {
                 Console.WriteLine("BLOCK SPELL");
                 args.Process = false;
                 return;
             }
-            LastType = 2;
+
             LastMouseTime = Utils.TickCount;
             LastMousePos = screenPos;
             PathPerSecCounter++;
@@ -162,7 +164,14 @@ namespace Sebby_Ban_War
 
             //Console.WriteLine("DIS " + LastMousePos.Distance(screenPos) + " TIME " + (Utils.TickCount - LastMouseTime));
             if (args.Order == GameObjectOrder.AttackUnit)
+            {
+                if (Config.Item("blockOut").GetValue<bool>() && !Render.OnScreen(screenPos))
+                {
+                    args.Process = false;
+                    Console.WriteLine("BLOCK AA OUT SCREEN");
+                }
                 LastType = 1;
+            }
             else
                 LastType = 0;
 
