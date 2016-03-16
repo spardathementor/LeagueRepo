@@ -24,18 +24,15 @@ namespace SebbyLib
             }
 
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
-            GameObject.OnDelete += GameObject_OnDelete;
+            Game.OnUpdate += Game_OnUpdate;
         }
 
-        private static void GameObject_OnDelete(GameObject sender, EventArgs args)
+        private static void Game_OnUpdate(EventArgs args)
         {
-            var minion = sender as Obj_AI_Minion;
-            if (minion != null)
-            {
-                RemoveMinionObject(minion);
-                if (!minion.IsAlly)
-                    AllMinionsObj.Remove(minion);
-            }
+            MinionsListEnemy.RemoveAll(minion => !IsValidMinion(minion));
+            MinionsListNeutral.RemoveAll(minion => !IsValidMinion(minion));
+            MinionsListAlly.RemoveAll(minion => !IsValidMinion(minion));
+            AllMinionsObj.RemoveAll(minion => !IsValidMinion(minion));
         }
 
         private static void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
@@ -49,32 +46,10 @@ namespace SebbyLib
             }
         }
 
-        private static void RemoveMinionObject(Obj_AI_Minion minion)
-        {
-            if (minion.MaxHealth >= 225)
-            {
-
-                if (minion.Team == GameObjectTeam.Neutral)
-                {
-                    MinionsListNeutral.Remove(minion);
-                }
-                else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
-                {
-                    if (minion.Team == GameObjectTeam.Unknown)
-                        return;
-                    else if (minion.Team != ObjectManager.Player.Team)
-                        MinionsListEnemy.Remove(minion);
-                    else if (minion.Team == ObjectManager.Player.Team)
-                        MinionsListAlly.Remove(minion);
-                }
-            }
-        }
-
         private static void AddMinionObject(Obj_AI_Minion minion)
         {
             if (minion.MaxHealth >= 225)
             {
-
                 if (minion.Team == GameObjectTeam.Neutral)
                 {
                     MinionsListNeutral.Add(minion);
@@ -95,24 +70,24 @@ namespace SebbyLib
         {
             if (team == MinionTeam.Enemy)
             {
-                MinionsListEnemy.RemoveAll(minion => !IsValidMinion(minion));
+                
                 return MinionsListEnemy.FindAll(minion => CanReturn(minion, from, range));
             }
             else if (team == MinionTeam.Ally)
             {
-                MinionsListAlly.RemoveAll(minion => !IsValidMinion(minion));
+                
                 return MinionsListAlly.FindAll(minion => CanReturn(minion, from, range));
             }
             else
             {
-                MinionsListNeutral.RemoveAll(minion => !IsValidMinion(minion));
+                
                 return MinionsListNeutral.Where(minion => CanReturn(minion, from, range)).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
         }
 
         public static List<Obj_AI_Base> GetAllMinions(Vector3 from, float range = float.MaxValue)
         {
-            AllMinionsObj.RemoveAll(minion => !IsValidMinion(minion));
+            
             return AllMinionsObj.FindAll(minion => CanReturn(minion, from, range));
         }
 
