@@ -41,7 +41,7 @@ namespace SebbyLib
             if (minion != null)
             {
                 AddMinionObject(minion);
-                if (!minion.IsAlly)
+                if (!minion.IsAlly )
                     AllMinionsObj.Add(minion);
             }
         }
@@ -78,17 +78,15 @@ namespace SebbyLib
                 
                 return MinionsListAlly.FindAll(minion => CanReturn(minion, from, range));
             }
-            else
+            else if(team == MinionTeam.Neutral)
             {
                 
                 return MinionsListNeutral.Where(minion => CanReturn(minion, from, range)).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
-        }
-
-        public static List<Obj_AI_Base> GetAllMinions(Vector3 from, float range = float.MaxValue)
-        {
-            
-            return AllMinionsObj.FindAll(minion => CanReturn(minion, from, range));
+            else
+            {
+                return AllMinionsObj.FindAll(minion => CanReturn(minion, from, range));
+            }
         }
 
         private static bool IsValidMinion(Obj_AI_Base minion)

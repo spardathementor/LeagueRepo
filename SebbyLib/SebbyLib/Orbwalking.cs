@@ -755,7 +755,7 @@ namespace SebbyLib
                     mode == OrbwalkingMode.Freeze)
                 {
                     var MinionList =
-                        Cache.GetAllMinions(Player.Position, 0).OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
+                        Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                             .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
                             .ThenBy(minion => minion.Health)
                             .ThenByDescending(minion => minion.MaxHealth);
