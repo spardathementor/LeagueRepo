@@ -106,9 +106,13 @@ namespace OneKeyToWin_AIO_Sebby
             if (obj.IsValid)
             {
                 if (obj.Name == "cryo_FlashFrost_Player_mis.troy")
+                {
                     QMissile = obj;
+                }
                 if (obj.Name.Contains("cryo_storm"))
+                {
                     RMissile = obj;
+                }
             }
         }
 
@@ -205,7 +209,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else
                     {
-                        if (t.Position.Distance(Player.ServerPosition) > t.Position.Distance(Player.Position))
+                        if (t.Position.Distance(Player.ServerPosition) > t.Position.Distance(Player.Position) && t.Distance(Player) < R.Range)
                             Program.CastSpell(W, t);
                     }
                 }
