@@ -418,25 +418,22 @@ namespace OneKeyToWin_AIO_Sebby
                 var LCP = Config.Item("LCP", true).GetValue<bool>();
                 var PT = Game.Time - GetPassiveTime() > -1.5 || !E.IsReady();
 
-                foreach (var minion in minions.Where(minion => minion.IsValidTarget() && minion.HealthPercent < 70 && Orbwalker.InAutoAttackRange(minion) && orbTarget != minion.NetworkId))
+                foreach (var minion in minions.Where(minion => Orbwalker.InAutoAttackRange(minion)))
                 {
                     
                     var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 300);
-                    if (hpPred < 10)
+                    if (hpPred < 20)
                         continue;
                     
                     var qDmg = Q.GetDamage(minion);
-                    if (hpPred < qDmg)
+                    if (hpPred < qDmg && orbTarget != minion.NetworkId)
                     {
-                        if (hpPred > minion.GetAutoAttackDamage(minion))
-                        {
-                            if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
-                                return;
-                        }
+                        if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
+                            return; 
                     }
                     else if (PT || LCP)
                     {
-                        if (hpPred > minion.GetAutoAttackDamage(minion) + qDmg)
+                        if (minion.HealthPercent > 70)
                         {
                             if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
                                 return;
