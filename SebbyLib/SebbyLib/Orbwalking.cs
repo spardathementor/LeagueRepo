@@ -721,13 +721,8 @@ namespace SebbyLib
             {
                 var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod);
                 return
-                    Cache.GetMinions(Player.Position, 1000)
-                        .Any(
-                            minion =>
-                                InAutoAttackRange(minion) &&
-                                HealthPrediction.LaneClearHealthPrediction(
-                                    minion, attackCalc, FarmDelay) <=
-                                Player.GetAutoAttackDamage(minion));
+                    Cache.GetMinions(Player.Position, 0).Any( 
+                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
@@ -735,11 +730,9 @@ namespace SebbyLib
                 var attackCalc = (int)(Player.AttackDelay * 1000 + (Player.IsMelee ? Player.AttackCastDelay * 1000 : Player.AttackCastDelay * 1000 +
                                                1000 * (Player.AttackRange + 2 * Player.BoundingRadius) / Player.BasicAttack.MissileSpeed));
                 return
-                    Cache.GetMinions(Player.Position, 1000)
-                        .Any(
-                            minion =>
+                    Cache.GetMinions(Player.Position, 0).Any( minion =>
                                 (noneKillableMinion != null ? noneKillableMinion.NetworkId != minion.NetworkId : true) &&
-                                InAutoAttackRange(minion) && HealthPrediction.LaneClearHealthPrediction( minion, attackCalc , FarmDelay) <= Player.GetAutoAttackDamage(minion));
+                                HealthPrediction.LaneClearHealthPrediction( minion, attackCalc , FarmDelay) <= Player.GetAutoAttackDamage(minion));
             }
 
             public virtual AttackableUnit GetTarget()
@@ -762,9 +755,7 @@ namespace SebbyLib
                     mode == OrbwalkingMode.Freeze)
                 {
                     var MinionList =
-                        Cache.GetAllMinions(Player.Position, 900)
-                            .Where(minion => !minion.IsAlly && InAutoAttackRange(minion))
-                            .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
+                        Cache.GetAllMinions(Player.Position, 0).OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                             .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
                             .ThenBy(minion => minion.Health)
                             .ThenByDescending(minion => minion.MaxHealth);
@@ -825,7 +816,7 @@ namespace SebbyLib
                 /* turrets / inhibitors / nexus */
                 if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed) &&
                     (!_config.Item("FocusMinionsOverTurrets").GetValue<KeyBind>().Active ||
-                     !Cache.GetMinions(ObjectManager.Player.Position, GetRealAutoAttackRange(ObjectManager.Player)).Any()))
+                     !Cache.GetMinions(Player.Position, 0).Any()))
                 {
                     /* turrets */
                     foreach (var turret in
@@ -862,11 +853,7 @@ namespace SebbyLib
                 /*Jungle minions*/
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
                 {
-                    var jminions =
-                        Cache.GetAllMinions(Player.Position, 900).Where(
-                                mob =>
-                                    mob.IsValidTarget() && mob.Team == GameObjectTeam.Neutral && InAutoAttackRange(mob) &&
-                                    mob.CharData.BaseSkinName != "gangplankbarrel" && mob.Name != "WardCorpse");
+                    var jminions = Cache.GetMinions(Player.Position, 0, MinionTeam.Neutral);
 
                     result = _config.Item("Smallminionsprio").GetValue<bool>()
                         ? jminions.MinOrDefault(mob => mob.MaxHealth)
@@ -891,15 +878,13 @@ namespace SebbyLib
                         Obj_AI_Minion farmUnderTurretMinion = null;
                         Obj_AI_Minion noneKillableMinion = null;
                         // return all the minions underturret in auto attack range
-                        var minions =
-                            Cache.GetMinions(Player.Position, Player.AttackRange + 200)
-                                .Where(
-                                    minion =>
-                                        InAutoAttackRange(minion) && closestTower.Distance(minion, true) < 900 * 900)
-                                .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
-                                .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
-                                .ThenByDescending(minion => minion.MaxHealth)
-                                .ThenByDescending(minion => minion.Health);
+                        var minions =  Cache.GetMinions(Player.Position, 0).Where(minion => 
+                            closestTower.Distance(minion, true) < 900 * 900)
+                            .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
+                            .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
+                            .ThenByDescending(minion => minion.MaxHealth)
+                            .ThenByDescending(minion => minion.Health);
+
                         if (minions.Any())
                         {
                             // get the turret aggro minion
@@ -1080,9 +1065,8 @@ namespace SebbyLib
                         }
 
                         result = (from minion in
-                            Cache.GetMinions(Player.Position, 1000).Where(
-                                    minion =>
-                                        minion.IsValidTarget() && InAutoAttackRange(minion) && ShouldAttackMinion(minion, false))
+                            Cache.GetMinions(Player.Position, 0).Where(
+                                    minion => ShouldAttackMinion(minion, false))
                                   let predHealth =
                                       HealthPrediction.LaneClearHealthPrediction(
                                           minion, (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod), FarmDelay)
@@ -1102,12 +1086,6 @@ namespace SebbyLib
                 return result;
             }
 
-            /// <summary>
-            ///     Returns if a minion should be attacked
-            /// </summary>
-            /// <param name="minion">The <see cref="Obj_AI_Minion" /></param>
-            /// <param name="includeBarrel">Include Gangplank Barrel</param>
-            /// <returns><c>true</c> if the minion should be attacked; otherwise, <c>false</c>.</returns>
             private bool ShouldAttackMinion(Obj_AI_Base minion, bool includeBarrel = false)
             {
                 if (minion.Name == "WardCorpse" || minion.CharData.BaseSkinName == "jarvanivstandard")
@@ -1161,10 +1139,6 @@ namespace SebbyLib
                 }
             }
 
-            /// <summary>
-            ///     Fired when the game is drawn.
-            /// </summary>
-            /// <param name="args">The <see cref="EventArgs" /> instance containing the event data.</param>
             private void DrawingOnOnDraw(EventArgs args)
             {
                 if (_config.Item("AACircle").GetValue<Circle>().Active)
