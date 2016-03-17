@@ -15,7 +15,7 @@ namespace SebbyLib
         public delegate void AfterAttackEvenH(AttackableUnit unit, AttackableUnit target);
 
         public delegate void BeforeAttackEvenH(BeforeAttackEventArgs args);
-
+ 
         public delegate void OnAttackEvenH(AttackableUnit unit, AttackableUnit target);
 
         public delegate void OnNonKillableMinionH(AttackableUnit minion);
@@ -24,7 +24,7 @@ namespace SebbyLib
 
         public enum OrbwalkingMode
         {
-            LastHit, Mixed, LaneClear, Combo, Freeze, CustomMode, None
+            LastHit,Mixed,LaneClear,Combo,Freeze,CustomMode,None
         }
 
         private static readonly string[] AttackResets =
@@ -721,10 +721,13 @@ namespace SebbyLib
             {
                 var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod);
                 return
-                    Cache.GetMinions(Player.Position, 0).Any(minion =>
-                               HealthPrediction.LaneClearHealthPrediction(
-                                   minion, attackCalc, FarmDelay) <=
-                               Player.GetAutoAttackDamage(minion));
+                    Cache.GetMinions(Player.Position, 1000)
+                        .Any(
+                            minion =>
+                                InAutoAttackRange(minion) &&
+                                HealthPrediction.LaneClearHealthPrediction(
+                                    minion, attackCalc, FarmDelay) <=
+                                Player.GetAutoAttackDamage(minion));
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
@@ -732,9 +735,11 @@ namespace SebbyLib
                 var attackCalc = (int)(Player.AttackDelay * 1000 + (Player.IsMelee ? Player.AttackCastDelay * 1000 : Player.AttackCastDelay * 1000 +
                                                1000 * (Player.AttackRange + 2 * Player.BoundingRadius) / Player.BasicAttack.MissileSpeed));
                 return
-                    Cache.GetMinions(Player.Position, 0).Any(minion =>
-                               (noneKillableMinion != null ? noneKillableMinion.NetworkId != minion.NetworkId : true) &&
-                               HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
+                    Cache.GetMinions(Player.Position, 1000)
+                        .Any(
+                            minion =>
+                                (noneKillableMinion != null ? noneKillableMinion.NetworkId != minion.NetworkId : true) &&
+                                InAutoAttackRange(minion) && HealthPrediction.LaneClearHealthPrediction( minion, attackCalc , FarmDelay) <= Player.GetAutoAttackDamage(minion));
             }
 
             public virtual AttackableUnit GetTarget()
@@ -757,7 +762,9 @@ namespace SebbyLib
                     mode == OrbwalkingMode.Freeze)
                 {
                     var MinionList =
-                        Cache.GetAllMinions(Player.Position, 0).OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
+                        Cache.GetAllMinions(Player.Position, 900)
+                            .Where(minion => !minion.IsAlly && InAutoAttackRange(minion))
+                            .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                             .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
                             .ThenBy(minion => minion.Health)
                             .ThenByDescending(minion => minion.MaxHealth);
@@ -802,7 +809,7 @@ namespace SebbyLib
                                 }
                             }
                         }
-                        else if (minion.Health < 2 && _config.Item("AttackBarrel").GetValue<bool>() && minion.CharData.BaseSkinName == "gangplankbarrel" && minion.IsHPBarRendered)
+                        else if ( minion.Health < 2 && _config.Item("AttackBarrel").GetValue<bool>() && minion.CharData.BaseSkinName == "gangplankbarrel" && minion.IsHPBarRendered)
                         {
                             return minion;
                         }
@@ -818,7 +825,7 @@ namespace SebbyLib
                 /* turrets / inhibitors / nexus */
                 if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed) &&
                     (!_config.Item("FocusMinionsOverTurrets").GetValue<KeyBind>().Active ||
-                     !Cache.GetMinions(Player.Position, 0).Any()))
+                     !Cache.GetMinions(ObjectManager.Player.Position, GetRealAutoAttackRange(ObjectManager.Player)).Any()))
                 {
                     /* turrets */
                     foreach (var turret in
@@ -856,9 +863,10 @@ namespace SebbyLib
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
                 {
                     var jminions =
-                        Cache.GetMinions(Player.Position, 0, MinionTeam.Neutral).Where(mob =>
-                                   mob.IsValidTarget() && mob.Team == GameObjectTeam.Neutral &&
-                                   mob.CharData.BaseSkinName != "gangplankbarrel" && mob.Name != "WardCorpse");
+                        Cache.GetAllMinions(Player.Position, 900).Where(
+                                mob =>
+                                    mob.IsValidTarget() && mob.Team == GameObjectTeam.Neutral && InAutoAttackRange(mob) &&
+                                    mob.CharData.BaseSkinName != "gangplankbarrel" && mob.Name != "WardCorpse");
 
                     result = _config.Item("Smallminionsprio").GetValue<bool>()
                         ? jminions.MinOrDefault(mob => mob.MaxHealth)
@@ -884,8 +892,10 @@ namespace SebbyLib
                         Obj_AI_Minion noneKillableMinion = null;
                         // return all the minions underturret in auto attack range
                         var minions =
-                            Cache.GetMinions(Player.Position, 0)
-                                .Where(minion => closestTower.Distance(minion, true) < 900 * 900)
+                            Cache.GetMinions(Player.Position, Player.AttackRange + 200)
+                                .Where(
+                                    minion =>
+                                        InAutoAttackRange(minion) && closestTower.Distance(minion, true) < 900 * 900)
                                 .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                                 .ThenBy(minion => minion.CharData.BaseSkinName.Contains("Super"))
                                 .ThenByDescending(minion => minion.MaxHealth)
@@ -1070,9 +1080,9 @@ namespace SebbyLib
                         }
 
                         result = (from minion in
-                            Cache.GetMinions(Player.Position, 0).Where(
+                            Cache.GetMinions(Player.Position, 1000).Where(
                                     minion =>
-                                        ShouldAttackMinion(minion, false))
+                                        minion.IsValidTarget() && InAutoAttackRange(minion) && ShouldAttackMinion(minion, false))
                                   let predHealth =
                                       HealthPrediction.LaneClearHealthPrediction(
                                           minion, (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod), FarmDelay)
