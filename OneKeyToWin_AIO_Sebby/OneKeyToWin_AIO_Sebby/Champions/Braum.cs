@@ -136,9 +136,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-            if (Player.CountEnemiesInRange(400) > 0)
-                t = TargetSelector.GetTarget(400, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(500, TargetSelector.DamageType.Physical);
+
+            if (!t.IsValidTarget())
+                t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
 
             if (t.IsValidTarget())
             {
@@ -161,8 +162,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-
-
             var rCount = Config.Item("rCount", true).GetValue<Slider>().Value;
             foreach (var t in Program.Enemies.Where(t => t.IsValidTarget(R.Range) && OktwCommon.ValidUlt(t)).OrderBy(t => t.Health))
             {
@@ -176,7 +175,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (rCount > 0)
                     R.CastIfWillHit(t, rCount);
 
-                if (Config.Item("rCc", true).GetValue<bool>() && !OktwCommon.CanMove(t))
+                if (Config.Item("rCc", true).GetValue<bool>() && !OktwCommon.CanMove(t) && t.HealthPercent > 20 * t.CountAlliesInRange(500) )
 
                     Utility.DelayAction.Add(800 - (int)(Player.Distance(t.Position) / 2) , () => CastRtime(t));
 
@@ -209,14 +208,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (W.IsReady() && args.SData.MissileSpeed > 0)
             {
-                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsMe && Player.Distance(ally.ServerPosition) < W.Range && Config.Item("Eon" + ally.ChampionName).GetValue<bool>()))
+                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && Player.Distance(ally.ServerPosition) < W.Range && Config.Item("Eon" + ally.ChampionName).GetValue<bool>()))
                 {
                     if (OktwCommon.CanHitSkillShot(ally, args) || OktwCommon.GetIncomingDamage(ally,1) > ally.Health * Config.Item("Edmg", true).GetValue<Slider>().Value * 0.01)
                     {
-                        W.Cast(ally);
                         if (E.IsReady())
                             Utility.DelayAction.Add(200, () => E.Cast(sender.Position));
-                        
+                        if (Player.HealthPercent < 20 && !ally.IsMe)
+                            continue;
+                        W.Cast(ally);
                     }
                 }
             }
