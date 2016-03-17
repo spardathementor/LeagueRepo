@@ -654,15 +654,15 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Player.Health + 200 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
                     Potion.Cast();
-                else if (Player.Health < Player.MaxHealth * 0.6)
+                else if (Player.HealthPercent < 60)
                     Potion.Cast();
                 return;
             }
             else if (Biscuit.IsReady())
             {
-                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
+                if (Player.Health + 350 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
                     Biscuit.Cast();
-                else if (Player.Health < Player.MaxHealth * 0.6)
+                else if (Player.HealthPercent < 50)
                     Biscuit.Cast();
                 return;
             }
@@ -670,7 +670,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
                     Hunter.Cast();
-                else if (Player.Health < Player.MaxHealth * 0.6)
+                else if (Player.HealthPercent < 60)
                     Hunter.Cast();
                 return;
             }
