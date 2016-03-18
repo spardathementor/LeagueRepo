@@ -74,11 +74,19 @@ namespace SebbyLib
 
         public static bool CanHarras()
         {
-            if (!Player.IsWindingUp && !Player.UnderTurret(true) && Orbwalking.CanMove(50))
+            if (!Player.IsWindingUp && !Player.UnderTurret(true) && Orbwalking.CanMove(50) && !ShouldWait())
                 return true;
             else
                 return false;
         }
+        public static bool ShouldWait()
+        {
+            var attackCalc = (int)(Player.AttackDelay * 1000 * 2);
+            return
+                Cache.GetMinions(Player.Position, 0).Any(
+                    minion => HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, 30) <= Player.GetAutoAttackDamage(minion));
+        }
+
 
         public static float GetEchoLudenDamage(Obj_AI_Hero target)
         {
