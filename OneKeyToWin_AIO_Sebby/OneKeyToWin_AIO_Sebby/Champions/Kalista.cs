@@ -261,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby
                 var eDmg = E.GetDamage(minion);
                 if (minion.Health < eDmg - minion.HPRegenRate && eDmg > 0)
                 {
-                    if (GetPassiveTime(minion) > 0.5 && SebbyLib.HealthPrediction.GetHealthPrediction(minion, 300, 50) > minion.GetAutoAttackDamage(minion))
+                    if (GetPassiveTime(minion) > 0.5 && SebbyLib.HealthPrediction.GetHealthPrediction(minion, 300, 50) > minion.GetAutoAttackDamage(minion) && !minion.HasBuff("kindredrnodeathbuff"))
                     {
                         count++;
                         if (!SebbyLib.Orbwalking.InAutoAttackRange(minion))
