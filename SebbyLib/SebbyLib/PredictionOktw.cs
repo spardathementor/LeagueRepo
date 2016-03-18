@@ -405,20 +405,12 @@ namespace SebbyLib.Prediction
             // NO WAY ///////////////////////////////////////////////////////////////////////////////////
             if (path != move)
             {
-                if (totalDelay < 0.7)
-                {
-                    OktwCommon.debug("PRED: NO WAY " + totalDelay);
-                    result.Hitchance = HitChance.VeryHigh;
-                    result.CastPosition = input.Unit.Position;
-                    return result;
-                }
-                else
-                {
-                    OktwCommon.debug("PRED: NO WAY " + totalDelay);
-                    result.Hitchance = HitChance.High;
-                    result.CastPosition = input.Unit.Position;
-                    return result;
-                }
+
+                OktwCommon.debug("PRED: NO WAY " + totalDelay);
+                result.Hitchance = HitChance.High;
+                result.CastPosition = input.Unit.Position;
+                return result;
+                
             }
 
             // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
