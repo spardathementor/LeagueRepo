@@ -629,7 +629,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (t.IsValidTarget() && t is Obj_AI_Hero)
                 {
-                    if (Config.Item("YoumuusKS").GetValue<bool>() && t.Health < Player.MaxHealth * 0.6)
+                    if (Config.Item("YoumuusKS").GetValue<bool>() && t.Health < Player.MaxHealth)
                         Youmuus.Cast();
                     if (Config.Item("YoumuusCombo").GetValue<bool>() && Program.Combo)
                         Youmuus.Cast();
