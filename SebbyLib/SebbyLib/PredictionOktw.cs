@@ -340,7 +340,7 @@ namespace SebbyLib.Prediction
 
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
-            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall"))
+            if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall") || (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.1d && input.Unit.IsRooted))
             {
                 result.Hitchance = HitChance.VeryHigh;
                 result.CastPosition = input.Unit.Position;
@@ -372,9 +372,9 @@ namespace SebbyLib.Prediction
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
-            float fixRange = moveArea * 0.4f;
-            float pathMinLen = 900 + +moveArea;
-            double angleMove = 30 + (input.Radius / 17) - totalDelay - (input.Delay * 2);
+            float fixRange = moveArea * 0.3f;
+            float pathMinLen = 800 + +moveArea;
+            double angleMove = 30 + (input.Radius / 20) - totalDelay - (input.Delay * 2);
 
             if (angleMove < 31)
                 angleMove = 31;
@@ -384,7 +384,7 @@ namespace SebbyLib.Prediction
                 result.Hitchance = HitChance.High;
                 pathMinLen = 600f + moveArea;
                 angleMove += 2;
-                fixRange = moveArea * 0.3f;
+                fixRange = moveArea * 0.2f;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -392,45 +392,43 @@ namespace SebbyLib.Prediction
                 fixRange -= input.Radius / 2;
             }
 
-            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
+            bool path = input.Unit.Path.Count() > 0;
+            bool move = input.Unit.IsMoving;
 
+            // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
             if (distanceFromToWaypoint <= distanceFromToUnit && distanceFromToUnit > input.Range - fixRange)
             {
                 result.Hitchance = HitChance.Medium;
                 return result;
             }
 
-            // AUTO ATTACK LOGIC ///////////////////////////////////////////////////////////////////////////////////
-
-            if (UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1d && input.Unit.IsWindingUp)
+            // NO WAY ///////////////////////////////////////////////////////////////////////////////////
+            if (path != move)
             {
-                result.CastPosition = input.Unit.Position;
-                if (input.Type == SkillshotType.SkillshotLine && totalDelay < 0.3 + (input.Radius * 0.002))
+                if (totalDelay < 0.7)
                 {
-                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 1");
+                    OktwCommon.debug("PRED: NO WAY " + totalDelay);
                     result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
-                else if (input.Type == SkillshotType.SkillshotCircle && totalDelay < 0.5 + (input.Radius * 0.002))
-                {
-                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION 2");
-                    result.Hitchance = HitChance.VeryHigh;
+                    result.CastPosition = input.Unit.Position;
                     return result;
                 }
                 else
                 {
+                    OktwCommon.debug("PRED: NO WAY " + totalDelay);
                     result.Hitchance = HitChance.High;
-                    OktwCommon.debug("PRED: AUTO ATTACK DETECTION HIGH");
+                    result.CastPosition = input.Unit.Position;
                     return result;
                 }
             }
 
             // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
 
-            else if (input.Unit.Path.Count() == 0 || !input.Unit.IsMoving)
+            else if (!input.Unit.IsMoving)
             {
                 if (input.Unit.IsWindingUp)
+                {
                     result.Hitchance = HitChance.High;
+                }
                 else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
                     result.Hitchance = HitChance.High;
                 else
@@ -481,33 +479,11 @@ namespace SebbyLib.Prediction
 
             if (getAngle < angleMove)
             {
-                if (distanceUnitToWaypoint > fixRange * 0.3 && UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
+                if (distanceUnitToWaypoint > 250 )
                 {
-                    OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove);
+                    OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
-                }
-
-                if (ObjectManager.Player.IsMoving && ObjectManager.Player.Distance(input.Unit.GetWaypoints().Last().To3D()) - ObjectManager.Player.Distance(input.Unit.Position) > 400)  
-                {
-                    if (ObjectManager.Player.IsFacing(input.Unit))
-                    {
-                        if (!input.Unit.IsFacing(ObjectManager.Player))
-                        {
-                            OktwCommon.debug(" PRED:TRY CATCH");
-                            result.Hitchance = HitChance.VeryHigh;
-                            return result;
-                        }
-                    }
-                    else
-                    {
-                        if (input.Unit.IsFacing(ObjectManager.Player))
-                        {
-                            OktwCommon.debug(" PRED:TRY CATCH 2");
-                            result.Hitchance = HitChance.VeryHigh;
-                            return result;
-                        }
-                    }
                 }
             }
 
