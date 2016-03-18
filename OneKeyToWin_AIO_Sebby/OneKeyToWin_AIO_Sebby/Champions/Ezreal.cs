@@ -433,7 +433,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else if (PT || LCP)
                     {
-                        if (minion.HealthPercent > 70)
+                        if (minion.HealthPercent > 80)
                         {
                             if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
                                 return;
