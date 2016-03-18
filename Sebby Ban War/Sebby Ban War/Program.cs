@@ -22,8 +22,7 @@ namespace Sebby_Ban_War
         public static int LastType = 0; // 0 Move , 1 Attack, 2 Cast spell
         public static int LastUserClickTime = Utils.TickCount;
         public static int PathPerSecInfo;
-
-
+        public static int PacketCast = Utils.TickCount;
 
         private static void Game_OnGameLoad(EventArgs args)
         {
@@ -33,14 +32,10 @@ namespace Sebby_Ban_War
             Config = new Menu("SBW - Sebby Ban War", "SBW - Sebby Ban War", true);
             Config.AddToMainMenu();
             Config.AddItem(new MenuItem("enable", "ENABLE").SetValue(true));
-            Config.AddItem(new MenuItem("ClickTime", "Minimum Click Time (100)").SetValue(new Slider(100, 300, 0)));
-            Config.AddItem(new MenuItem("Info", "0 - 100 scripter"));
-            Config.AddItem(new MenuItem("Info2", "100 - 200 pro player"));
-            Config.AddItem(new MenuItem("Info3", "200 + normal player"));
+            Config.AddItem(new MenuItem("ClickTime", "Minimum Click Time (100)").SetValue(new Slider(100, 300, 0))).SetTooltip("0 - 100 scripter, 100 - 200 pro player, 200+ normal player");
             Config.AddItem(new MenuItem("showCPS", "Show action per sec").SetValue(true));
-            Config.AddItem(new MenuItem("blockOut", "Block targeted action out screen").SetValue(true));
 
-
+            Config.SubMenu("Advance").AddItem(new MenuItem("blockOut", "Block targeted action out screen").SetValue(true));
             Config.SubMenu("Advance").AddItem(new MenuItem("cut", "CUT SKILLSHOTS").SetValue(true));
             Config.SubMenu("Advance").AddItem(new MenuItem("skill", "BLOCK inhuman skill cast").SetValue(true));
             Obj_AI_Base.OnNewPath += Obj_AI_Base_OnNewPath;
@@ -49,21 +44,14 @@ namespace Sebby_Ban_War
             Game.OnWndProc += Game_OnWndProc;
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
+            Game.OnSendPacket += Game_OnSendPacket;
         }
 
-        private static void Drawing_OnDraw(EventArgs args)
+        private static void Game_OnSendPacket(GamePacketEventArgs args)
         {
-            if (Config.Item("showCPS").GetValue<bool>())
+            if(args.GetPacketId() == 270)
             {
-                var h = Drawing.Height * 0.7f;
-                var w = Drawing.Width * 0.15f;
-                var color = Color.Yellow;
-                if (PathPerSecInfo < 5)
-                    color = Color.GreenYellow;
-                else if (PathPerSecInfo > 8)
-                    color = Color.OrangeRed;
-
-                DrawFontTextScreen(Tahoma13, "SBW Server action per sec: " + PathPerSecInfo, h, w, color);
+                PathPerSecCounter++;
             }
         }
 
@@ -98,6 +86,7 @@ namespace Sebby_Ban_War
 
         private static void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
+            
             if (!Config.Item("enable").GetValue<bool>())
                 return;
             
@@ -118,7 +107,7 @@ namespace Sebby_Ban_War
             // IGNORE TARGETED SPELLS
             if (spellPosition.IsZero)
                 return;
-             
+
             if (args.Slot != SpellSlot.Q && args.Slot != SpellSlot.W && args.Slot != SpellSlot.E && args.Slot != SpellSlot.R)
                 return;
 
@@ -144,7 +133,6 @@ namespace Sebby_Ban_War
 
             LastMouseTime = Utils.TickCount;
             LastMousePos = screenPos;
-            PathPerSecCounter++;
         }
 
         private static void Obj_AI_Base_OnIssueOrder(Obj_AI_Base sender, GameObjectIssueOrderEventArgs args)
@@ -181,6 +169,22 @@ namespace Sebby_Ban_War
 
             LastMouseTime = Utils.TickCount;
             LastMousePos = screenPos;
+        }
+
+        private static void Drawing_OnDraw(EventArgs args)
+        {
+            if (Config.Item("showCPS").GetValue<bool>())
+            {
+                var h = Drawing.Height * 0.7f;
+                var w = Drawing.Width * 0.15f;
+                var color = Color.Yellow;
+                if (PathPerSecInfo < 5)
+                    color = Color.GreenYellow;
+                else if (PathPerSecInfo > 8)
+                    color = Color.OrangeRed;
+
+                DrawFontTextScreen(Tahoma13, "SBW Server action per sec: " + PathPerSecInfo, h, w, color);
+            }
         }
 
         public static void DrawFontTextScreen(Font vFont, string vText, float vPosX, float vPosY, ColorBGRA vColor)
