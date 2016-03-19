@@ -489,7 +489,7 @@ namespace SebbyLib.Prediction
 
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (getAngle < angleMove && distanceUnitToWaypoint > 270)
+            if (getAngle < angleMove && distanceUnitToWaypoint > 300 - input.Radius)
             {
                 OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
                 result.Hitchance = HitChance.VeryHigh;
