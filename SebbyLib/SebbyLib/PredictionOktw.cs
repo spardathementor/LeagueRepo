@@ -332,16 +332,11 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
-            if (input.Unit.HealthPercent < 20 || ObjectManager.Player.HealthPercent < 20)
-            {
-                result.Hitchance = HitChance.VeryHigh;
-                return result;
-            }
-
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 0 || input.Unit.HasBuff("Recall") || (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.1d && input.Unit.IsRooted))
             {
+                OktwCommon.debug("CAN'T MOVE SPELLS");
                 result.Hitchance = HitChance.VeryHigh;
                 result.CastPosition = input.Unit.Position;
                 return result;
@@ -353,6 +348,19 @@ namespace SebbyLib.Prediction
             {
                 OktwCommon.debug("PRED: NEW VISABLE");
                 result.Hitchance = HitChance.Medium;
+                return result;
+            }
+
+            bool path = input.Unit.Path.Count() > 0;
+            bool move = input.Unit.IsMoving;
+
+            // NO WAY ///////////////////////////////////////////////////////////////////////////////////
+
+            if (path != move)
+            {
+                OktwCommon.debug("PRED: NO WAY ");
+                result.Hitchance = HitChance.Medium;
+                result.CastPosition = input.Unit.Position;
                 return result;
             }
 
@@ -372,8 +380,8 @@ namespace SebbyLib.Prediction
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
-            float fixRange = moveArea * 0.3f;
-            float pathMinLen = 800 + +moveArea;
+            float fixRange = moveArea * 0.4f;
+            float pathMinLen = 900 + + moveArea;
             double angleMove = 30 + (input.Radius / 20) - totalDelay - (input.Delay * 2);
 
             if (angleMove < 31)
@@ -382,9 +390,9 @@ namespace SebbyLib.Prediction
             if (UnitTracker.GetLastNewPathTime(input.Unit) < 0.1d)
             {
                 result.Hitchance = HitChance.High;
-                pathMinLen = 600f + moveArea;
+                pathMinLen = 700f + moveArea;
                 angleMove += 2;
-                fixRange = moveArea * 0.2f;
+                fixRange = moveArea * 0.3f;
             }
 
             if (input.Type == SkillshotType.SkillshotCircle)
@@ -392,43 +400,18 @@ namespace SebbyLib.Prediction
                 fixRange -= input.Radius / 2;
             }
 
-            bool path = input.Unit.Path.Count() > 0;
-            bool move = input.Unit.IsMoving;
-
             // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
-            if (distanceFromToWaypoint <= distanceFromToUnit && distanceFromToUnit > input.Range - fixRange)
+            if (distanceFromToWaypoint <= distanceFromToUnit)
             {
-                result.Hitchance = HitChance.Medium;
-                return result;
-            }
-
-            // NO WAY ///////////////////////////////////////////////////////////////////////////////////
-            if (path != move)
-            {
-
-                OktwCommon.debug("PRED: NO WAY " + totalDelay);
-                result.Hitchance = HitChance.High;
-                result.CastPosition = input.Unit.Position;
-                return result;
-                
-            }
-
-            // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
-
-            else if (!input.Unit.IsMoving)
-            {
-                if (input.Unit.IsWindingUp)
+                if (distanceFromToUnit > input.Range - fixRange)
                 {
-                    result.Hitchance = HitChance.High;
+                    result.Hitchance = HitChance.Medium;
+                    return result;
                 }
-                else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5d)
-                    result.Hitchance = HitChance.High;
-                else
-                {
-                    OktwCommon.debug("PRED: STOP LOGIC");
-                    result.Hitchance = HitChance.VeryHigh;
-                }
-                return result;
+            }
+            else if (distanceUnitToWaypoint > 300)
+            {
+                angleMove += 2;
             }
 
             // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
@@ -436,7 +419,10 @@ namespace SebbyLib.Prediction
             if (UnitTracker.PathCalc(input.Unit))
             {
                 OktwCommon.debug("PRED: SPAM CLICK");
-                result.Hitchance = HitChance.VeryHigh;
+                if(distanceFromToUnit < input.Range - fixRange)
+                    result.Hitchance = HitChance.VeryHigh;
+                else
+                    result.Hitchance = HitChance.Medium;
                 return result;
             }
 
@@ -449,9 +435,35 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
+            // STOP LOGIC ///////////////////////////////////////////////////////////////////////////////////
+
+            if (!input.Unit.IsMoving)
+            {
+                if (input.Unit.IsWindingUp)
+                {
+                    if ((UnitTracker.GetLastAutoAttackTime(input.Unit) < 0.1 || UnitTracker.GetLastStopMoveTime(input.Unit) < 0.1) && totalDelay < 0.6)
+                    {
+                        OktwCommon.debug("PRED: STOP LOGIC WINDING");
+                        result.Hitchance = HitChance.VeryHigh;
+                    }
+                    else
+                        result.Hitchance = HitChance.High;
+                }
+                else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 0.5)
+                {
+                    result.Hitchance = HitChance.High;
+                }
+                else
+                {
+                    OktwCommon.debug("PRED: STOP LOGIC");
+                    result.Hitchance = HitChance.VeryHigh;
+                }
+                return result;
+            }
+
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 250 || input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 100)
+            if (distanceFromToUnit < 250 || input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 150)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES");
                 result.Hitchance = HitChance.VeryHigh;
@@ -467,16 +479,21 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
+            // LOW HP DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (input.Unit.HealthPercent < 20 || ObjectManager.Player.HealthPercent < 20)
+            {
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+            }
+
             // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
-            if (getAngle < angleMove)
+            if (getAngle < angleMove && distanceUnitToWaypoint > 270)
             {
-                if (distanceUnitToWaypoint > 250 )
-                {
-                    OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
+                OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
             }
 
             // CIRCLE NEW PATH ///////////////////////////////////////////////////////////////////////////////////
@@ -1226,7 +1243,7 @@ namespace SebbyLib.Prediction
 
             info.NewPathTick = Utils.TickCount;
 
-            if (args.Path.Count() == 1) // STOP MOVE DETECTION
+            if (args.Path.Count() == 1 && !sender.IsMoving) // STOP MOVE DETECTION
                 UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).StopMoveTick = Utils.TickCount;
             else // SPAM CLICK LOGIC
                 info.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
