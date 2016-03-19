@@ -391,7 +391,7 @@ namespace SebbyLib.Prediction
             {
                 result.Hitchance = HitChance.High;
                 pathMinLen = 700f + moveArea;
-                angleMove += 2;
+                angleMove += 3;
                 fixRange = moveArea * 0.3f;
             }
 
@@ -465,7 +465,19 @@ namespace SebbyLib.Prediction
 
             if (distanceFromToUnit < 250 || input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 150)
             {
-                OktwCommon.debug("PRED: SPECIAL CASES");
+                OktwCommon.debug("PRED: SPECIAL CASES NEAR");
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+            }
+            else if( input.Unit.MoveSpeed < 200 )
+            {
+                OktwCommon.debug("PRED: SPECIAL CASES SLOW");
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+            }
+            else if(distanceFromToWaypoint < 150)
+            {
+                OktwCommon.debug("PRED: SPECIAL CASES ON WAY");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -487,9 +499,9 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
-            // RUN IN LANE DETECTION ///////////////////////////////////////////////////////////////////////////////////
+            // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
 
-            if (getAngle < angleMove && distanceUnitToWaypoint > 300 - input.Radius)
+            if (getAngle < angleMove && distanceUnitToWaypoint > 260)
             {
                 OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
                 result.Hitchance = HitChance.VeryHigh;
@@ -1254,7 +1266,7 @@ namespace SebbyLib.Prediction
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.Type != GameObjectType.obj_AI_Hero) return;
+            if (!(sender is Obj_AI_Hero)) return;
 
             if (args.SData.IsAutoAttack())
                 UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).AaTick = Utils.TickCount;
@@ -1271,12 +1283,11 @@ namespace SebbyLib.Prediction
         public static bool SpamSamePlace(Obj_AI_Base unit)
         {
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
-            if (TrackerUnit.PathBank.Count < 3)
+            if (TrackerUnit.PathBank.Count < 2)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f
-                && TrackerUnit.PathBank[2].Time + 0.15f < Game.Time
-                && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) < 100
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 0.3f
+                && TrackerUnit.PathBank[2].Time + 0.10f < Game.Time
                 && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 100)
             {
                 return true;
