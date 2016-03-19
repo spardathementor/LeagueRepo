@@ -141,26 +141,21 @@ namespace Sebby_Ban_War
                 return;
 
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
-
-            // ignore user clicks
+            var mouseDis = LastMousePos.Distance(screenPos);
             if (Utils.TickCount - LastUserClickTime < 500)
                 return;
 
-            if (args.Order == GameObjectOrder.AttackUnit)
+            if (args.Order == GameObjectOrder.AttackUnit && args.Target is Obj_AI_Minion && LastType == 0 && Utils.TickCount - LastMouseTime > mouseDis / 15)
             {
-                if (args.Target is Obj_AI_Minion && LastType == 0)
-                {
-                    Console.WriteLine("SBW farm protection");
-                    LastType = 1;
-                    LastMouseTime = Utils.TickCount;
-                    LastMousePos = screenPos;
-                    return;
-                }
+                Console.WriteLine("SBW farm protection");
+                LastType = 1;
+                LastMouseTime = Utils.TickCount;
+                LastMousePos = screenPos;
+                return;
             }
-            
           
             //Console.WriteLine(args.Order);
-            if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 15))
+            if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (mouseDis / 15))
             {
                 //Console.WriteLine("BLOCK " + args.Order);
                 args.Process = false;
