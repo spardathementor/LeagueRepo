@@ -142,7 +142,7 @@ namespace Sebby_Ban_War
 
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
             var mouseDis = LastMousePos.Distance(screenPos);
-            if (Utils.TickCount - LastUserClickTime < 500)
+            if (Utils.TickCount - LastUserClickTime < 100)
                 return;
 
             if (args.Order == GameObjectOrder.AttackUnit && args.Target is Obj_AI_Minion && LastType == 0 && Utils.TickCount - LastMouseTime > mouseDis / 15)
