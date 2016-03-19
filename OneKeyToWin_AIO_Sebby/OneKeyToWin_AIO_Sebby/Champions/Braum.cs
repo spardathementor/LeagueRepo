@@ -84,9 +84,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("AGC", true).GetValue<bool>())
             {
-                if (W.IsReady())
+                if (W.IsReady() && gapcloser.End.Distance(Player.Position) < gapcloser.Start.Distance(Player.Position))
                 {
-                    var allyHero = Program.Allies.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe)
+                    var allyHero = Program.Allies.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe )
                            .OrderBy(ally => ally.Distance(gapcloser.End)).FirstOrDefault();
 
                     if (allyHero != null && Config.Item("Eon" + allyHero.ChampionName).GetValue<bool>())
@@ -214,8 +214,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (E.IsReady())
                             Utility.DelayAction.Add(200, () => E.Cast(sender.Position));
+
                         if (Player.HealthPercent < 20 && !ally.IsMe)
                             continue;
+                        if (Player.HealthPercent < 50 && !ally.IsMe && ally.UnderTurret(true))
+                            continue;
+
                         W.Cast(ally);
                     }
                 }
