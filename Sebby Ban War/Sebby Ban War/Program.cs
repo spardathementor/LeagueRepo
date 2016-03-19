@@ -144,6 +144,15 @@ namespace Sebby_Ban_War
             if (Utils.TickCount - LastUserClickTime < 500)
                 return;
 
+            if (args.Order == GameObjectOrder.AttackUnit)
+            {
+                if (args.Target is Obj_AI_Minion && LastType == 0)
+                {
+                    Console.WriteLine("SBW farm protection");
+                    LastType = 1;
+                    return;
+                }
+            }
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
           
             //Console.WriteLine(args.Order);
@@ -160,7 +169,12 @@ namespace Sebby_Ban_War
                 if (Config.Item("blockOut").GetValue<bool>() && !Render.OnScreen(screenPos))
                 {
                     args.Process = false;
-                    Console.WriteLine("BLOCK AA OUT SCREEN");
+                    Console.WriteLine("SBW BLOCK AA OUT SCREEN");
+                }
+                if (args.Target is Obj_AI_Minion && LastType == 0)
+                {
+                    LastType = 1;
+                    return;
                 }
                 LastType = 1;
             }
