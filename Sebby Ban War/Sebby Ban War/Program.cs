@@ -140,6 +140,8 @@ namespace Sebby_Ban_War
             if (!Config.Item("enable").GetValue<bool>())
                 return;
 
+            var screenPos = Drawing.WorldToScreen(args.TargetPosition);
+
             // ignore user clicks
             if (Utils.TickCount - LastUserClickTime < 500)
                 return;
@@ -150,10 +152,12 @@ namespace Sebby_Ban_War
                 {
                     Console.WriteLine("SBW farm protection");
                     LastType = 1;
+                    LastMouseTime = Utils.TickCount;
+                    LastMousePos = screenPos;
                     return;
                 }
             }
-            var screenPos = Drawing.WorldToScreen(args.TargetPosition);
+            
           
             //Console.WriteLine(args.Order);
             if (Utils.TickCount - LastMouseTime < Config.Item("ClickTime").GetValue<Slider>().Value + (LastMousePos.Distance(screenPos) / 15))
