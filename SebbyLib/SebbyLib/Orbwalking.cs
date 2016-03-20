@@ -755,7 +755,8 @@ namespace SebbyLib
                 /*Killable Minion*/
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)
                 {
-                    var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).OrderBy(minion => HealthPrediction.GetHealthPrediction(minion, 600));
+
+                    var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).OrderBy(minion => HealthPrediction.GetHealthPrediction(minion, 1000));
 
                     foreach (var minion in MinionList)
                     {
@@ -764,7 +765,7 @@ namespace SebbyLib
                             if (!ShouldAttackMinion(minion))
                                 continue;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = (int)(Player.AttackCastDelay * 1000) - 150 + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                             if (mode == OrbwalkingMode.Freeze)
                             {
@@ -773,7 +774,7 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
 
-                            var damage = Player.GetAutoAttackDamage(minion, true);
+                            var damage = Player.GetAutoAttackDamage(minion, true) * 0.98;
                             var killable = predHealth <= damage;
 
                             if (mode == OrbwalkingMode.Freeze)
@@ -785,12 +786,7 @@ namespace SebbyLib
                             }
                             else
                             {
-                                if (predHealth <= 0)
-                                {
-                                    FireOnNonKillableMinion(minion);
-                                }
-
-                                if (killable)
+                                if (killable && predHealth > 0)
                                 {
                                     return minion;
                                 }
