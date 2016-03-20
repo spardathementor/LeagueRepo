@@ -20,7 +20,7 @@ namespace Sebby_Ban_War
         public static Vector2 LastMousePos = Game.CursorPos.To2D();
         public static int NewPathTime = Utils.TickCount;
         public static int LastType = 0; // 0 Move , 1 Attack, 2 Cast spell
-        public static int LastUserClickTime = Utils.TickCount;
+        public static bool LastUserClickTime = false;
         public static int PathPerSecInfo;
         public static int PacketCast = Utils.TickCount;
 
@@ -80,7 +80,7 @@ namespace Sebby_Ban_War
         {
             if (args.Msg == 123)
             {
-                LastUserClickTime = Utils.TickCount;
+                LastUserClickTime = true;
             }
         }
 
@@ -142,8 +142,11 @@ namespace Sebby_Ban_War
 
             var screenPos = Drawing.WorldToScreen(args.TargetPosition);
             var mouseDis = LastMousePos.Distance(screenPos);
-            if (Utils.TickCount - LastUserClickTime < 100)
+            if (LastUserClickTime)
+            {
+                LastUserClickTime = false;
                 return;
+            }
 
             if (args.Order == GameObjectOrder.AttackUnit && args.Target is Obj_AI_Minion && LastType == 0 && Utils.TickCount - LastMouseTime > mouseDis / 15)
             {
