@@ -765,7 +765,7 @@ namespace SebbyLib
                             if (!ShouldAttackMinion(minion))
                                 continue;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) - 150 + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                             if (mode == OrbwalkingMode.Freeze)
                             {
@@ -774,7 +774,7 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
 
-                            var damage = Player.GetAutoAttackDamage(minion, true) * 0.98;
+                            var damage = Player.GetAutoAttackDamage(minion, true);
                             var killable = predHealth <= damage;
 
                             if (mode == OrbwalkingMode.Freeze)
