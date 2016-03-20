@@ -647,50 +647,25 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void PotionManagement()
         {
-            if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlaskJungle") || Player.HasBuff("ItemDarkCrystalFlask"))
+            if (Player.Health + 250 > Player.MaxHealth)
+                return;
+
+            if(Player.HealthPercent > 50 && Player.CountEnemiesInRange(700) == 0)
+                return;
+
+            if (Player.HasBuff("RegenerationPotion") || Player.HasBuff("ItemMiniRegenPotion") || Player.HasBuff("ItemCrystalFlaskJungle") || Player.HasBuff("ItemDarkCrystalFlask") || Player.HasBuff("ItemCrystalFlask"))
                 return;
 
             if (Potion.IsReady())
-            {
-                if (Player.Health + 200 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                    Potion.Cast();
-                else if (Player.HealthPercent < 60)
-                    Potion.Cast();
-                return;
-            }
+                Potion.Cast();
             else if (Biscuit.IsReady())
-            {
-                if (Player.Health + 350 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                    Biscuit.Cast();
-                else if (Player.HealthPercent < 50)
-                    Biscuit.Cast();
-                return;
-            }
+                Biscuit.Cast();
             else if (Hunter.IsReady())
-            {
-                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                    Hunter.Cast();
-                else if (Player.HealthPercent < 60)
-                    Hunter.Cast();
-                return;
-            }
+                Hunter.Cast();
             else if (Corrupting.IsReady())
-            {
-                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                    Corrupting.Cast();
-                else if (Player.Health < Player.MaxHealth * 0.6)
-                    Corrupting.Cast();
-
-                return;
-            }
+                Corrupting.Cast();
             else if (Refillable.IsReady())
-            {
-                if (Player.Health + 250 < Player.MaxHealth && Player.CountEnemiesInRange(700) > 0)
-                    Refillable.Cast();
-                else if (Player.Health < Player.MaxHealth * 0.6)
-                    Refillable.Cast();
-                return;
-            }
+                Refillable.Cast();
         }
 
         private bool CanUse(SpellSlot sum)
