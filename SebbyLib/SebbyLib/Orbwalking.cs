@@ -591,7 +591,7 @@ namespace SebbyLib
                 _config.AddItem(
                     new MenuItem("ExtraWindup", "Extra windup time").SetShared().SetValue(new Slider(80, 0, 200)));
                 _config.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
-
+                _config.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage %").SetShared().SetValue(new Slider(100, 0, 200)));
                 /*Load the menu*/
                 _config.AddItem(
                     new MenuItem("LastHit", "Last hit").SetShared().SetValue(new KeyBind('X', KeyBindType.Press)));
@@ -774,7 +774,7 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
 
-                            var damage = Player.GetAutoAttackDamage(minion, true);
+                            var damage = Player.GetAutoAttackDamage(minion, true) * 0.01 * _config.Item("DamageAdjust").GetValue<Slider>().Value;
                             var killable = predHealth <= damage;
 
                             if (mode == OrbwalkingMode.Freeze)
