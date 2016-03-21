@@ -59,6 +59,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("smartE", "SmartCast E key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("smartEW", "SmartCast E + W key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoEgrab", "Auto E anti grab", true).SetValue(true));
             Dash = new Core.OKTWdash(E);
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
@@ -93,6 +94,22 @@ namespace OneKeyToWin_AIO_Sebby
             Game.OnUpdate += Game_OnUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
             SebbyLib.Orbwalking.AfterAttack += afterAttack;
+            Obj_AI_Base.OnBuffAdd += Obj_AI_Base_OnBuffAdd;
+        }
+
+        private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
+        {
+            if(sender.IsMe && Config.Item("autoEgrab", true).GetValue<bool>() && E.IsReady())
+            {
+                if(args.Buff.Name == "ThreshQ" || args.Buff.Name == "rocketgrab2")
+                {
+                    var dashPos = Dash.CastDash(true);
+                    if (!dashPos.IsZero)
+                    {
+                        E.Cast(dashPos);
+                    }
+                }
+            }
         }
 
         private void afterAttack(AttackableUnit unit, AttackableUnit target)
