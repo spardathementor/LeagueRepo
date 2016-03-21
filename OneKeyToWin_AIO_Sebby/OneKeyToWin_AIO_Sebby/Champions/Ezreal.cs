@@ -108,6 +108,10 @@ namespace OneKeyToWin_AIO_Sebby
                     {
                         E.Cast(dashPos);
                     }
+                    else
+                    {
+                        E.Cast(Game.CursorPos);
+                    }
                 }
             }
         }
