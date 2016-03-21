@@ -1283,7 +1283,7 @@ namespace SebbyLib.Prediction
         public static bool SpamSamePlace(Obj_AI_Base unit)
         {
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
-            if (TrackerUnit.PathBank.Count < 2)
+            if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
             if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 0.3f
