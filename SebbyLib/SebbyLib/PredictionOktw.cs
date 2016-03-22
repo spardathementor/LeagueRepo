@@ -393,7 +393,7 @@ namespace SebbyLib.Prediction
             {
                 result.Hitchance = HitChance.High;
                 pathMinLen = 700f + moveArea;
-                angleMove += 1;
+                angleMove += 1.5;
                 fixRange = moveArea * 0.3f;
             }
 
@@ -413,7 +413,7 @@ namespace SebbyLib.Prediction
             }
             else if (distanceUnitToWaypoint > 300)
             {
-                angleMove += 2;
+                angleMove += 1.5;
             }
 
             // SPAM CLICK ///////////////////////////////////////////////////////////////////////////////////
@@ -465,19 +465,19 @@ namespace SebbyLib.Prediction
 
             // SPECIAL CASES ///////////////////////////////////////////////////////////////////////////////////
 
-            if (distanceFromToUnit < 250 || input.Unit.MoveSpeed < 200 || distanceFromToWaypoint < 150)
+            if (distanceFromToUnit < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES NEAR");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-            else if( input.Unit.MoveSpeed < 200 )
+            else if( input.Unit.MoveSpeed < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES SLOW");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-            else if(distanceFromToWaypoint < 150)
+            else if(distanceFromToWaypoint < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES ON WAY");
                 result.Hitchance = HitChance.VeryHigh;
