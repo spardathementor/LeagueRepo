@@ -124,7 +124,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Jungle()
         {
-            if (Program.LaneClear && Player.Mana > RMANA + WMANA + QMANA + EMANA)
+            if (Program.LaneClear)
             {
                 var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
