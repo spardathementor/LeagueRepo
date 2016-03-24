@@ -386,6 +386,8 @@ namespace SebbyLib.Prediction
 
             if (input.Radius > 70)
                 angleMove ++;
+            else if (input.Radius <= 60)
+                angleMove--;
             if (input.Delay < 0.3)
                 angleMove++;
 
@@ -411,7 +413,7 @@ namespace SebbyLib.Prediction
                     return result;
                 }
             }
-            else if (distanceUnitToWaypoint > 300)
+            else if (distanceUnitToWaypoint > 350)
             {
                 angleMove += 1.5;
             }
@@ -1304,7 +1306,7 @@ namespace SebbyLib.Prediction
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.3f && Game.Time - TrackerUnit.PathBank[2].Time < 0.15 && Game.Time - TrackerUnit.PathBank[2].Time > 0.08)
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f && Game.Time - TrackerUnit.PathBank[2].Time < 0.1)
             {
                 var dis = unit.Distance(TrackerUnit.PathBank[2].Position);
                 if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > dis && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) > dis)
@@ -1319,11 +1321,8 @@ namespace SebbyLib.Prediction
         public static List<Vector2> GetPathWayCalc(Obj_AI_Base unit)
         {
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
-            Vector2 sr;
-            sr.X = (TrackerUnit.PathBank[0].Position.X + TrackerUnit.PathBank[1].Position.X + TrackerUnit.PathBank[2].Position.X) / 3;
-            sr.Y = (TrackerUnit.PathBank[0].Position.Y + TrackerUnit.PathBank[1].Position.Y + TrackerUnit.PathBank[2].Position.Y) / 3;
             List<Vector2> points = new List<Vector2>();
-            points.Add(sr);
+            points.Add(unit.ServerPosition.To2D());
             return points;
         }
 
