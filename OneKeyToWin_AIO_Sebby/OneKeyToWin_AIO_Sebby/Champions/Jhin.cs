@@ -53,6 +53,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qminion", "Q on minion", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWcombo", "Auto W only in combo", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wstun", "W stun, marked only", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Waoe", "W aoe (above 2 enemy)", true).SetValue(true));
@@ -241,6 +242,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var wDmg = GetWdmg(t);
                 if (wDmg > t.Health - OktwCommon.GetIncomingDamage(t))
                     Program.CastSpell(W, t);
+
+                if (Config.Item("autoWcombo", true).GetValue<bool>() && !Program.Combo)
+                    return;
 
                 if (Player.CountEnemiesInRange(400) > 1 || Player.CountEnemiesInRange(250) > 0)
                     return;
