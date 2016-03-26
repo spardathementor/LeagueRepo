@@ -42,7 +42,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     var spell = enemy.Spellbook.Spells[i];
                     if (spell.SData.TargettingType != SpellDataTargetType.Self && spell.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
                     {
-                        Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name).SetValue(true));
+                        Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name.ToLower(), spell.Name).SetValue(true));
                     }
                 }
             }
@@ -198,7 +198,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (!sender.IsEnemy)
                 return;
 
-            if (Config.Item("spell" + args.SData.Name) != null && !Config.Item("spell" + args.SData.Name).GetValue<bool>())
+            if (Config.Item("spell" + args.SData.Name.ToLower()) != null && !Config.Item("spell" + args.SData.Name.ToLower()).GetValue<bool>())
                 return;
 
             if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && OktwCommon.CanHitSkillShot(Player, args))
