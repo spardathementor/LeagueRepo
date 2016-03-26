@@ -1306,7 +1306,10 @@ namespace SebbyLib.Prediction
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f && Game.Time - TrackerUnit.PathBank[2].Time < 0.1)
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f && Game.Time - TrackerUnit.PathBank[2].Time < 0.1
+                && TrackerUnit.PathBank[2].Position.Distance(unit.Position) < 300
+                && TrackerUnit.PathBank[1].Position.Distance(unit.Position) < 300
+                && TrackerUnit.PathBank[0].Position.Distance(unit.Position) < 300)
             {
                 var dis = unit.Distance(TrackerUnit.PathBank[2].Position);
                 if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > dis && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) > dis)
