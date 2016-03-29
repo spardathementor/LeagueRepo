@@ -52,6 +52,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWm", "Auto W melee", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWmove", "Disable move if W range active", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E range (Q + E)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoEm", "Auto E melee", true).SetValue(true));
@@ -197,6 +198,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Range)
             {
+                
+                if (Config.Item("autoWmove", true).GetValue<bool>() && Orbwalker.GetTarget() != null && Player.HasBuff("jaycehyperchargevfx"))
+                    SebbyLib.Orbwalking.Move = false;
+                else
+                    SebbyLib.Orbwalking.Move = true;
+
                 if (Program.LagFree(1) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                     LogicQ();
 
