@@ -241,11 +241,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                                 E.Cast(Player.ServerPosition);
                             else if (Q.IsReady() && !E.IsReady())
                                 Q.Cast(Player.Position.Extend(Game.CursorPos, 500));
+                            else if (R.IsReady() && Player.InFountain())
+                                R.Cast();
                         }
                         else
                         {
                             if (W.IsReady())
                                 W.Cast();
+                            else if (R.IsReady() && Player.InFountain())
+                                R.Cast();
                         }
                     }
                 }
