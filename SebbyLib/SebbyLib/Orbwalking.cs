@@ -588,7 +588,7 @@ namespace SebbyLib
                 var sebbyFix = new Menu("Sebby FIX", "Sebby FIX");
 
                 sebbyFix.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage %").SetShared().SetValue(new Slider(100, 0, 200)));
-                sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last Hit time adjust %").SetShared().SetValue(new Slider(0, -200, 200)));
+                sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last Hit time adjust (ms)").SetShared().SetValue(new Slider(0, -200, 200)));
 
                 _config.AddSubMenu(sebbyFix);
                 /* Missile check */
