@@ -18,6 +18,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private Vector3 EcastPos;
         private int Etick = 0;
+        public int Muramana = 3042;
+        public int Tear = 3070;
+        public int Manamune = 3004;
+
+
         public void LoadOKTW()
         {
             #region SET SKILLS
@@ -63,6 +68,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRm", "Auto R melee", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("stack", "Stack Tear if full mana", true).SetValue(false));
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -223,6 +229,27 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Program.LagFree(4))
             {
+                if (Program.None && Config.Item("stack", true).GetValue<bool>()  && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.90 &&  (Items.HasItem(Tear) || Items.HasItem(Manamune)))
+                {
+                    if(Utils.TickCount - Q.LastCastAttemptT > 4200 && Utils.TickCount - W.LastCastAttemptT > 4200 && Utils.TickCount - E.LastCastAttemptT > 4200)
+                    {
+                        if (Range)
+                        {
+                            if (W.IsReady())
+                                W.Cast();
+                            else if (E.IsReady() && (Player.InFountain() || Player.IsMoving))
+                                E.Cast(Player.ServerPosition);
+                            else if (Q.IsReady() && !E.IsReady())
+                                Q.Cast(Player.Position.Extend(Game.CursorPos, 500));
+                        }
+                        else
+                        {
+                            if (W.IsReady())
+                                W.Cast();
+                        }
+                    }
+                }
+
                 SetValue();
                 if(R.IsReady())
                     LogicR();
