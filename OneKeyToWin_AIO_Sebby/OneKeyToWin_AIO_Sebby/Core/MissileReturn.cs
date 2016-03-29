@@ -97,7 +97,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (Missile != null && Missile.IsValid && Target.IsValidTarget())
             {
                 var finishPosition = Missile.Position;
-                if (Missile.SData.Name == MissileName)
+                if (Missile.SData.Name.ToLower() == MissileName.ToLower())
                 {
                     finishPosition = MissileEndPos;
                 }

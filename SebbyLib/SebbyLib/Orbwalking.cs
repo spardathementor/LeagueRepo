@@ -212,7 +212,13 @@ namespace SebbyLib
 
         public static float GetMyProjectileSpeed()
         {
-            return IsMelee(Player) || _championName == "Azir" || _championName == "Velkoz" ||
+            if (_championName == "Velkoz")
+            {
+                Console.WriteLine("" + Player.BasicAttack.MissileSpeed);
+                //return 2000;
+            }
+
+            return IsMelee(Player) || _championName == "Azir" ||
                    _championName == "Viktor" && Player.HasBuff("ViktorPowerTransferReturn")
                 ? float.MaxValue
                 : Player.BasicAttack.MissileSpeed;
@@ -584,6 +590,13 @@ namespace SebbyLib
 
                 _config.AddSubMenu(misc);
 
+
+                var sebbyFix = new Menu("Sebby FIX", "Sebby FIX");
+
+                sebbyFix.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage %").SetShared().SetValue(new Slider(100, 0, 200)));
+                sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last Hit time adjust %").SetShared().SetValue(new Slider(0, -200, 200)));
+
+                _config.AddSubMenu(sebbyFix);
                 /* Missile check */
                 _config.AddItem(new MenuItem("MissileCheck", "Use Missile Check").SetShared().SetValue(true));
 
@@ -591,7 +604,7 @@ namespace SebbyLib
                 _config.AddItem(
                     new MenuItem("ExtraWindup", "Extra windup time").SetShared().SetValue(new Slider(80, 0, 200)));
                 _config.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
-                _config.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage %").SetShared().SetValue(new Slider(100, 0, 200)));
+                
                 /*Load the menu*/
                 _config.AddItem(
                     new MenuItem("LastHit", "Last hit").SetShared().SetValue(new KeyBind('X', KeyBindType.Press)));
@@ -765,13 +778,13 @@ namespace SebbyLib
                             if (!ShouldAttackMinion(minion))
                                 continue;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + _config.Item("TimeAdjust").GetValue<Slider>().Value + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                             if (mode == OrbwalkingMode.Freeze)
                             {
                                 t += 200 + Game.Ping / 2;
                             }
-
+                            
                             var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
 
                             var damage = Player.GetAutoAttackDamage(minion, true) * 0.01 * _config.Item("DamageAdjust").GetValue<Slider>().Value;
