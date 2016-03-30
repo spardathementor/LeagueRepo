@@ -763,7 +763,7 @@ namespace SebbyLib
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)
                 {
 
-                    var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).OrderBy(minion => HealthPrediction.GetHealthPrediction(minion, 1000));
+                    var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).OrderBy(minion => HealthPrediction.GetHealthPrediction(minion, 1200));
 
                     foreach (var minion in MinionList)
                     {
@@ -772,14 +772,14 @@ namespace SebbyLib
                             if (!ShouldAttackMinion(minion))
                                 continue;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + _config.Item("TimeAdjust").GetValue<Slider>().Value + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = (int)(Player.AttackCastDelay * 1000) + _config.Item("TimeAdjust").GetValue<Slider>().Value + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                             if (mode == OrbwalkingMode.Freeze)
                             {
                                 t += 200 + Game.Ping / 2;
                             }
                             
-                            var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
+                            var predHealth = HealthPrediction.GetHealthPrediction(minion, t, 70);
 
                             var damage = Player.GetAutoAttackDamage(minion, true) * 0.01 * _config.Item("DamageAdjust").GetValue<Slider>().Value;
                             var killable = predHealth <= damage;
@@ -793,7 +793,12 @@ namespace SebbyLib
                             }
                             else
                             {
-                                if (killable && predHealth > 0)
+                                if (predHealth <= 0 && predHealth > -damage / 2)
+                                {
+                                    FireOnNonKillableMinion(minion);
+                                }
+
+                                if (killable)
                                 {
                                     return minion;
                                 }

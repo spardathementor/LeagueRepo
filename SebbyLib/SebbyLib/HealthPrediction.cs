@@ -117,8 +117,7 @@ namespace SebbyLib
                 if (!attack.Processed && attack.Source.IsValidTarget(float.MaxValue, false) &&
                     attack.Target.IsValidTarget(float.MaxValue, false) && attack.Target.NetworkId == unit.NetworkId)
                 {
-                    var landTime = attack.StartTick + attack.Delay +
-                                   1000 * Math.Max(0, unit.Distance(attack.Source) - attack.Source.BoundingRadius) / attack.ProjectileSpeed + delay;
+                    var landTime = attack.StartTick + attack.Delay + 1000 * Math.Max(0, unit.Distance(attack.Source) - attack.Source.BoundingRadius) / attack.ProjectileSpeed + delay;
 
                     if (/*Utils.GameTimeTickCount < landTime - delay &&*/ landTime < Utils.GameTimeTickCount + time)
                     {
