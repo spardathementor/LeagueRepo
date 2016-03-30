@@ -20,10 +20,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q = new Spell(SpellSlot.Q, 825);
             W = new Spell(SpellSlot.W, 600);
             E = new Spell(SpellSlot.E, 800);
-            R = new Spell(SpellSlot.R, 1250);
+            R = new Spell(SpellSlot.R, 1230);
            
-            Q.SetSkillshot(0.25f, 200f, 1000f, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.16f, 40f, 2000f, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.3f, 200f, 1000f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.2f, 40f, 2000f, true, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA)
+                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA && OktwCommon.CanHarras())
                     Program.CastSpell(Q, t);
                 else
                 {

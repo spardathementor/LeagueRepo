@@ -87,8 +87,7 @@ namespace SebbyLib
         /// <param name="args">The <see cref="GameObjectProcessSpellCastEventArgs"/> instance containing the event data.</param>
         private static void ObjAiBaseOnOnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if ( sender.Team != ObjectManager.Player.Team || !sender.IsValidTarget(3000, false)
-                || !Orbwalking.IsAutoAttack(args.SData.Name) || !(args.Target is Obj_AI_Base))
+            if ( sender.Team != ObjectManager.Player.Team || !sender.IsValidTarget(3000, false) || !Orbwalking.IsAutoAttack(args.SData.Name) || !(args.Target is Obj_AI_Base))
             {
                 return;
             }
