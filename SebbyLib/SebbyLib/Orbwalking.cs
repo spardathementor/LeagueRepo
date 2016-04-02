@@ -850,7 +850,8 @@ namespace SebbyLib
                     var target = TargetSelector.GetTarget(-1, TargetSelector.DamageType.Physical);
                     if (target.IsValidTarget() && InAutoAttackRange(target))
                     {
-                        return target;
+                        if(!ObjectManager.Player.UnderTurret(true) || mode == OrbwalkingMode.Combo)
+                            return target;
                     }
                 }
 
