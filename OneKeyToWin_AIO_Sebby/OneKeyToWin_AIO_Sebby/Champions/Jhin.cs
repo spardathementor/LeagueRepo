@@ -340,7 +340,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (t.IsValidTarget() )
                     {
                         
-                        var minion = Cache.GetMinions(Prediction.GetPrediction(t, 0.4f).CastPosition, 350).Where(minion2 => minion2.IsValidTarget(Q.Range)).FirstOrDefault();
+                        var minion = Cache.GetMinions(Prediction.GetPrediction(t, 0.3f).CastPosition, 300).Where(minion2 => minion2.IsValidTarget(Q.Range)).FirstOrDefault();
                         if (minion.IsValidTarget())
                         {
                             if (t.Health < GetQdmg(t))
