@@ -78,12 +78,12 @@ namespace OneKeyToWin_AIO_Sebby
         }
         private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
-            if (!Q.IsReady() || !Config.Item("autoQ", true).GetValue<bool>() || !(args.Target is Obj_AI_Hero))
+            if (!Q.IsReady() || !Config.Item("autoQ", true).GetValue<bool>() || !FishBoneActive)
                 return;
 
-            var t = (Obj_AI_Hero)args.Target;
+            var t = args.Target as Obj_AI_Hero;
 
-            if (FishBoneActive && t.IsValidTarget())
+            if (t != null)
             {
                 var realDistance = GetRealDistance(t);
                 if (Program.Combo && realDistance < GetRealPowPowRange(t) && (Player.Mana < RMANA + 20 || Player.GetAutoAttackDamage(t) * 3 < t.Health))
@@ -92,12 +92,12 @@ namespace OneKeyToWin_AIO_Sebby
                     Q.Cast();
             }
 
-            if (Program.LaneClear && !FishBoneActive && Config.Item("farmQ", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Player.Mana > RMANA + EMANA + WMANA + 30)
+            var minion = args.Target as Obj_AI_Minion;
+            if (Program.Farm && minion != null)
             {
+                var realDistance = GetRealDistance(minion);
 
-                var allMinionsQ = Cache.GetMinions(Player.ServerPosition, bonusRange());
-                foreach (var minion in allMinionsQ.Where(
-                    minion => args.Target.NetworkId != minion.NetworkId && minion.Distance(args.Target.Position) < 200 && (5 - Q.Level) * Player.GetAutoAttackDamage(minion) < args.Target.Health && (5 - Q.Level) * Player.GetAutoAttackDamage(minion) < minion.Health))
+                if(realDistance < GetRealPowPowRange(minion) || Player.ManaPercent < Config.Item("Mana", true).GetValue<Slider>().Value)
                 {
                     Q.Cast();
                 }
@@ -178,17 +178,21 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
-            if (Program.Farm && (Game.Time - lag > 0.1) && !FishBoneActive  && !Player.IsWindingUp && SebbyLib.Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
+            if (Program.Farm && !FishBoneActive && !Player.IsWindingUp && Orbwalker.GetTarget() == null && SebbyLib.Orbwalking.CanAttack() && Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + 10)
             {
                 foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(
-                minion => !SebbyLib.Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
+                minion => !SebbyLib.Orbwalking.InAutoAttackRange(minion) && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
                 {
-                    Orbwalker.ForceTarget(minion);
-                    Q.Cast();
-                    return;
+                    var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 200, 70);
+                    if (hpPred < Player.GetAutoAttackDamage(minion) * 1.1 && hpPred > 5)
+                    {
+                        Orbwalker.ForceTarget(minion);
+                        Q.Cast();
+                        return;
+                    }
                 }
-                lag = Game.Time;
             }
+
             var t = TargetSelector.GetTarget(bonusRange() + 60, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget())
             {
@@ -236,9 +240,10 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Player.CountEnemiesInRange(bonusRange() + 50) == 0)
                 {
-                    if (Program.Combo && Player.Mana > RMANA + WMANA + 10 && GetRealDistance(t) > bonusRange() - 50)
+                    if (Program.Combo && Player.Mana > RMANA + WMANA + 10)
                     {
-                        Program.CastSpell(W, t);
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && GetRealDistance(enemy) > bonusRange() - 50).OrderBy(enemy => enemy.Health))
+                            Program.CastSpell(W, enemy);
                     }
                     else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + WMANA + 40 && OktwCommon.CanHarras())
                     {
