@@ -85,8 +85,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (t != null)
             {
-                var realDistance = GetRealDistance(t);
-                if (Program.Combo && realDistance < GetRealPowPowRange(t) && (Player.Mana < RMANA + 20 || Player.GetAutoAttackDamage(t) * 3 < t.Health))
+                var realDistance = GetRealDistance(t) - 50;
+                if (Program.Combo && (realDistance < GetRealPowPowRange(t) || (Player.Mana < RMANA + 20 && Player.GetAutoAttackDamage(t) * 3 < t.Health)))
                     Q.Cast();
                 else if (Program.Farm && Config.Item("Qharras", true).GetValue<bool>() && (realDistance > bonusRange() || realDistance < GetRealPowPowRange(t) || Player.Mana < RMANA + EMANA + WMANA + WMANA))
                     Q.Cast();
@@ -223,7 +223,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (t.IsValidTarget())
             {
  
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && enemy.Distance(Player) > bonusRange() + 50))
+                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && enemy.Distance(Player) > bonusRange()))
                 {
                     var comboDmg = OktwCommon.GetKsDamage(enemy, W);
                     if (R.IsReady() && Player.Mana > RMANA + WMANA + 20)
@@ -238,11 +238,11 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 
 
-                if (Player.CountEnemiesInRange(bonusRange() + 50) == 0)
+                if (Player.CountEnemiesInRange(bonusRange()) == 0)
                 {
                     if (Program.Combo && Player.Mana > RMANA + WMANA + 10)
                     {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && GetRealDistance(enemy) > bonusRange() - 50).OrderBy(enemy => enemy.Health))
+                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && GetRealDistance(enemy) > bonusRange() ).OrderBy(enemy => enemy.Health))
                             Program.CastSpell(W, enemy);
                     }
                     else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + WMANA + 40 && OktwCommon.CanHarras())
