@@ -147,6 +147,22 @@ namespace OneKeyToWin_AIO_Sebby
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
+                if (Q.IsReady() && Program.LagFree(3) && Config.Item("autoQ", true).GetValue<bool>())
+                {
+                    if (Program.Combo && RMANA + WMANA < Player.Mana)
+                        Q.Cast(t);
+                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harrasQ", true).GetValue<bool>())
+                        Q.Cast(t);
+                    else
+                    {
+                        var qDmg = OktwCommon.GetKsDamage(t, Q);
+                        var wDmg = W.GetDamage(t);
+                        if (qDmg > t.Health)
+                            Q.Cast(t);
+                        else if (qDmg + wDmg > t.Health && Player.Mana > QMANA + WMANA)
+                            Q.Cast(t);
+                    }
+                }
                 if (W.IsReady() && Program.LagFree(2) && Config.Item("autoW", true).GetValue<bool>())
                 {
                     var poutput = W.GetPrediction(t, true);
@@ -164,23 +180,6 @@ namespace OneKeyToWin_AIO_Sebby
                             W.Cast(poutput.CastPosition);
                         else if (qDmg + wDmg > t.Health && Player.Mana > QMANA + WMANA)
                             W.Cast(poutput.CastPosition);
-                    }
-                }
-
-                if (Q.IsReady() && Program.LagFree(3) && Config.Item("autoQ", true).GetValue<bool>())
-                {
-                    if (Program.Combo && RMANA + WMANA < Player.Mana)
-                        Q.Cast(t);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harrasQ", true).GetValue<bool>())
-                        Q.Cast(t);
-                    else
-                    {
-                        var qDmg = OktwCommon.GetKsDamage(t, Q);
-                        var wDmg = W.GetDamage(t);
-                        if (qDmg > t.Health)
-                            Q.Cast(t);
-                        else if (qDmg + wDmg > t.Health && Player.Mana > QMANA + WMANA)
-                            Q.Cast(t);
                     }
                 }
             }
@@ -215,7 +214,7 @@ namespace OneKeyToWin_AIO_Sebby
                     if (Config.Item("tibers", true).GetValue<bool>() && HaveTibers)
                     {
                         var BestEnemy = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Magical);
-                        if (BestEnemy.IsValidTarget(2000) && Game.Time - TibbersTimer > 2)
+                        if (BestEnemy.IsValidTarget(2000) && Game.Time - TibbersTimer > 2 && !BestEnemy.UnderTurret(true))
                         {
                             Player.IssueOrder(GameObjectOrder.MovePet, BestEnemy.Position);
                             R.CastOnUnit(BestEnemy);
