@@ -336,11 +336,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Config.Item("Qminion", true).GetValue<bool>())
                 {
-                    var t = TargetSelector.GetTarget(Q.Range + 400, TargetSelector.DamageType.Physical);
+                    var t = TargetSelector.GetTarget(Q.Range + 300, TargetSelector.DamageType.Physical);
                     if (t.IsValidTarget() )
                     {
                         
-                        var minion = Cache.GetMinions(Prediction.GetPrediction(t, 0.3f).CastPosition, 300).Where(minion2 => minion2.IsValidTarget(Q.Range)).FirstOrDefault();
+                        var minion = Cache.GetMinions(Prediction.GetPrediction(t, 0.1f).CastPosition, 300).Where(minion2 => minion2.IsValidTarget(Q.Range)).OrderBy(x => x.Distance(t)).FirstOrDefault();
                         if (minion.IsValidTarget())
                         {
                             if (t.Health < GetQdmg(t))
@@ -367,9 +367,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmQ", true).GetValue<bool>())
             {
                 var minionList = Cache.GetMinions(Player.ServerPosition, Q.Range);
-
-                if (minionList.Count > Config.Item("LCminions", true).GetValue<Slider>().Value)
-                    Q.CastOnUnit(minionList[0]);
+                
+                if (minionList.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                {
+                    var minionAttack = minionList.FirstOrDefault(x => Q.GetDamage(x) > SebbyLib.HealthPrediction.GetHealthPrediction(x, 300));
+                    if(minionAttack.IsValidTarget())
+                        Q.CastOnUnit(minionAttack);
+                }
+                    
             }
         }
 
