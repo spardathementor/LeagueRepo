@@ -54,6 +54,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEforce", "force E + Q", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEsplash", "Q + E splash minion damage", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QEsplashAdjust", "Q + E splash minion radius", true).SetValue(new Slider(150, 250, 50)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("useQE", "Semi-manual Q + E near mouse key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W range", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWm", "Auto W melee", true).SetValue(true));
@@ -305,7 +306,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var Qtype = Q;
             if (CanUseQE())
+            {
                 Qtype = Qext;
+
+                if (Config.Item("useQE", true).GetValue<KeyBind>().Active)
+                {
+                    var mouseTarget = Program.Enemies.Where(enemy =>
+                        enemy.IsValidTarget(Qtype.Range)).OrderBy(enemy => enemy.Distance(Game.CursorPos)).FirstOrDefault();
+
+                    if (mouseTarget != null)
+                    {
+                        CastQ(mouseTarget);
+                        return;
+                    }
+                }
+            }
 
             var t = TargetSelector.GetTarget(Qtype.Range, TargetSelector.DamageType.Physical);
 

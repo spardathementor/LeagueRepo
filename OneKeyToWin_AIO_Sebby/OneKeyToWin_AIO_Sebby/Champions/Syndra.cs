@@ -48,6 +48,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto Q + E combo, ks", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasE", "Harass Q + E", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EInterrupter", "Auto Q + E Interrupter", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("useQE", "Semi-manual Q + E near mouse key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Auto Q + E Gapcloser").AddItem(new MenuItem("Egapcloser" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
@@ -178,6 +179,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
+            if(Config.Item("useQE", true).GetValue<KeyBind>().Active)
+            {
+                var mouseTarget = Program.Enemies.Where(enemy => 
+                    enemy.IsValidTarget(Eany.Range)).OrderBy(enemy => enemy.Distance(Game.CursorPos)).FirstOrDefault();
+
+                if (mouseTarget != null)
+                {
+                    TryBallE(mouseTarget);
+                    return;
+                }
+            }
+
             var t = TargetSelector.GetTarget(Eany.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
