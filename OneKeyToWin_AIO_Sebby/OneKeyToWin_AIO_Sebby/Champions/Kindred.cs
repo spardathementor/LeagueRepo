@@ -43,9 +43,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Renemy", "Don't R if x enemies", true).SetValue(new Slider(4, 5, 0)));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsAlly))
-                Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Use on").AddItem(new MenuItem("Ruse" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
-
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("Haras").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
@@ -173,22 +170,19 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             var rEnemy = Config.Item("Renemy", true).GetValue<Slider>().Value;
-            
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.Distance(ally.ServerPosition) < R.Range && Config.Item("Ruse" + ally.ChampionName, true).GetValue<bool>() ))
+
+            double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+            var enemys = Player.CountEnemiesInRange(900);
+
+            if (dmg == 0 && enemys == 0)
+                return;
+
+            if (Player.CountEnemiesInRange(500) < rEnemy)
             {
-                double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-                var enemys = ally.CountEnemiesInRange(900);
-
-                if (dmg == 0 && enemys == 0)
-                    continue;
-
-                if (ally.CountEnemiesInRange(500) < rEnemy)
-                {
-                    if (ally.Health - dmg < enemys * ally.Level * 15)
-                        R.CastOnUnit(ally);
-                    else if (ally.Health - dmg < ally.Level * 15)
-                        R.CastOnUnit(ally);
-                }
+                if (Player.Health - dmg < enemys * Player.Level * 15)
+                    R.Cast(Player);
+                else if (Player.Health - dmg < Player.Level * 15)
+                    R.Cast(Player);
             }
         }
 
