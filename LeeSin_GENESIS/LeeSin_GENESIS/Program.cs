@@ -12,9 +12,10 @@ namespace LeeSin_GENESIS
 {
     public enum ComboMode
     {
+        None,
         OneVsOne,
-        MoreAlly,
-        MoreEnemy
+        MoreAllyVsOneEnemy,
+        OneVsMoreEnemy
     }
 
     class Program
@@ -40,8 +41,7 @@ namespace LeeSin_GENESIS
         private static Obj_AI_Base Marked;
         private static int LastTimeWardPlace;
 
-        private static ComboMode ComboMode;
-        private static SebbyLib.Prediction.PredictionInput PredictionRnormal;
+        private static ComboMode ComboMode = ComboMode.None;
 
         private static void Game_OnGameLoad(EventArgs args)
         {
@@ -57,6 +57,9 @@ namespace LeeSin_GENESIS
 
             Config.SubMenu("Q Config").AddItem(new MenuItem("Q2delay", "Q2 Delay").SetValue(new Slider(500, 2000, 0)));
 
+            Config.SubMenu("W Config").AddItem(new MenuItem("WwardJump", "Ward Jump Key").SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
+
+
             Config.SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range").SetValue(false));
 
 
@@ -69,19 +72,7 @@ namespace LeeSin_GENESIS
             Rnormal = new Spell(SpellSlot.R, 700);
 
             Q.SetSkillshot(0.25f, 60f, 1800f, true, SkillshotType.SkillshotLine);
-            Rnormal.SetSkillshot(0f, 70f, 1500f, false, SkillshotType.SkillshotLine);
-
-            PredictionRnormal = new SebbyLib.Prediction.PredictionInput
-            {
-                Aoe = true,
-                Collision = false,
-                Speed = Rnormal.Speed,
-                Delay = Rnormal.Delay,
-                Range = Rnormal.Range,
-                Radius = Rnormal.Width,
-                Type = SebbyLib.Prediction.SkillshotType.SkillshotLine
-            };
-
+            Rnormal.SetSkillshot(0.2f, 50f, 1100f, false, SkillshotType.SkillshotLine);
 
             flash = Player.GetSpellSlot("summonerflash");
             ignite = Player.GetSpellSlot("summonerdot");
@@ -97,65 +88,26 @@ namespace LeeSin_GENESIS
             Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
             Orbwalking.AfterAttack += Orbwalking_AfterAttack;
             Drawing.OnDraw += Drawing_OnDraw;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+        }
+
+        private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (sender.IsMe && !args.SData.IsAutoAttack())
+            {
+                Console.WriteLine(args.MissileNetworkId);
+                
+            }
         }
 
         private static void Drawing_OnDraw(EventArgs args)
         {
-            return;
-            if (R.IsReady() && COMBO)
-            {
-                int searchRange = 400;
-
-                if (CanJump())
-                    searchRange = 1000;
-
-                foreach (var t in HeroManager.Enemies.Where(x => x.IsValidTarget(searchRange)))
-                {
-                    PredictionRnormal.From = R.GetPrediction(t).CastPosition;
-                    
-                    foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget() && x.NetworkId != t.NetworkId && x.Distance(t) < Rnormal.Range))
-                    {
-                        PredictionRnormal.Unit = enemy;
-
-                        var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(PredictionRnormal);
-
-
-                        //Render.Circle.DrawCircle(Rnormal.From, 50, System.Drawing.Color.Yellow, 1);
-                        //Console.WriteLine(" " + poutput2.AoeTargetsHitCount);
-                        //Render.Circle.DrawCircle(poutput2.CastPosition, 50, System.Drawing.Color.Orange, 1);
-
-                        var castPos = poutput2.CastPosition;
-                        var ext = castPos.Extend(PredictionRnormal.From, castPos.Distance(PredictionRnormal.From) + 250);
-                        
-                        //Render.Circle.DrawCircle(ext, 50, System.Drawing.Color.YellowGreen, 1);
-
-
-                        if (Player.Distance(ext) < 150)
-                        {
-                            R.Cast(t);
-                            return;
-                        }
-                        else if (W.IsReady() && Player.Distance(ext) < W.Range)
-                        {
-                            Jump(ext);
-                            return;
-                        }
-                        else if (Player.Distance(ext) < 300)
-                        {
-                            Orbwalker.SetOrbwalkingPoint(ext);
-                            return;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
-            }
+            Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.4f, System.Drawing.Color.YellowGreen, "COMBO MODE: " + ComboMode );
         }
 
         private static void Game_OnGameUpdate(EventArgs args)
         {
+            ModeDetector();
             //Console.WriteLine(E.Instance.Name);
             if (Q.IsReady() && COMBO)
                 Qlogic();
@@ -169,13 +121,24 @@ namespace LeeSin_GENESIS
 
         private static void Rlogic()
         {
-            if (COMBO && !TryKickAOE())
+            if (COMBO )
             {
-                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
-                if (CanJump())
+                if(ComboMode == ComboMode.OneVsOne)
                 {
-                    TryToGetPosAOE();
+
                 }
+                else
+                {
+                    if (!TryKickAOE())
+                    {
+                        Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
+                        if (CanJump() && Utils.TickCount - LastTimeWardPlace > 250)
+                        {
+                            TryToGetPosAOE();
+                        }
+                    }
+                }
+               
             }
         }
 
@@ -183,8 +146,8 @@ namespace LeeSin_GENESIS
         {
             if (WFIRST)
             {
-                //if (COMBO)
-                    //Jump(Game.CursorPos);
+                if(Config.Item("WwardJump").GetValue<KeyBind>().Active)
+                    Jump(Player.Position.Extend(Game.CursorPos, W.Range));
             }
         }
 
@@ -202,57 +165,73 @@ namespace LeeSin_GENESIS
             {
                 if (Marked.IsValidTarget())
                 {
-                    
-                
                     if (Config.Item("Q2delay").GetValue<Slider>().Value < Utils.TickCount - Q.LastCastAttemptT)
                     {
                         Q.Cast();
                     }
                 }
             }
-            
-
         }
 
         private static void Jump(Vector3 position)
         {
-            Obj_AI_Base obj = HeroManager.Allies.FirstOrDefault(x => x.IsValid && !x.IsDead && x.Distance(position) < 200 && x.Distance(position) < 200 && !x.IsMe);
+            if (position.IsWall())
+                return;
+
+            if(Player.Distance(position) > W.Range)
+            {
+                position = Player.Position.Extend(position, W.Range);
+            }
+
+            Obj_AI_Base obj = HeroManager.Allies.FirstOrDefault(x => x.IsValid && !x.IsDead && !x.IsMe && x.Distance(position) < 150 );
             if (obj == null)
             {
-                obj = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(x => x.IsValid && x.IsAlly && !x.IsDead && x.Distance(position) < 200);
+                obj = ObjectManager.Get<Obj_AI_Minion>().FirstOrDefault(x => x.IsValid && x.IsAlly && !x.IsDead && x.Distance(position) < 150);
             }
 
             if(obj == null)
             {
+                if (Utils.TickCount - LastTimeWardPlace < 250)
+                {
+                    Utility.DelayAction.Add(40, () => Jump(position));
+                    Orbwalker.SetOrbwalkingPoint(position);
+                    return;
+                }
                 if (TrinketN.IsReady())
                 {
                     TrinketN.Cast(position);
                     LastTimeWardPlace = Utils.TickCount;
+                    Utility.DelayAction.Add(40, () => Jump(position));
                 }
                 else if (SightStone.IsReady())
                 {
                     SightStone.Cast(position);
                     LastTimeWardPlace = Utils.TickCount;
+                    Utility.DelayAction.Add(40, () => Jump(position));
                 }
                 else if (WardN.IsReady())
                 {
                     WardN.Cast(position);
                     LastTimeWardPlace = Utils.TickCount;
+                    Utility.DelayAction.Add(40, () => Jump(position));
                 }
                 else if (EOTOasis.IsReady())
                 {
                     EOTOasis.Cast(position);
                     LastTimeWardPlace = Utils.TickCount;
+                    Utility.DelayAction.Add(40, () => Jump(position));
                 }
                 else if (EOTEquinox.IsReady())
                 {
                     EOTEquinox.Cast(position);
                     LastTimeWardPlace = Utils.TickCount;
+                    Utility.DelayAction.Add(40, () => Jump(position));
                 }
                 else if (EOTWatchers.IsReady())
                 {
                     EOTWatchers.Cast(position);
                     LastTimeWardPlace = Utils.TickCount;
+                    Utility.DelayAction.Add(40, () => Jump(position));
                 }
             }
             else
@@ -285,16 +264,33 @@ namespace LeeSin_GENESIS
         {
             foreach (var t in HeroManager.Enemies.Where(x => x.IsValidTarget(1000)))
             {
-                PredictionRnormal.From = Prediction.GetPrediction(t, 0.40f).CastPosition;
+                var from = Prediction.GetPrediction(t, Rnormal.Delay).CastPosition;
 
-                foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget() && x.NetworkId != t.NetworkId && x.Distance(t) < Rnormal.Range))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget() && enemy.NetworkId != t.NetworkId && enemy.Distance(t) < Rnormal.Range))
                 {
-                    PredictionRnormal.Unit = enemy;
+                    var PredictionRnormal = new SebbyLib.Prediction.PredictionInput
+                    {
+                        Aoe = true,
+                        Collision = false,
+                        Speed = Rnormal.Speed,
+                        Delay = Rnormal.Delay,
+                        Range = Rnormal.Range,
+                        Radius = Rnormal.Width,
+                        Unit = enemy,
+                        From = from,
+                        Type = SebbyLib.Prediction.SkillshotType.SkillshotLine
+                    };
 
                     var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(PredictionRnormal);
-                    var castPos = poutput2.CastPosition;
-                    var ext = castPos.Extend(PredictionRnormal.From, castPos.Distance(PredictionRnormal.From) + 250);
+                    if (poutput2.AoeTargetsHitCount == 0 || poutput2.Hitchance < SebbyLib.Prediction.HitChance.Medium)
+                    {
+                        continue;
+                    }
 
+                    var castPos = poutput2.CastPosition;
+                    var ext = castPos.Extend(from, castPos.Distance(t.ServerPosition) + 200);
+
+                    Console.WriteLine("AOE2 " + poutput2.AoeTargetsHitCount);
                     if (Player.Distance(ext) < W.Range)
                     {
                         Jump(ext);
@@ -309,23 +305,42 @@ namespace LeeSin_GENESIS
         {
             foreach (var t in HeroManager.Enemies.Where(x => x.IsValidTarget(400)))
             {
-                PredictionRnormal.From = R.GetPrediction(t).CastPosition;
+                var from = Prediction.GetPrediction(t, Rnormal.Delay).CastPosition;
 
-                foreach (var enemy in HeroManager.Enemies.Where(x => x.IsValidTarget() && x.NetworkId != t.NetworkId && x.Distance(t) < Rnormal.Range))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget() && enemy.NetworkId != t.NetworkId && enemy.Distance(t) < Rnormal.Range))
                 {
-                    PredictionRnormal.Unit = enemy;
+                    var PredictionRnormal = new SebbyLib.Prediction.PredictionInput
+                    {
+                        Aoe = true,
+                        Collision = false,
+                        Speed = Rnormal.Speed,
+                        Delay = Rnormal.Delay,
+                        Range = Rnormal.Range,
+                        Radius = Rnormal.Width,
+                        Unit = enemy,
+                        From = from,
+                        Type = SebbyLib.Prediction.SkillshotType.SkillshotLine
+                    };
+
 
                     var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(PredictionRnormal);
-                    var castPos = poutput2.CastPosition;
-                    var ext = castPos.Extend(PredictionRnormal.From, castPos.Distance(PredictionRnormal.From) + 280);
+                    if (poutput2.AoeTargetsHitCount == 0)
+                    {
+                        continue;
+                    }
 
-                    if (Player.Distance(ext) < 120)
+                    var castPos = poutput2.CastPosition;
+                    var ext = castPos.Extend(from, castPos.Distance(t.ServerPosition) + 300);
+
+                    Console.WriteLine("AOE " + poutput2.AoeTargetsHitCount);
+                    
+                    if (Player.Distance(ext) < 100)
                     {
                         Orbwalker.SetOrbwalkingPoint(ext);
                         R.Cast(t);
                         return true;
                     }
-                    else if (Player.Distance(ext) < 300)
+                    else if (Player.Distance(ext) < 200)
                     {
                         Orbwalker.SetOrbwalkingPoint(ext);
                         return true;
@@ -369,7 +384,17 @@ namespace LeeSin_GENESIS
 
         private static void ModeDetector()
         {
-
+            int allys = Player.CountAlliesInRange(2000);
+            int enemys = Player.CountEnemiesInRange(2000);
+            Console.WriteLine("" + allys + " " + enemys);
+            if (enemys == 0)
+                ComboMode = ComboMode.None;
+            else if(allys == 0 && enemys == 1)
+                ComboMode = ComboMode.OneVsOne;
+            else if (allys == 0 && enemys > 1)
+                ComboMode = ComboMode.OneVsMoreEnemy;
+            else if (allys > 0 && enemys == 1)
+                ComboMode = ComboMode.MoreAllyVsOneEnemy;
         }
     }
 }

@@ -150,7 +150,7 @@ namespace Sebby_Ban_War
 
             if (args.Order == GameObjectOrder.AttackUnit && args.Target is Obj_AI_Minion && LastType == 0 && Utils.TickCount - LastMouseTime > mouseDis / 15)
             {
-                Console.WriteLine("SBW farm protection");
+                //Console.WriteLine("SBW farm protection");
                 LastType = 1;
                 LastMouseTime = Utils.TickCount;
                 LastMousePos = screenPos;
