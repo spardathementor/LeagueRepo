@@ -140,6 +140,8 @@ namespace OneKeyToWin_AIO_Sebby
                     R.CastOnUnit(t);
             }
 
+
+
             if (Program.LagFree(0))
             {
                 SetMana();
@@ -201,6 +203,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Player.Mana > RMANA + WMANA)
             {
+                if (Program.Combo && Player.IsWindingUp)
+                    return;
                 if (Config.Item("autoW", true).GetValue<bool>())
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && !enemy.HasBuff("caitlynyordletrapinternal")))
                         W.Cast(enemy.Position, true);
@@ -213,6 +217,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicQ()
         {
+            if (Program.Combo && Player.IsWindingUp)
+                return;
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget(Q.Range))
             {
@@ -247,6 +253,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicE()
         {
+            if (Program.Combo && Player.IsWindingUp)
+                return;
             if (Config.Item("autoE", true).GetValue<bool>() )
             {
                 var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
