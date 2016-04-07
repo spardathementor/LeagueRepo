@@ -14,7 +14,7 @@ namespace OneKeyToWin_AIO_Sebby
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private SpellSlot flash;
 
-        public GameObject Tibbers;
+        public Obj_AI_Base Tibbers;
         public float TibbersTimer = 0;
         private bool HaveStun = false;
         private Obj_AI_Hero Player
@@ -24,13 +24,13 @@ namespace OneKeyToWin_AIO_Sebby
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 625f);
-            W = new Spell(SpellSlot.W, 560f);
+            W = new Spell(SpellSlot.W, 550f);
             E = new Spell(SpellSlot.E);
             R = new Spell(SpellSlot.R, 625f);
             FR = new Spell(SpellSlot.R, 1000f );
 
             Q.SetTargetted(0.25f, 1400f);
-            W.SetSkillshot(0.25f, 100f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.3f, 80f, float.MaxValue, false, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             FR.SetSkillshot(0.20f, 250f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
@@ -72,10 +72,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnCreate(GameObject obj, EventArgs args)
         {
-            if (obj.IsValid && obj.IsAlly && obj.Type == GameObjectType.obj_AI_Minion && obj.Name == "Tibbers")
+            if (obj.IsValid && obj.IsAlly && obj is Obj_AI_Minion && obj.Name.ToLower() == "tibbers")
             {
-                Tibbers = obj;
-                Program.debug("" + obj.Type);
+                Tibbers = obj as Obj_AI_Base ;
             }
         }
 
@@ -88,7 +87,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             SetMana();
 
-            if (R.IsReady() && Program.LagFree(1) && !HaveTibers)
+            if (R.IsReady() && (Program.LagFree(1) || Program.LagFree(3)) && !HaveTibers)
             {
                 var realRange = R.Range;
 
@@ -145,9 +144,9 @@ namespace OneKeyToWin_AIO_Sebby
             }
 
             var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget())
+            if (t.IsValidTarget() && Program.LagFree(2))
             {
-                if (Q.IsReady() && Program.LagFree(3) && Config.Item("autoQ", true).GetValue<bool>())
+                if (Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
                 {
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         Q.Cast(t);
@@ -163,7 +162,7 @@ namespace OneKeyToWin_AIO_Sebby
                             Q.Cast(t);
                     }
                 }
-                if (W.IsReady() && Program.LagFree(2) && Config.Item("autoW", true).GetValue<bool>())
+                if (W.IsReady() && Config.Item("autoW", true).GetValue<bool>() && t.IsValidTarget(W.Range))
                 {
                     var poutput = W.GetPrediction(t, true);
                     var aoeCount = poutput.AoeTargetsHitCount;
@@ -211,14 +210,31 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 if (R.IsReady())
                 {
-                    if (Config.Item("tibers", true).GetValue<bool>() && HaveTibers)
+                    if (Config.Item("tibers", true).GetValue<bool>() && HaveTibers && Tibbers != null && Tibbers.IsValid)
                     {
-                        var BestEnemy = TargetSelector.GetTarget(2000, TargetSelector.DamageType.Magical);
-                        if (BestEnemy.IsValidTarget(2000) && Game.Time - TibbersTimer > 2 && !BestEnemy.UnderTurret(true))
+                        var enemy = Program.Enemies.Where(x => x.IsValidTarget() && Tibbers.Distance(x.Position) < 1000 && !x.UnderTurret(true)).OrderBy(x => x.Distance(Tibbers)).FirstOrDefault();
+                        if(enemy != null)
                         {
-                            Player.IssueOrder(GameObjectOrder.MovePet, BestEnemy.Position);
-                            R.CastOnUnit(BestEnemy);
-                            TibbersTimer = Game.Time;
+
+                            if (Tibbers.Distance(enemy.Position) > 200)
+                                Player.IssueOrder(GameObjectOrder.MovePet, enemy);
+                            else
+                                Tibbers.IssueOrder(GameObjectOrder.AttackUnit, enemy);
+                        }
+                        else
+                        {
+                            var annieTarget = Orbwalker.GetTarget() as Obj_AI_Base;
+                            if (annieTarget != null)
+                            {
+                                if (Tibbers.Distance(annieTarget.Position) > 200)
+                                    Player.IssueOrder(GameObjectOrder.MovePet, annieTarget);
+                                else
+                                    Tibbers.IssueOrder(GameObjectOrder.AttackUnit, annieTarget);
+                            }
+                            else if (Tibbers.UnderTurret(true))
+                            {
+                                Player.IssueOrder(GameObjectOrder.MovePet, Player);
+                            }
                         }
                     }
                     else
