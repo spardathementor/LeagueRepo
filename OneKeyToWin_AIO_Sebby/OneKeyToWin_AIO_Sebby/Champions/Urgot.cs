@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Q.SetSkillshot(0.25f, 60f, 1600f, true, SkillshotType.SkillshotLine);
             Q2.SetSkillshot(0.25f, 60f, 1600f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 200f, 1750f, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
             LoadMenuOKTW();
 
             Drawing.OnDraw += Drawing_OnDraw;
