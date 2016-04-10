@@ -171,16 +171,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 SetMana();
                 Jungle();
+
                 if (!Player.HasBuff("xerathascended2onhit"))
                     Orbwalker.ForceTarget(null);
-                if ((Program.Combo || Program.Farm) && Config.Item("force", true).GetValue<bool>() && Player.Mana < Player.MaxMana && Player.HasBuff("xerathascended2onhit") && !Orbwalker.GetTarget().IsValidTarget())
+                else if ((Program.Combo || Program.Farm) && Config.Item("force", true).GetValue<bool>() && Player.Mana < Player.MaxMana && Orbwalker.GetTarget() == null)
                 {
-                    var allMinions = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2).OrderByDescending(x => x.Health);
-                    foreach (var minion in allMinions)
-                    {
+                    var minion = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2).OrderByDescending(x => x.Health).FirstOrDefault();
+
+                    if(minion != null)
                         Orbwalker.ForceTarget(minion);
-                        return;
-                    }
                 }
             }
 
