@@ -171,10 +171,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 SetMana();
                 Jungle();
-
-                if (!Player.HasBuff("xerathascended2onhit"))
+                int[] mana = new int[] { 0, 30, 33, 36, 42, 48, 54, 63, 72, 81, 90, 102, 114, 126, 138, 150, 165, 180, 195 };
+                if (!Player.HasBuff("xerathascended2onhit") || Player.Mana + mana[Player.Level] > Player.MaxMana)
                     Orbwalker.ForceTarget(null);
-                else if ((Program.Combo || Program.Farm) && Config.Item("force", true).GetValue<bool>() && Player.Mana < Player.MaxMana && Orbwalker.GetTarget() == null)
+                else if ((Program.Combo || Program.Farm) && Config.Item("force", true).GetValue<bool>() && Orbwalker.GetTarget() == null)
                 {
                     var minion = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2).OrderByDescending(x => x.Health).FirstOrDefault();
 
@@ -195,8 +195,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-
-            
             R.Range = 2000 + R.Level * 1200;
             if (!IsCastingR)
                 R.Range = R.Range - Config.Item("MaxRangeR", true).GetValue<Slider>().Value;
