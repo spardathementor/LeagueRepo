@@ -200,7 +200,7 @@ namespace OneKeyToWin_AIO_Sebby
                         new Champions.Brand().LoadOKTW();
                         break;
                     case "Morgana":
-                        new Champions.Morgana().LoadOKTW();
+                        new Morgana().LoadOKTW();
                         break;
                     case "Lux":
                         new Champions.Lux().LoadOKTW();
