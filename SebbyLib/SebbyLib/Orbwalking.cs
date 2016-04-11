@@ -587,7 +587,7 @@ namespace SebbyLib
 
                 var sebbyFix = new Menu("Sebby FIX", "Sebby FIX");
 
-                sebbyFix.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage %").SetShared().SetValue(new Slider(100, 0, 200)));
+                sebbyFix.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage").SetShared().SetValue(new Slider(0,-100, 100)));
                 sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last Hit time adjust (ms)").SetShared().SetValue(new Slider(0, -200, 200)));
 
                 _config.AddSubMenu(sebbyFix);
@@ -781,7 +781,7 @@ namespace SebbyLib
                             
                             var predHealth = HealthPrediction.GetHealthPrediction(minion, t, 70);
 
-                            var damage = Player.GetAutoAttackDamage(minion, true) * 0.01 * _config.Item("DamageAdjust").GetValue<Slider>().Value;
+                            var damage = Player.GetAutoAttackDamage(minion, true) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
                             var killable = predHealth <= damage;
 
                             if (mode == OrbwalkingMode.Freeze)
