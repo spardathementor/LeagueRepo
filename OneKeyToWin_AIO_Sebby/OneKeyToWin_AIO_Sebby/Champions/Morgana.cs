@@ -51,7 +51,7 @@ namespace OneKeyToWin_AIO_Sebby
                 for (int i = 0; i < 4; i++)
                 {
                     var spell2 = enemy.Spellbook.Spells[i];
-                    if (spell2.SData.TargettingType != SpellDataTargetType.Self && spell2.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
+                    if (spell2 != null && spell2.SData != null && spell2.SData.TargettingType != SpellDataTargetType.Self && spell2.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
                     { 
                         var spell = Damage.Spells[enemy.ChampionName].FirstOrDefault(s => s.Slot == enemy.Spellbook.Spells[i].Slot);
                         if (spell != null)
