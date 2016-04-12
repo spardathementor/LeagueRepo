@@ -163,7 +163,7 @@ namespace OneKeyToWin_AIO_Sebby
                 else if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
                     W.Cast();
                 else if (Player.Health - dmg < nearEnemys * Player.Level * sensitivity)
-                    R.Cast(Player);
+                    W.Cast();
             }
         }
 
@@ -180,7 +180,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q2.Range) && enemy.HasBuff("urgotcorrosivedebuff")))
                 {
-                    if ((Player.Mana > WMANA + QMANA * 4 || Q.GetDamage(enemy) * 3 > enemy.Health) && W.IsReady())
+                    if (W.IsReady() && (Player.Mana > WMANA + QMANA * 4 || Q.GetDamage(enemy) * 3 > enemy.Health) &&  Config.Item("autoW", true).GetValue<bool>())
                     {
                         W.Cast();
                         Program.debug("W");
