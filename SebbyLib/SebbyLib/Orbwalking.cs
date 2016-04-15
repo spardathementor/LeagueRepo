@@ -212,7 +212,7 @@ namespace SebbyLib
 
         public static float GetMyProjectileSpeed()
         {
-            return IsMelee(Player) || _championName == "Azir" ||
+            return IsMelee(Player) || _championName == "Azir" || _championName == "Velkoz" ||
                    _championName == "Viktor" && Player.HasBuff("ViktorPowerTransferReturn")
                 ? float.MaxValue
                 : Player.BasicAttack.MissileSpeed;
