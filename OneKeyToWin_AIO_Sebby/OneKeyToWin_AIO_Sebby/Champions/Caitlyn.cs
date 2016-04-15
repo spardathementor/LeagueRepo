@@ -18,6 +18,7 @@ namespace OneKeyToWin_AIO_Sebby
         private float QCastTime = 0;
 
         public Obj_AI_Hero Player { get { return ObjectManager.Player; }}
+        public Obj_AI_Hero LastW = ObjectManager.Player;
 
         private static string[] Spells =
         {
@@ -206,11 +207,24 @@ namespace OneKeyToWin_AIO_Sebby
                 if (Program.Combo && Player.IsWindingUp)
                     return;
                 if (Config.Item("autoW", true).GetValue<bool>())
+                { 
                     foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && !enemy.HasBuff("caitlynyordletrapinternal")))
-                        W.Cast(enemy.Position, true);
+                    {
+                        if (Utils.TickCount - W.LastCastAttemptT > 1000)
+                        {
+                            W.Cast(enemy.Position, true);
+                            LastW = enemy;
+                        }
+                        else if (LastW.NetworkId != enemy.NetworkId)
+                        {
+                            W.Cast(enemy.Position, true);
+                            LastW = enemy;
+                        }
+                    }
+                }
                 
                 if (Config.Item("telE", true).GetValue<bool>())
-                    foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Distance(Player.ServerPosition) < W.Range  && Obj.Team != Player.Team && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
+                    foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Team != Player.Team && Obj.Distance(Player.ServerPosition) < W.Range  && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
                         W.Cast(Object.Position, true);
             }
         }
