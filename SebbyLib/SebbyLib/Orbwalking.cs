@@ -589,6 +589,7 @@ namespace SebbyLib
 
                 sebbyFix.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage").SetShared().SetValue(new Slider(0,-100, 100)));
                 sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last Hit time adjust (ms)").SetShared().SetValue(new Slider(0, -200, 200)));
+                sebbyFix.AddItem(new MenuItem("PassiveDmg", "Last hit include passive damage", true).SetShared().SetValue(true));
 
                 _config.AddSubMenu(sebbyFix);
                 /* Missile check */
@@ -781,7 +782,9 @@ namespace SebbyLib
                             
                             var predHealth = HealthPrediction.GetHealthPrediction(minion, t, 70);
 
-                            var damage = Player.GetAutoAttackDamage(minion, true) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
+                            
+                            var damage = Player.GetAutoAttackDamage(minion, _config.Item("PassiveDmg", true).GetValue<bool>()) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
+
                             var killable = predHealth <= damage;
 
                             if (mode == OrbwalkingMode.Freeze)

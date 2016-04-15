@@ -49,7 +49,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 else
                     Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
             }
-            
+            else
+                Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
