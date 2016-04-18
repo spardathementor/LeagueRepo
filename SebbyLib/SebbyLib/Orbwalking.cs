@@ -773,14 +773,14 @@ namespace SebbyLib
                             if (!ShouldAttackMinion(minion))
                                 continue;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) + _config.Item("TimeAdjust").GetValue<Slider>().Value + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + _config.Item("TimeAdjust").GetValue<Slider>().Value + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                             if (mode == OrbwalkingMode.Freeze)
                             {
                                 t += 200 + Game.Ping / 2;
                             }
                             
-                            var predHealth = HealthPrediction.GetHealthPrediction(minion, t, 70);
+                            var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
 
                             
                             var damage = Player.GetAutoAttackDamage(minion, _config.Item("PassiveDmg", true).GetValue<bool>()) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
