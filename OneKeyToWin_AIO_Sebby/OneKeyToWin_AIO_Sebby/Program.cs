@@ -75,7 +75,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
             }
 
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK"}, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK press F5 if not loaded"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
 
@@ -86,6 +86,13 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
+
+            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
+            {
+                var d = new LeagueSharp.SDK.Movement();
+            }
+            else
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("321", "SDK NOT LOADED"));
 
             if (AIOmode != 2)
             {
