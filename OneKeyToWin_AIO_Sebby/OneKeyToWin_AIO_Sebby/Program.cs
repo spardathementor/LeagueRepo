@@ -88,13 +88,7 @@ namespace OneKeyToWin_AIO_Sebby
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
 
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
-            {
-                var d = new LeagueSharp.SDK.Movement();
-                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("321", "SDK LOADED"));
-            }
-            else
-                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("321", "SDK NOT LOADED"));
+            LeagueSharp.SDK.Variables.Orbwalker.Enabled = false;
 
             if (AIOmode != 2)
             {
