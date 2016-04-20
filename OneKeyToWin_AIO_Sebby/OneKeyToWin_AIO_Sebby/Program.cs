@@ -106,7 +106,6 @@ namespace OneKeyToWin_AIO_Sebby
 
                 #region LOAD CHAMPIONS
 
-            
                 switch (Player.ChampionName)
                 {
                     case "Jinx":
@@ -453,45 +452,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
             {
-                LeagueSharp.SDK.SkillshotType CoreType2 = LeagueSharp.SDK.SkillshotType.SkillshotLine;
-                if (QWER.Type == SkillshotType.SkillshotCircle)
-                    CoreType2 = LeagueSharp.SDK.SkillshotType.SkillshotCircle;
-                else if (QWER.Type == SkillshotType.SkillshotCone)
-                    CoreType2 = LeagueSharp.SDK.SkillshotType.SkillshotCone;
-
-                var input = new LeagueSharp.SDK.PredictionInput
-                {
-                    Collision = QWER.Collision,
-                    Speed = QWER.Speed,
-                    Delay = QWER.Delay,
-                    Range = QWER.Range,
-                    From = Player.ServerPosition,
-                    Radius = QWER.Width,
-                    Unit = target,
-                    Type = CoreType2,
-                     AoE = false, UseBoundingRadius = true , RangeCheckFrom = Player.ServerPosition
-                };
-                var output = LeagueSharp.SDK.Movement.GetPrediction(input);
 
 
-                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                {
-                    Program.debug(""+ output.Hitchance);
-                    if (output.Hitchance >= LeagueSharp.SDK.HitChance.VeryHigh)
-                        QWER.Cast(output.CastPosition);
-
-                }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                {
-                    if (output.Hitchance >= LeagueSharp.SDK.HitChance.High)
-                        QWER.Cast(output.CastPosition);
-
-                }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
-                {
-                    if (output.Hitchance >= LeagueSharp.SDK.HitChance.Medium)
-                        QWER.Cast(output.CastPosition);
-                }
             }
             else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
