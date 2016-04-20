@@ -83,6 +83,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
                 SPredictionLoad = true;
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION LOADED"));
             }
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
@@ -90,6 +91,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
             {
                 var d = new LeagueSharp.SDK.Movement();
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("321", "SDK LOADED"));
             }
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("321", "SDK NOT LOADED"));
