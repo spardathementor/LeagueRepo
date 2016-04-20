@@ -155,6 +155,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if(Q.IsCharging && (int)(Game.Time * 10) % 2 == 0)
+            {
+                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            }
+
             //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
             if (IsCastingR)
             {
