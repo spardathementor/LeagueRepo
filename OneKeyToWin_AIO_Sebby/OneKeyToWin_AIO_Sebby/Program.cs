@@ -75,7 +75,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
             }
 
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK press F5 if not loaded"}, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
 
@@ -88,7 +88,7 @@ namespace OneKeyToWin_AIO_Sebby
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
 
-            LeagueSharp.SDK.Variables.Orbwalker.Enabled = false;
+       
 
             if (AIOmode != 2)
             {
@@ -106,6 +106,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 #region LOAD CHAMPIONS
 
+            
                 switch (Player.ChampionName)
                 {
                     case "Jinx":
@@ -450,12 +451,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
-            {
-
-
-            }
-            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
+            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
                 SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
