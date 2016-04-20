@@ -90,7 +90,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
             {
-                var d = new LeagueSharp.SDK.Movement();
+                //var d = new LeagueSharp.SDK.Movement();
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("321", "SDK LOADED"));
             }
             else
