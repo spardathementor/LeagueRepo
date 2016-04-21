@@ -14,19 +14,19 @@ namespace OneKeyToWin_AIO_Sebby
         public static Menu Config;
         public static SebbyLib.Orbwalking.Orbwalker Orbwalker;
         public static Spell Q, W, E, R, DrawSpell;
-        public static float JungleTime, DrawSpellTime=0;
+        public static float JungleTime, DrawSpellTime = 0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
         public static Obj_SpawnPoint enemySpawn;
         public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
-        public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>() , Allies = new List<Obj_AI_Hero>();
+        public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>(), Allies = new List<Obj_AI_Hero>();
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static bool SPredictionLoad = false;
         public static int AIOmode = 0;
         private static float dodgeRange = 420;
         private static float dodgeTime = Game.Time;
 
-        static void Main(string[] args) { CustomEvents.Game.OnGameLoad += GameOnOnGameLoad;}
+        static void Main(string[] args) { CustomEvents.Game.OnGameLoad += GameOnOnGameLoad; }
 
         private static void GameOnOnGameLoad(EventArgs args)
         {
@@ -75,7 +75,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
             }
 
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK" }, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
 
@@ -88,7 +88,7 @@ namespace OneKeyToWin_AIO_Sebby
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
 
-       
+            LeagueSharp.SDK.Variables.Orbwalker.Enabled = false;
 
             if (AIOmode != 2)
             {
@@ -98,7 +98,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("collAA", "Disable auto-attack if Yasuo wall collision", true).SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistant", "Anti-Melee Positioning Assistant OKTW©").SetValue(true));
 
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsMelee ))
+                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsMelee))
                     Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistantDraw", "Show notification").SetValue(true));
 
@@ -106,7 +106,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 #region LOAD CHAMPIONS
 
-            
+
                 switch (Player.ChampionName)
                 {
                     case "Jinx":
@@ -271,7 +271,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             new Core.OKTWtracker().LoadOKTW();
 
-            Config.AddItem(new MenuItem("aiomodes", "!!! PRESS F5 TO RELOAD MODE !!!" ));
+            Config.AddItem(new MenuItem("aiomodes", "!!! PRESS F5 TO RELOAD MODE !!!"));
             //new Core.OKTWtargetSelector().LoadOKTW();
             if (AIOmode != 2)
             {
@@ -314,7 +314,7 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             }
 
-            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() ))
+            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>()))
             {
                 if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
                     OktwCommon.blockAttack = true;
@@ -330,7 +330,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
 
-                if ( enemy.Distance(bestPoint) > dodgeRange && !bestPoint.IsWall() && !bestPoint.UnderTurret(true) )
+                if (enemy.Distance(bestPoint) > dodgeRange && !bestPoint.IsWall() && !bestPoint.UnderTurret(true))
                 {
                     Orbwalker.SetOrbwalkingPoint(bestPoint);
                 }
@@ -344,7 +344,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 dodgeTime = Game.Time;
                 return;
-            }   
+            }
 
             Orbwalker.SetOrbwalkingPoint(new Vector3());
             if (OktwCommon.blockAttack == true)
@@ -359,16 +359,16 @@ namespace OneKeyToWin_AIO_Sebby
             if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>())
             {
                 var t = (Obj_AI_Hero)args.Target;
-                if(6 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen"))
+                if (6 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen"))
                     args.Process = false;
             }
 
-            if (!Player.IsMelee && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) &&  Config.Item("collAA", true).GetValue<bool>())
+            if (!Player.IsMelee && OktwCommon.CollisionYasuo(Player.ServerPosition, args.Target.Position) && Config.Item("collAA", true).GetValue<bool>())
             {
                 args.Process = false;
             }
 
-            if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed && Config.Item("supportMode",true).GetValue<bool>())
+            if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed && Config.Item("supportMode", true).GetValue<bool>())
             {
                 if (args.Target.Type == GameObjectType.obj_AI_Minion) args.Process = false;
             }
@@ -432,7 +432,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static bool None { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None); } }
 
-        public static bool Combo { get {
+        public static bool Combo
+        {
+            get
+            {
                 if (AIOmode == 2)
                 {
                     if (Player.IsMoving)
@@ -443,7 +446,8 @@ namespace OneKeyToWin_AIO_Sebby
                 else
                     return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo);
 
-            } }
+            }
+        }
 
         public static bool LaneClear { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear); } }
 
@@ -451,7 +455,50 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
+            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
+            {
+                LeagueSharp.SDK.Enumerations.SkillshotType CoreType2 = LeagueSharp.SDK.Enumerations.SkillshotType.SkillshotLine;
+                if (QWER.Type == SkillshotType.SkillshotCircle)
+                    CoreType2 = LeagueSharp.SDK.Enumerations.SkillshotType.SkillshotCircle;
+                else if (QWER.Type == SkillshotType.SkillshotCone)
+                    CoreType2 = LeagueSharp.SDK.Enumerations.SkillshotType.SkillshotCone;
+
+                var input = new LeagueSharp.SDK.PredictionInput
+                {
+                    Collision = QWER.Collision,
+                    Speed = QWER.Speed,
+                    Delay = QWER.Delay,
+                    Range = QWER.Range,
+                    From = Player.ServerPosition,
+                    Radius = QWER.Width,
+                    Unit = target,
+                    Type = CoreType2,
+                    AoE = false,
+                    UseBoundingRadius = true,
+                    RangeCheckFrom = Player.ServerPosition
+                };
+                var output = LeagueSharp.SDK.Movement.GetPrediction(input);
+
+
+                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                {
+                    if (output.Hitchance >= LeagueSharp.SDK.Enumerations.HitChance.VeryHigh)
+                        QWER.Cast(output.CastPosition);
+
+                }
+                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                {
+                    if (output.Hitchance >= LeagueSharp.SDK.Enumerations.HitChance.High)
+                        QWER.Cast(output.CastPosition);
+
+                }
+                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                {
+                    if (output.Hitchance >= LeagueSharp.SDK.Enumerations.HitChance.Medium)
+                        QWER.Cast(output.CastPosition);
+                }
+            }
+            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
                 SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
@@ -531,9 +578,9 @@ namespace OneKeyToWin_AIO_Sebby
                     return;
                 }
             }
-            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2 )
+            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
             {
-                
+
                 if (target is Obj_AI_Hero && target.IsValid)
                 {
                     var t = target as Obj_AI_Hero;
@@ -589,10 +636,10 @@ namespace OneKeyToWin_AIO_Sebby
             if (Game.Time - dodgeTime < 0.01 && (int)(Game.Time * 10) % 2 == 0 && !Player.IsMelee && Config.Item("positioningAssistant").GetValue<bool>() && Config.Item("positioningAssistantDraw").GetValue<bool>())
             {
                 Render.Circle.DrawCircle(Player.Position, dodgeRange, System.Drawing.Color.DimGray, 1);
-                drawText("Anti-Melle Positioning Assistant" , Player.Position, System.Drawing.Color.Gray);
+                drawText("Anti-Melle Positioning Assistant", Player.Position, System.Drawing.Color.Gray);
             }
 
-            if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1  )
+            if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
                 if (DrawSpell.Type == SkillshotType.SkillshotLine)
                     OktwCommon.DrawLineRectangle(DrawSpellPos.CastPosition, Player.Position, (int)DrawSpell.Width, 1, System.Drawing.Color.DimGray);
@@ -601,7 +648,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 drawText("Aiming " + DrawSpellPos.Hitchance, Player.Position.Extend(DrawSpellPos.CastPosition, 400), System.Drawing.Color.Gray);
             }
-            
+
             if (AIOmode != 1 && Config.Item("timer").GetValue<bool>() && jungler != null)
             {
                 if (jungler == Player)
