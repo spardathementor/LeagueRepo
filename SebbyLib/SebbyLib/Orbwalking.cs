@@ -35,7 +35,7 @@ namespace SebbyLib
             "gangplankqwrapper", "poppypassiveattack", "powerfist", "renektonpreexecute", "rengarq",
             "shyvanadoubleattack", "sivirw", "takedown", "talonnoxiandiplomacy", "trundletrollsmash", "vaynetumble",
             "vie", "volibearq", "xenzhaocombotarget", "yorickspectral", "reksaiq", "itemtitanichydracleave", "masochism",
-            "illaoiw", "elisespiderw", "fiorae", "meditate", "sejuaninorthernwinds"
+            "illaoiw", "elisespiderw", "fiorae", "meditate", "sejuaninorthernwinds","asheq"
         };
 
         private static readonly string[] NoAttacks =
@@ -750,6 +750,7 @@ namespace SebbyLib
                 AttackableUnit result = null;
                 var mode = ActiveMode;
 
+
                 if ((mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LaneClear) &&
                     !_config.Item("PriorizeFarm").GetValue<bool>())
                 {
@@ -759,7 +760,7 @@ namespace SebbyLib
                         return target;
                     }
                 }
-
+                
                 /*Killable Minion*/
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)
                 {
@@ -821,9 +822,7 @@ namespace SebbyLib
                 }
 
                 /* turrets / inhibitors / nexus */
-                if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed) &&
-                    (!_config.Item("FocusMinionsOverTurrets").GetValue<KeyBind>().Active ||
-                     !MinionListAA.Any()))
+                if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
                 {
                     /* turrets */
                     foreach (var turret in
