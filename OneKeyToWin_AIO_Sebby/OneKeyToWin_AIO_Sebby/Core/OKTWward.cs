@@ -187,7 +187,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                             }
                         }
 
-                        if (Config.Item("AutoWardBlue").GetValue<bool>())
+                        if (Config.Item("AutoWardBlue").GetValue<bool>() && MenuGUI.IsShopOpen)
                         {
                             if (FarsightOrb.IsReady())
                             {
