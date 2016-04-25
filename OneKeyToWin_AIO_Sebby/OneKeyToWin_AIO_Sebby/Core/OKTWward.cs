@@ -86,7 +86,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
             }
 
-            if (Config.Item("autoBuy").GetValue<bool>() && Player.InFountain() && !ScryingOrb.IsOwned() && Player.Level >= 9)
+            if (Config.Item("autoBuy").GetValue<bool>() && Player.InFountain() && !ScryingOrb.IsOwned() && Player.Level >= 9 && MenuGUI.IsShopOpen)
                 Player.BuyItem(ItemId.Farsight_Orb_Trinket);
 
             if(rengar && Player.HasBuff("rengarralertsound"))
@@ -187,7 +187,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                             }
                         }
 
-                        if (Config.Item("AutoWardBlue").GetValue<bool>() && MenuGUI.IsShopOpen)
+                        if (Config.Item("AutoWardBlue").GetValue<bool>())
                         {
                             if (FarsightOrb.IsReady())
                             {
