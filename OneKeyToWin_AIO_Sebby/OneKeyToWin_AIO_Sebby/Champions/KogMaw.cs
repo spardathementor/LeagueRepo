@@ -105,7 +105,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(2) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
 
-            if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp)
+            if (Program.LagFree(3) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
 
             if (Program.LagFree(4) && R.IsReady() && !Player.IsWindingUp)
@@ -157,17 +157,12 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-            if (Config.Item("autoW", true).GetValue<bool>())
+            if (Player.CountEnemiesInRange(W.Range) > 0 && Sheen())
             {
-                if (Player.CountEnemiesInRange(W.Range) > 0 && Sheen())
-                {
-                    if (Program.Combo)
-                        W.Cast();
-                    else if (Program.Farm && Config.Item("harasW", true).GetValue<bool>())
-                        W.Cast();
-                    else if (Program.Farm && Player.CountEnemiesInRange(Player.AttackRange) > 0)
-                        W.Cast();
-                }
+                if (Program.Combo)
+                    W.Cast();
+                else if (Program.Farm && Config.Item("harasW", true).GetValue<bool>() && Player.CountEnemiesInRange(Player.AttackRange) > 0)
+                    W.Cast();
             }
         }
 
@@ -211,7 +206,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(E, t);
                     else if (Program.Combo && ObjectManager.Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(E, t);
-                    else if (Program.Farm && Config.Item("HarrasE", true).GetValue<bool>() &&  ObjectManager.Player.Mana > RMANA + WMANA + EMANA + QMANA + EMANA)
+                    else if (Program.Farm && Config.Item("HarrasE", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + EMANA)
                         Program.CastSpell(E, t);
                     else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + WMANA + EMANA)
                     {
