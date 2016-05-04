@@ -75,7 +75,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
             }
 
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
 
@@ -287,7 +287,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("print").GetValue<bool>())
             {
                 Game.PrintChat("<font size='30'>OneKeyToWin</font> <font color='#b756c5'>by Sebby</font>");
-                //Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font>SDK PREDICTION SUPPORTED");
+                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font>SDK PREDICTION SUPPORTED");
             }
         }
 
@@ -451,7 +451,62 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
+            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
+            {
+                SebbyLib.Movement.SkillshotType CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotLine;
+                bool aoe2 = false;
+
+                if (QWER.Type == SkillshotType.SkillshotCircle)
+                {
+                    CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotCircle;
+                    aoe2 = true;
+                }
+
+                if (QWER.Width > 80 && !QWER.Collision)
+                    aoe2 = true;
+
+                var predInput2 = new SebbyLib.Movement.PredictionInput
+                {
+                    Aoe = aoe2,
+                    Collision = QWER.Collision,
+                    Speed = QWER.Speed,
+                    Delay = QWER.Delay,
+                    Range = QWER.Range,
+                    From = Player.ServerPosition,
+                    Radius = QWER.Width,
+                    Unit = target,
+                    Type = CoreType2
+                };
+                var poutput2 = SebbyLib.Movement.Prediction.GetPrediction(predInput2);
+
+                //var poutput2 = QWER.GetPrediction(target);
+
+                if (QWER.Speed != float.MaxValue && OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
+                    return;
+
+                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                {
+                    if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.VeryHigh)
+                        QWER.Cast(poutput2.CastPosition);
+                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
+                    {
+                        QWER.Cast(poutput2.CastPosition);
+                    }
+
+                }
+                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                {
+                    if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
+                        QWER.Cast(poutput2.CastPosition);
+
+                }
+                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                {
+                    if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.Medium)
+                        QWER.Cast(poutput2.CastPosition);
+                }
+            }
+            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
             {
                 SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
                 bool aoe2 = false;

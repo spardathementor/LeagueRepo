@@ -81,7 +81,7 @@ namespace SebbyLib
         }
         public static bool ShouldWait()
         {
-            var attackCalc = (int)(Player.AttackDelay * 1000 * 2);
+            var attackCalc = (int)(Player.AttackDelay * 1000);
             return
                 Cache.GetMinions(Player.Position, 0).Any(
                     minion => HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, 30) <= Player.GetAutoAttackDamage(minion));
