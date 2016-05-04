@@ -119,7 +119,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if(sender.IsMe && args.SData.Name == "JhinR")
+            if(sender.IsMe && args.SData.Name.ToLower() == "jhinr")
             {
                 rPosCast = args.End;
             }
@@ -214,11 +214,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 if (IsCastingR)
                 {
-                    if(InCone(t))
+                    if(InCone(t.ServerPosition))
                         R.Cast(t);
                     else
                     {
-                        foreach(var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && InCone(enemy)).OrderBy(enemy => enemy.Health))
+                        foreach(var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && InCone(t.ServerPosition)).OrderBy(enemy => enemy.Health))
                         {
                             R.Cast(t);
                             rPosLast = R.GetPrediction(enemy).CastPosition;
@@ -229,7 +229,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (IsCastingR && rTargetLast != null && !rTargetLast.IsDead)
             {
-                if(!Config.Item("Rvisable", true).GetValue<bool>())
+                if(!Config.Item("Rvisable", true).GetValue<bool>() && InCone(rTargetLast.Position) && InCone(rPosLast))
                     R.Cast(rPosLast);
             }
         }
@@ -379,7 +379,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         }
 
 
-        private bool InCone(Obj_AI_Hero enemy)
+        private bool InCone(Vector3 Position)
         {
             var range = R.Range;
             var angle = 70f * (float)Math.PI / 180;
@@ -387,7 +387,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var edge1 = end2.Rotated(-angle / 2);
             var edge2 = edge1.Rotated(angle);
 
-            var point = enemy.Position.To2D() - Player.Position.To2D();
+            var point = Position.To2D() - Player.Position.To2D();
             if (point.Distance(new Vector2(), true) < range * range && edge1.CrossProduct(point) > 0 && point.CrossProduct(edge2) > 0)
                 return true;
 
