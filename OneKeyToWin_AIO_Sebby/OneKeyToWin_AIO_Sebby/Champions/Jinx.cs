@@ -183,7 +183,7 @@ namespace OneKeyToWin_AIO_Sebby
                 foreach (var minion in Cache.GetMinions(Player.Position, bonusRange() + 30).Where(
                 minion => !SebbyLib.Orbwalking.InAutoAttackRange(minion) && GetRealPowPowRange(minion) < GetRealDistance(minion) && bonusRange() < GetRealDistance(minion)))
                 {
-                    var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 200, 70);
+                    var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 400, 70);
                     if (hpPred < Player.GetAutoAttackDamage(minion) * 1.1 && hpPred > 5)
                     {
                         Orbwalker.ForceTarget(minion);
