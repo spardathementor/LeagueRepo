@@ -25,7 +25,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 700);
 
             Qr.SetSkillshot(0.25f, 100, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            Q.SetSkillshot(0.5f, 80, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.75f, 80, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(1.2f, 230, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
