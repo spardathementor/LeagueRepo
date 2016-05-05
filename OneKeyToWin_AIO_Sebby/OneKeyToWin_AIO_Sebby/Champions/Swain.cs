@@ -24,12 +24,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q, 625);
+            Q = new Spell(SpellSlot.Q, 700);
             W = new Spell(SpellSlot.W, 900);
             E = new Spell(SpellSlot.E, 625);
             R = new Spell(SpellSlot.R, 675);
 
-            W.SetSkillshot(1.30f, 240f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(1.5f, 240f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -241,13 +242,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (t.IsValidTarget())
             {
                 if (t.Health < OktwCommon.GetKsDamage(t, Q) + E.GetDamage(t))
-                    Q.CastOnUnit(t);
+                    Q.Cast(t);
                 if (!Config.Item("Quse" + t.ChampionName, true).GetValue<bool>())
                     return;
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
-                    Q.CastOnUnit(t);
+                    Q.Cast(t);
                 else if (Program.Farm && Config.Item("harrasQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
-                    Q.CastOnUnit(t);
+                    Q.Cast(t);
+                else if ((Program.Combo || Program.Farm))
+                {
+                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                        Q.Cast(enemy);
+                }
             }
         }
 
