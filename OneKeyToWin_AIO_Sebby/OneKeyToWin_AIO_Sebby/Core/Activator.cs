@@ -41,9 +41,11 @@ namespace OneKeyToWin_AIO_Sebby
             HydraTitanic = new Items.Item(3748, 150f),
             Hextech = new Items.Item(3146, 700f),
             FrostQueen = new Items.Item(3092, 850f),
-            
+            Protobelt = new Items.Item(3152, 850f),
+            GLP800= new Items.Item(3030, 800f),
+
             //def
-            FaceOfTheMountain = new Items.Item(3401, 600f),
+        FaceOfTheMountain = new Items.Item(3401, 600f),
             Zhonya = new Items.Item(3157, 0),
             Seraph = new Items.Item(3040, 0),
             Solari = new Items.Item(3190, 600f),
@@ -123,6 +125,14 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Hextech").AddItem(new MenuItem("Hextech", "Hextech").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Hextech").AddItem(new MenuItem("HextechKS", "Hextech KS").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Hextech").AddItem(new MenuItem("HextechCombo", "Hextech always in combo").SetValue(true));
+
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Protobelt").AddItem(new MenuItem("Protobelt", "Protobelt").SetValue(true));
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Protobelt").AddItem(new MenuItem("ProtobeltKS", "Protobelt KS").SetValue(true));
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Protobelt").AddItem(new MenuItem("ProtobeltCombo", "Protobelt always in combo").SetValue(true));
+
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("GLP800").AddItem(new MenuItem("GLP800", "GLP800").SetValue(true));
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("GLP800").AddItem(new MenuItem("GLP800KS", "GLP800 KS").SetValue(true));
+            Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("GLP800").AddItem(new MenuItem("GLP800Combo", "GLP800 always in combo").SetValue(true));
 
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("Youmuus", "Youmuus").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Youmuus").AddItem(new MenuItem("YoumuusR", "TwitchR, AsheQ").SetValue(true));
@@ -591,6 +601,36 @@ namespace OneKeyToWin_AIO_Sebby
                         Botrk.Cast(t);
                     if (Config.Item("BotrkCombo").GetValue<bool>() && Program.Combo)
                         Botrk.Cast(t);
+                }
+            }
+
+            if (GLP800.IsReady() && Config.Item("GLP800").GetValue<bool>())
+            {
+                var t = TargetSelector.GetTarget(GLP800.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget())
+                {
+                    if (Config.Item("GLP800KS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 200 + Player.FlatMagicDamageMod * 0.35) > t.Health - OktwCommon.GetIncomingDamage(t))
+                        GLP800.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                    if (Config.Item("GLP800Combo").GetValue<bool>() && Program.Combo)
+                    {
+                        Program.debug("PRO");
+                        GLP800.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                    }
+                }
+            }
+
+            if (Protobelt.IsReady() && Config.Item("Protobelt").GetValue<bool>())
+            {
+                var t = TargetSelector.GetTarget(Protobelt.Range, TargetSelector.DamageType.Magical);
+                if (t.IsValidTarget())
+                {
+                    if (Config.Item("ProtobeltKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 150 + Player.FlatMagicDamageMod * 0.35) > t.Health - OktwCommon.GetIncomingDamage(t))
+                        Protobelt.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                    if (Config.Item("ProtobeltCombo").GetValue<bool>() && Program.Combo)
+                    {
+                        Program.debug("PRO");
+                        Protobelt.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                    }
                 }
             }
 
