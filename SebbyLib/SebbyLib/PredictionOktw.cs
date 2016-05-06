@@ -351,23 +351,9 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
-            bool path = input.Unit.Path.Count() > 0;
-            bool move = input.Unit.IsMoving;
-
-            // NO WAY ///////////////////////////////////////////////////////////////////////////////////
-
-            if (path != move)
-            {
-                OktwCommon.debug("PRED: NO WAY ");
-                result.Hitchance = HitChance.Medium;
-                result.CastPosition = input.Unit.Position;
-                return result;
-            }
-
             // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
 
             result.Hitchance = HitChance.Medium;
-
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
             var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
@@ -380,23 +366,10 @@ namespace SebbyLib.Prediction
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
-            float fixRange = moveArea * 0.3f;
-            float pathMinLen = 900 + moveArea;
-            double angleMove = 31;
+            float fixRange = moveArea * 0.35f;
+            float pathMinLen = 800 + moveArea;
 
-            if (input.Radius > 70)
-                angleMove ++;
-            else if (input.Radius <= 60)
-                angleMove--;
-            if (input.Delay < 0.3)
-                angleMove++;
-
-            if (UnitTracker.GetLastNewPathTime(input.Unit) < 100)
-            {
-                result.Hitchance = HitChance.High;
-                pathMinLen = 700f + moveArea;
-                angleMove += 1.5;
-            }
+            double angleMove = 32;
 
             if (input.Type == SkillshotType.SkillshotCircle)
             {
@@ -412,35 +385,33 @@ namespace SebbyLib.Prediction
                     return result;
                 }
             }
-            else if (distanceUnitToWaypoint > 350)
-            {
-                angleMove += 1.5;
-            }
 
+            var points = OktwCommon.CirclePoints(15, 450, input.Unit.Position).Where(x => x.IsWall());
 
-            // SPAM POSITION ///////////////////////////////////////////////////////////////////////////////////
-            if (UnitTracker.GetLastStopMoveTime(input.Unit) < 100 )
+            if (points.Count() > 2)
             {
-                if (totalDelay < 0.7)
+                var runOutWall = true;
+                foreach (var point in points)
                 {
+                    if (input.Unit.Position.Distance(point) > lastWaypiont.Distance(point))
+                    {
+                        Render.Circle.DrawCircle(point, 50, System.Drawing.Color.Orange, 1);
+                        runOutWall = false;
+                    }
+                }
+                if(runOutWall)
+                {
+                    OktwCommon.debug("PRED: RUN OUT WALL");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
-                else
-                {
-                    result.Hitchance = HitChance.High;
-                    return result;
-                }
             }
-            else if (input.Unit.IsWindingUp)
-            {
-                result.Hitchance = HitChance.High;
-                return result;
-            }
-            else if (!input.Unit.IsMoving)
+
+            if(input.Unit.GetWaypoints().Count == 1)
             {
                 if (UnitTracker.GetLastStopMoveTime(input.Unit) < 500)
                 {
+                    //OktwCommon.debug("PRED: STOP HIGH");
                     result.Hitchance = HitChance.High;
                     return result;
                 }
@@ -500,7 +471,7 @@ namespace SebbyLib.Prediction
 
             // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
 
-            if (getAngle < angleMove)
+            if (getAngle < angleMove && distanceUnitToWaypoint > 300)
             {
                 OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
                 result.Hitchance = HitChance.VeryHigh;
@@ -600,9 +571,9 @@ namespace SebbyLib.Prediction
 
             var B = from.To2D();
 
-            var AB = Math.Pow((double)A.X - (double)B.X, 2) + Math.Pow((double)A.Y - (double)B.Y, 2);
-            var BC = Math.Pow((double)B.X - (double)C.X, 2) + Math.Pow((double)B.Y - (double)C.Y, 2);
-            var AC = Math.Pow((double)A.X - (double)C.X, 2) + Math.Pow((double)A.Y - (double)C.Y, 2);
+            var AB = Math.Pow(A.X - B.X, 2) + Math.Pow(A.Y - B.Y, 2);
+            var BC = Math.Pow(B.X - C.X, 2) + Math.Pow(B.Y - C.Y, 2);
+            var AC = Math.Pow(A.X - C.X, 2) + Math.Pow(A.Y - C.Y, 2);
 
             return Math.Cos((AB + BC - AC) / (2 * Math.Sqrt(AB) * Math.Sqrt(BC))) * 180 / Math.PI;
         }
@@ -624,7 +595,7 @@ namespace SebbyLib.Prediction
         {
             speed = (Math.Abs(speed - (-1)) < float.Epsilon) ? input.Unit.MoveSpeed : speed;
 
-            if (path.Count <= 1 || (input.Unit is Obj_AI_Hero && UnitTracker.GetLastStopMoveTime(input.Unit) < 100))
+            if (path.Count <= 1 || input.Unit.IsWindingUp)
             {
                 return new PredictionOutput
                 {
@@ -1236,7 +1207,7 @@ namespace SebbyLib.Prediction
                 else
                 {
                     UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).NewPathTick = Utils.TickCount;
-                    UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Game.Time });
+                    UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Utils.TickCount });
 
                 }
 
@@ -1268,29 +1239,20 @@ namespace SebbyLib.Prediction
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 0.2f
-                && TrackerUnit.PathBank[2].Time + 0.1f < Game.Time
-                && TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 100)
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 200 && Utils.TickCount - TrackerUnit.PathBank[2].Time < 100)
             {
-                return true;
-            }
-            else
-                return false;
-        }
+                var C = TrackerUnit.PathBank[1].Position;
+                var A = TrackerUnit.PathBank[2].Position;
 
-        public static bool PathCalc(Obj_AI_Base unit)
-        {
-            var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
-            if (TrackerUnit.PathBank.Count < 3)
-                return false;
+                var B = unit.Position.To2D();
 
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[0].Time < 0.4f && Game.Time - TrackerUnit.PathBank[2].Time < 0.1
-                && TrackerUnit.PathBank[2].Position.Distance(unit.Position) < 300
-                && TrackerUnit.PathBank[1].Position.Distance(unit.Position) < 300
-                && TrackerUnit.PathBank[0].Position.Distance(unit.Position) < 300)
-            {
-                var dis = unit.Distance(TrackerUnit.PathBank[2].Position);
-                if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) > dis && TrackerUnit.PathBank[0].Position.Distance(TrackerUnit.PathBank[1].Position) > dis)
+                var AB = Math.Pow(A.X - B.X, 2) + Math.Pow(A.Y - B.Y, 2);
+                var BC = Math.Pow(B.X - C.X, 2) + Math.Pow(B.Y - C.Y, 2);
+                var AC = Math.Pow(A.X - C.X, 2) + Math.Pow(A.Y - C.Y, 2);
+
+                if(TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 150)
+                    return true;
+                else if (Math.Cos((AB + BC - AC) / (2 * Math.Sqrt(AB) * Math.Sqrt(BC))) * 180 / Math.PI < 31)
                     return true;
                 else
                     return false;
