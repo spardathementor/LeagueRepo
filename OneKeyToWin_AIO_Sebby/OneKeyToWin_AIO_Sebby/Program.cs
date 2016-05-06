@@ -287,7 +287,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("print").GetValue<bool>())
             {
                 Game.PrintChat("<font size='30'>OneKeyToWin</font> <font color='#b756c5'>by Sebby</font>");
-                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font>SDK PREDICTION SUPPORTED , 6.9 MAGE RDY ");
+                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font>OKTW PREDICTION REWORKED");
             }
         }
 
