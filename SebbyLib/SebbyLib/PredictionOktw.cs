@@ -409,7 +409,7 @@ namespace SebbyLib.Prediction
 
             if(input.Unit.GetWaypoints().Count == 1)
             {
-                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 500)
+                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 600)
                 {
                     //OktwCommon.debug("PRED: STOP HIGH");
                     result.Hitchance = HitChance.High;
@@ -471,7 +471,7 @@ namespace SebbyLib.Prediction
 
             // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
 
-            if (getAngle < angleMove && distanceUnitToWaypoint > 300)
+            if (getAngle < angleMove && UnitTracker.GetLastNewPathTime(input.Unit) < 100)
             {
                 OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
                 result.Hitchance = HitChance.VeryHigh;
