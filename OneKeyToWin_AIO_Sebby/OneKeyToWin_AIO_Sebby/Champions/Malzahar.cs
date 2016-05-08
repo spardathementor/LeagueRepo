@@ -78,6 +78,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
             {
+                OktwCommon.blockMove = true;
+                OktwCommon.blockAttack = true;
+                OktwCommon.blockSpells = true;
+                SebbyLib.Orbwalking.Attack = false;
+                SebbyLib.Orbwalking.Move = false;
                 args.Process = false;
                 return;
             }
@@ -115,6 +120,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
+            if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
+            {
+                Program.debug("R chaneling");
+                OktwCommon.blockMove = true;
+                OktwCommon.blockAttack = true;
+                OktwCommon.blockSpells = true;
+                SebbyLib.Orbwalking.Attack = false;
+                SebbyLib.Orbwalking.Move = false;
+                return;
+            }
             var t = gapcloser.Sender;
 
             if (Q.IsReady() && Config.Item("gapQ", true).GetValue<bool>() && t.IsValidTarget(Q.Range))
@@ -129,6 +144,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero t, Interrupter2.InterruptableTargetEventArgs args)
         {
+            if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
+            {
+                Program.debug("R chaneling");
+                OktwCommon.blockMove = true;
+                OktwCommon.blockAttack = true;
+                OktwCommon.blockSpells = true;
+                SebbyLib.Orbwalking.Attack = false;
+                SebbyLib.Orbwalking.Move = false;
+                return;
+            }
             if (!Config.Item("intQ", true).GetValue<bool>() || !Q.IsReady())
                 return;
 

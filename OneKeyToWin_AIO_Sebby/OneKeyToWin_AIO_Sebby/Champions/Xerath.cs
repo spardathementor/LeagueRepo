@@ -155,21 +155,34 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if(Q.IsCharging && (int)(Game.Time * 10) % 2 == 0)
-            {
-                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
-            }
+            if (Program.LagFree(3) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                LogicR();
+
 
             //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
-            if (IsCastingR)
+            if (IsCastingR || Player.IsChannelingImportantSpell())
             {
+                OktwCommon.blockMove = true;
+                OktwCommon.blockAttack = true;
                 OktwCommon.blockAttack = true;
                 OktwCommon.blockMove = true;
+                SebbyLib.Orbwalking.Attack = false;
+                SebbyLib.Orbwalking.Move = false;
+                return;
             }
             else
             {
+                OktwCommon.blockMove = false;
+                OktwCommon.blockAttack = false;
                 OktwCommon.blockAttack = false;
                 OktwCommon.blockMove = false;
+                SebbyLib.Orbwalking.Attack = true;
+                SebbyLib.Orbwalking.Move = true;
+            }
+
+            if (Q.IsCharging && (int)(Game.Time * 10) % 2 == 0)
+            {
+                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
             }
 
             if (Program.LagFree(1))
@@ -192,8 +205,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicE();
             if (Program.LagFree(2) && W.IsReady() && !Player.IsWindingUp && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
-            if (Program.LagFree(3) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
-                LogicR();
             if (Program.LagFree(4) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ", true).GetValue<bool>())
                 LogicQ();
         }
