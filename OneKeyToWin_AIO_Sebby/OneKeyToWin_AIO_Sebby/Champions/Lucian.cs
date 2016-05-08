@@ -100,6 +100,12 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.IsChannelingImportantSpell() && (int)(Game.Time * 10) % 2 == 0)
+            {
+                Console.WriteLine("chaneling");
+                Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
+            }
+
             if (R1.IsReady() && Game.Time - castR > 5 && Config.Item("useR", true).GetValue<KeyBind>().Active)
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
