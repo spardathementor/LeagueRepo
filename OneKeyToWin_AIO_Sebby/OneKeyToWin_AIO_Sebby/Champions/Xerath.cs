@@ -101,7 +101,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.R )
+            if (args.Slot == SpellSlot.R)
             {
                 if (Config.Item("trinkiet", true).GetValue<bool>() && !IsCastingR)
                 {
@@ -196,7 +196,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     var minion = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2).OrderByDescending(x => x.Health).FirstOrDefault();
 
-                    if(minion != null)
+                    if(minion != null && OktwCommon.CanHarras())
                         Orbwalker.ForceTarget(minion);
                 }
             }
