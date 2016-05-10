@@ -26,6 +26,8 @@ namespace OneKeyToWin_AIO_Sebby
             "cassiopeiapetrifyinggaze","ezrealtrueshotbarrage","galioidolofdurand","luxmalicecannon", "missfortunebullettime","infiniteduress","alzaharnethergrasp","lucianq","velkozr","rocketgrabmissile"
         };
 
+
+        
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 1250f);
@@ -49,8 +51,17 @@ namespace OneKeyToWin_AIO_Sebby
             //SebbyLib.Orbwalking.BeforeAttack += BeforeAttack;
             //SebbyLib.Orbwalking.AfterAttack += afterAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Spellbook.OnCastSpell += Spellbook_OnCastSpell;
         }
 
+        private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
+        {
+            if (args.Slot == SpellSlot.W)
+            {
+                if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower()) ))
+                    args.Process = false;
+            }
+        }
 
         private void LoadMenuOKTW()
         {
@@ -229,6 +240,7 @@ namespace OneKeyToWin_AIO_Sebby
                     if (!trapPos.IsZero)
                         W.Cast(trapPos);
                 }
+
             }
         }
 
