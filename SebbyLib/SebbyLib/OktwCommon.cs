@@ -233,7 +233,7 @@ namespace SebbyLib
                 var name = obj.Name.ToLower();
                 
                 if (name.Contains("GateMarker_red.troy".ToLower()) || name.Contains("global_ss_teleport_target_red.troy".ToLower())
-                    || name.Contains("Pantheon_Base_R_indicator_red.troy".ToLower()))
+                    || name.Contains("R_indicator_red.troy".ToLower()))
                     return obj.Position;
             }
 
