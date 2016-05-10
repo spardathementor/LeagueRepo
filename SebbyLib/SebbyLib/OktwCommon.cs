@@ -223,7 +223,7 @@ namespace SebbyLib
 
         public static Vector3 GetTrapPos(float range)
         {
-            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid && enemy.Distance(Player.ServerPosition) < range && enemy.HasBuff("zhonyasringshield")))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid && enemy.Distance(Player.ServerPosition) < range && (enemy.HasBuff("zhonyasringshield") || enemy.HasBuff("BardRStasis"))))
             {
                 return enemy.Position;
             }
