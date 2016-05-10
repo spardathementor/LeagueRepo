@@ -224,8 +224,11 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 
                 if (Config.Item("telE", true).GetValue<bool>())
-                    foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.Team != Player.Team && Obj.Distance(Player.ServerPosition) < W.Range  && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
-                        W.Cast(Object.Position, true);
+                {
+                    var trapPos = OktwCommon.GetTrapPos(W.Range);
+                    if (!trapPos.IsZero)
+                        W.Cast(trapPos);
+                }
             }
         }
 

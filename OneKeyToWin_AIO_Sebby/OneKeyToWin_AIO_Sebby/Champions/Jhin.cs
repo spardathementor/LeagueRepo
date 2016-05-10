@@ -286,8 +286,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicE()
         {
             if (Config.Item("autoE", true).GetValue<bool>())
+            {
+                var trapPos = OktwCommon.GetTrapPos(E.Range);
+                if (!trapPos.IsZero)
+                    E.Cast(trapPos);
+
                 foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                     E.Cast(enemy.ServerPosition);
+            }
 
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && Config.Item("EmodeCombo", true).GetValue<StringList>().SelectedIndex != 2)

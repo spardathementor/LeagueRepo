@@ -273,10 +273,9 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Config.Item("telE", true).GetValue<bool>())
                 {
-                    foreach (var Object in ObjectManager.Get<Obj_AI_Base>().Where(Obj => Obj.IsEnemy && Obj.Distance(Player.ServerPosition) < E.Range && (Obj.HasBuff("teleport_target", true) || Obj.HasBuff("Pantheon_GrandSkyfall_Jump", true))))
-                    {
-                        E.Cast(Object.Position);
-                    }
+                    var trapPos = OktwCommon.GetTrapPos(E.Range);
+                    if(!trapPos.IsZero)
+                        E.Cast(trapPos);
                 }
 
                 if (Program.Combo && Player.IsMoving && Config.Item("comboE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA)
