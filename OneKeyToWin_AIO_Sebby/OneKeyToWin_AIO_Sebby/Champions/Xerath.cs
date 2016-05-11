@@ -155,7 +155,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Program.LagFree(3) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+            if (Program.LagFree(3) && R.IsReady())
                 LogicR();
 
 
@@ -222,7 +222,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     R.Cast();
                 }
-                if (!t.IsValidTarget(W.Range) && !IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(1100) == 0)
+                if (!t.IsValidTarget(W.Range) && Config.Item("autoR", true).GetValue<bool>() && !IsCastingR && t.CountAlliesInRange(500) == 0 && Player.CountEnemiesInRange(1100) == 0)
                 {
                     if (OktwCommon.GetKsDamage(t, R) + (R.GetDamage(t) * R.Level)  > t.Health)
                     {
