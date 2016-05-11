@@ -101,7 +101,7 @@ namespace OneKeyToWin_AIO_Sebby
                 foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsMelee ))
                     Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistantDraw", "Show notification").SetValue(true));
-                Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("harassLaneclear", "Harass lane clear").SetValue(true));
+                Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("harassLaneclear", "Skill-Harass in lane clear").SetValue(true));
                 Config.Item("supportMode", true).SetValue(false);
 
                 #region LOAD CHAMPIONS
