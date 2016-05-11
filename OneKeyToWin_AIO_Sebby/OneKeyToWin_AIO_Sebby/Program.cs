@@ -101,7 +101,7 @@ namespace OneKeyToWin_AIO_Sebby
                 foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsMelee ))
                     Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistantDraw", "Show notification").SetValue(true));
-
+                Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("harassLaneclear", "Harass lane clear").SetValue(true));
                 Config.Item("supportMode", true).SetValue(false);
 
                 #region LOAD CHAMPIONS
@@ -428,7 +428,7 @@ namespace OneKeyToWin_AIO_Sebby
                 return false;
         }
 
-        public static bool Farm { get { return Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed; } }
+        public static bool Farm { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Config.Item("harassLaneclear").GetValue<bool>()) || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed; } }
 
         public static bool None { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None); } }
 
