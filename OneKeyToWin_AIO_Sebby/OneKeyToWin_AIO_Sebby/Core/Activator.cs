@@ -469,8 +469,12 @@ namespace OneKeyToWin_AIO_Sebby
 
                     var IgnDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) ;
 
-                    if (pred <= IgnDmg && Player.ServerPosition.Distance(enemy.ServerPosition) > 500 && enemy.CountAlliesInRange(500) < 2 )
-                        Player.Spellbook.CastSpell(ignite, enemy);
+                    if (pred <= IgnDmg && enemy.CountAlliesInRange(500) < 2)
+                    {
+                        var enemyPred = Prediction.GetPrediction(enemy, 0.1f).CastPosition;
+                        if (Player.ServerPosition.Distance(enemyPred) > 500 || NavMesh.IsWallOfGrass(enemyPred, 0))
+                            Player.Spellbook.CastSpell(ignite, enemy);
+                    }
 
                     if (pred <= 2 * IgnDmg)
                     {
