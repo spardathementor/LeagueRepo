@@ -112,7 +112,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     int count = point.CountEnemiesInRange(350);
                     if (!InAARange(point))
                         continue;
-                    if (count < enemies)
+                    if (point.UnderAllyTurret())
+                    {
+                        bestpoint = point;
+                        enemies = count - 1;
+                    }
+                    else if (count < enemies)
                     {
                         enemies = count;
                         bestpoint = point;
