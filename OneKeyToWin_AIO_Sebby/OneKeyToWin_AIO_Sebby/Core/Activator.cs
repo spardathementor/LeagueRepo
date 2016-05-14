@@ -669,7 +669,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Youmuus.IsReady() && Config.Item("Youmuus").GetValue<bool>())
+            if (Youmuus.IsReady() && Config.Item("Youmuus").GetValue<bool>() && Program.Combo)
             {
                 var t = Orbwalker.GetTarget();
 
@@ -677,7 +677,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (Config.Item("YoumuusKS").GetValue<bool>() && t.Health < Player.MaxHealth)
                         Youmuus.Cast();
-                    if (Config.Item("YoumuusCombo").GetValue<bool>() && Program.Combo)
+                    if (Config.Item("YoumuusCombo").GetValue<bool>() )
                         Youmuus.Cast();
                 }
             }
