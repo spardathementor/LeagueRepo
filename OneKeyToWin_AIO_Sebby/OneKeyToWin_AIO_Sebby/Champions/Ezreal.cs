@@ -215,7 +215,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (Program.LagFree(2))
             {
-                if (Farm && Player.Mana > RMANA + EMANA + WMANA + QMANA * 3)
+                if (Farm && Player.Mana > QMANA)
                 {
                     farmQ();
                     lag = Game.Time;
