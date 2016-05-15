@@ -22,7 +22,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 520);
             R = new Spell(SpellSlot.R, 20000);
 
-            Q.SetSkillshot(1.02f, 150f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.95f, 140f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.5f, 50f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             R.DamageType = TargetSelector.DamageType.Magical;
