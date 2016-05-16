@@ -340,7 +340,7 @@ namespace SebbyLib.Prediction
                 float fixRange = moveArea * 0.35f;
                 float pathMinLen = 800 + moveArea;
 
-                OktwCommon.debug("RES Ways: " + input.Unit.GetWaypoints().Count + " WIND: " + input.Unit.IsWindingUp + " DIS " + distanceUnitToWaypoint + " TIME " + UnitTracker.GetLastNewPathTime(input.Unit) + " " + input.Unit.Position.To2D().AngleBetween(lastWaypiont.To2D()));
+                OktwCommon.debug(input.Radius+ " RES Ways: " + input.Unit.GetWaypoints().Count + " WIND: " + input.Unit.IsWindingUp + " DIS " + distanceUnitToWaypoint + " TIME " + UnitTracker.GetLastNewPathTime(input.Unit));
             }
             return result;
         }
@@ -376,9 +376,6 @@ namespace SebbyLib.Prediction
 
             result.Hitchance = HitChance.Medium;
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
-
-            if (!lastWaypiont.IsValid() || lastWaypiont.IsZero)
-                Console.WriteLine("IS BAD");
 
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
             var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
@@ -442,7 +439,7 @@ namespace SebbyLib.Prediction
 
             if(input.Unit.GetWaypoints().Count == 1)
             {
-                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 600)
+                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 800)
                 {
                     //OktwCommon.debug("PRED: STOP HIGH");
                     result.Hitchance = HitChance.High;
