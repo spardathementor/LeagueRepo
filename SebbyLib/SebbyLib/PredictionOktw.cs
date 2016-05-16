@@ -306,13 +306,7 @@ namespace SebbyLib.Prediction
                 }
             }
 
-            //Set hit chance
-            if (result.Hitchance == HitChance.High)
-            {
-                result = WayPointAnalysis(result, input);
-                //.debug(input.Unit.BaseSkinName + result.Hitchance);
-               
-            }
+            
 
             //Check for collision
             if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
@@ -323,6 +317,14 @@ namespace SebbyLib.Prediction
                     result.Hitchance = HitChance.Collision;
             }
 
+            //Set hit chance
+            if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
+            {
+                
+                result = WayPointAnalysis(result, input);
+                //.debug(input.Unit.BaseSkinName + result.Hitchance);
+
+            }
             if (false && result.Hitchance >= HitChance.VeryHigh && input.Unit is Obj_AI_Hero && input.Radius > 1)
             {
 
@@ -347,12 +349,12 @@ namespace SebbyLib.Prediction
 
         internal static PredictionOutput WayPointAnalysis(PredictionOutput result, PredictionInput input)
         {
-            if (!input.Unit.IsValid<Obj_AI_Hero>() || input.Radius == 1)
+            if (!(input.Unit is Obj_AI_Hero) || input.Radius == 1)
             {
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-
+            OktwCommon.debug("DUPA");
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 100 || input.Unit.HasBuff("Recall") || (UnitTracker.GetLastStopMoveTime(input.Unit) < 100 && input.Unit.IsRooted))
@@ -409,37 +411,15 @@ namespace SebbyLib.Prediction
                     return result;
                 }
             }
-
-            var points = OktwCommon.CirclePoints(15, 450, input.Unit.Position).Where(x => x.IsWall());
-
-            if (points.Count() > 2)
-            {
-                var runOutWall = true;
-                foreach (var point in points)
-                {
-                    if (input.Unit.Position.Distance(point) > lastWaypiont.Distance(point))
-                    {
-                        Render.Circle.DrawCircle(point, 50, System.Drawing.Color.Orange, 1);
-                        runOutWall = false;
-                    }
-                }
-                if(runOutWall)
-                {
-                    OktwCommon.debug("PRED: RUN OUT WALL");
-                    result.Hitchance = HitChance.VeryHigh;
-                    return result;
-                }
-            }
-
-            if(input.Unit.IsWindingUp)
-            {
-                result.Hitchance = HitChance.High;
-                return result;
-            }
-
+            
             if(input.Unit.GetWaypoints().Count == 1)
             {
-                if (UnitTracker.GetLastStopMoveTime(input.Unit) < 800)
+                if (input.Unit.IsWindingUp)
+                {
+                    result.Hitchance = HitChance.High;
+                    return result;
+                }
+                else if (UnitTracker.GetLastStopMoveTime(input.Unit) < 800)
                 {
                     //OktwCommon.debug("PRED: STOP HIGH");
                     result.Hitchance = HitChance.High;
@@ -491,6 +471,15 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
+            // SHORT CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceUnitToWaypoint > 0 && distanceUnitToWaypoint < 50)
+            {
+                OktwCommon.debug("PRED: SHORT CLICK DETECTION");
+                result.Hitchance = HitChance.Medium;
+                return result;
+            }
+
             // LOW HP DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
             if (input.Unit.HealthPercent < 20 || ObjectManager.Player.HealthPercent < 20)
@@ -517,6 +506,29 @@ namespace SebbyLib.Prediction
                     OktwCommon.debug("PRED: CIRCLE NEW PATH");
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
+                }
+            }
+            if (distanceUnitToWaypoint > 0)
+            {
+                var points = OktwCommon.CirclePoints(15, 450, input.Unit.Position).Where(x => x.IsWall());
+
+                if (points.Count() > 2)
+                {
+                    var runOutWall = true;
+                    foreach (var point in points)
+                    {
+                        if (input.Unit.Position.Distance(point) > lastWaypiont.Distance(point))
+                        {
+                            Render.Circle.DrawCircle(point, 50, System.Drawing.Color.Orange, 1);
+                            runOutWall = false;
+                        }
+                    }
+                    if (runOutWall)
+                    {
+                        OktwCommon.debug("PRED: RUN OUT WALL");
+                        result.Hitchance = HitChance.VeryHigh;
+                        return result;
+                    }
                 }
             }
             //Program.debug("PRED: NO DETECTION");
@@ -1213,8 +1225,9 @@ namespace SebbyLib.Prediction
         {
             if (sender is Obj_AI_Hero)
             {
+                var item = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
                 if (args.Path.Count() == 1) // STOP MOVE DETECTION
-                    UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).StopMoveTick = Utils.TickCount;
+                    item.StopMoveTick = Utils.TickCount;
                 else
                 {
                     UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).NewPathTick = Utils.TickCount;
