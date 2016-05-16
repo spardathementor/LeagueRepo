@@ -376,15 +376,17 @@ namespace SebbyLib.Prediction
 
             result.Hitchance = HitChance.Medium;
             var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
+
+            if (!lastWaypiont.IsValid() || lastWaypiont.IsZero)
+                Console.WriteLine("IS BAD");
+
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
             var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
             var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
 
             Vector2 pos1 = lastWaypiont.To2D() - input.Unit.Position.To2D();
             Vector2 pos2 = input.From.To2D() - input.Unit.Position.To2D();
-
             var getAngle = pos1.AngleBetween(pos2);
-            OktwCommon.debug("PRED: ANGLE " + getAngle);
 
             float speedDelay = distanceFromToUnit / input.Speed;
 
@@ -502,7 +504,7 @@ namespace SebbyLib.Prediction
 
             // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
 
-            if (getAngle < 15 && getAngle > 160 && UnitTracker.GetLastNewPathTime(input.Unit) < 100 && input.Unit.IsMoving)
+            if ((getAngle < 20 || getAngle > 160) && input.Unit.IsMoving)
             {
                 OktwCommon.debug("PRED: ANGLE " + getAngle );
                 result.Hitchance = HitChance.VeryHigh;
