@@ -311,6 +311,7 @@ namespace SebbyLib.Prediction
             {
                 result = WayPointAnalysis(result, input);
                 //.debug(input.Unit.BaseSkinName + result.Hitchance);
+               
             }
 
             //Check for collision
@@ -320,6 +321,26 @@ namespace SebbyLib.Prediction
                 var originalUnit = input.Unit;
                 if (Collision.GetCollision(positions, input))
                     result.Hitchance = HitChance.Collision;
+            }
+
+            if (false && result.Hitchance >= HitChance.VeryHigh && input.Unit is Obj_AI_Hero && input.Radius > 1)
+            {
+
+                var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
+                var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
+                var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
+                var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
+                float speedDelay = distanceFromToUnit / input.Speed;
+
+                if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
+                    speedDelay = 0;
+
+                float totalDelay = speedDelay + input.Delay;
+                float moveArea = input.Unit.MoveSpeed * totalDelay;
+                float fixRange = moveArea * 0.35f;
+                float pathMinLen = 800 + moveArea;
+
+                OktwCommon.debug("RES Ways: " + input.Unit.GetWaypoints().Count + " WIND: " + input.Unit.IsWindingUp + " DIS " + distanceUnitToWaypoint + " TIME " + UnitTracker.GetLastNewPathTime(input.Unit) + " " + input.Unit.Position.To2D().AngleBetween(lastWaypiont.To2D()));
             }
             return result;
         }
@@ -358,7 +379,13 @@ namespace SebbyLib.Prediction
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
             var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
             var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
-            var getAngle = GetAngle(input.From, input.Unit);
+
+            Vector2 pos1 = lastWaypiont.To2D() - input.Unit.Position.To2D();
+            Vector2 pos2 = input.From.To2D() - input.Unit.Position.To2D();
+
+            var getAngle = pos1.AngleBetween(pos2);
+            OktwCommon.debug("PRED: ANGLE " + getAngle);
+
             float speedDelay = distanceFromToUnit / input.Speed;
 
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
@@ -368,8 +395,6 @@ namespace SebbyLib.Prediction
             float moveArea = input.Unit.MoveSpeed * totalDelay;
             float fixRange = moveArea * 0.35f;
             float pathMinLen = 800 + moveArea;
-
-            double angleMove = 32;
 
             if (input.Type == SkillshotType.SkillshotCircle)
             {
@@ -405,6 +430,12 @@ namespace SebbyLib.Prediction
                     result.Hitchance = HitChance.VeryHigh;
                     return result;
                 }
+            }
+
+            if(input.Unit.IsWindingUp)
+            {
+                result.Hitchance = HitChance.High;
+                return result;
             }
 
             if(input.Unit.GetWaypoints().Count == 1)
@@ -471,9 +502,9 @@ namespace SebbyLib.Prediction
 
             // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
 
-            if (getAngle < angleMove && UnitTracker.GetLastNewPathTime(input.Unit) < 100)
+            if (getAngle < 15 && getAngle > 160 && UnitTracker.GetLastNewPathTime(input.Unit) < 100 && input.Unit.IsMoving)
             {
-                OktwCommon.debug(GetAngle(input.From, input.Unit) + " PRED: ANGLE " + angleMove + " DIS " + distanceUnitToWaypoint);
+                OktwCommon.debug("PRED: ANGLE " + getAngle );
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -557,25 +588,6 @@ namespace SebbyLib.Prediction
                 Hitchance = HitChance.High
                 /*timeToReachTargetPosition - remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed < 0.4d ? HitChance.High : HitChance.Medium*/
             };
-        }
-
-
-
-        internal static double GetAngle(Vector3 from, Obj_AI_Base target)
-        {
-            var C = target.ServerPosition.To2D();
-            var A = target.GetWaypoints().Last();
-
-            if (C == A)
-                return 60;
-
-            var B = from.To2D();
-
-            var AB = Math.Pow(A.X - B.X, 2) + Math.Pow(A.Y - B.Y, 2);
-            var BC = Math.Pow(B.X - C.X, 2) + Math.Pow(B.Y - C.Y, 2);
-            var AC = Math.Pow(A.X - C.X, 2) + Math.Pow(A.Y - C.Y, 2);
-
-            return Math.Cos((AB + BC - AC) / (2 * Math.Sqrt(AB) * Math.Sqrt(BC))) * 180 / Math.PI;
         }
 
         internal static double UnitIsImmobileUntil(Obj_AI_Base unit)
