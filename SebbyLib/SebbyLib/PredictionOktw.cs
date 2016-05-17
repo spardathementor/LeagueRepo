@@ -325,7 +325,7 @@ namespace SebbyLib.Prediction
                 //.debug(input.Unit.BaseSkinName + result.Hitchance);
 
             }
-            if (false && result.Hitchance >= HitChance.VeryHigh && input.Unit is Obj_AI_Hero && input.Radius > 1)
+            if (result.Hitchance >= HitChance.VeryHigh && input.Unit is Obj_AI_Hero && input.Radius > 1)
             {
 
                 var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
@@ -1071,7 +1071,6 @@ namespace SebbyLib.Prediction
                         case CollisionableObjects.Minions:
                             foreach (var minion in  Cache.GetMinions(input.From, Math.Min(input.Range + input.Radius + 100, 2000)))
                             {
-                                input.Unit = minion;
 
                                 var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
 
@@ -1095,7 +1094,18 @@ namespace SebbyLib.Prediction
                                     int bonusRadius = 20;
                                     if (minion.IsMoving)
                                     {
-                                        minionPos = Prediction.GetPrediction(input, false, false).CastPosition;
+                                        var predInput2 = new PredictionInput
+                                        {
+                                            Collision = false,
+                                            Speed = input.Speed,
+                                            Delay = input.Delay,
+                                            Range = input.Range,
+                                            From = input.From,
+                                            Radius = input.Radius,
+                                            Unit = minion,
+                                            Type = input.Type
+                                        };
+                                        minionPos = Prediction.GetPrediction(predInput2).CastPosition;
                                         bonusRadius = 60 + (int)input.Radius;
                                     }
 
