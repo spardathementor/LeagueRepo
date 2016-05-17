@@ -359,7 +359,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>())
             {
                 var t = (Obj_AI_Hero)args.Target;
-                if(6 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen") && !Player.HasBuff("Mastery6261"))
+                if(4 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen") && !Player.HasBuff("Mastery6261"))
                     args.Process = false;
             }
 
@@ -532,7 +532,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Unit = target,
                     Type = CoreType2
                 };
-                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
+                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2); 
 
                 //var poutput2 = QWER.GetPrediction(target);
 
