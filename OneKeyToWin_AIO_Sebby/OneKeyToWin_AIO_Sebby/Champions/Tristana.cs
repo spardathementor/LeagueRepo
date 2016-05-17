@@ -117,18 +117,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
             }
 
-            if (Config.Item("focusE", true).GetValue<bool>())
-            {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(900) && target.HasBuff("tristanaechargesound")))
-                {
-                    if (SebbyLib.Orbwalking.InAutoAttackRange(target))
-                        Orbwalker.ForceTarget(target);
-                }
-            }
+            
         }
 
         private void Game_OnUpdate(EventArgs args)
         {
+
+            if (Config.Item("focusE", true).GetValue<bool>())
+            {
+                var eTarget = Program.Enemies.FirstOrDefault(target => target.IsValidTarget() && SebbyLib.Orbwalking.InAutoAttackRange(target) && target.HasBuff("tristanaechargesound"));
+                if(eTarget != null)
+                {
+                    Orbwalker.ForceTarget(eTarget);
+                }
+            }
+
             if (W.IsReady() && Config.Item("smartW", true).GetValue<KeyBind>().Active)
             {
                 W.Cast(Game.CursorPos);
