@@ -306,8 +306,6 @@ namespace SebbyLib.Prediction
                 }
             }
 
-            
-
             //Check for collision
             if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
             {
@@ -342,7 +340,7 @@ namespace SebbyLib.Prediction
                 float fixRange = moveArea * 0.35f;
                 float pathMinLen = 800 + moveArea;
 
-                OktwCommon.debug(input.Radius+ " RES Ways: " + input.Unit.GetWaypoints().Count + " WIND: " + input.Unit.IsWindingUp + " DIS " + distanceUnitToWaypoint + " TIME " + UnitTracker.GetLastNewPathTime(input.Unit));
+                OktwCommon.debug(input.Radius+ " RES Ways: " + input.Unit.GetWaypoints().Count + " W " + input.Unit.IsWindingUp + " D " + distanceUnitToWaypoint + " T " + UnitTracker.GetLastNewPathTime(input.Unit) + " " + result.Hitchance );
             }
             return result;
         }
@@ -411,8 +409,17 @@ namespace SebbyLib.Prediction
                     return result;
                 }
             }
-            
-            if(input.Unit.GetWaypoints().Count == 1)
+
+            // SHORT CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceUnitToWaypoint > 0 && distanceUnitToWaypoint < 50)
+            {
+                OktwCommon.debug("PRED: SHORT CLICK DETECTION");
+                result.Hitchance = HitChance.Medium;
+                return result;
+            }
+
+            if (input.Unit.GetWaypoints().Count == 1)
             {
                 if (input.Unit.IsWindingUp)
                 {
@@ -471,28 +478,11 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
-            // SHORT CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
-
-            if (distanceUnitToWaypoint > 0 && distanceUnitToWaypoint < 50)
-            {
-                OktwCommon.debug("PRED: SHORT CLICK DETECTION");
-                result.Hitchance = HitChance.Medium;
-                return result;
-            }
 
             // LOW HP DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
             if (input.Unit.HealthPercent < 20 || ObjectManager.Player.HealthPercent < 20)
             {
-                result.Hitchance = HitChance.VeryHigh;
-                return result;
-            }
-
-            // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
-
-            if ((getAngle < 20 || getAngle > 160) && input.Unit.IsMoving)
-            {
-                OktwCommon.debug("PRED: ANGLE " + getAngle );
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -508,8 +498,20 @@ namespace SebbyLib.Prediction
                     return result;
                 }
             }
+
             if (distanceUnitToWaypoint > 0)
             {
+                // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
+
+                if (getAngle < 20 || getAngle > 150)
+                {
+                    OktwCommon.debug("PRED: ANGLE " + getAngle);
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
+
+                // WALL LOGIC  ///////////////////////////////////////////////////////////////////////////////////
+
                 var points = OktwCommon.CirclePoints(15, 450, input.Unit.Position).Where(x => x.IsWall());
 
                 if (points.Count() > 2)
@@ -519,7 +521,6 @@ namespace SebbyLib.Prediction
                     {
                         if (input.Unit.Position.Distance(point) > lastWaypiont.Distance(point))
                         {
-                            Render.Circle.DrawCircle(point, 50, System.Drawing.Color.Orange, 1);
                             runOutWall = false;
                         }
                     }
@@ -1238,15 +1239,12 @@ namespace SebbyLib.Prediction
                 var item = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
                 if (args.Path.Count() == 1) // STOP MOVE DETECTION
                     item.StopMoveTick = Utils.TickCount;
-                else
-                {
-                    UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).NewPathTick = Utils.TickCount;
-                    UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Utils.TickCount });
 
-                }
+                item.NewPathTick = Utils.TickCount;
+                item.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Utils.TickCount });
 
-                if (UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.Count > 3)
-                    UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.Remove(UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.First());
+                if (item.PathBank.Count > 3)
+                    item.PathBank.Remove(UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.First());
             }
         }
 
@@ -1272,7 +1270,10 @@ namespace SebbyLib.Prediction
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
-
+            if (TrackerUnit.PathBank[1].Time == TrackerUnit.StopMoveTick)
+            {
+                return true;
+            }
             if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 200 && Utils.TickCount - TrackerUnit.PathBank[2].Time < 100)
             {
                 var C = TrackerUnit.PathBank[1].Position;
@@ -1284,7 +1285,8 @@ namespace SebbyLib.Prediction
                 var BC = Math.Pow(B.X - C.X, 2) + Math.Pow(B.Y - C.Y, 2);
                 var AC = Math.Pow(A.X - C.X, 2) + Math.Pow(A.Y - C.Y, 2);
 
-                if(TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 150)
+                
+                if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 150)
                     return true;
                 else if (Math.Cos((AB + BC - AC) / (2 * Math.Sqrt(AB) * Math.Sqrt(BC))) * 180 / Math.PI < 31)
                     return true;
