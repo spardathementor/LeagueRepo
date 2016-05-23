@@ -352,7 +352,7 @@ namespace SebbyLib.Prediction
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-            OktwCommon.debug("DUPA");
+            OktwCommon.debug("WAIT.....");
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 100 || input.Unit.HasBuff("Recall") || (UnitTracker.GetLastStopMoveTime(input.Unit) < 100 && input.Unit.IsRooted))
@@ -443,7 +443,6 @@ namespace SebbyLib.Prediction
 
             if (UnitTracker.SpamSamePlace(input.Unit))
             {
-                OktwCommon.debug("PRED: SPAM POSITION");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -1244,7 +1243,7 @@ namespace SebbyLib.Prediction
                 item.PathBank.Add(new PathInfo() { Position = args.Path.Last().To2D(), Time = Utils.TickCount });
 
                 if (item.PathBank.Count > 3)
-                    item.PathBank.Remove(UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).PathBank.First());
+                    item.PathBank.RemoveAt(0);
             }
         }
 
@@ -1272,9 +1271,10 @@ namespace SebbyLib.Prediction
                 return false;
             if (TrackerUnit.PathBank[1].Time == TrackerUnit.StopMoveTick)
             {
+                Console.WriteLine("FIRST CLICK");
                 return true;
             }
-            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 200 && Utils.TickCount - TrackerUnit.PathBank[2].Time < 100)
+            else if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 180 && Utils.TickCount - TrackerUnit.PathBank[2].Time < 90)
             {
                 var C = TrackerUnit.PathBank[1].Position;
                 var A = TrackerUnit.PathBank[2].Position;
@@ -1285,11 +1285,17 @@ namespace SebbyLib.Prediction
                 var BC = Math.Pow(B.X - C.X, 2) + Math.Pow(B.Y - C.Y, 2);
                 var AC = Math.Pow(A.X - C.X, 2) + Math.Pow(A.Y - C.Y, 2);
 
-                
-                if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 150)
+
+                if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 50)
+                {
+                    Console.WriteLine("SPAM PLACE");
                     return true;
+                }
                 else if (Math.Cos((AB + BC - AC) / (2 * Math.Sqrt(AB) * Math.Sqrt(BC))) * 180 / Math.PI < 31)
+                {
+                    Console.WriteLine("SPAM ANGLE");
                     return true;
+                }
                 else
                     return false;
             }
