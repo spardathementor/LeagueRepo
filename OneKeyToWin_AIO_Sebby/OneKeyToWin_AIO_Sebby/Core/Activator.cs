@@ -434,7 +434,8 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     foreach (var mob in mobs)
                     {
-                        if ((((mob.SkinName.ToLower().Contains("SRU_Dragon".ToLower())) && Config.Item("Rdragon", true).GetValue<bool>())
+                        Console.WriteLine(mob.SkinName);
+                        if ((((mob.SkinName.ToLower().Contains("dragon")) && Config.Item("Rdragon", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_RiftHerald" && Config.Item("Rherald", true).GetValue<bool>())
                             || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
