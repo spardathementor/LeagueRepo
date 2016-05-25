@@ -76,7 +76,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            Jungle();
+            
             if ( E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
         }
@@ -109,6 +109,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(0))
             {
                 SetMana();
+                Jungle();
             }
             
             if (!Config.Item("QWlogic", true).GetValue<bool>() || !Player.HasBuff("gravesbasicattackammo1"))
