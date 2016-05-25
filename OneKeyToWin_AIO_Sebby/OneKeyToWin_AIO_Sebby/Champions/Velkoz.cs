@@ -124,9 +124,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SebbyLib.Orbwalking.Attack = false;
                 SebbyLib.Orbwalking.Move = false;
             }
-            else if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+            else 
             {
-                LogicR();
+                if (R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+                    LogicR();
                 OktwCommon.blockMove = false;
                 OktwCommon.blockAttack = false;
                 SebbyLib.Orbwalking.Attack = true;
