@@ -13,6 +13,7 @@ namespace OneKeyToWin_AIO_Sebby
         private Spell E, Q, R, W;
         private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private float RCastTime = 0;
+        private int Rwidth = 400;
         private static GameObject QMissile, RMissile;
         private Obj_AI_Hero Player {get{return ObjectManager.Player;}}
 
@@ -25,7 +26,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             Q.SetSkillshot(0.25f, 110f, 870f, false, SkillshotType.SkillshotLine);
             W.SetSkillshot(0.6f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(2f, 400f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             LoadMenuOKTW();
 
@@ -284,7 +285,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmR", true).GetValue<bool>())
                 {
                     var allMinions = Cache.GetMinions(Player.ServerPosition, R.Range);
-                    var farmPos = R.GetCircularFarmLocation(allMinions, R.Width);
+                    var farmPos = R.GetCircularFarmLocation(allMinions, Rwidth);
                     if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
                         R.Cast(farmPos.Position);
                 }
@@ -293,8 +294,8 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Program.LaneClear && Config.Item("farmR", true).GetValue<bool>())
                 {
-                    var allMinions = Cache.GetMinions(RMissile.Position, R.Width);
-                    var mobs = Cache.GetMinions(RMissile.Position, R.Width, MinionTeam.Neutral);
+                    var allMinions = Cache.GetMinions(RMissile.Position, Rwidth);
+                    var mobs = Cache.GetMinions(RMissile.Position, Rwidth, MinionTeam.Neutral);
                     if (mobs.Count > 0)
                     {
                         if (!Config.Item("jungleR", true).GetValue<bool>())
