@@ -76,31 +76,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
-            {
-                OktwCommon.blockMove = true;
-                OktwCommon.blockAttack = true;
-                OktwCommon.blockSpells = true;
-                SebbyLib.Orbwalking.Attack = false;
-                SebbyLib.Orbwalking.Move = false;
-                args.Process = false;
-                return;
-            }
-
             if (args.Slot == SpellSlot.R )
             {
                 var t = TargetSelector.GetTarget(R.Range - 20, TargetSelector.DamageType.Magical);
 
-                if (E.IsReady() && t.IsValidTarget(E.Range) && Player.Mana > RMANA + EMANA)
+                if (E.IsReady() && Player.Mana > RMANA + EMANA)
                 {
                     E.CastOnUnit(t);
                     args.Process = false;
                     return;
                 }
 
-                if (W.IsReady() && t.IsValidTarget(W.Range) && Player.Mana > RMANA + WMANA)
+                if (W.IsReady() && Player.Mana > RMANA + WMANA)
                 {
-                    W.Cast(t);
+                    W.Cast(t.Position);
                     args.Process = false;
                     return;
                 }
@@ -120,16 +109,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
-            {
-                Program.debug("R chaneling");
-                OktwCommon.blockMove = true;
-                OktwCommon.blockAttack = true;
-                OktwCommon.blockSpells = true;
-                SebbyLib.Orbwalking.Attack = false;
-                SebbyLib.Orbwalking.Move = false;
-                return;
-            }
+
             var t = gapcloser.Sender;
 
             if (Q.IsReady() && Config.Item("gapQ", true).GetValue<bool>() && t.IsValidTarget(Q.Range))
@@ -144,16 +124,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero t, Interrupter2.InterruptableTargetEventArgs args)
         {
-            if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
-            {
-                Program.debug("R chaneling");
-                OktwCommon.blockMove = true;
-                OktwCommon.blockAttack = true;
-                OktwCommon.blockSpells = true;
-                SebbyLib.Orbwalking.Attack = false;
-                SebbyLib.Orbwalking.Move = false;
-                return;
-            }
             if (!Config.Item("intQ", true).GetValue<bool>() || !Q.IsReady())
                 return;
 
@@ -165,7 +135,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if ((Player.IsChannelingImportantSpell() || Game.Time - Rtime < 0.5) && Game.Time - Rtime < 2.5)
+            if (Player.IsChannelingImportantSpell() || Game.Time - Rtime < 2.5 || Player.HasBuff("malzaharrsound"))
             {
                 Program.debug("R chaneling");
                 OktwCommon.blockMove = true;
@@ -184,7 +154,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SebbyLib.Orbwalking.Move = true;
             }
 
-             if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
+            if (R.IsReady() && Config.Item("useR", true).GetValue<KeyBind>().Active)
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
                 if (t.IsValidTarget(R.Range) && Config.Item("Ron" + t.ChampionName).GetValue<bool>())
@@ -259,7 +229,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast(Player.Position.Extend(t.Position, 450));
                 else if (Program.Combo && Player.Mana > RMANA + WMANA)
                     W.Cast(Player.Position.Extend(t.Position, 450));
-                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                else if (Program.Farm && Config.Item("harrasW", true).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                     W.Cast(Player.Position.Extend(t.Position, 450));
             }
             else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>() )
