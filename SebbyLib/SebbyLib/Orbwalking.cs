@@ -797,12 +797,17 @@ namespace SebbyLib
                             }
                             else
                             {
-                                if (predHealth <= 0 && (HealthPrediction.GetHealthPrediction(minion, t - 70 - Game.Ping, FarmDelay) > 0 || HealthPrediction.GetHealthPrediction(minion, t + 70 + Game.Ping, FarmDelay) > 0))
+                                if (predHealth <= 0 )
                                 {
-                                    FireOnNonKillableMinion(minion);
+                                    if (HealthPrediction.GetHealthPrediction(minion, t - 50, FarmDelay) > 0)
+                                    {
+                                        Console.WriteLine("try kill");
+                                        FireOnNonKillableMinion(minion);
+                                        return minion;
+                                    }
                                 }
 
-                                if (killable)
+                                else if (killable)
                                 {
                                     return minion;
                                 }
