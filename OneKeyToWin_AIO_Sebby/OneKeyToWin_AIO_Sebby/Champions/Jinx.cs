@@ -76,6 +76,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Q Mana", true).SetValue(new Slider(80, 100, 30)));
 
         }
+
         private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             if (!Q.IsReady() || !Config.Item("autoQ", true).GetValue<bool>() || !FishBoneActive)
@@ -504,7 +505,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (FishBoneActive)
                     Utility.DrawCircle(Player.Position, 590f + Player.BoundingRadius, System.Drawing.Color.DeepPink, 1, 1);
                 else
-                    Utility.DrawCircle(Player.Position, bonusRange() - 40, System.Drawing.Color.DeepPink, 1, 1);
+                    Utility.DrawCircle(Player.Position, bonusRange() -29, System.Drawing.Color.DeepPink, 1, 1);
             }
             if (Config.Item("wRange", true).GetValue<bool>())
             {
