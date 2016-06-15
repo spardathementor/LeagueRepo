@@ -123,7 +123,7 @@ namespace SebbyLib.Prediction
 
         internal float RealRadius
         {
-            get { return UseBoundingRadius ? Radius + Unit.BoundingRadius / 2 : Radius; }
+            get { return UseBoundingRadius ? Radius + Unit.BoundingRadius * 1.1f : Radius; }
         }
     }
 
@@ -237,7 +237,7 @@ namespace SebbyLib.Prediction
             if (ft)
             {
                 //Increase the delay due to the latency and server tick:
-                input.Delay += Game.Ping / 2000f + 0.07f;
+                input.Delay += Game.Ping / 2000f + 0.05f;
 
                 if (input.Aoe)
                 {
