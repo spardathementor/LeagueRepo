@@ -124,7 +124,7 @@ namespace SebbyLib.Prediction
 
         internal float RealRadius
         {
-            get { return UseBoundingRadius ? Radius + Unit.BoundingRadius : Radius; }
+            get { return UseBoundingRadius ? Radius + Unit.BoundingRadius   : Radius; }
         }
     }
 
@@ -401,19 +401,16 @@ namespace SebbyLib.Prediction
             }
 
             // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
-            if (distanceFromToWaypoint <= distanceFromToUnit)
+            if (distanceFromToWaypoint <= distanceFromToUnit && distanceFromToUnit > input.Range - fixRange)
             {
-                if (distanceFromToUnit > input.Range - fixRange)
-                {
-                    result.Hitchance = HitChance.Medium;
-                    return result;
-                }
+                result.Hitchance = HitChance.Medium;
+                return result; 
             }
 
             if (distanceUnitToWaypoint > 0)
             {
                 // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
-                if (getAngle < 20 || getAngle > 150)
+                if (getAngle < 20 || getAngle > 160 || (getAngle > 130 && distanceUnitToWaypoint > 400) )
                 {
                     OktwCommon.debug("PRED: ANGLE " + getAngle);
                     result.Hitchance = HitChance.VeryHigh;
@@ -1087,14 +1084,14 @@ namespace SebbyLib.Prediction
 
                                 var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
 
-                                if (distanceFromToUnit < input.Radius + minion.BoundingRadius)
+                                if (distanceFromToUnit < 10 + minion.BoundingRadius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < input.Radius + minion.BoundingRadius)
+                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
@@ -1104,7 +1101,7 @@ namespace SebbyLib.Prediction
                                 else
                                 {
                                     var minionPos = minion.ServerPosition;
-                                    int bonusRadius = 20;
+                                    int bonusRadius = 15;
                                     if (minion.IsMoving)
                                     {
                                         var predInput2 = new PredictionInput
@@ -1119,7 +1116,7 @@ namespace SebbyLib.Prediction
                                             Type = input.Type
                                         };
                                         minionPos = Prediction.GetPrediction(predInput2).CastPosition;
-                                        bonusRadius = 60 + (int)input.Radius;
+                                        bonusRadius = 50 + (int)input.Radius;
                                     }
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
