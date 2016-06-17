@@ -1279,12 +1279,7 @@ namespace SebbyLib.Prediction
             var TrackerUnit = UnitTrackerInfoList.Find(x => x.NetworkId == unit.NetworkId);
             if (TrackerUnit.PathBank.Count < 3)
                 return false;
-            if (TrackerUnit.PathBank[1].Time == TrackerUnit.StopMoveTick)
-            {
-                Console.WriteLine("FIRST CLICK");
-                return true;
-            }
-            else if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 180 && Utils.TickCount - TrackerUnit.PathBank[2].Time < 90)
+            if (TrackerUnit.PathBank[2].Time - TrackerUnit.PathBank[1].Time < 180 && Utils.TickCount - TrackerUnit.PathBank[2].Time < 90)
             {
                 var C = TrackerUnit.PathBank[1].Position;
                 var A = TrackerUnit.PathBank[2].Position;
