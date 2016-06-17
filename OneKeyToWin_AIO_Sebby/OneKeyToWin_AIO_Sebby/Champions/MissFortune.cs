@@ -40,7 +40,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("harasQ", "Use Q on minion", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("killQ", "Use Q only if can kill minion", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionMove", "Don't use if minions moving", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionWidth", "Collision width calculation", true).SetValue(new Slider(70, 200, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionWidth", "secound Q angle", true).SetValue(new Slider(40, 90, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass W", true).SetValue(true));
@@ -56,9 +56,12 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("newTarget", "Try change focus after attack ", true).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle Q ks", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "LaneClear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "LaneClear E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear  Mana", true).SetValue(new Slider(80, 100, 0)));
+
 
 
             Game.OnUpdate += Game_OnGameUpdate;
@@ -104,47 +107,61 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             LastAttackId = target.NetworkId;
 
-            if (!(target is Obj_AI_Hero))
-                return;
             var t = target as Obj_AI_Hero;
+            if (t != null)
+            {
+                if (Q.IsReady())
+                {
+                    if (Q.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health)
+                        Q.Cast(t);
+                    else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
+                        Q.Cast(t);
+                    else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA)
+                        Q.Cast(t);
+                }
+                if (W.IsReady())
+                {
+                    if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo && Player.Mana > RMANA + WMANA && Config.Item("autoW", true).GetValue<bool>())
+                        W.Cast();
+                    else if (Player.Mana > RMANA + WMANA + QMANA && Config.Item("harasW", true).GetValue<bool>())
+                        W.Cast();
+                }
+            }
+            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value )
+            {
+                var minions = Cache.GetMinions(Player.ServerPosition, 600);
 
-            if (Q.IsReady() && t.IsValidTarget(Q.Range))
-            {
-                if (Q.GetDamage(t) + Player.GetAutoAttackDamage(t) * 3 > t.Health)
-                    Q.Cast(t);
-                else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
-                    Q.Cast(t);
-                else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA)
-                    Q.Cast(t);
+                if (minions.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                {
+                    if (Q.IsReady() && Config.Item("farmQ", true).GetValue<bool>() && minions.Count > 1)
+                        Q.Cast(minions.FirstOrDefault());
+                    if (W.IsReady() && Config.Item("farmW", true).GetValue<bool>() && minions.Count > 1)
+                        W.Cast();
+                }
             }
-            if (W.IsReady())
-            {
-                if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo && Player.Mana > RMANA + WMANA && Config.Item("autoW", true).GetValue<bool>())
-                    W.Cast();
-                else if (Player.Mana > RMANA + WMANA + QMANA && Config.Item("harasW", true).GetValue<bool>())
-                    W.Cast();
-            }
+
+
         }
 
         private void Jungle()
         {
-            if (Program.LaneClear && Player.Mana > RMANA + WMANA + QMANA )
+            if (Program.LaneClear && Player.Mana > RMANA + QMANA )
             {
                 var mobs = Cache.GetMinions(Player.ServerPosition, 600, MinionTeam.Neutral);
                 if (mobs.Count > 0)
                 {
                     var mob = mobs[0];
-                    if (Q.IsReady() && Config.Item("jungleQ", true).GetValue<bool>() && Q.GetDamage(mob) > mob.Health)
+                    if (Q.IsReady() && Q.GetDamage(mob) > mob.Health)
                     {
                         Q.Cast(mob);
                         return;
                     }
-                    if (W.IsReady() && Config.Item("jungleW", true).GetValue<bool>())
+                    if (W.IsReady())
                     {
                         W.Cast();
                         return;
                     }
-                    if (E.IsReady() && Config.Item("jungleE", true).GetValue<bool>())
+                    if (E.IsReady())
                     {
                         E.Cast(mob.ServerPosition);
                         return;
@@ -255,40 +272,54 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (t1.IsValidTarget(Q1.Range) && Config.Item("harasQ", true).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 50)
             {
+                var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
+
+
+
                 if (Config.Item("qMinionMove", true).GetValue<bool>())
                 {
-                    var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
-
                     if (minions.Exists(x => x.IsMoving))
                         return;
                 }
 
-                Q1.Width = Config.Item("qMinionWidth", true).GetValue<Slider>().Value;
-
-                var poutput = Q1.GetPrediction(t1);
-                var col = poutput.CollisionObjects;
-                if (col.Count() == 0)
-                    return;
-
-                var minionQ = col.Last();
-                if (minionQ.IsValidTarget(Q.Range))
+                var enemyPredictionPos = SebbyLib.Prediction.Prediction.GetPrediction(t1, 0.2f).CastPosition;
+                foreach(var minion in minions)
                 {
-                    if (Config.Item("killQ", true).GetValue<bool>() && Q.GetDamage(minionQ) < minionQ.Health)
-                        return;
-                    var minionToT = minionQ.Distance(t1.Position);
-                    var minionToP = minionQ.Distance(poutput.CastPosition);
-                    if (minionToP < 400 && minionToT < 420 && minionToT > 150 && minionToP > 200)
+                    if (Config.Item("killQ", true).GetValue<bool>() && Q.GetDamage(minion) < minion.Health)
+                        continue;
+
+                    var posExt = Player.ServerPosition.Extend(minion.ServerPosition, 420 + Player.Distance(minion));
+                    
+                    if (InCone(enemyPredictionPos, posExt, minion.ServerPosition, Config.Item("qMinionWidth", true).GetValue<Slider>().Value))
                     {
-                        if (Q.GetDamage(t1) + Player.GetAutoAttackDamage(t1) > t1.Health)
-                            Q.Cast(col.Last());
-                        else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
-                            Q.Cast(col.Last());
-                        else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA + QMANA)
-                            Q.Cast(col.Last());
+                        Program.debug("dupa");
+                        if (minions.Exists(x => 
+                        InCone(x.Position, posExt, minion.ServerPosition, Config.Item("qMinionWidth", true).GetValue<Slider>().Value + 10)
+                        ))
+                            continue;
+                        Q.Cast(minion);
+                        return;
                     }
                 }
             }
         }
+
+
+        private bool InCone(Vector3 Position, Vector3 finishPos, Vector3 firstPos, int angleSet)
+        {
+            var range = 420;
+            var angle = angleSet * (float)Math.PI / 180;
+            var end2 = finishPos.To2D() - firstPos.To2D();
+            var edge1 = end2.Rotated(-angle / 2);
+            var edge2 = edge1.Rotated(angle);
+
+            var point = Position.To2D() - firstPos.To2D();
+            if (point.Distance(new Vector2(), true) < range * range && edge1.CrossProduct(point) > 0 && point.CrossProduct(edge2) > 0)
+                return true;
+
+            return false;
+        }
+
         private void LogicE()
         {
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
@@ -309,7 +340,16 @@ namespace OneKeyToWin_AIO_Sebby
                             E.Cast(enemy, true, true);
                     }
                 }
-            }   
+            }
+            if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>())
+            {
+                var minions = Cache.GetMinions(Player.ServerPosition, E.Range);
+                var farmPos = E.GetCircularFarmLocation(minions, E.Width);
+                if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                {
+                    E.Cast(farmPos.Position);
+                }
+            }
         }
 
         private void LogicR()
