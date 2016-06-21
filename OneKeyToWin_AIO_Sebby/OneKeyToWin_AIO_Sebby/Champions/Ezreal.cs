@@ -192,7 +192,15 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 bool cc = !Program.None && Player.Mana > RMANA + QMANA + EMANA;
                 bool harass = Program.Farm && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
-                bool combo = Program.Combo && Player.Mana > RMANA + QMANA;
+
+                if (Program.Combo && Player.Mana > RMANA + QMANA)
+                {
+                    var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+
+                    if (t.IsValidTarget())
+                        Program.CastSpell(Q, t);
+                }
+
                 foreach (var t in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(t => t.Health))
                 {
                     var qDmg = OktwCommon.GetKsDamage(t, Q);
@@ -207,9 +215,7 @@ namespace OneKeyToWin_AIO_Sebby
                     if (cc && !OktwCommon.CanMove(t))
                         Q.Cast(t);
 
-                    if (combo)
-                        Program.CastSpell(Q, t);
-                    else if (harass && Config.Item("haras" + t.ChampionName).GetValue<bool>())
+                    if (harass && Config.Item("haras" + t.ChampionName).GetValue<bool>())
                         Program.CastSpell(Q, t);
                 }
             }
