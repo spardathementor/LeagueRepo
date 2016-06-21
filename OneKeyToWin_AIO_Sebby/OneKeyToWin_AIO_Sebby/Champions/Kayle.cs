@@ -43,6 +43,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsAlly))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("R ally:").AddItem(new MenuItem("Rally" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    var spell = enemy.Spellbook.Spells[i];
+                    if (spell.SData.TargettingType != SpellDataTargetType.Self && spell.SData.TargettingType != SpellDataTargetType.SelfAndUnit)
+                    {
+                        Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Spell Manager").SubMenu(enemy.ChampionName).AddItem(new MenuItem("spell" + spell.SData.Name, spell.Name,true).SetValue(false));
+                    }
+                }
+            }
+
+
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
@@ -52,8 +66,35 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Game.OnUpdate += Game_OnGameUpdate;
             Drawing.OnDraw += Drawing_OnDraw;
+            Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
         }
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
+        {
+            if (!R.IsReady() || sender.IsMinion || !sender.IsEnemy || args.SData.IsAutoAttack() || !Config.Item("autoR", true).GetValue<bool>()
+                 || !sender.IsValid<Obj_AI_Hero>() || args.SData.Name.ToLower() == "tormentedsoil")
+                return;
 
+            if (Config.Item("spell" + args.SData.Name,true) == null || !Config.Item("spell" + args.SData.Name,true).GetValue<bool>())
+                return;
+
+            if (args.Target != null)
+            {
+                if (args.Target.IsAlly )
+                {
+                    var ally = args.Target as Obj_AI_Hero;
+                    if(ally != null && Config.Item("Rally" + ally.ChampionName).GetValue<bool>())
+                        R.CastOnUnit(ally);
+                }
+            }
+            else
+            {
+                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>()))
+                {
+                    if(OktwCommon.CanHitSkillShot(ally, args))
+                        R.CastOnUnit(ally);
+                }
+            }
+        }
         private void Game_OnGameUpdate(EventArgs args)
         {
             if (Program.LagFree(1))
