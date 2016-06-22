@@ -28,7 +28,7 @@ namespace OneKeyToWin_AIO_Sebby
             Q1.SetSkillshot(0.25f, 70f, 1500f, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
             E.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.25f, 100f, 2000f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.25f, 50f, 3000f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("QRange", "Q range", true).SetValue(false));
