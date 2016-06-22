@@ -316,32 +316,43 @@ namespace OneKeyToWin_AIO_Sebby
 
             foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() ))
             {
+                var points = OktwCommon.CirclePoints(20, 250, Player.Position);
+
+                
+
                 if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
                     OktwCommon.blockAttack = true;
 
-                var points = OktwCommon.CirclePoints(20, 200, Player.Position);
+               
                 Vector3 bestPoint = Vector3.Zero;
 
                 foreach (var point in points)
                 {
+                    if (point.IsWall() || point.UnderTurret(true))
+                    {
+                        Orbwalker.SetOrbwalkingPoint(new Vector3());
+                        return;
+                    }
+
                     if (enemy.Distance(point) > dodgeRange && (bestPoint == Vector3.Zero || Game.CursorPos.Distance(point) < Game.CursorPos.Distance(bestPoint)))
                     {
                         bestPoint = point;
                     }
                 }
 
-                if ( enemy.Distance(bestPoint) > dodgeRange && !bestPoint.IsWall() && !bestPoint.UnderTurret(true) )
+                if ( enemy.Distance(bestPoint) > dodgeRange )
                 {
                     Orbwalker.SetOrbwalkingPoint(bestPoint);
                 }
                 else
                 {
                     var fastPoint = enemy.ServerPosition.Extend(Player.ServerPosition, dodgeRange);
-                    if (!fastPoint.IsWall() && !fastPoint.UnderTurret(true) && fastPoint.CountEnemiesInRange(dodgeRange) <= Player.CountEnemiesInRange(dodgeRange))
+                    if (fastPoint.CountEnemiesInRange(dodgeRange) <= Player.CountEnemiesInRange(dodgeRange))
                     {
                         Orbwalker.SetOrbwalkingPoint(fastPoint);
                     }
                 }
+
                 dodgeTime = Game.Time;
                 return;
             }   
