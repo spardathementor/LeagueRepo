@@ -801,7 +801,6 @@ namespace SebbyLib
                                 {
                                     if (HealthPrediction.GetHealthPrediction(minion, t - 50, FarmDelay) > 0)
                                     {
-                                        Console.WriteLine("try kill");
                                         FireOnNonKillableMinion(minion);
                                         return minion;
                                     }

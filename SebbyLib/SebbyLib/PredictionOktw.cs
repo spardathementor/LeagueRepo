@@ -345,6 +345,14 @@ namespace SebbyLib.Prediction
             return result;
         }
 
+        public static bool PointInLineSegment(Vector2 segmentStart, Vector2 segmentEnd, Vector2 point)
+        {
+            var distanceStartEnd = segmentStart.Distance(segmentEnd, true);
+            var distanceStartPoint = segmentStart.Distance(point, true);
+            var distanceEndPoint = segmentEnd.Distance(point, true);
+            return !(distanceEndPoint > distanceStartEnd || distanceStartPoint > distanceStartEnd);
+        }
+
         internal static PredictionOutput WayPointAnalysis(PredictionOutput result, PredictionInput input)
         {
             if (!(input.Unit is Obj_AI_Hero) || input.Radius == 1)
@@ -373,9 +381,10 @@ namespace SebbyLib.Prediction
             }
 
             // PREPARE MATH ///////////////////////////////////////////////////////////////////////////////////
+            var path = input.Unit.GetWaypoints();
 
-            result.Hitchance = HitChance.Medium;
-            var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
+
+            var lastWaypiont = path.Last().To3D();
 
             var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
             var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
@@ -501,6 +510,15 @@ namespace SebbyLib.Prediction
             else if (distanceFromToWaypoint < 250)
             {
                 OktwCommon.debug("PRED: SPECIAL CASES ON WAY");
+                result.Hitchance = HitChance.VeryHigh;
+                return result;
+            }
+
+            // LONG TIME ///////////////////////////////////////////////////////////////////////////////////
+
+            if (UnitTracker.GetLastNewPathTime(input.Unit) > 250)
+            {
+                OktwCommon.debug("PRED: LONG TIME");
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
@@ -1245,6 +1263,7 @@ namespace SebbyLib.Prediction
         {
             if (sender is Obj_AI_Hero)
             {
+
                 var item = UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId);
                 if (args.Path.Count() == 1) // STOP MOVE DETECTION
                     item.StopMoveTick = Utils.TickCount;
@@ -1265,10 +1284,15 @@ namespace SebbyLib.Prediction
                     UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).AaTick = Utils.TickCount;
                 else
                 {
+                    
                     var foundSpell = spells.Find(x => args.SData.Name.ToLower() == x.name.ToLower());
                     if (foundSpell != null)
                     {
                         UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).SpecialSpellFinishTick = Utils.TickCount + (int)(foundSpell.duration * 1000);
+                    }
+                    else if(sender.IsWindingUp || sender.IsRooted || !sender.CanMove)
+                    {
+                        UnitTrackerInfoList.Find(x => x.NetworkId == sender.NetworkId).SpecialSpellFinishTick = Utils.TickCount + 100;
                     }
                 }
             }
