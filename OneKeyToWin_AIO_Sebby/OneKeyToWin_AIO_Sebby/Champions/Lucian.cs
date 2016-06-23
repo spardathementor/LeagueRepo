@@ -55,9 +55,9 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear + jungle Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "LaneClear + jungle  W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear + jungle  Mana", true).SetValue(new Slider(80, 100, 30)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "LaneClear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 30)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
             
@@ -132,7 +132,7 @@ namespace OneKeyToWin_AIO_Sebby
                     LogicR();
 
                 if (!passRdy && !SpellLock)
-                farm();
+                    farm();
             }
         }
 
@@ -286,22 +286,21 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
-
         public void farm()
         {
-            if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear)
+            if (Program.LaneClear && Player.Mana > RMANA + QMANA)
             {
                 var mobs = Cache.GetMinions(Player.ServerPosition, Q.Range, MinionTeam.Neutral);
-                if (mobs.Count > 0 && Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                if (mobs.Count > 0 )
                 {
                     var mob = mobs[0];
-                    if (Q.IsReady() && Config.Item("farmQ", true).GetValue<bool>())
+                    if (Q.IsReady())
                     {
                         Q.Cast(mob);
                         return;
                     }
 
-                    if (W.IsReady() && Config.Item("farmW", true).GetValue<bool>())
+                    if (W.IsReady())
                     {
                         W.Cast(mob);
                         return;
@@ -310,9 +309,10 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
                 {
-                    var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
+                    
                     if (Q.IsReady() && Config.Item("farmQ", true).GetValue<bool>())
                     {
+                        var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
                         foreach (var minion in minions)
                         {
                             var poutput = Q1.GetPrediction(minion);
@@ -331,6 +331,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     if (W.IsReady() && Config.Item("farmW", true).GetValue<bool>())
                     {
+                        var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
                         var Wfarm = W.GetCircularFarmLocation(minions, 150);
                         if (Wfarm.MinionsHit > 3 )
                             W.Cast(Wfarm.Position);
