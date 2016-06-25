@@ -209,7 +209,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void JungleE()
         {
-            if (!Config.Item("jungleE", true).GetValue<bool>() || Player.Mana < RMANA + EMANA)
+            if (!Config.Item("jungleE", true).GetValue<bool>() || Player.Mana < RMANA + EMANA || Player.Level == 1)
                 return;
 
             var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
@@ -218,7 +218,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var mob = mobs[0];
                 if (E.IsKillable(mob))
                 {
-                    Program.debug("DUPAAA");
                     E.Cast();
                 }
             }
