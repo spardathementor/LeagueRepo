@@ -32,7 +32,7 @@ namespace OneKeyToWin_AIO_Sebby
             Q.SetSkillshot(0.05f, 70f, 1150f, false, SkillshotType.SkillshotCircle);
             W.SetSkillshot(0.25f, 210f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             E.SetSkillshot(0.25f, 100f, 1700f, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.5f, 360f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.4f, 370f, float.MaxValue, false, SkillshotType.SkillshotCircle);
             QR.SetSkillshot(0.5f, 400f, 100f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
