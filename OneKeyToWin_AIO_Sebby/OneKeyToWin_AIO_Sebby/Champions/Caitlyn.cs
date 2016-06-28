@@ -64,7 +64,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
             {
-                W.Cast(args.EndPosition);
+                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 150));
                 Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
             }
         }
@@ -84,7 +84,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W on hard CC", true).SetValue(true));  
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("telE", "Auto W teleport", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW", "Auto W bush after enemy enter", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW2", "Auto W bush if full ammo", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW2", "Auto W bush and turret if full ammo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wspell", "W on special spell detection", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").AddItem(new MenuItem("WmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position",  "My hero position" }, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -168,11 +168,11 @@ namespace OneKeyToWin_AIO_Sebby
                 //debug("" + ObjectManager.Player.AttackRange);
             }
             
-            if (Program.LagFree(1) && E.IsReady() && !Player.IsWindingUp)
+            if (Program.LagFree(1) && E.IsReady() && SebbyLib.Orbwalking.CanMove(40))
                 LogicE();
-            if (Program.LagFree(2) && W.IsReady() && !Player.IsWindingUp)
+            if (Program.LagFree(2) && W.IsReady() && SebbyLib.Orbwalking.CanMove(40))
                 LogicW();
-            if (Program.LagFree(3) && Q.IsReady() && !Player.IsWindingUp && Config.Item("autoQ2", true).GetValue<bool>())
+            if (Program.LagFree(3) && Q.IsReady() && SebbyLib.Orbwalking.CanMove(40) && Config.Item("autoQ2", true).GetValue<bool>())
                 LogicQ();
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Game.Time - QCastTime > 1)
                 LogicR();
@@ -254,8 +254,8 @@ namespace OneKeyToWin_AIO_Sebby
                         var points = OktwCommon.CirclePoints(8, W.Range, Player.Position);
                         foreach (var point in points)
                         {
-                            if (NavMesh.IsWallOfGrass(point, 0))
-                            {
+                            if (NavMesh.IsWallOfGrass(point, 0) || point.UnderTurret(true))
+                            {   
                                 W.Cast(point);
                                 return;
                             }
