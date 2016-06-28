@@ -64,7 +64,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
             {
-                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 150));
+                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 100));
                 Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
             }
         }
