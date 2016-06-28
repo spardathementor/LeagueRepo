@@ -40,7 +40,7 @@ namespace OneKeyToWin_AIO_Sebby
             Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
             Qc.SetSkillshot(0.65f, 60f, 2200f, true, SkillshotType.SkillshotLine);
             W.SetSkillshot(1.5f, 20f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 70f, 1600f, true, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.35f, 70f, 1600f, true, SkillshotType.SkillshotLine);
             R.SetSkillshot(0.7f, 200f, 1500f, false, SkillshotType.SkillshotCircle);
 
             LoadMenuOKTW();
@@ -52,6 +52,7 @@ namespace OneKeyToWin_AIO_Sebby
             //SebbyLib.Orbwalking.AfterAttack += afterAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
+
         }
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
@@ -60,6 +61,11 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower()) ))
                     args.Process = false;
+            }
+            if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
+            {
+                W.Cast(args.EndPosition);
+                Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
             }
         }
 
@@ -77,7 +83,8 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W on hard CC", true).SetValue(true));  
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("telE", "Auto W teleport", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW", "Auto W bush", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW", "Auto W bush after enemy enter", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW2", "Auto W bush if full ammo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wspell", "W on special spell detection", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").AddItem(new MenuItem("WmodeGC", "Gap Closer position mode", true).SetValue(new StringList(new[] { "Dash end position",  "My hero position" }, 0)));
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
@@ -240,7 +247,21 @@ namespace OneKeyToWin_AIO_Sebby
                     if (!trapPos.IsZero)
                         W.Cast(trapPos);
                 }
-
+                if((int)(Game.Time * 10) % 2 == 0 && Config.Item("bushW2", true).GetValue<bool>())
+                {
+                    if (Player.Spellbook.GetSpell(SpellSlot.W).Ammo == new int[]{0,3,3,4,4,5}[W.Level] && Player.CountEnemiesInRange(1000) == 0)
+                    {
+                        var points = OktwCommon.CirclePoints(8, W.Range, Player.Position);
+                        foreach (var point in points)
+                        {
+                            if (NavMesh.IsWallOfGrass(point, 0))
+                            {
+                                W.Cast(point);
+                                return;
+                            }
+                        }
+                    }
+                }
             }
         }
 
