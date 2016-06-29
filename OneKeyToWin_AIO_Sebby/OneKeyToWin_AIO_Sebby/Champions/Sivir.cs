@@ -81,9 +81,11 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (W.IsReady() && !Program.None && target.IsValidTarget())
             {
-                if (target is Obj_AI_Hero)
+                var t = target as Obj_AI_Hero;
+                if (t != null)
                 {
-                    var t = target as Obj_AI_Hero;
+                    if(Player.GetAutoAttackDamage(t) * 3 > t.Health - OktwCommon.GetIncomingDamage(t))
+                        W.Cast();
                     if (Program.Combo && Player.Mana > RMANA + WMANA)
                         W.Cast();
                     else if (Config.Item("harasW", true).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && Config.Item("haras" + t.ChampionName).GetValue<bool>())
@@ -93,8 +95,8 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else
                 {
-                    var t = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
-                    if (t.IsValidTarget() && Config.Item("harasW", true).GetValue<bool>() && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t.Distance(target.Position) < 500)
+                    var t2 = TargetSelector.GetTarget(900, TargetSelector.DamageType.Physical);
+                    if (t2.IsValidTarget() && Config.Item("harasW", true).GetValue<bool>() && Config.Item("haras" + t2.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + QMANA && t2.Distance(target.Position) < 500)
                     {
                         W.Cast();
                     }
