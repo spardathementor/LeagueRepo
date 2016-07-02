@@ -40,7 +40,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("harasQ", "Use Q on minion", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("killQ", "Use Q only if can kill minion", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionMove", "Don't use if minions moving", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionWidth", "secound Q angle", true).SetValue(new Slider(40, 90, 0)));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionWidth", "secound Q angle", true).SetValue(new Slider(80, 100, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass W", true).SetValue(true));
