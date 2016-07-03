@@ -47,16 +47,16 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             List<string> modes = new List<string>();
+
             modes.Add("LOW HP");
             modes.Add("CLOSEST");
+
             foreach (var enemy in HeroManager.Enemies)
             {
                 modes.Add(enemy.ChampionName);
             }
             
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Semi-manual", "Semi-manual MODE", true).SetValue(new StringList(modes.ToArray(), 0)));
-
-
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser R").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName).SetValue(false));
@@ -98,10 +98,8 @@ namespace OneKeyToWin_AIO_Sebby
                 || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(2500) || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
-            if (Config.Item("spell" + args.SData.Name, true) == null || !Config.Item("spell" + args.SData.Name, true).GetValue<bool>())
-                return;
-
-            R.Cast(sender);
+            if (Config.Item("spell" + args.SData.Name, true) != null && !Config.Item("spell" + args.SData.Name, true).GetValue<bool>())
+                R.Cast(sender);
         }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
