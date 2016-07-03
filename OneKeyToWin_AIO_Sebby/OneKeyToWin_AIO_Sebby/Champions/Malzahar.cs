@@ -76,31 +76,33 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-            if (args.Slot == SpellSlot.R )
+            if (args.Slot == SpellSlot.R)
             {
-                var t = TargetSelector.GetTarget(R.Range - 20, TargetSelector.DamageType.Magical);
-
-                if (E.IsReady() && Player.Mana > RMANA + EMANA)
+                var t = args.Target as Obj_AI_Hero;
+                if (t != null && t.Health > R.GetDamage(t))
                 {
-                    E.CastOnUnit(t);
-                    args.Process = false;
-                    return;
-                }
+                    if (E.IsReady() && Player.Mana > RMANA + EMANA)
+                    {
+                        E.CastOnUnit(t);
+                        args.Process = false;
+                        return;
+                    }
 
-                if (W.IsReady() && Player.Mana > RMANA + WMANA)
-                {
-                    W.Cast(t.Position);
-                    args.Process = false;
-                    return;
-                }
+                    if (W.IsReady() && Player.Mana > RMANA + WMANA)
+                    {
+                        W.Cast(t.Position);
+                        args.Process = false;
+                        return;
+                    }
 
-                if (Q.IsReady() && t.IsValidTarget(Q.Range) && Player.Mana > RMANA + QMANA)
-                {
-                    Qr.Cast(t);
-                    args.Process = false;
-                    return;
-                }
+                    if (Q.IsReady() && t.IsValidTarget(Q.Range) && Player.Mana > RMANA + QMANA)
+                    {
+                        Qr.Cast(t);
+                        args.Process = false;
+                        return;
+                    }
 
+                }
                 if(R.IsReady() && t.IsValidTarget())
                      Rtime = Game.Time;
                 
