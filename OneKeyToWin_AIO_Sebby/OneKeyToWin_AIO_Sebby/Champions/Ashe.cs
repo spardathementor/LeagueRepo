@@ -96,7 +96,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
 
             if (!R.IsReady() || sender.IsMinion || !sender.IsEnemy || args.SData.IsAutoAttack()
-                || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(2500) || args.SData.Name.ToLower() == "tormentedsoil")
+                || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget() || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
             if (Config.Item("spell" + args.SData.Name, true) != null && Config.Item("spell" + args.SData.Name, true).GetValue<bool>())
