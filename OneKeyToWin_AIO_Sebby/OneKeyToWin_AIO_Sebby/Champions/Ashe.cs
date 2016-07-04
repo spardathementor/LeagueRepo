@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rkscombo", "R KS combo R + W + AA", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRaoe", "Auto R aoe", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRinter", "Auto R OnPossibleToInterrupt", true).SetValue(true));
-            /*
+
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
             {
                 for (int i = 0; i < 4; i++)
@@ -43,7 +43,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
             }
-            */
+
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             List<string> modes = new List<string>();
@@ -94,13 +94,16 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            return;
+
             if (!R.IsReady() || sender.IsMinion || !sender.IsEnemy || args.SData.IsAutoAttack()
                 || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(2500) || args.SData.Name.ToLower() == "tormentedsoil")
                 return;
 
-            if (Config.Item("spell" + args.SData.Name, true) != null && !Config.Item("spell" + args.SData.Name, true).GetValue<bool>())
+            if (Config.Item("spell" + args.SData.Name, true) != null && Config.Item("spell" + args.SData.Name, true).GetValue<bool>())
+            {
                 R.Cast(sender);
+                Program.debug("R 2");
+            }
         }
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
@@ -138,6 +141,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (CastR)
                 {
+                    Program.debug("R semi");
                     if (Config.Item("Semi-manual", true).GetValue<StringList>().SelectedIndex == 0)
                     { 
                         var t = TargetSelector.GetTarget(1800, TargetSelector.DamageType.Physical);
@@ -203,7 +207,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("autoR", true).GetValue<bool>())
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
+                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(2000) && OktwCommon.ValidUlt(target)))
                 {
                     var rDmg = OktwCommon.GetKsDamage(target, R);
                     if (Program.Combo && target.CountEnemiesInRange(250) > 2 && Config.Item("autoRaoe", true).GetValue<bool>())
