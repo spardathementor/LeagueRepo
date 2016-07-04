@@ -64,7 +64,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
             {
-                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 100));
+                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 50));
                 Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
             }
         }
@@ -80,6 +80,9 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ2", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Reduce Q use", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Reduce Q use", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qaoe", "Q aoe", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qslow", "Q slow", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W on hard CC", true).SetValue(true));  
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("telE", "Auto W teleport", true).SetValue(true));
@@ -91,6 +94,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu(Player.ChampionName).SubMenu("W Config").SubMenu("W Gap Closer").SubMenu("Cast on enemy:").AddItem(new MenuItem("WGCchampion" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Ehitchance", "Auto E dash and immobile target", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harrasEQ", "Harass E + Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("EQks", "Ks E + Q + AA", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("useE", "Dash E HotKeySmartcast", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press)));
@@ -288,10 +292,10 @@ namespace OneKeyToWin_AIO_Sebby
                         Q.Cast(enemy, true);
                     if (Player.CountEnemiesInRange(bonusRange()) == 0 && OktwCommon.CanHarras())
                     {
-                        if (t.HasBuffOfType(BuffType.Slow))
+                        if (t.HasBuffOfType(BuffType.Slow) && Config.Item("Qslow", true).GetValue<bool>())
                             Q.Cast(t);
-
-                        Q.CastIfWillHit(t, 2, true);
+                        if(Config.Item("Qaoe", true).GetValue<bool>())
+                            Q.CastIfWillHit(t, 2, true);
                     }
                 }
             }
@@ -331,12 +335,19 @@ namespace OneKeyToWin_AIO_Sebby
                         }
                     }
 
-                    if (Player.Mana > RMANA + EMANA && Player.Health < Player.MaxHealth * 0.3)
+                    if (Player.Mana > RMANA + EMANA)
                     {
-                        if (GetRealDistance(t) < 500 )
-                            E.Cast(t, true);
-                        if (Player.CountEnemiesInRange(250) > 0)
-                            E.Cast(t, true);
+                        if (Config.Item("Ehitchance", true).GetValue<bool>())
+                        {
+                            E.CastIfHitchanceEquals(t, HitChance.Dashing);
+                        }
+                        if (Player.Health < Player.MaxHealth * 0.3)
+                        {
+                            if (GetRealDistance(t) < 500)
+                                E.Cast(t, true);
+                            if (Player.CountEnemiesInRange(250) > 0)
+                                E.Cast(t, true);
+                        }
                     }
                         
                 }
