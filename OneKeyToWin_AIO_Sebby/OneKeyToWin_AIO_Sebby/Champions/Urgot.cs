@@ -83,6 +83,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
+
             if (R.IsReady())
             {
                 var t = gapcloser.Sender;
@@ -118,6 +119,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            if (Player.IsRecalling())
+                return;
             if (Config.Item("useR", true).GetValue<KeyBind>().Active )
             {
                 var tr = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
