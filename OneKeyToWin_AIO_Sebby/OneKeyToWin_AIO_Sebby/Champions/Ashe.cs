@@ -108,7 +108,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Interrupter2_OnInterruptableTarget(Obj_AI_Hero sender, Interrupter2.InterruptableTargetEventArgs args)
         {
-            if (Config.Item("autoRinter", true).GetValue<bool>() && R.IsReady() && sender.IsValidTarget(R.Range))
+            if (Config.Item("autoRinter", true).GetValue<bool>() && R.IsReady() && sender.IsValidTarget(2500))
                 R.Cast(sender);
         }
 
