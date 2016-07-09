@@ -877,8 +877,8 @@ namespace SebbyLib
                 }
 
                 /* UnderTurret Farming */
-                if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit ||
-                    mode == OrbwalkingMode.Freeze)
+                if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit ||
+                    mode == OrbwalkingMode.Freeze) && CanAttack())
                 {
                     var closestTower =
                         Cache.TurretList.MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
