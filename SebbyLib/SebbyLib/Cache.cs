@@ -13,6 +13,9 @@ namespace SebbyLib
         public static List<Obj_AI_Base> MinionsListEnemy = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListAlly = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListNeutral = new List<Obj_AI_Base>();
+        public static List<Obj_AI_Turret> TurretList = ObjectManager.Get<Obj_AI_Turret>().ToList();
+        public static List<Obj_HQ> NexusList = ObjectManager.Get<Obj_HQ>().ToList();
+        public static List<Obj_BarracksDampener> InhiList = ObjectManager.Get<Obj_BarracksDampener>().ToList();
 
         static Cache()
         {

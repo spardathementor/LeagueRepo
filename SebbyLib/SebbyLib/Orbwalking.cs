@@ -830,21 +830,21 @@ namespace SebbyLib
                 {
                     /* turrets */
                     foreach (var turret in
-                        ObjectManager.Get<Obj_AI_Turret>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                        Cache.TurretList.Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
                     {
                         return turret;
                     }
 
                     /* inhibitor */
                     foreach (var turret in
-                        ObjectManager.Get<Obj_BarracksDampener>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                        Cache.InhiList.Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
                     {
                         return turret;
                     }
 
                     /* nexus */
                     foreach (var nexus in
-                        ObjectManager.Get<Obj_HQ>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                        Cache.NexusList.Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
                     {
                         return nexus;
                     }
@@ -881,8 +881,7 @@ namespace SebbyLib
                     mode == OrbwalkingMode.Freeze)
                 {
                     var closestTower =
-                        ObjectManager.Get<Obj_AI_Turret>()
-                            .MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
+                        Cache.TurretList.MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
 
                     if (closestTower != null && Player.Distance(closestTower, true) < 1500 * 1500)
                     {
@@ -1184,7 +1183,7 @@ namespace SebbyLib
                 if (_config.Item("LastHitHelper").GetValue<bool>())
                 {
                     foreach (var minion in
-                        ObjectManager.Get<Obj_AI_Minion>()
+                        Cache.MinionsListEnemy
                             .Where(
                                 x => x.Name.ToLower().Contains("minion") && x.IsHPBarRendered && x.IsValidTarget(1000)))
                     {
