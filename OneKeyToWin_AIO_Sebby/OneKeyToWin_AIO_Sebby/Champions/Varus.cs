@@ -25,7 +25,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 975);
             R = new Spell(SpellSlot.R, 1050);
 
-            Q.SetSkillshot(0.25f, 70, 1900, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 70, 1650, false, SkillshotType.SkillshotLine);
             E.SetSkillshot(0.35f, 120, 1500, false, SkillshotType.SkillshotCircle);
             R.SetSkillshot(0.25f, 120, 1950, false, SkillshotType.SkillshotLine);
             Q.SetCharged("VarusQ", "VarusQ", 925, 1600, 1.5f);
