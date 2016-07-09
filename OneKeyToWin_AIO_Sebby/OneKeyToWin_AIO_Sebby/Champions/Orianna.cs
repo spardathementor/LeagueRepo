@@ -61,7 +61,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rks", "R ks", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rlifesaver", "auto R life saver", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R config").AddItem(new MenuItem("Rblock", "Block R if 0 hit ", true).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("R config").SubMenu("Always R").AddItem(new MenuItem("Ralways" + enemy.ChampionName, enemy.ChampionName,true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("W", "Auto W SpeedUp logic", true).SetValue(false));
@@ -121,7 +121,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             best = Player;
 
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead))
+            foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead))
             {
                 if (ally.HasBuff("orianaghostself") || ally.HasBuff("orianaghost"))
                     BallPos = ally.ServerPosition;
@@ -213,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicR()
         {            
-            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Width && BallPos.Distance(t.ServerPosition) < R.Width))
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Width && BallPos.Distance(t.ServerPosition) < R.Width))
             {
                 if (Program.Combo && Config.Item("Ralways" + t.ChampionName, true).GetValue<bool>())
                 {
@@ -254,7 +254,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void LogicW()
         {
-            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(t.ServerPosition) < 250 && t.Health < W.GetDamage(t)))
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(t.ServerPosition) < 250 && t.Health < W.GetDamage(t)))
             {
                 W.Cast();
                 return;
@@ -412,7 +412,7 @@ namespace OneKeyToWin_AIO_Sebby
              if (!E.IsReady() || !sender.IsEnemy || !Config.Item("autoW", true).GetValue<bool>() || Player.Mana < EMANA + RMANA || sender.Distance(Player.Position) > 1600)
                 return;
 
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < E.Range))
+            foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && Player.Distance(ally.ServerPosition) < E.Range))
             {
                 double dmg = 0;
                 if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
@@ -440,7 +440,7 @@ namespace OneKeyToWin_AIO_Sebby
         private int CountEnemiesInRangeDeley(Vector3 position, float range, float delay)
         {
             int count = 0;
-            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget()))
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget()))
             {
                 Vector3 prepos = Prediction.GetPrediction(t, delay).CastPosition;
                 if (position.Distance(prepos) < range)

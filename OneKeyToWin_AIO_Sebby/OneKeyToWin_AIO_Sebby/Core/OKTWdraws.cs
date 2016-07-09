@@ -204,7 +204,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         {
             if (Config.Item("minimap").GetValue<bool>())
             {
-                foreach (var enemy in Program.Enemies)
+                foreach (var enemy in HeroManager.Enemies)
                 {
                     if (!enemy.IsVisible)
                     {
@@ -301,7 +301,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var Color = System.Drawing.Color.Azure;
             float offset = 0;
                 
-            foreach (var enemy in Program.Enemies)
+            foreach (var enemy in HeroManager.Enemies)
             {
                 if (Config.Item("SS").GetValue<bool>())
                 {

@@ -87,7 +87,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if (!Program.LagFree(0))
                 return;
 
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValid))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid))
             {
                 var ChampionInfoOne = ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
                 if (enemy.IsDead)

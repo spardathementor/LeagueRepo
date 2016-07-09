@@ -55,9 +55,9 @@ namespace OneKeyToWin_AIO_Sebby
             Dash = new Core.OKTWdash(Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("GapCloser").AddItem(new MenuItem("gapE", "Enable", true).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("GapCloser").AddItem(new MenuItem("gap" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Use E ").AddItem(new MenuItem("stun" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("useE", "OneKeyToCast E closest person", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -92,7 +92,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (GetWStacks(t) < 2 && args.Target.Health > 5 * Player.GetAutoAttackDamage(t))
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(800) && GetWStacks(target) == 2))
+                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(800) && GetWStacks(target) == 2))
                 {
                     if (SebbyLib.Orbwalking.InAutoAttackRange(target) && args.Target.Health > 3 * Player.GetAutoAttackDamage(target))
                     {
@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (E.IsReady())
             {
                 var ksTarget = Player;
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range) && target.Path.Count() < 2 ))
+                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range) && target.Path.Count() < 2 ))
                 {
                     if (CondemnCheck(Player.ServerPosition, target) && Config.Item("stun" + target.ChampionName).GetValue<bool>() )
                         E.Cast(target);
@@ -213,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Program.LagFree(2))
             {
                 Obj_AI_Hero bestEnemy = null;
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range)))
+                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range)))
                 {
                     if (target.IsValidTarget(250) && target.IsMelee)
                     {
@@ -331,7 +331,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (E.IsReady() && Config.Item("eRange2", true).GetValue<bool>())
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(800)))
+                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(800)))
                 {
                     var poutput = E.GetPrediction(target);
 

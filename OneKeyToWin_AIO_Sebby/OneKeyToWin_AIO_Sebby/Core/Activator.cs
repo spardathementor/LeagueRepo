@@ -149,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").AddItem(new MenuItem("FaceOfTheMountain", "FaceOfTheMountain").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Defensives").SubMenu("Zhonya").AddItem(new MenuItem("Zhonya", "Zhonya").SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
             {
                 var spell = enemy.Spellbook.Spells[3];
                     Config.SubMenu("Activator OKTW©").SubMenu("Defensives").SubMenu("Zhonya").AddItem(new MenuItem("spellZ" + spell.SData.Name, enemy.ChampionName + ": "+spell.Name).SetValue(spell.SData.TargettingType == SpellDataTargetType.Unit));
@@ -161,7 +161,7 @@ namespace OneKeyToWin_AIO_Sebby
             
             Config.SubMenu("Activator OKTW©").SubMenu("Cleansers").AddItem(new MenuItem("Clean", "Quicksilver, Mikaels, Mercurial, Dervish").SetValue(true));
 
-            foreach (var ally in ObjectManager.Get<Obj_AI_Hero>().Where(ally => ally.IsAlly))
+            foreach (var ally in HeroManager.Allies)
                 Config.SubMenu("Activator OKTW©").SubMenu("Cleansers").SubMenu("Mikaels allys").AddItem(new MenuItem("MikaelsAlly" + ally.ChampionName, ally.ChampionName).SetValue(true));
 
             Config.SubMenu("Activator OKTW©").SubMenu("Cleansers").AddItem(new MenuItem("CSSdelay", "Delay x ms").SetValue(new Slider(0, 1000, 0)));
@@ -218,7 +218,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (CanUse(exhaust) && Config.Item("Exhaust").GetValue<bool>())
             {
-                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 51 && Player.Distance(ally.ServerPosition) < 700))
+                foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 51 && Player.Distance(ally.ServerPosition) < 700))
                 {
                     double dmg = 0;
                     if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
@@ -308,7 +308,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (!Solari.IsReady() && !FaceOfTheMountain.IsReady() && !CanUse(heal) )
                 return;
 
-            foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < 700))
+            foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < 700))
             {
                 double dmg = OktwCommon.GetIncomingDamage(ally, 1);
                 var enemys = ally.CountEnemiesInRange(700);
@@ -394,9 +394,9 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (CanUse(teleport) && !Player.HasBuff("teleport"))
             {
-                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && !ally.IsDead  && ally.CountEnemiesInRange(1000) > 0 ))
+                foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead  && ally.CountEnemiesInRange(1000) > 0 ))
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValid && !enemy.IsDead))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid && !enemy.IsDead))
                     {
                         var distanceEA = enemy.Distance(ally);
                         if (distanceEA < 1000)
@@ -456,7 +456,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Config.Item("Exhaust1").GetValue<bool>())
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(650) && enemy.IsChannelingImportantSpell()))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(650) && enemy.IsChannelingImportantSpell()))
                     {
                         Player.Spellbook.CastSpell(exhaust, enemy);
                     }
@@ -546,7 +546,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if (Mikaels.IsReady())
             {
-                foreach (var ally in Program.Allies.Where(
+                foreach (var ally in HeroManager.Allies.Where(
                     ally => ally.IsValid && !ally.IsDead && Config.Item("MikaelsAlly" + ally.ChampionName).GetValue<bool>() && Player.Distance(ally.Position) < Mikaels.Range 
                     && ally.HealthPercent < (float)Config.Item("cleanHP").GetValue<Slider>().Value))
                 {

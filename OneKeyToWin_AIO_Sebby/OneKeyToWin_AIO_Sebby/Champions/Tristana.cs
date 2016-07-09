@@ -38,9 +38,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eafter", "E after attack", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("focusE", "Focus target with E", true).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Harras E").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Use E on").AddItem(new MenuItem("useEon" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R KS (E+R calculation)", true).SetValue(true));
@@ -49,7 +49,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("OnInterruptableSpell", "OnInterruptableSpell", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "OneKeyToCast R closest person", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser & anti-meele").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser & anti-meele").AddItem(new MenuItem("RgapHP", " use gapcloser only under % hp", true).SetValue(new Slider(40, 100, 0)));
@@ -125,7 +125,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("focusE", true).GetValue<bool>())
             {
-                var eTarget = Program.Enemies.FirstOrDefault(target => target.IsValidTarget() && SebbyLib.Orbwalking.InAutoAttackRange(target) && target.HasBuff("tristanaechargesound"));
+                var eTarget = HeroManager.Enemies.FirstOrDefault(target => target.IsValidTarget() && SebbyLib.Orbwalking.InAutoAttackRange(target) && target.HasBuff("tristanaechargesound"));
                 if(eTarget != null)
                 {
                     Orbwalker.ForceTarget(eTarget);
@@ -158,7 +158,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Config.Item("Wks", true).GetValue<bool>() && Player.Mana > RMANA + WMANA)
             {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 2 && enemy.CountAlliesInRange(400) == 0  && enemy.Health > enemy.Level * 2))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && OktwCommon.ValidUlt(enemy) && enemy.CountEnemiesInRange(800) < 2 && enemy.CountAlliesInRange(400) == 0  && enemy.Health > enemy.Level * 2))
                 {
                     var playerAaDmg = Player.GetAutoAttackDamage(enemy);
                     var dmgCombo = playerAaDmg + OktwCommon.GetKsDamage(enemy, W) + GetEDmg(enemy);
@@ -186,7 +186,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             Obj_AI_Hero bestEnemy = null;
             float pushDistance = 400 + (R.Level * 200);
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && OktwCommon.ValidUlt(enemy)))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && OktwCommon.ValidUlt(enemy)))
             {
                 if (bestEnemy == null)
                     bestEnemy = enemy;
@@ -317,7 +317,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("eInfo", true).GetValue<bool>())
             {
-                foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(2000)))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(2000)))
                 {
                     if (GetEDmg(enemy) > enemy.Health)
                         drawText("IS DEAD", enemy, System.Drawing.Color.Yellow);

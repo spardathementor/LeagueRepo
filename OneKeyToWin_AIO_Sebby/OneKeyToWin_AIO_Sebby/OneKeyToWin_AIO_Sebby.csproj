@@ -37,31 +37,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="clipper_library">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\clipper_library.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\clipper_library.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\LeagueSharp.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\LeagueSharp.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Common">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\LeagueSharp.Common.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.Data">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\LeagueSharp.Data.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\LeagueSharp.Data.dll</HintPath>
     </Reference>
     <Reference Include="LeagueSharp.SDK">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\LeagueSharp.SDK.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\LeagueSharp.SDK.dll</HintPath>
     </Reference>
     <Reference Include="SebbyLib">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\SebbyLib.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\SebbyLib.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\SharpDX.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\SharpDX.Direct3D9.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\SharpDX.Direct3D9.dll</HintPath>
     </Reference>
     <Reference Include="SPrediction">
-      <HintPath>C:\Users\Sebby\Documents\PlaySharp\System\SPrediction.dll</HintPath>
+      <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\SPrediction.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

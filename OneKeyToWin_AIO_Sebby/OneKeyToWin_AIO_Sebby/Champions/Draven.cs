@@ -201,7 +201,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !SebbyLib.Orbwalking.InAutoAttackRange(enemy) && E.GetDamage(enemy) > enemy.Health))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !SebbyLib.Orbwalking.InAutoAttackRange(enemy) && E.GetDamage(enemy) > enemy.Health))
             {
                 Program.CastSpell(E, enemy);
                 return;
@@ -228,7 +228,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     E.CastIfWillHit(t, 2, true);
                 }
             }
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(E.Range)))
+            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range)))
             {
                 if (target.IsValidTarget(300) && target.IsMelee)
                 {
@@ -251,7 +251,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             if (Config.Item("autoR", true).GetValue<bool>())
             {
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.CountAlliesInRange(500) == 0))
+                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) && target.CountAlliesInRange(500) == 0))
                 {
                     float predictedHealth = target.Health - (float)OktwCommon.GetIncomingDamage(target);
                     double Rdmg = CalculateR(target) ;
@@ -314,7 +314,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             PredictionOutput output = R.GetPrediction(target);
             Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
             direction.Normalize();
-            List<Obj_AI_Hero> enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy && x.IsValidTarget()).ToList();
+            List<Obj_AI_Hero> enemies = HeroManager.Enemies.Where(x => x.IsValidTarget()).ToList();
             foreach (var enemy in enemies)
             {
                 PredictionOutput prediction = R.GetPrediction(enemy);

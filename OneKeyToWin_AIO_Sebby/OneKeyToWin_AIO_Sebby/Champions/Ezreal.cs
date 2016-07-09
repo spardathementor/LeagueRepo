@@ -84,7 +84,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(50, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCP", "FAST LaneClear", true).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("debug", "Debug", true).SetValue(false));
@@ -121,7 +121,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (W.IsReady() && Config.Item("wPush", true).GetValue<bool>() && target.IsValid<Obj_AI_Turret>() && Player.Mana > RMANA + EMANA + QMANA + WMANA + WMANA + RMANA)
             {
-                foreach (var ally in Program.Allies)
+                foreach (var ally in HeroManager.Allies)
                 {
                     if (!ally.IsMe && ally.IsAlly && ally.Distance(Player.Position) < 600)
                         W.Cast(ally);
@@ -201,7 +201,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(Q, t);
                 }
 
-                foreach (var t in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(t => t.Health))
+                foreach (var t in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(t => t.Health))
                 {
                     var qDmg = OktwCommon.GetKsDamage(t, Q);
                     var wDmg = W.GetDamage(t);
@@ -259,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (!Program.None && Player.Mana > RMANA + WMANA + EMANA)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy, true);
                 }
             }
@@ -271,7 +271,7 @@ namespace OneKeyToWin_AIO_Sebby
             
             if (Config.Item("EAntiMelee", true).GetValue<bool>())
             { 
-                if (Program.Enemies.Any(target => target.IsValidTarget(1000) && target.IsMelee && Player.Distance(Prediction.GetPrediction(target, 0.2f).CastPosition) < 250))
+                if (HeroManager.Enemies.Any(target => target.IsValidTarget(1000) && target.IsMelee && Player.Distance(Prediction.GetPrediction(target, 0.2f).CastPosition) < 250))
                 {
                     var dashPos = Dash.CastDash(true);
                     if (!dashPos.IsZero)
@@ -320,7 +320,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("autoR", true).GetValue<bool>() && Player.CountEnemiesInRange(800) == 0 && Game.Time - OverKill > 0.6)
             {
                 R.Range = Config.Item("MaxRangeR", true).GetValue<Slider>().Value;
-                foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
+                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
                 {
                     double predictedHealth = target.Health - OktwCommon.GetIncomingDamage(target);
 
@@ -362,7 +362,7 @@ namespace OneKeyToWin_AIO_Sebby
             PredictionOutput output = R.GetPrediction(target);
             Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
             direction.Normalize();
-            List<Obj_AI_Hero> enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy && x.IsValidTarget()).ToList();
+            List<Obj_AI_Hero> enemies = HeroManager.Enemies.Where(x =>x.IsValidTarget()).ToList();
             foreach (var enemy in enemies)
             {
                 PredictionOutput prediction = R.GetPrediction(enemy);

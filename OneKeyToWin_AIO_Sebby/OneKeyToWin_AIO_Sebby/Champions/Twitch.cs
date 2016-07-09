@@ -133,7 +133,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(W, t);
                 else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy, true);
                 }
             }
@@ -149,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 return;
 
             var count = 0;
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(3000)))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(3000)))
             {
                 List<Vector2> waypoints = enemy.GetWaypoints();
 
@@ -163,7 +163,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom")))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
                 if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) > enemy.Health)
                 {
@@ -275,7 +275,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             }
 
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(2000) && enemy.HasBuff("TwitchDeadlyVenom")))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(2000) && enemy.HasBuff("TwitchDeadlyVenom")))
             {
                 if (passiveDmg(enemy) > enemy.Health)
                     drawText("IS DEAD", enemy, System.Drawing.Color.Yellow);

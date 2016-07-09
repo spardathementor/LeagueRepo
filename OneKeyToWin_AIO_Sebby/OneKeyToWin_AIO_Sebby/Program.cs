@@ -19,7 +19,6 @@ namespace OneKeyToWin_AIO_Sebby
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
         public static Obj_SpawnPoint enemySpawn;
         public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
-        public static List<Obj_AI_Hero> Enemies = new List<Obj_AI_Hero>() , Allies = new List<Obj_AI_Hero>();
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static bool SPredictionLoad = false;
         public static int AIOmode = 0;
@@ -98,7 +97,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("collAA", "Disable auto-attack if Yasuo wall collision", true).SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistant", "Anti-Melee Positioning Assistant OKTW©").SetValue(true));
 
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy && enemy.IsMelee ))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsMelee))
                     Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistantDraw", "Show notification").SetValue(true));
                 Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("harassLaneclear", "Skill-Harass in lane clear").SetValue(true));
@@ -243,16 +242,9 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (hero.IsEnemy && hero.Team != Player.Team)
                 {
-                    Enemies.Add(hero);
                     if (IsJungler(hero))
                         jungler = hero;
                 }
-            }
-
-            foreach (var hero in HeroManager.Allies)
-            {
-                if (hero.IsAlly && hero.Team == Player.Team)
-                    Allies.Add(hero);
             }
 
             if (Config.Item("debug").GetValue<bool>())
@@ -314,11 +306,9 @@ namespace OneKeyToWin_AIO_Sebby
                 return;
             }
 
-            foreach (var enemy in Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() ))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsMelee && enemy.IsValidTarget(dodgeRange) && enemy.IsFacing(Player) && Config.Item("posAssistant" + enemy.ChampionName).GetValue<bool>() ))
             {
-                var points = OktwCommon.CirclePoints(20, 250, Player.Position);
-
-                
+                var points = OktwCommon.CirclePoints(20, 250, Player.Position);   
 
                 if (Player.FlatMagicDamageMod > Player.FlatPhysicalDamageMod)
                     OktwCommon.blockAttack = true;

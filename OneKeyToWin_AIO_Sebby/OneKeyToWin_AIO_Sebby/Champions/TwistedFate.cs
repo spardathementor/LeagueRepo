@@ -336,7 +336,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             Program.CastSpell(Q, t);
                     }
 
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true, true);
                 
             }

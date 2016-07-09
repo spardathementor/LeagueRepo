@@ -30,7 +30,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             int i = 5;
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy).OrderBy(enemy => enemy.MaxHealth / Player.GetAutoAttackDamage(enemy)))
+            foreach (var enemy in HeroManager.Enemies.OrderBy(enemy => enemy.MaxHealth / Player.GetAutoAttackDamage(enemy)))
             {
                 Config.SubMenu("Target Selector OKTW©").AddItem(new MenuItem("TsAaPriority" + enemy.ChampionName, enemy.ChampionName).SetValue(new Slider(i, 0, 5))).DontSave();
                 i--;
@@ -68,7 +68,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             if(args.WParam == 16)
             {
                 var priority = Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 1;
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                foreach (var enemy in HeroManager.Enemies)
                 {
                     Config.Item("TsAaPriority" + enemy.ChampionName).Show(priority);
 
@@ -81,7 +81,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if(Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 2)
                 {
-                    foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+                    foreach (var enemy in HeroManager.Enemies)
                     {
                         Config.Item("TsAaPriority" + enemy.ChampionName).Show(false);
 
@@ -123,7 +123,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     var aaRange = Player.AttackRange + Player.BoundingRadius + Config.Item("extraRang").GetValue<Slider>().Value;
 
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(aaRange)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(aaRange)))
                     {
                         if (enemy.Health / Player.GetAutoAttackDamage(enemy) + 1 < forceFocusEnemy.Health / Player.GetAutoAttackDamage(forceFocusEnemy))
                         {
@@ -158,7 +158,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (Config.Item("TsAa").GetValue<StringList>().SelectedIndex == 0)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget() && Orbwalker.InAutoAttackRange(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget() && Orbwalker.InAutoAttackRange(enemy)))
                     {
                         if (enemy.Health / Player.GetAutoAttackDamage(enemy) < hitToBestTarget)
                         {
@@ -168,7 +168,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 }
                 else
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget() && Orbwalker.InAutoAttackRange(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget() && Orbwalker.InAutoAttackRange(enemy)))
                     {
 
                         if(enemy.Health / Player.GetAutoAttackDamage(enemy) < 3)

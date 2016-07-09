@@ -55,15 +55,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("AutoWard OKTW©").AddItem(new MenuItem("AutoWardCombo", "Only combo mode").SetValue(true));
             Config.SubMenu("AutoWard OKTW©").AddItem(new MenuItem("AutoWardPink", "Auto VisionWard, OracleLens").SetValue(true));
 
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>())
+            foreach (var hero in HeroManager.Enemies)
             {
-                if (hero.IsEnemy)
-                {
-                    if (hero.ChampionName == "Rengar")
-                        rengar = true;
-                    if (hero.ChampionName == "Vayne")
-                        Vayne = hero;
-                }
+                if (hero.ChampionName == "Rengar")
+                    rengar = true;
+                if (hero.ChampionName == "Vayne")
+                    Vayne = hero;
             }
             
             Game.OnUpdate += Game_OnUpdate;
@@ -100,7 +97,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void AutoWardLogic()
         {
-            foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValid && !enemy.IsVisible && !enemy.IsDead))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid && !enemy.IsVisible && !enemy.IsDead))
             {
                 var need = OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
 

@@ -231,7 +231,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if (t2.IsValidTarget() && t2.NetworkId == LastAttackId)
                 {
-                    var ta = ObjectManager.Get<Obj_AI_Hero>().Where(enemy => 
+                    var ta = HeroManager.Enemies.Where(enemy => 
                         enemy.IsValidTarget() && SebbyLib.Orbwalking.InAutoAttackRange(enemy) 
                             && (enemy.NetworkId != LastAttackId || enemy.Health < Player.GetAutoAttackDamage(enemy) * 2) ).FirstOrDefault();
 
@@ -338,7 +338,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(E, t);
                     else 
                     {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
+                        foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                             E.Cast(enemy, true, true);
                     }
                 }

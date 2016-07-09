@@ -177,7 +177,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(R, target);
                     else if (countR < comboStack + 2 && Player.Mana > RMANA * 3)
                     {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && !OktwCommon.CanMove(enemy)))
+                        foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && !OktwCommon.CanMove(enemy)))
                         {
                                 R.Cast(enemy, true);
                         }
@@ -221,7 +221,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(Q, t);
                     else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
                     {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                        foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                              Q.Cast(enemy, true);
 
                     }
@@ -248,7 +248,7 @@ namespace OneKeyToWin_AIO_Sebby
                         Program.CastSpell(E, t);
                     else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + WMANA + EMANA)
                     {
-                        foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
+                        foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                                 E.Cast(enemy, true);
                     }
                 }
@@ -326,7 +326,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("ComboInfo", true).GetValue<bool>())
             {
                 var combo = "haras";
-                foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsValidTarget()))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget()))
                 {
                     if (R.GetDamage(enemy) > enemy.Health)
                     {

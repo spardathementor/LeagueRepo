@@ -172,7 +172,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(targetR, true);
             }
 
-            foreach (var target in Program.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) ))
+            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) ))
             {
 
                 var dmgR = OktwCommon.GetKsDamage(target, R);

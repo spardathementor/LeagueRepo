@@ -35,7 +35,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("AGCq", "Anti Gapcloser Q", true).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
             {
                 for (int i = 0; i < 4; i++)
                 {
@@ -50,11 +50,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").AddItem(new MenuItem("Edmg", "Shield incoming damage %", true).SetValue(new Slider(20, 100, 0)));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team == Player.Team))
+            foreach (var enemy in HeroManager.Allies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").SubMenu("Use on").AddItem(new MenuItem("Eon" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").SubMenu("Gapcloser").AddItem(new MenuItem("AGC", "Anti Gapcloser E + W", true).SetValue(true));
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E W Shield Config").SubMenu("Gapcloser").AddItem(new MenuItem("gapcloser" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
@@ -64,10 +64,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("rCc", "Auto R immobile enemy korean style", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("OnInterruptableSpell", "OnInterruptableSpell", true).SetValue(true));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.IsEnemy))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("Ultimate manager").AddItem(new MenuItem("Rmode" + enemy.ChampionName, enemy.ChampionName, true).SetValue(new StringList(new[] { "Normal ", "Always ", "Never ", "Normal + Gapcloser R" }, 0)));
 
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(enemy => enemy.Team != Player.Team))
+            foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Game.OnUpdate += Game_OnGameUpdate;
@@ -86,7 +86,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (W.IsReady() && gapcloser.End.Distance(Player.Position) < gapcloser.Start.Distance(Player.Position))
                 {
-                    var allyHero = Program.Allies.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe )
+                    var allyHero = HeroManager.Allies.Where(ally => ally.Distance(Player) <= W.Range && !ally.IsMe )
                            .OrderBy(ally => ally.Distance(gapcloser.End)).FirstOrDefault();
 
                     if (allyHero != null && Config.Item("Eon" + allyHero.ChampionName).GetValue<bool>())
@@ -147,14 +147,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(Q, t);
                 else if (Program.Farm)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("haras" + enemy.ChampionName).GetValue<bool>()))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("haras" + enemy.ChampionName).GetValue<bool>()))
                     {
                         Program.CastSpell(Q, enemy);
                     }
                 }
                 if (!Program.None && Player.Mana > RMANA + QMANA + EMANA)
                 {
-                    foreach (var enemy in Program.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy, true);
                 }
             }
@@ -163,7 +163,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicR()
         {
             var rCount = Config.Item("rCount", true).GetValue<Slider>().Value;
-            foreach (var t in Program.Enemies.Where(t => t.IsValidTarget(R.Range) && OktwCommon.ValidUlt(t)).OrderBy(t => t.Health))
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget(R.Range) && OktwCommon.ValidUlt(t)).OrderBy(t => t.Health))
             {
                 int Rmode = Config.Item("Rmode" + t.ChampionName, true).GetValue<StringList>().SelectedIndex;
 
@@ -208,7 +208,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (W.IsReady() && args.SData.MissileSpeed > 0)
             {
-                foreach (var ally in Program.Allies.Where(ally => ally.IsValid && Player.Distance(ally.ServerPosition) < W.Range && Config.Item("Eon" + ally.ChampionName).GetValue<bool>()))
+                foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && Player.Distance(ally.ServerPosition) < W.Range && Config.Item("Eon" + ally.ChampionName).GetValue<bool>()))
                 {
                     if (OktwCommon.CanHitSkillShot(ally, args) || OktwCommon.GetIncomingDamage(ally,1) > ally.Health * Config.Item("Edmg", true).GetValue<Slider>().Value * 0.01)
                     {
