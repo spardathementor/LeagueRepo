@@ -881,8 +881,7 @@ namespace SebbyLib
                     mode == OrbwalkingMode.Freeze) && CanAttack())
                 {
                     var closestTower =
-                        ObjectManager.Get<Obj_AI_Turret>()
- -                            .MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
+                        ObjectManager.Get<Obj_AI_Turret>().MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
 
                     if (closestTower != null && Player.Distance(closestTower, true) < 1500 * 1500)
                     {
