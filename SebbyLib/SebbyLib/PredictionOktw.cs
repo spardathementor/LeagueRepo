@@ -447,6 +447,13 @@ namespace SebbyLib.Prediction
                         return result;
                     }
                 }
+                else if (UnitTracker.GetLastNewPathTime(input.Unit) > 250 && input.Delay < 0.3)
+                {
+                    // LONG TIME ///////////////////////////////////////////////////////////////////////////////////
+                    OktwCommon.debug("PRED: LONG TIME");
+                    result.Hitchance = HitChance.VeryHigh;
+                    return result;
+                }
             }
 
             // SHORT CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
@@ -514,14 +521,7 @@ namespace SebbyLib.Prediction
                 return result;
             }
 
-            // LONG TIME ///////////////////////////////////////////////////////////////////////////////////
-
-            if (UnitTracker.GetLastNewPathTime(input.Unit) > 250)
-            {
-                OktwCommon.debug("PRED: LONG TIME");
-                result.Hitchance = HitChance.VeryHigh;
-                return result;
-            }
+            
 
             // LONG CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
 
