@@ -133,7 +133,7 @@ namespace SebbyLib
                     {
                         BrainFarmInt -= 3;
                     }
-                    else if (x > 110)
+                    else if (x > 105)
                     {
                         BrainFarmInt += 3;
                     }
