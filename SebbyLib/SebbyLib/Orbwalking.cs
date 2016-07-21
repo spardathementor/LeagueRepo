@@ -64,6 +64,9 @@ namespace SebbyLib
 
         public static int LastAATick;
 
+
+        public static int BrainFarmInt =  -90;
+
         public static bool Attack = true;
 
         public static bool DisableNextAttack;
@@ -99,6 +102,52 @@ namespace SebbyLib
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
             Spellbook.OnStopCast += SpellbookOnStopCast;
+            AttackableUnit.OnDamage += Obj_AI_Base_OnDamage;
+            Obj_AI_Base.OnDelete += Obj_AI_Base_OnDelete;
+            Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
+        }
+
+        private static void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
+        {
+            var missile = sender as MissileClient;
+            if (missile != null)
+            {
+                if (missile.SpellCaster.IsMe)
+                {
+                    //Console.WriteLine(Player.BoundingRadius + " dis " + (missile.Position.Distance(Player.Position)));
+                }
+            }
+        }
+
+        private static void Obj_AI_Base_OnDelete(GameObject sender, EventArgs args)
+        {
+            var missile = sender as MissileClient;
+            if(missile != null)
+            {
+                if(missile.SpellCaster.IsMe && missile.SData.IsAutoAttack() && DelayOnFire != 0)
+                {
+                    var x = Utils.TickCount - DelayOnFire;
+
+                    if (x < 80)
+                    {
+                        BrainFarmInt -= 5;
+                    }
+                    else if (x > 110)
+                    {
+                        BrainFarmInt += 5;
+                    }
+                    Console.WriteLine(BrainFarmInt + " ADJ " + (Utils.TickCount - DelayOnFire));
+                    //Console.WriteLine(missile.Target.BoundingRadius + " dis2 " + (missile.Position.Distance(missile.Target.Position)));
+                }
+            }
+        }
+
+        private static void Obj_AI_Base_OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            if (args.SourceNetworkId == Player.NetworkId)
+            {
+                //Console.WriteLine("OD4 "+ (Utils.TickCount - DelayOnFire) );
+            }
         }
 
         public static event BeforeAttackEvenH BeforeAttack;
@@ -588,7 +637,6 @@ namespace SebbyLib
                 var sebbyFix = new Menu("Sebby FIX", "Sebby FIX");
 
                 sebbyFix.AddItem(new MenuItem("DamageAdjust", "Adjust last hit auto attack damage").SetShared().SetValue(new Slider(0,-100, 100)));
-                sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last Hit time adjust (ms)").SetShared().SetValue(new Slider(0, -200, 200)));
                 sebbyFix.AddItem(new MenuItem("PassiveDmg", "Last hit include passive damage", true).SetShared().SetValue(true));
 
                 _config.AddSubMenu(sebbyFix);
@@ -774,7 +822,7 @@ namespace SebbyLib
                             if (!ShouldAttackMinion(minion))
                                 continue;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) - 100 + _config.Item("TimeAdjust").GetValue<Slider>().Value + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(minion) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                             if (mode == OrbwalkingMode.Freeze)
                             {
@@ -797,6 +845,9 @@ namespace SebbyLib
                             }
                             else
                             {
+                                if (CanAttack())
+                                    DelayOnFire = t + Utils.TickCount;
+
                                 if (predHealth <= 0 )
                                 {
                                     if (HealthPrediction.GetHealthPrediction(minion, t - 50, FarmDelay) > 0)
@@ -808,6 +859,7 @@ namespace SebbyLib
 
                                 else if (killable)
                                 {
+                                    
                                     return minion;
                                 }
                             }
@@ -818,7 +870,8 @@ namespace SebbyLib
                         }
                     }
                 }
-
+                if (CanAttack())
+                    DelayOnFire = 0;
                 //Forced target
                 if (_forcedTarget.IsValidTarget() && InAutoAttackRange(_forcedTarget))
                 {

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
-
+using SharpDX;
 namespace SebbyLib
 {
     public class HealthPrediction
@@ -98,6 +98,7 @@ namespace SebbyLib
             var attackData = new PredictedDamage(
                 sender,
                 target,
+                sender.ServerPosition,
                 Utils.GameTimeTickCount - Game.Ping / 2,
                 sender.AttackCastDelay * 1000,
                 sender.AttackDelay * 1000 - (sender is Obj_AI_Turret ? 70 : 0),
@@ -113,10 +114,17 @@ namespace SebbyLib
             foreach (var attack in ActiveAttacks.Values)
             {
                 var attackDamage = 0f;
-                if (!attack.Processed && attack.Source.IsValidTarget(float.MaxValue, false) &&
+                if (!attack.Processed &&
                     attack.Target.IsValidTarget(float.MaxValue, false) && attack.Target.NetworkId == unit.NetworkId)
                 {
-                    var landTime = attack.StartTick + attack.Delay + 1000 * Math.Max(0, unit.Distance(attack.Source) - attack.Source.BoundingRadius) / attack.ProjectileSpeed + delay;
+
+                    float bonding = Math.Max(attack.Target.BoundingRadius, unit.Distance(attack.StartPos) - attack.Source.BoundingRadius);
+                    if(attack.Source.IsMelee )
+                    {
+                        bonding = 0;
+                    }
+
+                    var landTime = attack.StartTick + attack.Delay + 1000 *  bonding / attack.ProjectileSpeed + delay;
 
                     if (/*Utils.GameTimeTickCount < landTime - delay &&*/ landTime < Utils.GameTimeTickCount + time)
                     {
@@ -147,7 +155,7 @@ namespace SebbyLib
                     while (fromT < toT)
                     {
                         if (fromT >= Utils.GameTimeTickCount &&
-                            (fromT + attack.Delay + Math.Max(0, unit.Distance(attack.Source) - attack.Source.BoundingRadius) / attack.ProjectileSpeed < toT))
+                            (fromT + attack.Delay + Math.Max(0, unit.Distance(attack.Source) - attack.Source.BoundingRadius / 2) / attack.ProjectileSpeed < toT))
                         {
                             n++;
                         }
@@ -248,6 +256,16 @@ namespace SebbyLib
             /// <value>
             /// The start tick.
             /// </value>
+            /// 
+            public Vector3 StartPos { get; private set; }
+
+            /// <summary>
+            /// Gets or sets the start tick.
+            /// </summary>
+            /// <value>
+            /// The start tick.
+            /// </value>
+            /// 
             public int StartTick { get; internal set; }
 
             /// <summary>
@@ -278,6 +296,7 @@ namespace SebbyLib
             /// <param name="damage">The damage.</param>
             public PredictedDamage(Obj_AI_Base source,
                 Obj_AI_Base target,
+                Vector3 startPos,
                 int startTick,
                 float delay,
                 float animationTime,
@@ -285,6 +304,7 @@ namespace SebbyLib
                 float damage)
             {
                 Source = source;
+                StartPos = startPos;
                 Target = target;
                 StartTick = startTick;
                 Delay = delay;
