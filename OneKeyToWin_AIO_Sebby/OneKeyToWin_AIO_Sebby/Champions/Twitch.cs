@@ -163,11 +163,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom")))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && enemy.HasBuff("TwitchDeadlyVenom") && OktwCommon.ValidUlt(enemy)))
             {
                 if (Config.Item("Eks", true).GetValue<bool>() && E.GetDamage(enemy) > enemy.Health)
                 {
-                    Program.debug("DUPAAA1");
                     E.Cast();
                 }
                 if (Player.Mana > RMANA + EMANA)
@@ -175,14 +174,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     int buffsNum = OktwCommon.GetBuffCount(enemy, "TwitchDeadlyVenom");
                     if (Config.Item("5e", true).GetValue<bool>() && buffsNum == 6)
                     {
-                        Program.debug("DUPAAA2");
                         E.Cast();
                     }
                     float buffTime = OktwCommon.GetPassiveTime(enemy, "TwitchDeadlyVenom");
                 
                     if (!SebbyLib.Orbwalking.InAutoAttackRange(enemy) && (Player.ServerPosition.Distance(enemy.ServerPosition) > 950 || buffTime < 1) && 0 < Config.Item("countE", true).GetValue<Slider>().Value && buffsNum >= Config.Item("countE", true).GetValue<Slider>().Value)
                     {
-                        Program.debug("DUPAAA3 " + buffTime);
                         E.Cast();
                     }
                 }
