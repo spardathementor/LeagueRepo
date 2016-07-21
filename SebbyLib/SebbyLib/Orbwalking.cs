@@ -64,6 +64,7 @@ namespace SebbyLib
 
         public static int LastAATick;
 
+        public static int DelayOnFire = 0;
 
         public static int BrainFarmInt =  -90;
 
