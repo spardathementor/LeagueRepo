@@ -318,8 +318,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else 
             {
-                if (Program.LaneClear && OktwCommon.CountEnemyMinions(Player, E.Range) >= Config.Item("ELCminions", true).GetValue<Slider>().Value && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
+                if (Program.LaneClear)
+                {
+                    if (OktwCommon.CountEnemyMinions(Player, E.Range) >= Config.Item("ELCminions", true).GetValue<Slider>().Value && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)
                     E.Cast();
+                }
                 else if (Config.Item("autoE", true).GetValue<bool>() && Player.ManaPercent > Config.Item("Emana", true).GetValue<Slider>().Value && Player.CountEnemiesInRange(E.Range) > 0)
                 {
                     E.Cast();
