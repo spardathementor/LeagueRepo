@@ -292,7 +292,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     E.Cast(trapPos);
 
                 foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
-                    E.Cast(enemy.ServerPosition);
+                    E.Cast(enemy);
             }
 
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
