@@ -22,8 +22,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
-
-
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rNot", "R key info", true).SetValue(true));
+            
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harasQ", "Harass Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
@@ -356,11 +356,13 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Drawing_OnDraw(EventArgs args)
         {
-            if(RTarget != null)
-                drawText("R KEY TARGET: " + RTarget.BaseSkinName, Player.Position, System.Drawing.Color.YellowGreen, 150);
-            else
-                drawText("PLS CLICK LEFT ON R TARGET" , Player.Position, System.Drawing.Color.YellowGreen, 150);
-
+            if (Config.Item("rNot", true).GetValue<bool>())
+            {
+                if (RTarget != null)
+                    drawText("R KEY TARGET: " + RTarget.BaseSkinName, Player.Position, System.Drawing.Color.YellowGreen, 150);
+                else
+                    drawText("PLS CLICK LEFT ON R TARGET", Player.Position, System.Drawing.Color.YellowGreen, 150);
+            }
             if (Config.Item("wRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
