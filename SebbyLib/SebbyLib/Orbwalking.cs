@@ -125,7 +125,7 @@ namespace SebbyLib
         private static void Obj_AI_Base_OnDelete(GameObject sender, EventArgs args)
         {
             var missile = sender as MissileClient;
-            if(DelayOnFire != 0 && missile != null && Player.AttackDelay < 1 / 2f)
+            if(DelayOnFire != 0 && missile != null && Player.AttackDelay > 1 / 2f)
             {
                 if(missile.SpellCaster.IsMe && missile.SData.IsAutoAttack() &&  DelayOnFireId == missile.Target.NetworkId)
                 {
