@@ -12,7 +12,8 @@ namespace OneKeyToWin_AIO_Sebby
     {
         private Menu Config = Program.Config;
         public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private bool CastR = false;
+        private bool CastR = false, CastR2 = false;
+        private Obj_AI_Base RTarget = null;
         public Spell Q, W, E, R;
         public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public Obj_AI_Hero Player { get { return ObjectManager.Player; }}
@@ -43,18 +44,13 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
             }
-
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR2", "R key target cast", true).SetValue(new KeyBind("Y".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
-
+            
             List<string> modes = new List<string>();
 
             modes.Add("LOW HP");
             modes.Add("CLOSEST");
-
-            foreach (var enemy in HeroManager.Enemies)
-            {
-                modes.Add(enemy.ChampionName);
-            }
             
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Semi-manual", "Semi-manual MODE", true).SetValue(new StringList(modes.ToArray(), 0)));
 
@@ -90,6 +86,17 @@ namespace OneKeyToWin_AIO_Sebby
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Interrupter2.OnInterruptableTarget +=Interrupter2_OnInterruptableTarget;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+            Game.OnWndProc += Game_OnWndProc;
+        }
+
+        private void Game_OnWndProc(WndEventArgs args)
+        {
+           
+            if(args.Msg == 513 && HeroManager.Enemies.Exists(x => Game.CursorPos.Distance(x.Position) < 300))
+            {
+                RTarget = HeroManager.Enemies.First(x => Game.CursorPos.Distance(x.Position) < 300);
+            }
+            
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
@@ -138,6 +145,17 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     CastR = true;
                 }
+                if (Config.Item("useR2", true).GetValue<KeyBind>().Active)
+                {
+                    CastR2 = true;
+                }
+
+                if (CastR2)
+                {
+                    if (RTarget.IsValidTarget())
+                        Program.CastSpell(R, RTarget);
+                }
+
 
                 if (CastR)
                 {
@@ -151,12 +169,6 @@ namespace OneKeyToWin_AIO_Sebby
                     else if(Config.Item("Semi-manual", true).GetValue<StringList>().SelectedIndex == 1)
                     {
                         var t = HeroManager.Enemies.OrderBy(x => x.Distance(Player)).FirstOrDefault();
-                        if (t.IsValidTarget())
-                            Program.CastSpell(R, t);
-                    }
-                    else
-                    {
-                        var t = HeroManager.Enemies[Config.Item("Semi-manual", true).GetValue<StringList>().SelectedIndex - 2];
                         if (t.IsValidTarget())
                             Program.CastSpell(R, t);
                     }
@@ -336,8 +348,19 @@ namespace OneKeyToWin_AIO_Sebby
                 RMANA = R.Instance.ManaCost;
         }
 
+        public void drawText(string msg, Vector3 Hero, System.Drawing.Color color, int weight = 0)
+        {
+            var wts = Drawing.WorldToScreen(Hero);
+            Drawing.DrawText(wts[0] - (msg.Length) * 5, wts[1] + weight, color, msg);
+        }
+
         private void Drawing_OnDraw(EventArgs args)
         {
+            if(RTarget != null)
+                drawText("R KEY TARGET: " + RTarget.BaseSkinName, Player.Position, System.Drawing.Color.YellowGreen, 150);
+            else
+                drawText("PLS CLICK LEFT ON R TARGET" , Player.Position, System.Drawing.Color.YellowGreen, 150);
+
             if (Config.Item("wRange", true).GetValue<bool>())
             {
                 if (Config.Item("onlyRdy", true).GetValue<bool>())
