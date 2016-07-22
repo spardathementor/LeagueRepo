@@ -51,7 +51,8 @@
     <Reference Include="LeagueSharp.SDK">
       <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\LeagueSharp.SDK.dll</HintPath>
     </Reference>
-    <Reference Include="SebbyLib">
+    <Reference Include="SebbyLib, Version=1.0.0.3, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Users\Sebby\Documents\PlaySharp\References\SebbyLib.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
