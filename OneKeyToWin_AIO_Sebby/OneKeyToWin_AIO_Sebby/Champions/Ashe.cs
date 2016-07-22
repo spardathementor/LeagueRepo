@@ -177,6 +177,7 @@ namespace OneKeyToWin_AIO_Sebby
             else
             {
                 CastR = false;
+                CastR2 = false;
             }
 
             if (Program.LagFree(1))
