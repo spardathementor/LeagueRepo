@@ -64,9 +64,11 @@ namespace SebbyLib
 
         public static int LastAATick;
 
-        public static int DelayOnFire = 0;
+        private static int DelayOnFire = 0;
 
-        public static int BrainFarmInt =  -90;
+        private static int DelayOnFireId = 0;
+
+        private static int BrainFarmInt = -90;
 
         public static bool Attack = true;
 
@@ -123,9 +125,9 @@ namespace SebbyLib
         private static void Obj_AI_Base_OnDelete(GameObject sender, EventArgs args)
         {
             var missile = sender as MissileClient;
-            if(missile != null)
+            if(DelayOnFire != 0 && missile != null)
             {
-                if(missile.SpellCaster.IsMe && missile.SData.IsAutoAttack() && DelayOnFire != 0)
+                if(missile.SpellCaster.IsMe && missile.SData.IsAutoAttack() &&  DelayOnFireId == missile.Target.NetworkId)
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
@@ -847,7 +849,10 @@ namespace SebbyLib
                             else
                             {
                                 if (CanAttack())
+                                {
                                     DelayOnFire = t + Utils.TickCount;
+                                    DelayOnFireId = minion.NetworkId;
+                                }
 
                                 if (predHealth <= 0 )
                                 {
@@ -872,7 +877,9 @@ namespace SebbyLib
                     }
                 }
                 if (CanAttack())
+                {
                     DelayOnFire = 0;
+                }
                 //Forced target
                 if (_forcedTarget.IsValidTarget() && InAutoAttackRange(_forcedTarget))
                 {
