@@ -26,8 +26,6 @@ namespace OneKeyToWin_AIO_Sebby
             "cassiopeiapetrifyinggaze","ezrealtrueshotbarrage","galioidolofdurand","luxmalicecannon", "missfortunebullettime","infiniteduress","alzaharnethergrasp","lucianq","velkozr","rocketgrabmissile"
         };
 
-
-        
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 1250f);
@@ -237,7 +235,7 @@ namespace OneKeyToWin_AIO_Sebby
                     {
                         if (Utils.TickCount - W.LastCastAttemptT > 1000)
                         {
-                            W.Cast(enemy.Position, true);
+                            W.Cast(enemy);
                             LastW = enemy;
                         }
                         else if (LastW.NetworkId != enemy.NetworkId)
