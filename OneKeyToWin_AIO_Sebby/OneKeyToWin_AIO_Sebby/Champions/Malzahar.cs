@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             Q = new Spell(SpellSlot.Q, 900);
             Qr = new Spell(SpellSlot.Q, 900);
-            W = new Spell(SpellSlot.W, 650);
+            W = new Spell(SpellSlot.W, 750);
             E = new Spell(SpellSlot.E, 650);
             R = new Spell(SpellSlot.R, 700);
 
