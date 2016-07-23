@@ -477,22 +477,22 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (CanUse(ignite) && Config.Item("Ignite").GetValue<bool>())
             {
-                var enemy = TargetSelector.GetTarget(600, TargetSelector.DamageType.True);
-                if (enemy.IsValidTarget() && OktwCommon.ValidUlt(enemy))
+                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(600)))
                 {
+
                     var pred = enemy.Health - OktwCommon.GetIncomingDamage(enemy);
 
-                    var IgnDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite) ;
+                    var IgnDmg = Player.GetSummonerSpellDamage(enemy, Damage.SummonerSpell.Ignite);
 
-                    if (pred <= IgnDmg && enemy.CountAlliesInRange(450) < 2)
+                    if (pred <= 2 * IgnDmg && OktwCommon.ValidUlt(enemy))
                     {
-                        var enemyPred = Prediction.GetPrediction(enemy, 0.1f).CastPosition;
-                        if (Player.ServerPosition.Distance(enemyPred) > 500 || NavMesh.IsWallOfGrass(enemyPred, 0))
-                            Player.Spellbook.CastSpell(ignite, enemy);
-                    }
+                        if (pred <= IgnDmg && enemy.CountAlliesInRange(450) < 2)
+                        {
+                            var enemyPred = Prediction.GetPrediction(enemy, 0.1f).CastPosition;
+                            if (Player.ServerPosition.Distance(enemyPred) > 500 || NavMesh.IsWallOfGrass(enemyPred, 0))
+                                Player.Spellbook.CastSpell(ignite, enemy);
+                        }
 
-                    if (pred <= 2 * IgnDmg)
-                    {
                         if (enemy.PercentLifeStealMod > 10)
                             Player.Spellbook.CastSpell(ignite, enemy);
 
