@@ -291,12 +291,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
                 return;
-            if (Player.CountEnemiesInRange(900) < 3)
+            if (Player.CountEnemiesInRange(800) < 3)
                 return;
-            var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-            if (t.IsValidTarget())
-            {
-                var totalComboDamage =  R.GetDamage(t) * 2.5;
+
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget(R.Range)))
+            { 
+                var totalComboDamage = R.GetDamage(t) * 2.5;
 
                 totalComboDamage += E.GetDamage(t);
 
@@ -305,7 +305,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     totalComboDamage += Q.GetDamage(t);
                 }
 
-                if ( Player.Mana > RMANA + QMANA)
+                if (Player.Mana > RMANA + QMANA)
                     totalComboDamage += Q.GetDamage(t);
 
                 if (totalComboDamage > t.Health - OktwCommon.GetIncomingDamage(t) && OktwCommon.ValidUlt(t))
