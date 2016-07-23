@@ -227,7 +227,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Player.Mana > RMANA + WMANA)
             {
-                if (Program.Combo && Player.IsWindingUp)
+                if (Program.Combo)
                     return;
                 if (Config.Item("autoW", true).GetValue<bool>())
                 { 
@@ -240,7 +240,7 @@ namespace OneKeyToWin_AIO_Sebby
                         }
                         else if (LastW.NetworkId != enemy.NetworkId)
                         {
-                            W.Cast(enemy.Position, true);
+                            W.Cast(enemy);
                             LastW = enemy;
                         }
                     }
