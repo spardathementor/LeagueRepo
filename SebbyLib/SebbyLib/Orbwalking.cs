@@ -131,7 +131,7 @@ namespace SebbyLib
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
-                    if (x < 80)
+                    if (x < 90)
                     {
                         BrainFarmInt -= 3;
                     }
