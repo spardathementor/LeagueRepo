@@ -79,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (args.Slot == SpellSlot.R)
             {
                 var t = args.Target as Obj_AI_Hero;
-                if (t != null && t.Health > R.GetDamage(t))
+                if (t != null && t.Health > R.GetDamage(t) * 2.5)
                 {
                     if (E.IsReady() && Player.Mana > RMANA + EMANA)
                     {
@@ -291,17 +291,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.UnderTurret(true) && Config.Item("Rturrent", true).GetValue<bool>())
                 return;
+            if (Player.CountEnemiesInRange(900) < 3)
+                return;
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
-            if (Player.CountEnemiesInRange(900) < 3 && t.IsValidTarget() )
+            if (t.IsValidTarget())
             {
-                var totalComboDamage = OktwCommon.GetKsDamage(t, R);
-                // E calculation
+                var totalComboDamage =  R.GetDamage(t) * 2.5;
 
                 totalComboDamage += E.GetDamage(t);
 
                 if (W.IsReady() && Player.Mana > RMANA + WMANA)
                 {
-                    totalComboDamage += W.GetDamage(t) * 5;
+                    totalComboDamage += Q.GetDamage(t);
                 }
 
                 if ( Player.Mana > RMANA + QMANA)
