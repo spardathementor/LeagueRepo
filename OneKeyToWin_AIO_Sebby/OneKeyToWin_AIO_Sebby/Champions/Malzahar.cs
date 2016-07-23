@@ -79,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (args.Slot == SpellSlot.R)
             {
                 var t = args.Target as Obj_AI_Hero;
-                if (t != null && t.Health > R.GetDamage(t) * 2.5)
+                if (t != null && t.Health - OktwCommon.GetIncomingDamage(t) > R.GetDamage(t) * 2.5)
                 {
                     if (E.IsReady() && Player.Mana > RMANA + EMANA)
                     {
