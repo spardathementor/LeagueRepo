@@ -190,6 +190,8 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LagFree(1))
             {
+                if (!SebbyLib.Orbwalking.CanMove(50))
+                    return;
                 bool cc = !Program.None && Player.Mana > RMANA + QMANA + EMANA;
                 bool harass = Program.Farm && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
 
@@ -427,6 +429,12 @@ namespace OneKeyToWin_AIO_Sebby
                     var mob = mobs[0];
                     Q.Cast(mob.Position);
                 }
+            }
+
+            if (!SebbyLib.Orbwalking.CanMove(50))
+            {
+                Console.WriteLine("dupa");  
+                return;
             }
 
             var minions = Cache.GetMinions(Player.ServerPosition, Q.Range);
