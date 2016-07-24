@@ -190,7 +190,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LagFree(1))
             {
-                if (!SebbyLib.Orbwalking.CanMove(50))
+                if (!SebbyLib.Orbwalking.CanMove(50) )
                     return;
                 bool cc = !Program.None && Player.Mana > RMANA + QMANA + EMANA;
                 bool harass = Program.Farm && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
@@ -431,9 +431,8 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (!SebbyLib.Orbwalking.CanMove(50))
+            if (!SebbyLib.Orbwalking.CanMove(50) || (Orbwalker.ShouldWait() && SebbyLib.Orbwalking.CanAttack()))
             {
-                Console.WriteLine("dupa");  
                 return;
             }
 
