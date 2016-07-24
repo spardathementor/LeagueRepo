@@ -413,7 +413,7 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var mob in mobs)
             {
                 //debug(mob.SkinName);
-                if (mob.Health < mob.MaxHealth && ((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
+                if (mob.Health < mob.MaxHealth && ((mob.SkinName.ToLower().Contains("dragon") && Config.Item("Rdragon", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>()))
                     && mob.CountAlliesInRange(1000) == 0
                     && mob.Distance(Player.Position) > 1000)

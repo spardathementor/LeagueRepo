@@ -488,7 +488,7 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (mob.Health == mob.MaxHealth)
                     continue;
-                if (((mob.SkinName == "SRU_Dragon" && Config.Item("Rdragon", true).GetValue<bool>())
+                if (((mob.SkinName.ToLower().Contains("dragon") && Config.Item("Rdragon", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Baron" && Config.Item("Rbaron", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Red" && Config.Item("Rred", true).GetValue<bool>())
                     || (mob.SkinName == "SRU_Blue" && Config.Item("Rblue", true).GetValue<bool>()))
