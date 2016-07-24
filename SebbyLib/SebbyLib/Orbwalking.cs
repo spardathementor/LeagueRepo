@@ -133,11 +133,11 @@ namespace SebbyLib
 
                     if (x < 90)
                     {
-                        BrainFarmInt -= 3;
+                        BrainFarmInt -= 2;
                     }
                     else if (x > 110)
                     {
-                        BrainFarmInt += 3;
+                        BrainFarmInt += 2;
                     }
                     Console.WriteLine(BrainFarmInt + " ADJ " + (Utils.TickCount - DelayOnFire));
                     //Console.WriteLine(missile.Target.BoundingRadius + " dis2 " + (missile.Position.Distance(missile.Target.Position)));
