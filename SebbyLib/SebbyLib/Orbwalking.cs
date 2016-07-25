@@ -68,7 +68,7 @@ namespace SebbyLib
 
         private static int DelayOnFireId = 0;
 
-        private static int BrainFarmInt = -90;
+        private static int BrainFarmInt = -100;
 
         public static bool Attack = true;
 
@@ -131,11 +131,11 @@ namespace SebbyLib
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
-                    if (x < 90)
+                    if (x < 120 - Game.Ping / 2)
                     {
                         BrainFarmInt -= 2;
                     }
-                    else if (x > 110)
+                    else if (x > 130 - Game.Ping / 2)
                     {
                         BrainFarmInt += 2;
                     }
@@ -836,6 +836,7 @@ namespace SebbyLib
 
                             
                             var damage = Player.GetAutoAttackDamage(minion, _config.Item("PassiveDmg", true).GetValue<bool>()) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
+                            
 
                             var killable = predHealth <= damage;
 
@@ -850,6 +851,7 @@ namespace SebbyLib
                             {
                                 if (CanAttack())
                                 {
+
                                     DelayOnFire = t + Utils.TickCount;
                                     DelayOnFireId = minion.NetworkId;
                                 }
@@ -865,7 +867,6 @@ namespace SebbyLib
 
                                 else if (killable)
                                 {
-                                    
                                     return minion;
                                 }
                             }
