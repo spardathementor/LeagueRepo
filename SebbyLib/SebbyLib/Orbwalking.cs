@@ -131,9 +131,11 @@ namespace SebbyLib
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
+                    if (x < 115 - Game.Ping / 2)
                     {
                         BrainFarmInt -= 2;
                     }
+                    else if (x > 135 - Game.Ping / 2)
                     {
                         BrainFarmInt += 2;
                     }
