@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
                     if (t.IsValidTarget())
-                        R.Cast(t, true, true);
+                        R.Cast(t);
                 }
                 if (Config.Item("Rjungle", true).GetValue<bool>())
                 {
