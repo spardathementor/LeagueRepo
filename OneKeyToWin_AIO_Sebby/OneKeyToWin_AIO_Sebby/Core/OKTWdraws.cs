@@ -43,6 +43,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("HpBar", "Dmg indicators BAR OKTW© style").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("ShowClicks", "Show enemy clicks").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("SS", "SS notification").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("RF", "R and Flash notification").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("showWards", "Show hidden objects, wards").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("minimap", "Mini-map hack").SetValue(true));
 
@@ -303,9 +304,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 
             foreach (var enemy in HeroManager.Enemies)
             {
+                offset += 0.15f;
+
                 if (Config.Item("SS").GetValue<bool>())
                 {
-                    offset += 0.15f;
                     if (!enemy.IsVisible && !enemy.IsDead)
                     {
                         var ChampionInfoOne = OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
@@ -313,11 +315,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         {
                             if ((int)(Game.Time * 10) % 2 == 0 && Game.Time - ChampionInfoOne.LastVisableTime > 3 && Game.Time - ChampionInfoOne.LastVisableTime < 7)
                             {
-                                DrawFontTextScreen(TextBold, "SS " + enemy.ChampionName + " " + (int)(Game.Time - ChampionInfoOne.LastVisableTime), Drawing.Width * offset, Drawing.Height * 0.02f, SharpDX.Color.OrangeRed);
+                                DrawFontTextScreen(TextBold, "SS " + enemy.ChampionName + " " + (int)(Game.Time - ChampionInfoOne.LastVisableTime), Drawing.Width * offset, Drawing.Height * 0.02f, SharpDX.Color.Orange);
                             }
                             if (Game.Time - ChampionInfoOne.LastVisableTime >= 7)
                             {
-                                DrawFontTextScreen(TextBold, "SS " + enemy.ChampionName + " " + (int)(Game.Time - ChampionInfoOne.LastVisableTime), Drawing.Width * offset, Drawing.Height * 0.02f, SharpDX.Color.OrangeRed);
+                                DrawFontTextScreen(TextBold, "SS " + enemy.ChampionName + " " + (int)(Game.Time - ChampionInfoOne.LastVisableTime), Drawing.Width * offset, Drawing.Height * 0.02f, SharpDX.Color.Orange);
                             }
                         }
                     }
@@ -433,8 +435,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         }
                     }
 
-                    if (ShowKDA)
-                    {
                         var fSlot = enemy.Spellbook.Spells[4];
    
                         if (fSlot.Name != "SummonerFlash")
@@ -443,26 +443,51 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         if (fSlot.Name == "SummonerFlash")
                         {
                             var fT = fSlot.CooldownExpires - Game.Time;
-                            if (fT < 0)
-                                DrawFontTextScreen(Tahoma13, "F rdy", posX + 110, posY + positionDraw, SharpDX.Color.GreenYellow);
-                            else
-                                DrawFontTextScreen(Tahoma13, "F " + (int)fT, posX + 110, posY + positionDraw, SharpDX.Color.Yellow);
+                            if (ShowKDA)
+                            {
+                                if (fT < 0)
+                                    DrawFontTextScreen(Tahoma13, "F rdy", posX + 110, posY + positionDraw, SharpDX.Color.GreenYellow);
+                                else
+                                    DrawFontTextScreen(Tahoma13, "F " + (int)fT, posX + 110, posY + positionDraw, SharpDX.Color.Yellow);
+                            }
+                            if (Config.Item("RF").GetValue<bool>())
+                            {
+                                if (fT < 2 && fT > -3)
+                                {
+                                    DrawFontTextScreen(TextBold, enemy.ChampionName + " FLASH READY!", Drawing.Width * offset, Drawing.Height * 0.1f, SharpDX.Color.Yellow);
+                                }
+                                else if (fSlot.Cooldown - fT < 5)
+                                {
+                                    DrawFontTextScreen(TextBold, enemy.ChampionName + " FLASH LOST!", Drawing.Width * offset, Drawing.Height * 0.1f, SharpDX.Color.Red);
+                                }
+                            }
                         }
 
                         if (enemy.Level > 5)
                         {
                             var rSlot = enemy.Spellbook.Spells[3];
                             var t = rSlot.CooldownExpires - Game.Time;
-
-                            if (t < 0)
-                                DrawFontTextScreen(Tahoma13, "R rdy", posX + 145, posY + positionDraw, SharpDX.Color.GreenYellow);
-                            else
-                                DrawFontTextScreen(Tahoma13, "R " + (int)t, posX + 145, posY + positionDraw, SharpDX.Color.Yellow);
+                            if (ShowKDA)
+                            {
+                                if (t < 0)
+                                    DrawFontTextScreen(Tahoma13, "R rdy", posX + 145, posY + positionDraw, SharpDX.Color.GreenYellow);
+                                else
+                                    DrawFontTextScreen(Tahoma13, "R " + (int)t, posX + 145, posY + positionDraw, SharpDX.Color.Yellow);
+                            }
+                            if (Config.Item("RF").GetValue<bool>())
+                            {
+                                if (t < 2 && t > -3)
+                                {
+                                    DrawFontTextScreen(TextBold, enemy.ChampionName + " R READY!", Drawing.Width * offset, Drawing.Height * 0.2f, SharpDX.Color.YellowGreen);
+                                }
+                                else if (rSlot.Cooldown - t < 5)
+                                {
+                                    DrawFontTextScreen(TextBold, enemy.ChampionName + " R LOST!", Drawing.Width * offset, Drawing.Height * 0.1f, SharpDX.Color.Red);
+                                }
+                            }
                         }
-                        else
-                            DrawFontTextScreen(Tahoma13, "R ", posX + 145, posY + positionDraw, SharpDX.Color.Yellow);
-                    }
-                    
+                        else if (ShowKDA)
+                            DrawFontTextScreen(Tahoma13, "R ", posX + 145, posY + positionDraw, SharpDX.Color.Yellow);  
                     //Drawing.DrawText(posX - 70, posY + positionDraw, kolor, enemy.Level + " lvl");
                 }
 
