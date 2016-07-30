@@ -367,7 +367,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private float GetRealPowPowRange(GameObject target)
         {
-            return 650f + Player.BoundingRadius + target.BoundingRadius;
+            return 640f + Player.BoundingRadius + target.BoundingRadius;
 
         }
 
