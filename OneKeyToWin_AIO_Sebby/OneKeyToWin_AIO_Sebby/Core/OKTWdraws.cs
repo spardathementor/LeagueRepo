@@ -535,7 +535,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
   
 
-                    if (Distance < 3500 && enemy.IsVisible && !Render.OnScreen(Drawing.WorldToScreen(enemy.Position)))
+                    if (Distance < 3500 && enemy.IsVisible && !Render.OnScreen(Drawing.WorldToScreen(enemy.Position)) && Program.jungler != null)
                     {
                         if (Program.jungler.NetworkId == enemy.NetworkId)
                         {
