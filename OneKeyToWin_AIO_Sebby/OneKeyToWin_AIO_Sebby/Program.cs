@@ -1,11 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
 using SPrediction;
 using SebbyLib;
+using SharpDX.Direct3D9;
 
 namespace OneKeyToWin_AIO_Sebby
 {
@@ -24,11 +24,16 @@ namespace OneKeyToWin_AIO_Sebby
         public static int AIOmode = 0;
         private static float dodgeRange = 420;
         private static float dodgeTime = Game.Time;
+        private static float spellFarmTimer = 0;
+        private static Font TextBold;
 
         static void Main(string[] args) { CustomEvents.Game.OnGameLoad += GameOnOnGameLoad;}
 
         private static void GameOnOnGameLoad(EventArgs args)
         {
+            TextBold = new Font(Drawing.Direct3DDevice, new FontDescription
+            { FaceName = "Impact", Height = 30, Weight = FontWeight.Normal, OutputPrecision = FontPrecision.Default, Quality = FontQuality.ClearType });
+
             enemySpawn = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy);
             Q = new Spell(SpellSlot.Q);
             E = new Spell(SpellSlot.E);
@@ -104,7 +109,6 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.Item("supportMode", true).SetValue(false);
 
                 #region LOAD CHAMPIONS
-
             
                 switch (Player.ChampionName)
                 {
@@ -235,9 +239,15 @@ namespace OneKeyToWin_AIO_Sebby
                         new Champions.Braum().LoadOKTW();
                         break;
                 }
+                #endregion
+
+                Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarm", "OKTW spells farm").SetValue(true)).Show();
+                Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmMode", "SPELLS FARM TOGGLE MODE").SetValue(new StringList(new[] { "Scroll down", "Scroll press", "Key toggle", "Disable" }, 1)));
+                Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmKeyToggle", "Key toggle").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle)));
+                Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("showNot", "Show notification").SetValue(true));
+                Config.Item("spellFarm").Permashow(true);
             }
 
-            #endregion
             foreach (var hero in HeroManager.Enemies)
             {
                 if (hero.IsEnemy && hero.Team != Player.Team)
@@ -292,6 +302,52 @@ namespace OneKeyToWin_AIO_Sebby
                 else
                     Config.Item("aiomodes").Show(false);
 
+            }
+
+            if (AIOmode == 2)
+                return;
+
+            if (Config.Item("spellFarm") == null || Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 3)
+                return;
+
+            if ((Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 0 && args.Msg == 0x20a)
+                || (Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 1 && args.Msg == 520)
+                )
+            {
+                if (!Config.Item("spellFarm").GetValue<bool>())
+                {
+                    Config.Item("spellFarm").SetValue<bool>(true);
+                    spellFarmTimer = Game.Time;
+
+                    if (Config.Item("farmQ", true) != null)
+                        Config.Item("farmQ", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmW", true) != null)
+                        Config.Item("farmW", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmE", true) != null)
+                        Config.Item("farmE", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmR", true) != null)
+                        Config.Item("farmR", true).SetValue<bool>(true);
+                }
+                else
+                {
+                    Config.Item("spellFarm").SetValue<bool>(false);
+                    spellFarmTimer = Game.Time;
+
+                    if (Config.Item("farmQ", true) != null)
+                        Config.Item("farmQ", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmW", true) != null)
+                        Config.Item("farmW", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmE", true) != null)
+                        Config.Item("farmE", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmR", true) != null)
+                        Config.Item("farmR", true).SetValue<bool>(false);
+                }
             }
         }
 
@@ -377,11 +433,50 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnUpdate(EventArgs args)
         {
-
+            
             if (AIOmode != 2)
             {
+                if (LagFree(0) && Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex != 3 && Config.Item("spellFarm") != null && Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 2 && Config.Item("spellFarmKeyToggle").GetValue<KeyBind>().Active != Config.Item("spellFarm").GetValue<bool>())
+                {
+                    if (Config.Item("spellFarmKeyToggle").GetValue<KeyBind>().Active)
+                    {
+                        Config.Item("spellFarm").SetValue<bool>(true);
+                        spellFarmTimer = Game.Time;
+
+                        if (Config.Item("farmQ", true) != null)
+                            Config.Item("farmQ", true).SetValue<bool>(true);
+
+                        if (Config.Item("farmW", true) != null)
+                            Config.Item("farmW", true).SetValue<bool>(true);
+
+                        if (Config.Item("farmE", true) != null)
+                            Config.Item("farmE", true).SetValue<bool>(true);
+
+                        if (Config.Item("farmR", true) != null)
+                            Config.Item("farmR", true).SetValue<bool>(true);
+                    }
+                    else
+                    {
+                        Config.Item("spellFarm").SetValue<bool>(false);
+                        spellFarmTimer = Game.Time;
+
+                        if (Config.Item("farmQ", true) != null)
+                            Config.Item("farmQ", true).SetValue<bool>(false);
+
+                        if (Config.Item("farmW", true) != null)
+                            Config.Item("farmW", true).SetValue<bool>(false);
+
+                        if (Config.Item("farmE", true) != null)
+                            Config.Item("farmE", true).SetValue<bool>(false);
+
+                        if (Config.Item("farmR", true) != null)
+                            Config.Item("farmR", true).SetValue<bool>(false);
+                    }
+                }
+
                 PositionHelper();
             }
+
             tickIndex++;
 
             if (tickIndex > 4)
@@ -635,10 +730,23 @@ namespace OneKeyToWin_AIO_Sebby
             }
         }
 
+        private static void DrawFontTextScreen(Font vFont, string vText, float vPosX, float vPosY, ColorBGRA vColor)
+        {
+            vFont.DrawText(null, vText, (int)vPosX, (int)vPosY, vColor);
+        }
+
         private static void OnDraw(EventArgs args)
         {
             if (!SPredictionLoad && (int)Game.Time % 2 == 0 && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
                 drawText("PRESS F5 TO LOAD SPREDICTION", Player.Position, System.Drawing.Color.Yellow, -300);
+
+            if (Program.AIOmode != 2 && spellFarmTimer + 1 > Game.Time && Config.Item("showNot").GetValue<bool>() && Config.Item("spellFarm") != null)
+            {
+                if (Config.Item("spellFarm").GetValue<bool>())
+                    DrawFontTextScreen(TextBold, "SPELLS FARM ON", Drawing.Width * 0.5f, Drawing.Height * 0.4f, Color.GreenYellow);
+                else
+                    DrawFontTextScreen(TextBold, "SPELLS FARM OFF", Drawing.Width * 0.5f, Drawing.Height * 0.4f, Color.OrangeRed);
+            }
 
             if (AIOmode == 1 || Config.Item("disableDraws").GetValue<bool>())
                 return;
