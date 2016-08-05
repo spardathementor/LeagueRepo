@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SebbyLib;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
@@ -13,7 +12,7 @@ namespace Jinx_Genesis
     {
         private static string ChampionName = "Jinx";
 
-        public static Orbwalking.Orbwalker Orbwalker;
+        public static SebbyLib.Orbwalking.Orbwalker Orbwalker;
         public static Menu Config;
 
         private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -64,7 +63,7 @@ namespace Jinx_Genesis
             }
 
             Game.OnUpdate += Game_OnGameUpdate;
-            Orbwalking.BeforeAttack += BeforeAttack;
+            SebbyLib.Orbwalking.BeforeAttack += BeforeAttack;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
             Drawing.OnDraw += Drawing_OnDraw;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -78,7 +77,7 @@ namespace Jinx_Genesis
             TargetSelector.AddToMenu(targetSelectorMenu);
             Config.AddSubMenu(targetSelectorMenu);
             Config.AddSubMenu(new Menu("Orbwalking", "Orbwalking"));
-            Orbwalker = new Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
+            Orbwalker = new SebbyLib.Orbwalking.Orbwalker(Config.SubMenu("Orbwalking"));
             Config.AddToMainMenu();
 
             Config.SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range").SetValue(false));
@@ -172,7 +171,7 @@ namespace Jinx_Genesis
             }
         }
 
-        private static void BeforeAttack(Orbwalking.BeforeAttackEventArgs args)
+        private static void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
             if (!FishBoneActive)
                 return;
@@ -189,7 +188,7 @@ namespace Jinx_Genesis
             if (!Combo && args.Target is Obj_AI_Minion)
             {
                 var t = (Obj_AI_Minion)args.Target;
-                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && CountMinionsInRange(250, t.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
+                if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && CountMinionsInRange(250, t.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
                 {
                     
                 }
@@ -264,10 +263,10 @@ namespace Jinx_Genesis
                 bool cast = false;
                 
 
-                if (Config.Item("RoverAA").GetValue<bool>() && (!Orbwalking.CanAttack() || Player.IsWindingUp))
+                if (Config.Item("RoverAA").GetValue<bool>() && (!SebbyLib.Orbwalking.CanAttack() || Player.IsWindingUp))
                     return;
 
-                foreach (var target in Enemies.Where(target => target.IsValidTarget(R.Range) && ValidUlt(target) ))
+                foreach (var target in Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) ))
                 {
                     
                     float predictedHealth = target.Health + target.HPRegenRate * 2;
@@ -341,7 +340,7 @@ namespace Jinx_Genesis
             }
             else if (Config.Item("Rmode").GetValue<StringList>().SelectedIndex == 2)
             {
-                if (range > Config.Item("Rcustome").GetValue<Slider>().Value && !Orbwalking.InAutoAttackRange(t))
+                if (range > Config.Item("Rcustome").GetValue<Slider>().Value && !SebbyLib.Orbwalking.InAutoAttackRange(t))
                     return true;
                 else
                     return false;
@@ -371,7 +370,7 @@ namespace Jinx_Genesis
 
                 if(Config.Item("Ecc").GetValue<bool>())
                 {
-                    if (!CanMove(enemy))
+                    if (!OktwCommon.CanMove(enemy))
                         E.Cast(enemy.Position);
                     E.CastIfHitchanceEquals(enemy, HitChance.Immobile);
                 }
@@ -445,7 +444,7 @@ namespace Jinx_Genesis
             var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget() && WValidRange(t))
             {
-                if (Config.Item("Wks").GetValue<bool>() && GetKsDamage(t, W) > t.Health && ValidUlt(t))
+                if (Config.Item("Wks").GetValue<bool>() && GetKsDamage(t, W) > t.Health && OktwCommon.ValidUlt(t))
                 {
                     CastSpell(W, t);
                 }
@@ -454,7 +453,7 @@ namespace Jinx_Genesis
                 {
                     CastSpell(W, t);
                 }
-                else if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Wharass").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaHarass").GetValue<Slider>().Value)
+                else if (Farm && SebbyLib.Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("Wharass").GetValue<bool>() && Player.ManaPercent > Config.Item("WmanaHarass").GetValue<Slider>().Value)
                 {
                     if (Config.Item("Wts").GetValue<StringList>().SelectedIndex == 0)
                     {
@@ -476,7 +475,7 @@ namespace Jinx_Genesis
             if (FishBoneActive)
             {
                 var orbT = Orbwalker.GetTarget();
-                if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && orbT.IsValid<Obj_AI_Minion>())
+                if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value && orbT.IsValid<Obj_AI_Minion>())
                 {
                     
                 }
@@ -487,7 +486,7 @@ namespace Jinx_Genesis
                 }  
                 else
                 {
-                    if (!Combo && Orbwalker.ActiveMode != Orbwalking.OrbwalkingMode.None)
+                    if (!Combo && Orbwalker.ActiveMode != SebbyLib.Orbwalking.OrbwalkingMode.None)
                         Q.Cast();
                 }
             }
@@ -496,13 +495,13 @@ namespace Jinx_Genesis
                 var t = TargetSelector.GetTarget(Q.Range + 40, TargetSelector.DamageType.Physical);
                 if (t.IsValidTarget())
                 {
-                    if ((!Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) >= Config.Item("Qaoe").GetValue<Slider>().Value))
+                    if ((!SebbyLib.Orbwalking.InAutoAttackRange(t) || t.CountEnemiesInRange(250) >= Config.Item("Qaoe").GetValue<Slider>().Value))
                     {
                         if (Combo && Config.Item("Qcombo").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaCombo").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
                         {
                             Q.Cast();
                         }
-                        if (Farm && Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harasQ" + t.ChampionName).GetValue<bool>() && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
+                        if (Farm && SebbyLib.Orbwalking.CanAttack() && !Player.IsWindingUp && Config.Item("harasQ" + t.ChampionName).GetValue<bool>() && Config.Item("Qharass").GetValue<bool>() && (Player.ManaPercent > Config.Item("QmanaHarass").GetValue<Slider>().Value || Player.GetAutoAttackDamage(t) * Config.Item("QmanaIgnore").GetValue<Slider>().Value > t.Health))
                         {
                             Q.Cast();
                         }
@@ -514,17 +513,17 @@ namespace Jinx_Genesis
                     {
                         Q.Cast();
                     }
-                    else if (Farm && !Player.IsWindingUp && Config.Item("farmQout").GetValue<bool>() && Orbwalking.CanAttack())
+                    else if (Farm && !Player.IsWindingUp && Config.Item("farmQout").GetValue<bool>() && SebbyLib.Orbwalking.CanAttack())
                     {
                         foreach (var minion in MinionManager.GetMinions(Q.Range + 30).Where(
-                        minion => !Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && Q.Range < GetRealDistance(minion)))
+                        minion => !SebbyLib.Orbwalking.InAutoAttackRange(minion) && minion.Health < Player.GetAutoAttackDamage(minion) * 1.2 && GetRealPowPowRange(minion) < GetRealDistance(minion) && Q.Range < GetRealDistance(minion)))
                         {
                             Orbwalker.ForceTarget(minion);
                             Q.Cast();
                             return;
                         }
                     }
-                    if(Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value)
+                    if(Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Player.ManaPercent > Config.Item("QmanaLC").GetValue<Slider>().Value)
                     {
                         var orbT = Orbwalker.GetTarget();
                         if (orbT.IsValid<Obj_AI_Minion>() && CountMinionsInRange(250, orbT.Position) >= Config.Item("Qlaneclear").GetValue<Slider>().Value)
@@ -566,43 +565,13 @@ namespace Jinx_Genesis
                 }
             }
 
-            var extraHP = t.Health - HealthPrediction.GetHealthPrediction(t, 500);
+            var extraHP = t.Health - SebbyLib.HealthPrediction.GetHealthPrediction(t, 500);
 
             totalDmg += extraHP;
             totalDmg -= t.HPRegenRate;
             totalDmg -= t.PercentLifeStealMod * 0.005f * t.FlatPhysicalDamageMod;
 
             return totalDmg;
-        }
-
-        public static bool ValidUlt(Obj_AI_Base target)
-        {
-            if (target.HasBuffOfType(BuffType.PhysicalImmunity)
-                || target.HasBuffOfType(BuffType.SpellImmunity)
-                || target.IsZombie
-                || target.IsInvulnerable
-                || target.HasBuffOfType(BuffType.Invulnerability)
-                || target.HasBuffOfType(BuffType.SpellShield)
-                || target.HasBuff("deathdefiedbuff")
-                || target.HasBuff("Undying Rage")
-                || target.HasBuff("Chrono Shift")
-                )
-                return false;
-            else
-                return true;
-        }
-
-        private static bool CanMove(Obj_AI_Hero target)
-        {
-            if (target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup) ||
-                target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Knockback) ||
-                target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression) ||
-                target.IsStunned || target.IsChannelingImportantSpell() || target.MoveSpeed < 50f)
-            {
-                return false;
-            }
-            else
-                return true;
         }
 
         private static void CastSpell(Spell QWER, Obj_AI_Base target)
@@ -633,16 +602,16 @@ namespace Jinx_Genesis
             }
             else
             {
-                Core.SkillshotType CoreType2 = Core.SkillshotType.SkillshotLine;
+                SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
 
                 if (QWER.Type == SkillshotType.SkillshotCircle)
                 {
-                    CoreType2 = Core.SkillshotType.SkillshotCircle;
+                    CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotCircle;
                     aoe2 = true;
                 }
 
-                var predInput2 = new Core.PredictionInput
+                var predInput2 = new SebbyLib.Prediction.PredictionInput
                 {
                     Aoe = aoe2,
                     Collision = QWER.Collision,
@@ -655,18 +624,18 @@ namespace Jinx_Genesis
                     Type = CoreType2
                 };
 
-                var poutput2 = Core.Prediction.GetPrediction(predInput2);
+                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
 
                 if (QWER.Slot == SpellSlot.W)
                 {
                     if (Config.Item("Wpred").GetValue<StringList>().SelectedIndex == 0)
                     {
-                        if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                        if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
                             QWER.Cast(poutput2.CastPosition);
                     }
                     else
                     {
-                        if (poutput2.Hitchance >= Core.HitChance.High)
+                        if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                             QWER.Cast(poutput2.CastPosition);
                     }
                 }
@@ -674,12 +643,12 @@ namespace Jinx_Genesis
                 {
                     if (Config.Item("Rpred").GetValue<StringList>().SelectedIndex == 0)
                     {
-                        if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                        if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
                             QWER.Cast(poutput2.CastPosition);
                     }
                     else
                     {
-                        if (poutput2.Hitchance >= Core.HitChance.High)
+                        if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                             QWER.Cast(poutput2.CastPosition);
                     }
                 }
@@ -687,12 +656,12 @@ namespace Jinx_Genesis
                 {
                     if (Config.Item("Epred").GetValue<StringList>().SelectedIndex == 0)
                     {
-                        if (poutput2.Hitchance >= Core.HitChance.VeryHigh)
+                        if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
                             QWER.Cast(poutput2.CastPosition);
                     }
                     else
                     {
-                        if (poutput2.Hitchance >= Core.HitChance.High)
+                        if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                             QWER.Cast(poutput2.CastPosition);
                     }
                 }
@@ -733,15 +702,15 @@ namespace Jinx_Genesis
             else
                 FishBoneActive = false;
 
-            if (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Combo)
+            if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo)
                 Combo = true;
             else
                 Combo = false;
 
             if (
-                (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LaneClear && Config.Item("LaneClearHarass").GetValue<bool>()) ||
-                (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.LastHit && Config.Item("LaneClearHarass").GetValue<bool>()) || 
-                (Orbwalker.ActiveMode == Orbwalking.OrbwalkingMode.Mixed && Config.Item("MixedHarass").GetValue<bool>())
+                (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Config.Item("LaneClearHarass").GetValue<bool>()) ||
+                (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LastHit && Config.Item("LaneClearHarass").GetValue<bool>()) || 
+                (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed && Config.Item("MixedHarass").GetValue<bool>())
                )
                 Farm = true;
             else
