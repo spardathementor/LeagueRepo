@@ -219,6 +219,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else
             {
+                SebbyLib.Orbwalking.Move = true;
                 if (Program.LagFree(1) && E2.IsReady() && Config.Item("autoEm", true).GetValue<bool>())
                     LogicE2();
 
