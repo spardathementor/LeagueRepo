@@ -27,7 +27,7 @@ namespace GankPlank_GENESIS
             Q = new Spell(SpellSlot.Q, 625);
             E = new Spell(SpellSlot.E, 1000);
 
-            E.SetSkillshot(0.7f, 300f, 2500, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.7f, 300f, 2000, false, SkillshotType.SkillshotCircle);
 
 
             Config = new Menu("Gankplan GENESIS", "Gankplan GENESIS", true);
@@ -130,19 +130,19 @@ namespace GankPlank_GENESIS
                     {
                         var tryPosition = barrel.Position.Extend(pred.CastPosition, 670);
 
-                        if (tryPosition.Distance(Player.ServerPosition) < E.Range && tryPosition.Distance(pred.CastPosition) < eRadius && tryPosition.Distance(pred.UnitPosition) < eRadius)
+                        if (tryPosition.Distance(Player.ServerPosition) < E.Range && tryPosition.Distance(pred.CastPosition) < eRadius && tryPosition.Distance(pred.UnitPosition) < eRadius && !BarrelList.Exists(x => x.Distance(tryPosition) < 400))
                         {
                             if (barrelInAaRange != null)
                             {
                                 if (barrelInAaRange == barrel)
                                 {
                                     E.Cast(tryPosition);
-                                    Orbwalker.ForceTarget(barrelInAaRange);
+                                    //Orbwalker.ForceTarget(barrelInAaRange);
                                 }
                                 else if (BarrelLink(barrelInAaRange, barrel))
                                 {
                                     E.Cast(tryPosition);
-                                    Orbwalker.ForceTarget(barrelInAaRange);
+                                    //Orbwalker.ForceTarget(barrelInAaRange);
                                 }
                             }
                             else if (Q.IsReady() && barrelInQRange != null)
@@ -150,18 +150,18 @@ namespace GankPlank_GENESIS
                                 if (barrelInQRange == barrel)
                                 {
                                     E.Cast(tryPosition);
-                                    Q.CastOnUnit(barrelInQRange);
+                                    //Q.CastOnUnit(barrelInQRange);
                                 }
                                 else if (BarrelLink(barrelInQRange, barrel))
                                 {
                                     E.Cast(tryPosition);
-                                    Q.CastOnUnit(barrelInQRange);
+                                   // Q.CastOnUnit(barrelInQRange);
                                 }
                             }
                             break;
                             
                         }
-                        else if (eAmmo > 1)
+                        else if (tryPosition.Distance(Player.ServerPosition) < E.Range && eAmmo > 1)
                         {
                             E.Cast(tryPosition);
                         }
