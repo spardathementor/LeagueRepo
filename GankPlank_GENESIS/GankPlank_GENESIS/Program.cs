@@ -95,7 +95,7 @@ namespace GankPlank_GENESIS
                 {
                     var ePos = Player.ServerPosition.Extend(Game.CursorPos, 250);
 
-                    if (!OktwCommon.CirclePoints(8, 450, ePos).Any(x => x.IsWall()))
+                    if (!OktwCommon.CirclePoints(8, 250, ePos).Any(x => x.IsWall()) && !BarrelList.Exists(x => x.Distance(ePos) < 600))
                         E.Cast(ePos);
                 }
             }
