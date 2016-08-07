@@ -29,6 +29,7 @@ namespace GankPlank_GENESIS
 
             E.SetSkillshot(0.7f, 300f, 2500, false, SkillshotType.SkillshotCircle);
 
+
             Config = new Menu("Gankplan GENESIS", "Gankplan GENESIS", true);
             var targetSelectorMenu = new Menu("Target Selector", "Target Selector");
             TargetSelector.AddToMenu(targetSelectorMenu);
@@ -108,24 +109,24 @@ namespace GankPlank_GENESIS
             {
                 var eRadius = 290 + enemy.BoundingRadius;
                 var pred = E.GetPrediction(enemy, true);
-                Utility.DrawCircle(pred.CastPosition, 100, System.Drawing.Color.Yellow, 1, 1);
+                
                 foreach (var barrel in BarrelList)
                 {
-                    if (barrel.Distance(pred.CastPosition) < eRadius && barrel.Distance(pred.UnitPosition) < eRadius)
+                    if (BarrelHitTarget(barrel,enemy))
                     {
                         //continue;
                         if (barrelInAaRange != null)
                         {
                             if(barrelInAaRange == barrel)
                                 Orbwalker.ForceTarget(barrelInAaRange);
-                            else if (barrelInAaRange.HasBuff("gangplankebarrellink") && barrel.HasBuff("gangplankebarrellink"))
+                            else if (BarrelLink(barrelInAaRange, barrel))
                                 Orbwalker.ForceTarget(barrelInAaRange);
                         }
                         else if (Q.IsReady() && barrelInQRange != null)
                         {
                             if(barrelInQRange == barrel )
                                 Q.CastOnUnit(barrelInQRange);   
-                            else if (barrelInQRange.HasBuff("gangplankebarrellink") && barrel.HasBuff("gangplankebarrellink"))
+                            else if (BarrelLink(barrelInQRange, barrel))
                                 Q.CastOnUnit(barrelInQRange);
                         }
                         break;
@@ -145,7 +146,7 @@ namespace GankPlank_GENESIS
                                         E.Cast(tryPosition);
                                         Orbwalker.ForceTarget(barrelInAaRange);
                                     }
-                                    else if (barrelInAaRange.HasBuff("gangplankebarrellink") && barrel.HasBuff("gangplankebarrellink"))
+                                    else if (BarrelLink(barrelInAaRange, barrel))
                                     {
                                         E.Cast(tryPosition);
                                         Orbwalker.ForceTarget(barrelInAaRange);
@@ -158,7 +159,7 @@ namespace GankPlank_GENESIS
                                         E.Cast(tryPosition);
                                         Q.CastOnUnit(barrelInQRange);
                                     }
-                                    else if (barrelInQRange.HasBuff("gangplankebarrellink") && barrel.HasBuff("gangplankebarrellink"))
+                                    else if (BarrelLink(barrelInQRange,barrel))
                                     {
                                         E.Cast(tryPosition);
                                         Q.CastOnUnit(barrelInQRange);
@@ -167,9 +168,40 @@ namespace GankPlank_GENESIS
                                 break;
                             }
                         }
+                        else if (eAmmo > 1)
+                        {
+                            E.Cast(tryPosition);
+                        }
                     }
                 }
             }
+        }
+
+        private static bool BarrelLink(Obj_AI_Minion barrel, Obj_AI_Minion barrel2)
+        {
+            if (barrel.HasBuff("gangplankebarrellink") && barrel2.HasBuff("gangplankebarrellink"))
+                return true;
+            else
+                return false;
+        }
+
+        private static bool BarrelHitTarget(Obj_AI_Minion barrel, Obj_AI_Base target)
+        {
+            float t = Player.Distance(target) / 2600;
+            var predPos = SebbyLib.Prediction.Prediction.GetPrediction(target, t);
+            Utility.DrawCircle(predPos.CastPosition, 100, System.Drawing.Color.Yellow, 1, 1);
+
+            var eRadius = 290 + target.BoundingRadius;
+            if (barrel.Distance(target.ServerPosition) > eRadius)
+                return false;
+
+           
+
+            
+            if (barrel.Distance(predPos.CastPosition) < eRadius)
+                return true;
+            else
+                return false;
         }
 
         private static bool CanAa(Obj_AI_Minion barrel)
