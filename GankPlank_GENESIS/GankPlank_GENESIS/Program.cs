@@ -88,12 +88,12 @@ namespace GankPlank_GENESIS
                 Orbwalker.ForceTarget(null);
 
 
-            if (eAmmo > 1 && barrelCount == 0 && E.IsReady())
+            if (eAmmo > 1 && Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo && E.IsReady())
             {
                 var t = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
                 if(t.IsValidTarget())
                 {
-                    var ePos = Player.ServerPosition.Extend(t.ServerPosition, 300);
+                    var ePos = Player.ServerPosition.Extend(Game.CursorPos, 250);
 
                     if (!OktwCommon.CirclePoints(8, 450, ePos).Any(x => x.IsWall()))
                         E.Cast(ePos);
@@ -185,7 +185,7 @@ namespace GankPlank_GENESIS
             if (barrel.Distance(target.ServerPosition) > eRadius)
                 return false;
 
-            float t = Player.Distance(target) / 2600;
+            float t = 0.1f + Player.Distance(target) / 2600;
             var predPos = SebbyLib.Prediction.Prediction.GetPrediction(target, t);
             Utility.DrawCircle(predPos.CastPosition, 100, System.Drawing.Color.Yellow, 1, 1);
              
