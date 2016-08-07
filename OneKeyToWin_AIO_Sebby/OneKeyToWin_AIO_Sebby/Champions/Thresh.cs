@@ -138,7 +138,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     CastW(allyHero.Position);
                 }
             }
-            if (E.IsReady() && Config.Item("Gap", true).GetValue<bool>() && gapcloser.Sender.IsValidTarget(E.Range))
+            if (E.IsReady() && Config.Item("Gap", true).GetValue<bool>() && gapcloser.Sender.IsValidTarget(E.Range) && !Marked.IsValidTarget())
             {
                 E.Cast(gapcloser.Sender);
             }
@@ -200,7 +200,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void LogicE()
         {
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-            if (t.IsValidTarget()  && OktwCommon.CanMove(t))
+            if (t.IsValidTarget()  && OktwCommon.CanMove(t) && !Marked.IsValidTarget())
             {
                 
                 if (Program.Combo)
@@ -268,14 +268,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            bool rKs = Config.Item("rKs", true).GetValue<bool>();
-            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && target.HasBuff("rocketgrab2")))
-            {
-                if (rKs && R.GetDamage(target) > target.Health)
-                    R.Cast();
-            }
-            if (Player.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
+
+            var rCountOut = Player.CountEnemiesInRange(R.Range);
+            var rCountIn = Player.CountEnemiesInRange(R.Range - 180);
+
+            if (rCountOut < rCountIn)
+                return;
+
+            if (rCountOut >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                 R.Cast();
+
             if (Config.Item("comboR", true).GetValue<bool>())
             {
                 var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Physical);
