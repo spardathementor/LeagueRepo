@@ -264,7 +264,7 @@ namespace SebbyLib
 
         public static float GetMyProjectileSpeed()
         {
-            return IsMelee(Player) || _championName == "Azir" || _championName == "Velkoz" ||
+            return IsMelee(Player) || _championName == "Azir" || _championName == "Thresh" || _championName == "Velkoz" ||
                    _championName == "Viktor" && Player.HasBuff("ViktorPowerTransferReturn")
                 ? float.MaxValue
                 : Player.BasicAttack.MissileSpeed;
@@ -873,7 +873,7 @@ namespace SebbyLib
                         }
                         else if ( minion.Health < 2 && _config.Item("AttackBarrel").GetValue<bool>() && minion.CharData.BaseSkinName == "gangplankbarrel" && minion.IsHPBarRendered)
                         {
-                            if(ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(x => x.Name == "Gangplank_Base_E_AoE_Red.troy" && minion.Distance(x.Position) < 10))
+                            if(ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(x => x.Name == "Gangplank_Base_E_AoE_Red.troy    " && minion.Distance(x.Position) < 10))
                                 return minion;
                         }
                     }
