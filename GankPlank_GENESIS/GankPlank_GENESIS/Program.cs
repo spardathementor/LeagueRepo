@@ -93,80 +93,73 @@ namespace GankPlank_GENESIS
                 var t = TargetSelector.GetTarget(1500, TargetSelector.DamageType.Physical);
                 if(t.IsValidTarget())
                 {
-                    var healthDecayRate = Player.Level >= 13 ? 0.5f : (Player.Level >= 7 ? 1f : 2f);
-                    var predPos = SebbyLib.Prediction.Prediction.GetPrediction(t, healthDecayRate * 2 - 0.5f);
-
-                    var ePos = Player.Position.Extend(predPos.CastPosition, 500);
-                    if (predPos.CastPosition.Distance(Player.Position) < Q.Range)
-                        ePos = predPos.CastPosition;
+                    var ePos = Player.ServerPosition.Extend(t.ServerPosition, 300);
 
                     if (!OktwCommon.CirclePoints(8, 450, ePos).Any(x => x.IsWall()))
                         E.Cast(ePos);
                 }
             }
 
-            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(1500)))
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(1700)))
             {
                 var eRadius = 290 + enemy.BoundingRadius;
                 var pred = E.GetPrediction(enemy, true);
-                
-                foreach (var barrel in BarrelList)
+                var barrelHitTarget = BarrelList.FirstOrDefault(x => BarrelHitTarget(x, enemy));
+
+                if (barrelHitTarget != null)
                 {
-                    if (BarrelHitTarget(barrel,enemy))
+                    if (barrelInAaRange != null)
                     {
-                        //continue;
-                        if (barrelInAaRange != null)
-                        {
-                            if(barrelInAaRange == barrel)
-                                Orbwalker.ForceTarget(barrelInAaRange);
-                            else if (BarrelLink(barrelInAaRange, barrel))
-                                Orbwalker.ForceTarget(barrelInAaRange);
-                        }
-                        else if (Q.IsReady() && barrelInQRange != null)
-                        {
-                            if(barrelInQRange == barrel )
-                                Q.CastOnUnit(barrelInQRange);   
-                            else if (BarrelLink(barrelInQRange, barrel))
-                                Q.CastOnUnit(barrelInQRange);
-                        }
-                        break;
+                        if (barrelInAaRange == barrelHitTarget)
+                            Orbwalker.ForceTarget(barrelInAaRange);
+                        else if (BarrelLink(barrelInAaRange, barrelHitTarget))
+                            Orbwalker.ForceTarget(barrelInAaRange);
                     }
-                    else if (E.IsReady())
+                    else if (Q.IsReady() && barrelInQRange != null)
+                    {
+                        if (barrelInQRange == barrelHitTarget)
+                            Q.CastOnUnit(barrelInQRange);
+                        else if (BarrelLink(barrelInQRange, barrelHitTarget))
+                            Q.CastOnUnit(barrelInQRange);
+                    }
+                    return;
+                }
+                else if (E.IsReady())
+                {
+                    foreach (var barrel in BarrelList)
                     {
                         var tryPosition = barrel.Position.Extend(pred.CastPosition, 670);
 
-                        if (tryPosition.Distance(Player.ServerPosition) < E.Range)
+                        if (tryPosition.Distance(Player.ServerPosition) < E.Range && tryPosition.Distance(pred.CastPosition) < eRadius && tryPosition.Distance(pred.UnitPosition) < eRadius)
                         {
-                            if (tryPosition.Distance(pred.CastPosition) < eRadius && tryPosition.Distance(pred.UnitPosition) < eRadius)
+                            if (barrelInAaRange != null)
                             {
-                                if (barrelInAaRange != null)
+                                if (barrelInAaRange == barrel)
                                 {
-                                    if (barrelInAaRange == barrel)
-                                    {
-                                        E.Cast(tryPosition);
-                                        Orbwalker.ForceTarget(barrelInAaRange);
-                                    }
-                                    else if (BarrelLink(barrelInAaRange, barrel))
-                                    {
-                                        E.Cast(tryPosition);
-                                        Orbwalker.ForceTarget(barrelInAaRange);
-                                    }
+                                    E.Cast(tryPosition);
+                                    Orbwalker.ForceTarget(barrelInAaRange);
                                 }
-                                else if (Q.IsReady() && barrelInQRange != null)
+                                else if (BarrelLink(barrelInAaRange, barrel))
                                 {
-                                    if (barrelInQRange == barrel)
-                                    {
-                                        E.Cast(tryPosition);
-                                        Q.CastOnUnit(barrelInQRange);
-                                    }
-                                    else if (BarrelLink(barrelInQRange,barrel))
-                                    {
-                                        E.Cast(tryPosition);
-                                        Q.CastOnUnit(barrelInQRange);
-                                    } 
+                                    E.Cast(tryPosition);
+                                    Orbwalker.ForceTarget(barrelInAaRange);
                                 }
-                                break;
                             }
+                            else if (Q.IsReady() && barrelInQRange != null)
+                            {
+                                if (barrelInQRange == barrel)
+                                {
+                                    E.Cast(tryPosition);
+                                    Q.CastOnUnit(barrelInQRange);
+                                }
+                                else if (BarrelLink(barrelInQRange, barrel))
+                                {
+                                    E.Cast(tryPosition);
+                                    Q.CastOnUnit(barrelInQRange);
+                                }
+                            }
+                            break;
+                            
                         }
                         else if (eAmmo > 1)
                         {
@@ -174,6 +167,7 @@ namespace GankPlank_GENESIS
                         }
                     }
                 }
+                
             }
         }
 
@@ -187,17 +181,14 @@ namespace GankPlank_GENESIS
 
         private static bool BarrelHitTarget(Obj_AI_Minion barrel, Obj_AI_Base target)
         {
-            float t = Player.Distance(target) / 2600;
-            var predPos = SebbyLib.Prediction.Prediction.GetPrediction(target, t);
-            Utility.DrawCircle(predPos.CastPosition, 100, System.Drawing.Color.Yellow, 1, 1);
-
-            var eRadius = 290 + target.BoundingRadius;
+            var eRadius = 280 + target.BoundingRadius;
             if (barrel.Distance(target.ServerPosition) > eRadius)
                 return false;
 
-           
-
-            
+            float t = Player.Distance(target) / 2600;
+            var predPos = SebbyLib.Prediction.Prediction.GetPrediction(target, t);
+            Utility.DrawCircle(predPos.CastPosition, 100, System.Drawing.Color.Yellow, 1, 1);
+             
             if (barrel.Distance(predPos.CastPosition) < eRadius)
                 return true;
             else
