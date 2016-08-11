@@ -7,17 +7,16 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Ahri
+    class Ahri : Program
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Spell Q, W, E, R;
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static GameObject QMissile = null, EMissile = null;
         public Obj_AI_Hero Qtarget = null;
         public static Core.MissileReturn missileManager;
-
+        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
+        public Obj_AI_Hero Player
+        {
+            get { return ObjectManager.Player; }
+        }
         public void LoadOKTW()
         {
             Q = new Spell(SpellSlot.Q, 870);
