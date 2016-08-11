@@ -13,17 +13,13 @@ namespace OneKeyToWin_AIO_Sebby
     {
         public static Menu Config;
         public static SebbyLib.Orbwalking.Orbwalker Orbwalker;
-        public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-
-        public static float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         public static Spell Q, W, E, R, DrawSpell;
-
         public static float JungleTime, DrawSpellTime=0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
         public static Obj_SpawnPoint enemySpawn;
         public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
-        
+        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static bool SPredictionLoad = false;
         public static int AIOmode = 0;
         private static float dodgeRange = 420;
@@ -95,6 +91,8 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
+
+       
 
             if (AIOmode != 2)
             {
@@ -303,6 +301,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Config.Item("aiomodes").Show(true);
                 else
                     Config.Item("aiomodes").Show(false);
+
             }
 
             if (AIOmode == 2)
@@ -317,14 +316,37 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (!Config.Item("spellFarm").GetValue<bool>())
                 {
-                    Config.Item("spellFarm").SetValue(true);
+                    Config.Item("spellFarm").SetValue<bool>(true);
                     spellFarmTimer = Game.Time;
 
+                    if (Config.Item("farmQ", true) != null)
+                        Config.Item("farmQ", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmW", true) != null)
+                        Config.Item("farmW", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmE", true) != null)
+                        Config.Item("farmE", true).SetValue<bool>(true);
+
+                    if (Config.Item("farmR", true) != null)
+                        Config.Item("farmR", true).SetValue<bool>(true);
                 }
                 else
                 {
-                    Config.Item("spellFarm").SetValue(false);
+                    Config.Item("spellFarm").SetValue<bool>(false);
                     spellFarmTimer = Game.Time;
+
+                    if (Config.Item("farmQ", true) != null)
+                        Config.Item("farmQ", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmW", true) != null)
+                        Config.Item("farmW", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmE", true) != null)
+                        Config.Item("farmE", true).SetValue<bool>(false);
+
+                    if (Config.Item("farmR", true) != null)
+                        Config.Item("farmR", true).SetValue<bool>(false);
                 }
             }
         }
@@ -411,22 +433,47 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnUpdate(EventArgs args)
         {
+            
             if (AIOmode != 2)
             {
                 if (LagFree(0) && Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex != 3 && Config.Item("spellFarm") != null && Config.Item("spellFarmMode").GetValue<StringList>().SelectedIndex == 2 && Config.Item("spellFarmKeyToggle").GetValue<KeyBind>().Active != Config.Item("spellFarm").GetValue<bool>())
                 {
                     if (Config.Item("spellFarmKeyToggle").GetValue<KeyBind>().Active)
                     {
-                        Config.Item("spellFarm").SetValue(true);
+                        Config.Item("spellFarm").SetValue<bool>(true);
                         spellFarmTimer = Game.Time;
 
+                        if (Config.Item("farmQ", true) != null)
+                            Config.Item("farmQ", true).SetValue<bool>(true);
+
+                        if (Config.Item("farmW", true) != null)
+                            Config.Item("farmW", true).SetValue<bool>(true);
+
+                        if (Config.Item("farmE", true) != null)
+                            Config.Item("farmE", true).SetValue<bool>(true);
+
+                        if (Config.Item("farmR", true) != null)
+                            Config.Item("farmR", true).SetValue<bool>(true);
                     }
                     else
                     {
-                        Config.Item("spellFarm").SetValue(false);
+                        Config.Item("spellFarm").SetValue<bool>(false);
                         spellFarmTimer = Game.Time;
+
+                        if (Config.Item("farmQ", true) != null)
+                            Config.Item("farmQ", true).SetValue<bool>(false);
+
+                        if (Config.Item("farmW", true) != null)
+                            Config.Item("farmW", true).SetValue<bool>(false);
+
+                        if (Config.Item("farmE", true) != null)
+                            Config.Item("farmE", true).SetValue<bool>(false);
+
+                        if (Config.Item("farmR", true) != null)
+                            Config.Item("farmR", true).SetValue<bool>(false);
                     }
                 }
+
                 PositionHelper();
             }
 
@@ -492,9 +539,10 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else
                     return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo);
+
             } }
 
-        public static bool LaneClear { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Config.Item("spellFarm").GetValue<bool>()); } }
+        public static bool LaneClear { get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear); } }
 
         private static bool IsJungler(Obj_AI_Hero hero) { return hero.Spellbook.Spells.Any(spell => spell.Name.ToLower().Contains("smite")); }
 
@@ -674,7 +722,6 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Config.Item("debug").GetValue<bool>())
             {
-
                 Console.WriteLine(msg);
             }
             if (Config.Item("debugChat").GetValue<bool>())
