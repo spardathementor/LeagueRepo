@@ -111,12 +111,8 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 var Target = gapcloser.Sender;
                 if (Target.IsValidTarget(E.Range))
-                {
                     E.Cast(gapcloser.End);
-                }
-                return;
             }
-            return;
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs args)
