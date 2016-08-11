@@ -269,7 +269,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else if (Program.Farm && orbTarget.IsValidTarget())
                     {
                         FindCard = 1;
-                        if (wName == "TwistedFate_Base_W_GoldCard.troy")
+                        if (wName == "TwistedFate_Base_W_BlueCard.troy")
                             W.Cast();
                     }
                     else if (Player.ManaPercent > Config.Item("WredFarm", true).GetValue<Slider>().Value && Program.LaneClear && Config.Item("farmW", true).GetValue<bool>())
