@@ -833,6 +833,8 @@ namespace SebbyLib
                             {
                                 var healthDecayRate = enemyGangPlank.Level >= 13 ? 0.5f : (enemyGangPlank.Level >= 7 ? 1f : 2f);
                                 var nextHealthDecayTime = Game.Time < barrelBuff.StartTime + healthDecayRate ? barrelBuff.StartTime + healthDecayRate : barrelBuff.StartTime + healthDecayRate * 2;
+                              
+                                if (nextHealthDecayTime <= Game.Time + t / 1000f && ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(x => x.Name == "Gangplank_Base_E_AoE_Red.troy" && barrel.Distance(x.Position) < 10))
                                     return barrel;
                                 
                             }
