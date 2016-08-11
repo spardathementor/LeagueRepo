@@ -800,7 +800,11 @@ namespace SebbyLib
             {
                 AttackableUnit result = null;
                 var mode = ActiveMode;
-
+                //Forced target
+                if (_forcedTarget.IsValidTarget() && InAutoAttackRange(_forcedTarget))
+                {
+                    return _forcedTarget;
+                }
 
                 if ((mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LaneClear) &&
                     !_config.Item("PriorizeFarm").GetValue<bool>())
@@ -836,7 +840,6 @@ namespace SebbyLib
                               
                                 if (nextHealthDecayTime <= Game.Time + t / 1000f && ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(x => x.Name == "Gangplank_Base_E_AoE_Red.troy" && barrel.Distance(x.Position) < 10))
                                     return barrel;
-                                
                             }
                         }
 
@@ -845,8 +848,6 @@ namespace SebbyLib
                         
                     }
                 }
-
-
 
                 /*Killable Minion*/
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)
@@ -913,11 +914,7 @@ namespace SebbyLib
                 {
                     DelayOnFire = 0;
                 }
-                //Forced target
-                if (_forcedTarget.IsValidTarget() && InAutoAttackRange(_forcedTarget))
-                {
-                    return _forcedTarget;
-                }
+
 
                 /* turrets / inhibitors / nexus */
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
