@@ -811,7 +811,41 @@ namespace SebbyLib
                         return target;
                     }
                 }
-                
+
+                if (_config.Item("AttackBarrel").GetValue<bool>()  &&( (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)))
+                {
+                    var enemyGangPlank = HeroManager.Enemies.FirstOrDefault(e => e.ChampionName.Equals("gangplank", StringComparison.InvariantCultureIgnoreCase));
+
+                    if (enemyGangPlank != null)
+                    {
+                        var barrels = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).Where(minion => minion.Team == GameObjectTeam.Neutral && minion.CharData.BaseSkinName == "gangplankbarrel" && minion.IsHPBarRendered && minion.IsValidTarget() && InAutoAttackRange(minion));
+
+                        foreach (var barrel in barrels)
+                        {
+                            if (barrel.Health <= 1f)
+                                return barrel;
+
+                            var t = (int)(Player.AttackCastDelay * 1000) + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(barrel) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+
+                            var barrelBuff = barrel.Buffs.FirstOrDefault(b => b.Name.Equals( "gangplankebarrelactive", StringComparison.InvariantCultureIgnoreCase));
+
+                            if (barrelBuff != null && barrel.Health <= 2f)
+                            {
+                                var healthDecayRate = enemyGangPlank.Level >= 13 ? 0.5f : (enemyGangPlank.Level >= 7 ? 1f : 2f);
+                                var nextHealthDecayTime = Game.Time < barrelBuff.StartTime + healthDecayRate ? barrelBuff.StartTime + healthDecayRate : barrelBuff.StartTime + healthDecayRate * 2;
+                                    return barrel;
+                                
+                            }
+                        }
+
+                        if (barrels.Any())
+                            return null;
+                        
+                    }
+                }
+
+
+
                 /*Killable Minion*/
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)
                 {
@@ -870,11 +904,6 @@ namespace SebbyLib
                                     return minion;
                                 }
                             }
-                        }
-                        else if ( minion.Health < 2 && _config.Item("AttackBarrel").GetValue<bool>() && minion.CharData.BaseSkinName == "gangplankbarrel" && minion.IsHPBarRendered)
-                        {
-                            if(ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(x => x.Name == "Gangplank_Base_E_AoE_Red.troy    " && minion.Distance(x.Position) < 10))
-                                return minion;
                         }
                     }
                 }
