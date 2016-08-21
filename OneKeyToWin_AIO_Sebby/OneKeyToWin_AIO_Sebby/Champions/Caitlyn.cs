@@ -260,9 +260,12 @@ namespace OneKeyToWin_AIO_Sebby
                         foreach (var point in points)
                         {
                             if (NavMesh.IsWallOfGrass(point, 0) || point.UnderTurret(true))
-                            {   
-                                W.Cast(point);
-                                return;
+                            {
+                                if (!OktwCommon.CirclePoints(8, 150, point).Any(x => x.IsWall()))
+                                {
+                                    W.Cast(point);
+                                    return;
+                                }
                             }
                         }
                     }
