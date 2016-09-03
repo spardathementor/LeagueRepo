@@ -12,14 +12,19 @@ namespace OneKeyToWin_AIO_Sebby
     internal class Program
     {
         public static Menu Config;
+
+        public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public static SebbyLib.Orbwalking.Orbwalker Orbwalker;
+
         public static Spell Q, W, E, R, DrawSpell;
+        public static float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
+
         public static float JungleTime, DrawSpellTime=0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
         public static Obj_SpawnPoint enemySpawn;
         public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
-        private static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
+        
         public static bool SPredictionLoad = false;
         public static int AIOmode = 0;
         private static float dodgeRange = 420;
@@ -79,7 +84,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
             }
 
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK"}, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK", "Exory prediction"}, 1)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
 
@@ -548,6 +553,38 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
+            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 4)
+            {
+                HitChance hitchance = HitChance.Low;
+                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                {
+
+                    hitchance = HitChance.VeryHigh;
+                }
+                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                {
+                    hitchance = HitChance.High;
+                }
+                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                {
+                    hitchance = HitChance.Medium;
+                }
+
+
+                if (QWER.Type == SkillshotType.SkillshotCircle)
+                {
+                    Core.PredictionAio.CCast(QWER, target, hitchance);
+                }
+                else if (QWER.Type == SkillshotType.SkillshotLine)
+                {
+                    Core.PredictionAio.LCast(QWER, target, hitchance);
+                }
+                else
+                {
+                    QWER.Cast(target);
+                }
+            }
+
             if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
             {
                 SebbyLib.Movement.SkillshotType CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotLine;
