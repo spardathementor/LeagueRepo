@@ -84,11 +84,21 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Utility, Draws OKTW©").SubMenu("GankTimer").AddItem(new MenuItem("4", "CYAN jungler dead - take objectives"));
             }
 
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("PredictionMODE", "Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK", "Exory prediction"}, 1)));
-            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("HitChance", "Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Qpred", "Q Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK", "Exory prediction" }, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("QHitChance", "Q Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Wpred", "W Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK", "Exory prediction" }, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("WHitChance", "W Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Epred", "E Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK", "Exory prediction" }, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("EHitChance", "E Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Rpred", "R Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK", "Exory prediction" }, 1)));
+            Config.SubMenu("Prediction MODE").AddItem(new MenuItem("RHitChance", "R Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
+
+
+
             Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
 
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
+            if (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 2
+                || Config.Item("Epred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex == 2)
             {
                 SPrediction.Prediction.Initialize(Config.SubMenu("Prediction MODE"));
                 SPredictionLoad = true;
@@ -553,24 +563,53 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 4)
+            int predIndex = 0;
+            HitChance hitchance = HitChance.Low;
+
+            if(QWER.Slot == SpellSlot.Q)
             {
-                HitChance hitchance = HitChance.Low;
-                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                {
-
+                predIndex = Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex;
+                if (Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex == 0)
                     hitchance = HitChance.VeryHigh;
-                }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                {
+                else if (Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex == 1)
                     hitchance = HitChance.High;
-                }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
-                {
+                else if (Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex == 2)
                     hitchance = HitChance.Medium;
-                }
+            }
+            else if (QWER.Slot == SpellSlot.W)
+            {
+                predIndex = Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex;
+                if (Config.Item("WHitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                    hitchance = HitChance.VeryHigh;
+                else if (Config.Item("WHitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                    hitchance = HitChance.High;
+                else if (Config.Item("WHitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                    hitchance = HitChance.Medium;
+            }
+            else if (QWER.Slot == SpellSlot.E)
+            {
+                predIndex = Config.Item("Epred", true).GetValue<StringList>().SelectedIndex;
+                if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                    hitchance = HitChance.VeryHigh;
+                else if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                    hitchance = HitChance.High;
+                else if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                    hitchance = HitChance.Medium;
+            }
+            else if (QWER.Slot == SpellSlot.R)
+            {
+                predIndex = Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex;
+                if (Config.Item("RHitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                    hitchance = HitChance.VeryHigh;
+                else if (Config.Item("RHitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                    hitchance = HitChance.High;
+                else if (Config.Item("RHitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                    hitchance = HitChance.Medium;
+            }
+           
 
-
+            if (predIndex == 4)
+            {
                 if (QWER.Type == SkillshotType.SkillshotCircle)
                 {
                     Core.PredictionAio.CCast(QWER, target, hitchance);
@@ -585,7 +624,7 @@ namespace OneKeyToWin_AIO_Sebby
                 }
             }
 
-            if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 3)
+            if (predIndex == 3)
             {
                 SebbyLib.Movement.SkillshotType CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
@@ -618,7 +657,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (QWER.Speed != float.MaxValue && OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
                     return;
 
-                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                if ((int)hitchance == 6)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.VeryHigh)
                         QWER.Cast(poutput2.CastPosition);
@@ -628,19 +667,19 @@ namespace OneKeyToWin_AIO_Sebby
                     }
 
                 }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                else if ((int)hitchance == 5)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
                         QWER.Cast(poutput2.CastPosition);
 
                 }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                else if ((int)hitchance == 4)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.Medium)
                         QWER.Cast(poutput2.CastPosition);
                 }
             }
-            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1)
+            else if (predIndex == 1)
             {
                 SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
@@ -673,7 +712,7 @@ namespace OneKeyToWin_AIO_Sebby
                 if (QWER.Speed != float.MaxValue && OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
                     return;
 
-                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
+                if ((int)hitchance == 6)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
                         QWER.Cast(poutput2.CastPosition);
@@ -683,13 +722,13 @@ namespace OneKeyToWin_AIO_Sebby
                     }
 
                 }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
+                else if ((int)hitchance == 5)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
                         QWER.Cast(poutput2.CastPosition);
 
                 }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 2)
+                else if ((int)hitchance == 4)
                 {
                     if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.Medium)
                         QWER.Cast(poutput2.CastPosition);
@@ -702,45 +741,16 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 DrawSpellPos = poutput2;
             }
-            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 0)
+            else if (predIndex == 0)
             {
-                if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                {
-                    QWER.CastIfHitchanceEquals(target, HitChance.VeryHigh);
-                    return;
-                }
-                else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                {
-                    QWER.CastIfHitchanceEquals(target, HitChance.High);
-                    return;
-                }
-                else if (Config.Item("HitChance ", true).GetValue<StringList>().SelectedIndex == 2)
-                {
-                    QWER.CastIfHitchanceEquals(target, HitChance.Medium);
-                    return;
-                }
+                QWER.CastIfHitchanceEquals(target, hitchance);  
             }
-            else if (Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2 )
+            else if (predIndex == 2 )
             {
-                
                 if (target is Obj_AI_Hero && target.IsValid)
                 {
                     var t = target as Obj_AI_Hero;
-                    if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                    {
-                        QWER.SPredictionCast(t, HitChance.VeryHigh);
-                        return;
-                    }
-                    else if (Config.Item("HitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                    {
-                        QWER.SPredictionCast(t, HitChance.High);
-                        return;
-                    }
-                    else if (Config.Item("HitChance ", true).GetValue<StringList>().SelectedIndex == 2)
-                    {
-                        QWER.SPredictionCast(t, HitChance.Medium);
-                        return;
-                    }
+                    QWER.SPredictionCast(t, hitchance);
                 }
                 else
                 {
@@ -774,7 +784,8 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnDraw(EventArgs args)
         {
-            if (!SPredictionLoad && (int)Game.Time % 2 == 0 && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 2)
+            if (!SPredictionLoad && (int)Game.Time % 2 == 0 && (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 2
+                || Config.Item("Epred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex == 2))
                 drawText("PRESS F5 TO LOAD SPREDICTION", Player.Position, System.Drawing.Color.Yellow, -300);
 
             if (Program.AIOmode != 2 && spellFarmTimer + 1 > Game.Time && Config.Item("showNot").GetValue<bool>() && Config.Item("spellFarm") != null)
@@ -794,7 +805,8 @@ namespace OneKeyToWin_AIO_Sebby
                 drawText("Anti-Melle Positioning Assistant" , Player.Position, System.Drawing.Color.Gray);
             }
 
-            if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && Config.Item("PredictionMODE", true).GetValue<StringList>().SelectedIndex == 1  )
+            if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 1|| Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 1
+                || Config.Item("Epred", true).GetValue<StringList>().SelectedIndex == 1 || Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex == 1))
             {
                 if (DrawSpell.Type == SkillshotType.SkillshotLine)
                     OktwCommon.DrawLineRectangle(DrawSpellPos.CastPosition, Player.Position, (int)DrawSpell.Width, 1, System.Drawing.Color.DimGray);
