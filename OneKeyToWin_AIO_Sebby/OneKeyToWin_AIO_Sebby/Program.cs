@@ -47,7 +47,7 @@ namespace OneKeyToWin_AIO_Sebby
             W = new Spell(SpellSlot.W);
             R = new Spell(SpellSlot.R);
 
-            Config = new Menu("OneKeyToWin AIO", "OneKeyToWin_AIO" + ObjectManager.Player.ChampionName, true);
+            Config = new Menu("OneKeyToWin AIO", "OneKeyToWin_AIO" + ObjectManager.Player.ChampionName, true).SetFontStyle(System.Drawing.FontStyle.Bold, Color.DeepSkyBlue);
 
             #region MENU ABOUT OKTW
             Config.SubMenu("About OKTW©").AddItem(new MenuItem("debug", "Debug").SetValue(false));
