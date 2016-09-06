@@ -11,6 +11,8 @@ namespace OneKeyToWin_AIO_Sebby
 {
     internal class Program
     {
+        private static string OktNews = "separate prediction added, Jhin W logic fixed";
+
         public static Menu Config;
 
         public static Obj_AI_Hero Player { get { return ObjectManager.Player; } }
@@ -18,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static Spell Q, W, E, R, DrawSpell;
         public static float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-
+        
         public static float JungleTime, DrawSpellTime=0;
         public static Obj_AI_Hero jungler = ObjectManager.Player;
         public static int timer, HitChanceNum = 4, tickNum = 4, tickIndex = 0;
@@ -304,7 +306,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (Config.Item("print").GetValue<bool>())
             {
                 Game.PrintChat("<font size='30'>OneKeyToWin</font> <font color='#b756c5'>by Sebby</font>");
-                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font>separate prediction added");
+                Game.PrintChat("<font color='#b756c5'>OKTW NEWS: </font>" + OktNews);
             }
         }
 
