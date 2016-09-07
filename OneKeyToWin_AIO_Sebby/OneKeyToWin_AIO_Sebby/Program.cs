@@ -255,6 +255,9 @@ namespace OneKeyToWin_AIO_Sebby
                     case "Braum":
                         new Champions.Braum().LoadOKTW();
                         break;
+                    case "Teemo":
+                        new Champions.Teemo().LoadOKTW();
+                        break;
                 }
                 #endregion
 

@@ -92,6 +92,7 @@
     <Compile Include="Champions\Jayce.cs" />
     <Compile Include="Champions\Swain.cs" />
     <Compile Include="Champions\Syndra.cs" />
+    <Compile Include="Champions\Teemo.cs" />
     <Compile Include="Champions\Thresh.cs" />
     <Compile Include="Champions\Tristana.cs" />
     <Compile Include="Champions\TwistedFate.cs" />
