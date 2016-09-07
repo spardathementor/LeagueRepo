@@ -32,6 +32,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            foreach (var enemy in HeroManager.Enemies)
+                Config.SubMenu(Player.ChampionName).SubMenu("Q On").SubMenu("Q Config").AddItem(new MenuItem("qUseOn" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+
+
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
@@ -170,11 +174,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (t.IsValidTarget())
             {
+                if (OktwCommon.GetKsDamage(t, Q) > t.Health)
+                    Q.Cast(t);
+
+                if (!Config.Item("qUseOn" + t.ChampionName).GetValue<bool>())
+                    return;
+
                 if (Program.Combo)
                     Q.Cast(t);
                 else if (Program.Farm && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
-                    Q.Cast(t);
-                else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
                     Q.Cast(t);
             }
         }
