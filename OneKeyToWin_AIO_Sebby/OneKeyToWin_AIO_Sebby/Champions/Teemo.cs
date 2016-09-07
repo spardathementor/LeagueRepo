@@ -118,16 +118,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.LagFree(1))
                 {
-                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(R.Range)))
+                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(R.Range + 100)))
                     {
                         if(Config.Item("autoRcc", true).GetValue<bool>() && !OktwCommon.CanMove(enemy))
                             R.Cast(enemy);
                         if (Config.Item("autoRdash", true).GetValue<bool>())
                             R.CastIfHitchanceEquals(enemy, HitChance.Dashing);
-                        if (Config.Item("autoRslow", true).GetValue<bool>() && enemy.HasBuffOfType(BuffType.Slow) && OktwCommon.IsMovingInSameDirection(Player, enemy))
+                        if (Config.Item("autoRslow", true).GetValue<bool>() && enemy.HasBuffOfType(BuffType.Slow))
                             Program.CastSpell(R, enemy);
                         if (Config.Item("Raoe", true).GetValue<bool>())
                             R.CastIfWillHit(enemy, 2);
+                        if (Config.Item("comboR", true).GetValue<bool>() && OktwCommon.IsMovingInSameDirection(Player, enemy))
+                        {
+                            var predPos = R.GetPrediction(enemy);
+                            if(predPos.CastPosition.Distance(enemy.Position) > 200 && predPos.Hitchance >= HitChance.Low)
+                                R.Cast(predPos.CastPosition);
+                        }
                     }
                 }
 
@@ -157,14 +163,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
 
-                if (Config.Item("comboR", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 2000)
-                {
-                    var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);             
-                    if (t.IsValidTarget() && OktwCommon.IsMovingInSameDirection(Player, t) && R.GetPrediction(t).CastPosition.Distance(t.Position) > 200)
-                    {
-                        R.Cast(t);
-                    }
-                }
+                
             }
         }
 
