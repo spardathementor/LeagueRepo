@@ -178,7 +178,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
 
 
-            if (Program.LagFree(4) && E.IsReady())
+            if (Program.LagFree(4) && E.IsReady() && SebbyLib.Orbwalking.CanMove(50))
                 LogicE();
 
             if (Program.LagFree(2) && Q.IsReady() && Config.Item("autoQ", true).GetValue<bool>())
