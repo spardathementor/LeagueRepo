@@ -58,7 +58,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Spellbook_OnCastSpell(Spellbook sender, SpellbookCastSpellEventArgs args)
         {
-
+            if (args.Slot == SpellSlot.R)
+            {
+                if (ObjectManager.Get<Obj_AI_Base>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 250 && obj.Name.ToLower().Contains("noxious trap".ToLower())))
+                    args.Process = false;
+            }
         }
         private void SetMana()
         {
@@ -131,8 +135,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (Config.Item("comboR", true).GetValue<bool>() && OktwCommon.IsMovingInSameDirection(Player, enemy))
                         {
                             var predPos = R.GetPrediction(enemy);
-                            if(predPos.CastPosition.Distance(enemy.Position) > 200 && predPos.Hitchance >= HitChance.Low)
-                                R.Cast(predPos.CastPosition);
+                            if (predPos.CastPosition.Distance(enemy.Position) > 200 && predPos.Hitchance >= HitChance.Low)
+                            {
+                                if (!OktwCommon.CirclePoints(8, 120, predPos.CastPosition).Any(x => x.IsWall()))
+                                {
+                                    R.Cast(predPos.CastPosition);
+                                    return;
+                                }
+                                    
+                            }
                         }
                     }
                 }
@@ -153,7 +164,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         {
                             if (NavMesh.IsWallOfGrass(point, 0))
                             {
-                                if (!OktwCommon.CirclePoints(8, 120, point).Any(x => x.IsWall()))
+                                if (!OktwCommon.CirclePoints(8, 120, point).Any(x => x.IsWall()) && !ObjectManager.Get<Obj_AI_Base>().Any(obj => obj.IsValid && obj.Position.Distance(point) < 500 && obj.Name.ToLower().Contains("noxious trap".ToLower())))
                                 {
                                     R.Cast(point);
                                     return;
@@ -162,8 +173,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         }
                     }
                 }
-
-                
             }
         }
 
