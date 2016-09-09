@@ -155,16 +155,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast(trapPos);
                 }
 
-                if ((int)(Game.Time * 10) % 2 == 0 && Config.Item("bushR2", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 4000)
+                if ((int)(Game.Time * 10) % 2 == 0 && Config.Item("bushR2", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 3000)
                 {
-                    if (Player.Spellbook.GetSpell(SpellSlot.R).Ammo > 1 && Player.CountEnemiesInRange(800) == 0)
+                    if (Player.Spellbook.GetSpell(SpellSlot.R).Ammo > 1 + Player.CountEnemiesInRange(1200) && Player.CountEnemiesInRange(800) == 0)
                     {
-                        var points = OktwCommon.CirclePoints(8, R.Range, Player.Position);
+                        var points = OktwCommon.CirclePoints(12, R.Range, Player.Position);
                         foreach (var point in points)
                         {
-                            if (NavMesh.IsWallOfGrass(point, 50))
+                            if (NavMesh.IsWallOfGrass(point, 10))
                             {
-                                if (!OktwCommon.CirclePoints(8, 140, point).Any(x => x.IsWall()) && !ObjectManager.Get<Obj_AI_Base>().Any(obj => obj.IsValid && obj.Position.Distance(point) < 500 && obj.Name.ToLower().Contains("noxious trap".ToLower())))
+                                if (!OktwCommon.CirclePoints(8, 110, point).Any(x => x.IsWall()) && !ObjectManager.Get<Obj_AI_Base>().Any(obj => obj.IsValid && obj.Position.Distance(point) < 500 && obj.Name.ToLower().Contains("noxious trap".ToLower()) && obj.Mana > 40))
                                 {
                                     R.Cast(point);
                                     return;
