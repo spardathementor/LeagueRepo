@@ -162,9 +162,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         var points = OktwCommon.CirclePoints(8, R.Range, Player.Position);
                         foreach (var point in points)
                         {
-                            if (NavMesh.IsWallOfGrass(point, 0))
+                            if (NavMesh.IsWallOfGrass(point, 50))
                             {
-                                if (!OktwCommon.CirclePoints(8, 120, point).Any(x => x.IsWall()) && !ObjectManager.Get<Obj_AI_Base>().Any(obj => obj.IsValid && obj.Position.Distance(point) < 500 && obj.Name.ToLower().Contains("noxious trap".ToLower())))
+                                if (!OktwCommon.CirclePoints(8, 140, point).Any(x => x.IsWall()) && !ObjectManager.Get<Obj_AI_Base>().Any(obj => obj.IsValid && obj.Position.Distance(point) < 500 && obj.Name.ToLower().Contains("noxious trap".ToLower())))
                                 {
                                     R.Cast(point);
                                     return;
