@@ -32,16 +32,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Q On").AddItem(new MenuItem("qUseOn" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
+            foreach (var enemy in HeroManager.Enemies)
+                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Q on").AddItem(new MenuItem("qUseOn" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWout", "Auto W if target outrange", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWnear", "Auto W if enemy near", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("comboR", "run R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "aoe", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("comboR", "Run run", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "AOE", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rgap", "Gapcloser", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRslow", "On slow", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRcc", "On CC", true).SetValue(true));
@@ -49,6 +49,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("telR", "On zhonya, teleport, spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("bushR2", "Bush above 1 ammo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("bushR", "Auto W bush after enemy enter", true).SetValue(true));
+
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
@@ -171,7 +172,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.Mana > RMANA + QMANA)
             {
-                if (Program.LagFree(1))
+                if (Program.LagFree(1) && SebbyLib.Orbwalking.CanMove(50))
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(R.Range + 100)))
                     {
@@ -205,7 +206,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast(trapPos);
                 }
 
-                if (Program.LagFree(3) && Player.Mana > RMANA + QMANA + WMANA && Config.Item("bushR2", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 3000)
+                if (Program.LagFree(3) && SebbyLib.Orbwalking.CanMove(50) && Player.Mana > RMANA + QMANA + WMANA && Config.Item("bushR2", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 3000)
                 {
                     if (Player.Spellbook.GetSpell(SpellSlot.R).Ammo > 1 + Player.CountEnemiesInRange(1200) && Player.CountEnemiesInRange(800) == 0)
                     {
