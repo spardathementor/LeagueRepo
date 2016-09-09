@@ -85,7 +85,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Program.LagFree(0))
             {
                 SetMana();
-                R.Range = 160 + 250 * R.Level;
+                R.Range = 150 + 250 * R.Level;
             }
             
 
