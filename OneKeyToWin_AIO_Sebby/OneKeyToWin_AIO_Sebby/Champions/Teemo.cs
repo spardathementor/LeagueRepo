@@ -32,6 +32,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qgap", "Auto Q Gapcloser", true).SetValue(true));
 
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Q on").AddItem(new MenuItem("qUseOn" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -74,6 +75,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     R.Cast(Player.ServerPosition);
                 }
+            }
+            else if (Q.IsReady() && Config.Item("Qgap", true).GetValue<bool>() && t.IsValidTarget(Q.Range))
+            {
+                Q.Cast(t);
             }
         }
 
@@ -157,7 +162,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.Mana < RMANA + WMANA)
                 return;
 
-            if (Player.CountEnemiesInRange(300) > 0 && Config.Item("autoWnear", true).GetValue<bool>())
+            if (HeroManager.Enemies.Any(enemy => enemy.IsValidTarget(350) && enemy.IsMoving && enemy.IsFacing(Player) && Config.Item("autoWnear", true).GetValue<bool>())
                 W.Cast();
 
             if (Program.Combo && Config.Item("autoWout", true).GetValue<bool>())
