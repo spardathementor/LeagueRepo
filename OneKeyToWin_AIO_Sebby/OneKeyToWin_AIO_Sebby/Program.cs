@@ -11,7 +11,7 @@ namespace OneKeyToWin_AIO_Sebby
 {
     internal class Program
     {
-        private static string OktNews = "separate prediction added, Jhin W logic fixed";
+        private static string OktNews = "NEW champion - TEEMO, Sivir E impove";
 
         public static Menu Config;
 
