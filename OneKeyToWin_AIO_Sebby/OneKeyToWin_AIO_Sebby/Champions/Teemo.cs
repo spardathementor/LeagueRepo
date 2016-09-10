@@ -41,7 +41,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoWnear", "Auto W if enemy near", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("comboR", "Run run", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("comboR", "Run", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Raoe", "AOE", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("Rgap", "Gapcloser", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRslow", "On slow", true).SetValue(true));
@@ -162,13 +162,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.Mana < RMANA + WMANA)
                 return;
 
-            if (HeroManager.Enemies.Any(enemy => enemy.IsValidTarget(350) && enemy.IsMoving && enemy.IsFacing(Player) && Config.Item("autoWnear", true).GetValue<bool>())
+            if (HeroManager.Enemies.Any(enemy => enemy.IsValidTarget(350) && enemy.IsMoving && enemy.IsFacing(Player) && Config.Item("autoWnear", true).GetValue<bool>()))
                 W.Cast();
 
             if (Program.Combo && Config.Item("autoWout", true).GetValue<bool>())
             {
                 var t = TargetSelector.GetTarget(800, TargetSelector.DamageType.Magical);
-                if (t.IsValidTarget() && !Orbwalker.InAutoAttackRange(t))
+                if (t.IsValidTarget() && !Orbwalker.InAutoAttackRange(t) && !t.IsFacing(Player))
                     W.Cast();
             }
         }
@@ -244,7 +244,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Program.Combo)
                     Q.Cast(t);
-                else if (Program.Farm && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
+                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
                     Q.Cast(t);
             }
         }
