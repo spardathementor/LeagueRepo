@@ -67,6 +67,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("autoEmissile", "Block unknown missile", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("Edmg", "Block under % hp", true).SetValue(new Slider(90, 100, 0)));
 
@@ -75,6 +76,20 @@ namespace OneKeyToWin_AIO_Sebby
             SebbyLib.Orbwalking.AfterAttack += Orbwalker_AfterAttack;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            GameObject.OnCreate += GameObject_OnCreate;
+        }
+
+        private void GameObject_OnCreate(GameObject sender, EventArgs args)
+        {
+            var missile = sender as MissileClient;
+
+            if(missile != null && Config.Item("autoEmissile", true).GetValue<bool>())
+            {
+                if(!missile.SData.IsAutoAttack() && missile.Target == Player && missile.SpellCaster.IsEnemy)
+                {
+                    E.Cast();
+                }
+            }
         }
 
         public void Orbwalker_AfterAttack(AttackableUnit unit, AttackableUnit target)
