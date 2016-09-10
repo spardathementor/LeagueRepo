@@ -780,7 +780,7 @@ namespace SebbyLib
 
             public bool ShouldWait()
             {
-                var attackCalc = (int)(Player.AttackDelay * 1000 * 1.2) + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
+                var attackCalc = (int)(Player.AttackDelay * 1000 * 1.6) + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
                 return
                     MinionListAA.Any( 
                         minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
