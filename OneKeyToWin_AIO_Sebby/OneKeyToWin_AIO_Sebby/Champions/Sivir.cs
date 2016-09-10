@@ -85,7 +85,7 @@ namespace OneKeyToWin_AIO_Sebby
 
             if(missile != null && Config.Item("autoEmissile", true).GetValue<bool>())
             {
-                if(!missile.SData.IsAutoAttack() && missile.Target == Player && missile.SpellCaster.IsEnemy)
+                if(!missile.SData.IsAutoAttack() && missile.Target == Player && missile.SpellCaster.IsEnemy && missile.SpellCaster.IsChampion())
                 {
                     E.Cast();
                 }
