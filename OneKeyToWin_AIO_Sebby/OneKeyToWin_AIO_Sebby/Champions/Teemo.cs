@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 400);
 
             Q.SetTargetted(0.5f, 1500f);
-            R.SetSkillshot(1.5f, 120f, 1000f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(1.7f, 130f, 1000f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -211,7 +211,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast(trapPos);
                 }
 
-                if (Program.LagFree(3) && SebbyLib.Orbwalking.CanMove(50) && Player.Mana > RMANA + QMANA + WMANA && Config.Item("bushR2", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 3000)
+                if (Program.LagFree(3) && SebbyLib.Orbwalking.CanMove(50) && Player.Mana > RMANA + QMANA + WMANA && Config.Item("bushR2", true).GetValue<bool>() && Utils.TickCount - R.LastCastAttemptT > 2000)
                 {
                     if (Player.Spellbook.GetSpell(SpellSlot.R).Ammo > 1 + Player.CountEnemiesInRange(1200) && Player.CountEnemiesInRange(800) == 0)
                     {
