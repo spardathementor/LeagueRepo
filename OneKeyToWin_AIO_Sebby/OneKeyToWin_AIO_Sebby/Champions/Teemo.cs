@@ -216,6 +216,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (Player.Spellbook.GetSpell(SpellSlot.R).Ammo > 1 + Player.CountEnemiesInRange(1200) && Player.CountEnemiesInRange(800) == 0)
                     {
                         var points = OktwCommon.CirclePoints(12, R.Range, Player.Position);
+                        points.Add(Player.Position);
                         foreach (var point in points)
                         {
                             if (NavMesh.IsWallOfGrass(point, 10))
