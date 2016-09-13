@@ -95,7 +95,7 @@ namespace OneKeyToWin_AIO_Sebby
             if (heal != SpellSlot.Unknown)
             {
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Heal").AddItem(new MenuItem("Heal", "Heal").SetValue(true));
-                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Heal").AddItem(new MenuItem("AllyHeal", "AllyHeal").SetValue(true));
+                Config.SubMenu("Activator OKTW©").SubMenu("Summoners").SubMenu("Heal").AddItem(new MenuItem("AllyHeal", "Ally Heal").SetValue(true));
             }
             if (barrier != SpellSlot.Unknown)
             {
@@ -111,7 +111,7 @@ namespace OneKeyToWin_AIO_Sebby
                 Config.SubMenu("Activator OKTW©").SubMenu("Summoners").AddItem(new MenuItem("Cleanse", "Cleanse").SetValue(true));
             }
 
-            Config.SubMenu("Activator OKTW©").AddItem(new MenuItem("pots", "Potion, ManaPotion, Flask, Biscuit").SetValue(true));
+            Config.SubMenu("Activator OKTW©").AddItem(new MenuItem("pots", "Potion, Flask, Biscuit").SetValue(true));
 
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Botrk").AddItem(new MenuItem("Botrk", "Botrk").SetValue(true));
             Config.SubMenu("Activator OKTW©").SubMenu("Offensives").SubMenu("Botrk").AddItem(new MenuItem("BotrkKS", "Botrk KS").SetValue(true));
