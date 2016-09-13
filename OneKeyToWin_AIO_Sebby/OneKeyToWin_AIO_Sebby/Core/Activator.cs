@@ -191,7 +191,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!(sender is Obj_AI_Hero) && !sender.IsEnemy)
+            if (!(sender is Obj_AI_Hero) || !sender.IsEnemy)
                 return;
 
             if (sender.Distance(Player.Position) > 1600)
