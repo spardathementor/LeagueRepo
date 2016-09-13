@@ -726,7 +726,7 @@ namespace SebbyLib.Prediction
                             break;
                         var p = pos + input.RealRadius * direction;
 
-                        if (input.Type == SkillshotType.SkillshotLine && false)
+                        if (input.Type == SkillshotType.SkillshotLine)
                         {
                             var alpha = (input.From.To2D() - p).AngleBetween(a - b);
                             if (alpha > 30 && alpha < 180 - 30)
