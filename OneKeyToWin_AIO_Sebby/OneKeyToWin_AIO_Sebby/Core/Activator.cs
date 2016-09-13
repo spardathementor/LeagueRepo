@@ -183,19 +183,17 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
         {
-            if (Config.Item("HydraTitanic").GetValue<bool>() && Program.Combo && HydraTitanic.IsReady() && target.IsValid<Obj_AI_Hero>())
+            if (target is Obj_AI_Hero && Config.Item("HydraTitanic").GetValue<bool>() && HydraTitanic.IsReady() && target.IsValid<Obj_AI_Hero>())
             {
                 HydraTitanic.Cast();
-                SebbyLib.Orbwalking.ResetAutoAttackTimer();
             }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (!sender.IsEnemy || sender.Type != GameObjectType.obj_AI_Hero)
+            if (!(sender is Obj_AI_Hero) && !sender.IsEnemy)
                 return;
 
-            
             if (sender.Distance(Player.Position) > 1600)
                 return;
 
@@ -209,8 +207,8 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else
                     {
-                        var castArea = Player.Distance(args.End) * (args.End - Player.ServerPosition).Normalized() + Player.ServerPosition;
-                        if (castArea.Distance(Player.ServerPosition) < Player.BoundingRadius / 2)
+                        ;
+                        if (OktwCommon.CanHitSkillShot(Player, args))
                             ZhonyaTryCast();
                     }
                 }
@@ -227,8 +225,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else
                     {
-                        var castArea = ally.Distance(args.End) * (args.End - ally.ServerPosition).Normalized() + ally.ServerPosition;
-                        if (castArea.Distance(ally.ServerPosition) < ally.BoundingRadius / 2)
+                        if (OktwCommon.CanHitSkillShot(ally, args))
                             dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                         else
                             continue;
