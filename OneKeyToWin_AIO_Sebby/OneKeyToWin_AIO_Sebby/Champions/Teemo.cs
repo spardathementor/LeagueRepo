@@ -33,6 +33,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qgap", "Auto Q Gapcloser", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("QafterAA", "Q after AA only", true).SetValue(true));
 
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Q on").AddItem(new MenuItem("qUseOn" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
@@ -59,7 +60,27 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
             AntiGapcloser.OnEnemyGapcloser += AntiGapcloser_OnEnemyGapcloser;
+            SebbyLib.Orbwalking.AfterAttack += Orbwalking_AfterAttack;
 
+        }
+
+        private void Orbwalking_AfterAttack(AttackableUnit unit, AttackableUnit target)
+        {
+            if (Q.IsReady() && target is Obj_AI_Hero)
+            {
+                foreach (var t in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(enemy => enemy.Health))
+                {
+
+                    if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
+                        Q.Cast(t);
+
+                    if (t.IsMelee && t.IsFacing(Player) && t.ServerPosition.Distance(Player.ServerPosition) > 300)
+                        continue;
+
+                    if (Program.Combo)
+                        Q.Cast(t);
+                }
+            }
         }
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
@@ -192,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (Config.Item("comboR", true).GetValue<bool>() && OktwCommon.IsMovingInSameDirection(Player, enemy))
                         {
                             var predPos = R.GetPrediction(enemy,true);
-                            if (predPos.CastPosition.Distance(enemy.Position) > 200 && predPos.Hitchance >= HitChance.Low)
+                            if (predPos.CastPosition.Distance(enemy.Position) > 300 && predPos.Hitchance >= HitChance.Low)
                             {
                                 if (!OktwCommon.CirclePoints(8, 120, predPos.CastPosition).Any(x => x.IsWall()))
                                 {
@@ -235,17 +256,25 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
+            var hpPred = Player.Health - OktwCommon.GetIncomingDamage(Player) > Player.MaxHealth * 0.3;
             foreach (var t in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(enemy => enemy.Health))
             {
                 if (OktwCommon.GetKsDamage(t, Q) + Player.GetAutoAttackDamage(t) > t.Health)
                     Q.Cast(t);
 
-                if (!Config.Item("qUseOn" + t.ChampionName).GetValue<bool>() && Player.Health - OktwCommon.GetIncomingDamage(Player) > Player.MaxHealth * 0.3)
+                if (!Config.Item("qUseOn" + t.ChampionName).GetValue<bool>() && hpPred)
+                    continue;
+
+                if(Config.Item("QafterAA", true).GetValue<bool>())
+                    continue;
+                
+                if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
+                    Q.Cast(t);
+
+                if (t.IsMelee && t.IsFacing(Player) && t.ServerPosition.Distance(Player.ServerPosition) > 300)
                     continue;
 
                 if (Program.Combo)
-                    Q.Cast(t);
-                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
                     Q.Cast(t);
             }
         }
