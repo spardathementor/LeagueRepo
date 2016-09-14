@@ -35,9 +35,18 @@ namespace SebbyLib
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
             Obj_AI_Base.OnIssueOrder += Obj_AI_Base_OnIssueOrder;
             Spellbook.OnCastSpell += Spellbook_OnCastSpell;
-            Game.OnUpdate += OnUpdate;
+            Obj_AI_Base.OnDamage += Obj_AI_Base_OnDamage;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
             Game.OnWndProc += Game_OnWndProc;
+        }
+
+        private static void Obj_AI_Base_OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
+        {
+            if (sender is Obj_AI_Hero)
+            {
+                float time = Game.Time - 2;
+                IncomingDamageList.RemoveAll(damage => time < damage.Time || ((int)damage.Damage == (int)args.Damage && damage.TargetNetworkId == sender.NetworkId));
+            }
         }
 
         public static void debug(string msg)
@@ -351,12 +360,6 @@ namespace SebbyLib
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage((Obj_AI_Base)args.Target, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }
-        }
-
-        private static void OnUpdate(EventArgs args)
-        {
-            float time = Game.Time - 2;
-            IncomingDamageList.RemoveAll(damage => time < damage.Time);
         }
 
         private static void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
