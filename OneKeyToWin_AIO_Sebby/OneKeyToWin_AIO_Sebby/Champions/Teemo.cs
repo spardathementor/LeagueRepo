@@ -196,7 +196,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {
-            if (Player.Mana > RMANA + QMANA)
+            if (Player.Mana > RMANA + QMANA && (Player.IsMoving || !Program.None))
             {
                 if (Program.LagFree(1) && SebbyLib.Orbwalking.CanMove(50))
                 {
