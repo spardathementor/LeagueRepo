@@ -109,7 +109,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Program.LagFree(0))
             {
-                R.Range = 800 + 300 * Player.Spellbook.GetSpell(SpellSlot.R).Level;
+                R.Range = 870 + 300 * Player.Spellbook.GetSpell(SpellSlot.R).Level;
                 W.Range = 650 + 30 * Player.Spellbook.GetSpell(SpellSlot.W).Level;
                 SetMana();
                 Jungle();
