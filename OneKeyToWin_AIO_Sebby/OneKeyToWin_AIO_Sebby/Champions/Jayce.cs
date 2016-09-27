@@ -678,7 +678,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             Utility.DrawCircle(Player.Position, Q.Range, System.Drawing.Color.Cyan, 1, 1);
                     }
                     else
-                        Utility.DrawCircle(Player.Position, Q2.Range, System.Drawing.Color.Orange, 1, 1);
+                        Utility.DrawCircle(Player.Position, Q2.Range, System.Drawing.Color.Cyan, 1, 1);
                 }
             }
 
