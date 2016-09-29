@@ -255,7 +255,17 @@ namespace SebbyLib
             {
                 return false;
             }
+
             var myRange = GetRealAutoAttackRange(target);
+            var hero = target as Obj_AI_Hero;
+            if(hero!= null)
+            {
+                return
+                Vector2.DistanceSquared(
+                   Prediction.Prediction.GetPrediction(hero, 0).CastPosition.To2D(),  Player.Position.To2D()) <= myRange * myRange;
+            }
+
+
             return
                 Vector2.DistanceSquared(
                     target is Obj_AI_Base ? ((Obj_AI_Base)target).ServerPosition.To2D() : target.Position.To2D(),
