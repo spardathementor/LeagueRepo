@@ -159,7 +159,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var ts = Config.Item("ts", true).GetValue<bool>();
             var qTur = Player.UnderAllyTurret() && Config.Item("qTur", true).GetValue<bool>();
             var qCC = Config.Item("qCC", true).GetValue<bool>();
-
+            var countE = Player.CountEnemiesInRange(1500) == 1;
             if (Program.Combo && ts)
             {
                 var t = TargetSelector.GetTarget(maxGrab, TargetSelector.DamageType.Physical);
@@ -168,7 +168,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(Q, t);
             }
 
-            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget(maxGrab) && Config.Item("grab" + t.ChampionName).GetValue<bool>()))
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget(maxGrab) && (Config.Item("grab" + t.ChampionName).GetValue<bool>() || countE)))
             {
                 if (!t.HasBuffOfType(BuffType.SpellImmunity) && !t.HasBuffOfType(BuffType.SpellShield) && Player.Distance(t.ServerPosition) > minGrab)
                 {
