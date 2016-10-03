@@ -158,7 +158,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Jungle();
             }
 
-            if (Program.LagFree(1) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>())
+            if (Program.LagFree(1) && R.IsReady() )
                 LogicR();
 
             if (IsCastingR)
@@ -205,7 +205,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     rTargetLast = t;
                 }
                 
-                if (!IsCastingR && Config.Item("Rks", true).GetValue<bool>() 
+                if (!IsCastingR && Config.Item("Rks", true).GetValue<bool>() && Config.Item("autoR", true).GetValue<bool>()
                     && GetRdmg(t) * 4 > t.Health && t.CountAlliesInRange(700) == 0 && Player.CountEnemiesInRange(Config.Item("Rsafe", true).GetValue<Slider>().Value) == 0 
                     && Player.Distance(t) > Config.Item("MinRangeR", true).GetValue<Slider>().Value
                     && !Player.UnderTurret(true) && OktwCommon.ValidUlt(t) && !OktwCommon.IsSpellHeroCollision(t, R))
