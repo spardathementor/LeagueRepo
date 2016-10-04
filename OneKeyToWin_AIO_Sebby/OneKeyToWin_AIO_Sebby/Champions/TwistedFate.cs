@@ -151,9 +151,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicWmaunal()
         {
+
             if (!Player.HasBuff("pickacard_tracker"))
-            { 
-                if (Utils.TickCount - W.LastCastAttemptT > 150)
+            {
+                if (Utils.TickCount - W.LastCastAttemptT > 300)
                 {
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                     {
@@ -195,7 +196,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else if (FindCard == 1)
                     {
                         if (wName == "TwistedFate_Base_W_GoldCard.troy")
+                        {
+                            Console.WriteLine("dupa" + Game.Time);  
                             W.Cast();
+                        }
                     }
                     else if (FindCard == 2)
                     {
@@ -217,7 +221,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(1100, TargetSelector.DamageType.Magical);
             if (!Player.HasBuff("pickacard_tracker"))
             { 
-                if (Utils.TickCount - W.LastCastAttemptT > 150)
+                if (Utils.TickCount - W.LastCastAttemptT > 300)
                 {
                     if (R.IsReady() && (Player.HasBuff("destiny_marker") || Player.HasBuff("gate")))
                         W.Cast();
