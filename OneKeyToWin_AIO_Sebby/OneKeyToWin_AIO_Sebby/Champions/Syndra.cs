@@ -112,7 +112,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (Q.IsReady())
                 {
                     EQcastNow = true;
-                    Q.Cast(gapcloser.End);
+                    Q.Cast(gapcloser.Sender);
                 }
                 else if(gapcloser.Sender.IsValidTarget(E.Range))
                 {
