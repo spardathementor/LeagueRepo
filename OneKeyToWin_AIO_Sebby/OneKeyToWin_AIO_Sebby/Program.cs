@@ -287,7 +287,6 @@ namespace OneKeyToWin_AIO_Sebby
                 new Activator().LoadOKTW();
                 new Core.OKTWward().LoadOKTW();
                 new Core.AutoLvlUp().LoadOKTW();
-                new Core.OKTWtracker().LoadOKTW();
                 new Core.OKTWdraws().LoadOKTW();
             }
 
