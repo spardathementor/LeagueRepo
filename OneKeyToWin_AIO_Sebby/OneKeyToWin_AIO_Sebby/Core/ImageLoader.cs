@@ -81,7 +81,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         public static Sprite GetSprite(string name)
         {
-            return new Sprite((Bitmap)Resource1.ResourceManager.GetObject(name), Vector2.Zero);
+            var sprite = new Sprite((Bitmap)Resource1.ResourceManager.GetObject(name), Vector2.Zero);
+            if (sprite == null)
+            {
+                Console.WriteLine("Can't find image: " + name);
+                sprite = new Sprite((Bitmap)Resource1.ResourceManager.GetObject("Default"), Vector2.Zero);
+            }
+            return sprite;
         }
 
         public static Sprite CreateRadrarIcon(string name, System.Drawing.Color color, int opacity = 60)
