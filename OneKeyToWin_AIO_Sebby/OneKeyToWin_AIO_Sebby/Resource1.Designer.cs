@@ -143,9 +143,9 @@ namespace OneKeyToWin_AIO_Sebby {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Aurelionsol_Square_0 {
+        internal static System.Drawing.Bitmap AurelionSol_Square_0 {
             get {
-                object obj = ResourceManager.GetObject("Aurelionsol_Square_0", resourceCulture);
+                object obj = ResourceManager.GetObject("AurelionSol_Square_0", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
