@@ -39,7 +39,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private static int NotTimer = Utils.TickCount + 1500;
 
-        public static string[] IgnoreR = { "Corki", "Jayce", "Kassadin", "KogMaw", "Leblanc", "Teemo", "Swain", "Shyvana", "Nidalee" };
+        public static string[] IgnoreR = { "Corki", "Jayce", "Kassadin", "KogMaw", "Leblanc", "Teemo", "Swain", "Shyvana", "Nidalee", "Anivia" };
 
 
         public void LoadOKTW()
@@ -319,7 +319,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var e = hero.Hero.Spellbook.GetSpell(SpellSlot.E);
                 var r = hero.Hero.Spellbook.GetSpell(SpellSlot.R);
 
-                if (hero.Hero.IsVisible &&((SpellTrackerAlly && hero.Hero.IsAlly) || (SpellTrackerEnemy && hero.Hero.IsEnemy)))
+                if (hero.Hero.IsVisible && ((SpellTrackerAlly && hero.Hero.IsAlly) || (SpellTrackerEnemy && hero.Hero.IsEnemy)))
                 {
                     if (hero.Hero.IsAlly)
                         barPos = barPos + new Vector2(0, -4);
