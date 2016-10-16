@@ -7,15 +7,12 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Thresh
+    class Thresh : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Spell E, Epush, Q, R, W;
+        private Spell Epush;
         private static Obj_AI_Base Marked;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
-        public void LoadOKTW()
+        public Thresh()
         {
             Q = new Spell(SpellSlot.Q, 1075);
             W = new Spell(SpellSlot.W, 950);
@@ -202,7 +199,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
             if (t.IsValidTarget()  && OktwCommon.CanMove(t) && !Marked.IsValidTarget())
             {
-                
                 if (Program.Combo)
                 {
                     if (Player.Distance(t) > Config.Item("Emin", true).GetValue<Slider>().Value)

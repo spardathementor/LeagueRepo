@@ -8,15 +8,9 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Teemo
+    class Teemo : Base
     {
-        private Spell E, Q, R, W;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        private Menu Config = Program.Config;
-
-        public void LoadOKTW()
+        public Teemo()
         {
             Q = new Spell(SpellSlot.Q, 680);
             W = new Spell(SpellSlot.W);
@@ -52,9 +46,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("bushR2", "Bush above 1 ammo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("bushR", "Auto W bush after enemy enter", true).SetValue(true));
 
-            foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-
             Drawing.OnDraw += Drawing_OnDraw;
             Game.OnUpdate += Game_OnGameUpdate;
             Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
@@ -71,7 +62,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 foreach (var t in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(enemy => enemy.Health))
                 {
 
-                    if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
+                    if (Program.Farm && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
                         Q.Cast(t);
 
                     if (t.IsMelee && t.IsFacing(Player) && t.ServerPosition.Distance(Player.ServerPosition) > 300)
@@ -268,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if(Config.Item("QafterAA", true).GetValue<bool>())
                     continue;
                 
-                if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harras" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
+                if (Program.Farm && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
                     Q.Cast(t);
 
                 if (t.IsMelee && t.IsFacing(Player) && t.ServerPosition.Distance(Player.ServerPosition) > 300)

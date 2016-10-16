@@ -8,18 +8,12 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Twitch
+    class Twitch : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        public Spell Q, W, E, R;
-        public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-
         private int count = 0, countE = 0;
         private float grabTime = Game.Time;
 
-        public void LoadOKTW()
+        public Twitch()
         {
             Q = new Spell(SpellSlot.Q, 0);
             W = new Spell(SpellSlot.W, 950);

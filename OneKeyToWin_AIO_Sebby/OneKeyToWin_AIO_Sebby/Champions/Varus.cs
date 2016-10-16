@@ -7,18 +7,13 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Varus
+    class Varus : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Spell Q, W, E, R;
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         public float AArange = ObjectManager.Player.AttackRange + ObjectManager.Player.BoundingRadius * 2;
         float CastTime = Game.Time;
         bool CanCast = true;
 
-        public void LoadOKTW()
+        public Varus()
         {
             Q = new Spell(SpellSlot.Q, 925);
             W = new Spell(SpellSlot.Q, 0);
@@ -47,12 +42,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser R").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName).SetValue(false));
 
-            foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("Harras").AddItem(new MenuItem("harras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "Lane clear E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(80, 100, 0)));
 
             Game.OnUpdate += Game_OnGameUpdate;
 
@@ -180,7 +171,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 }
 
-                if (Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value)
+                if (FarmSpells)
                 {
                     var allMinionsE = Cache.GetMinions(Player.ServerPosition, E.Range);
                     var Efarm = Q.GetCircularFarmLocation(allMinionsE, E.Width);
@@ -255,7 +246,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         CastQ(t);
                     }
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + QMANA && Config.Item("harras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + QMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && OktwCommon.CanHarras())
                     {
                         CastQ(t);
                     }
@@ -266,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
             }
-            else if (Program.LaneClear && Config.Item("farmQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA && Q.Range > 1500 && Player.CountEnemiesInRange(1450) == 0 &&  (Q.IsCharging || (Player.ManaPercentage() > Config.Item("Mana", true).GetValue<Slider>().Value)))
+            else if (FarmSpells && Config.Item("farmQ", true).GetValue<bool>() && Q.Range > 1500 && Player.CountEnemiesInRange(1450) == 0 &&  (Q.IsCharging || (Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value)))
             {
                 var allMinionsQ = Cache.GetMinions(Player.ServerPosition, Q.Range);
                 var Qfarm = Q.GetLineFarmLocation(allMinionsQ, Q.Width);

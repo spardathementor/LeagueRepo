@@ -387,27 +387,6 @@ namespace OneKeyToWin_AIO_Sebby
             ZhonyaCast();
         }
 
-        private void Teleport()
-        {
-            if (CanUse(teleport) && !Player.HasBuff("teleport"))
-            {
-                foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead  && ally.CountEnemiesInRange(1000) > 0 ))
-                {
-                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid && !enemy.IsDead))
-                    {
-                        var distanceEA = enemy.Distance(ally);
-                        if (distanceEA < 1000)
-                        {
-                            foreach (var obj in ObjectManager.Get<Obj_AI_Minion>().Where(obj => obj.IsAlly &&  distanceEA < obj.Position.Distance(ally.Position)))
-                            {
-                                Player.Spellbook.CastSpell(teleport, obj);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         private void Smite()
         {
             if (CanUse(smite) )

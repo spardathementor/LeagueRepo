@@ -5,19 +5,14 @@ using LeagueSharp.Common;
 using SharpDX;
 using SebbyLib;
 
-namespace OneKeyToWin_AIO_Sebby
+namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class MissFortune
+    class MissFortune : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Spell E, Q, Q1, R, W;
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private int LastAttackId = 0;
         private float RCastTime = 0;
 
-        public void LoadOKTW()
+        public MissFortune()
         {
             Q = new Spell(SpellSlot.Q, 655f);
             Q1 = new Spell(SpellSlot.Q, 1300f);
@@ -37,13 +32,13 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("harasQ", "Use Q on minion", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("harassQ", "Use Q on minion", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("killQ", "Use Q only if can kill minion", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionMove", "Don't use if minions moving", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Minion config").AddItem(new MenuItem("qMinionWidth", "secound Q angle", true).SetValue(new Slider(80, 100, 0)));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harasW", "Harass W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harassW", "Harass W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
@@ -59,8 +54,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "LaneClear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "LaneClear E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear  Mana", true).SetValue(new Slider(80, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleE", "Jungle clear E", true).SetValue(true));
@@ -125,15 +118,15 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo && Player.Mana > RMANA + WMANA && Config.Item("autoW", true).GetValue<bool>())
                         W.Cast();
-                    else if (Player.Mana > RMANA + WMANA + QMANA && Config.Item("harasW", true).GetValue<bool>())
+                    else if (Player.Mana > RMANA + WMANA + QMANA && Config.Item("harassW", true).GetValue<bool>())
                         W.Cast();
                 }
             }
-            else if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value )
+            else if (FarmSpells )
             {
                 var minions = Cache.GetMinions(Player.ServerPosition, 600);
 
-                if (minions.Count >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                if (minions.Count >= FarmMinions)
                 {
                     if (Q.IsReady() && Config.Item("farmQ", true).GetValue<bool>() && minions.Count > 1)
                         Q.Cast(minions.FirstOrDefault());
@@ -272,7 +265,7 @@ namespace OneKeyToWin_AIO_Sebby
                 else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA)
                     Q.Cast(t);
             }
-            else if (t1.IsValidTarget(Q1.Range) && Config.Item("harasQ", true).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 50)
+            else if (t1.IsValidTarget(Q1.Range) && Config.Item("harassQ", true).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 50)
             {
                 var minions = Cache.GetMinions(Player.ServerPosition, Q1.Range);
 
@@ -343,11 +336,11 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                 }
             }
-            if (Program.LaneClear && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmE", true).GetValue<bool>())
+            if (FarmSpells && Config.Item("farmE", true).GetValue<bool>())
             {
                 var minions = Cache.GetMinions(Player.ServerPosition, E.Range);
                 var farmPos = E.GetCircularFarmLocation(minions, E.Width);
-                if (farmPos.MinionsHit >= Config.Item("LCminions", true).GetValue<Slider>().Value)
+                if (farmPos.MinionsHit >= FarmMinions)
                 {
                     E.Cast(farmPos.Position);
                 }

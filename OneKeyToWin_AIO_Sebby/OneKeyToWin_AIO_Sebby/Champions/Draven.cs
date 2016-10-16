@@ -8,18 +8,13 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Draven
+    class Draven : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Spell E, Q, R, W;
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private int axeCatchRange;
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
         private static GameObject RMissile = null;
         public List<GameObject> axeList = new List<GameObject>();
 
-        public void LoadOKTW()
+        public Draven()
         {
             Q = new Spell(SpellSlot.Q);
             W = new Spell(SpellSlot.W);

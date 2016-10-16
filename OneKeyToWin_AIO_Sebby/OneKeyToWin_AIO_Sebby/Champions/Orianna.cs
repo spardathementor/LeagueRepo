@@ -5,23 +5,18 @@ using LeagueSharp.Common;
 using SharpDX;
 using SebbyLib;
 
-namespace OneKeyToWin_AIO_Sebby
+namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Orianna
+    class Orianna : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Spell E, Q, R, W, QR;
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-        private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-
+        private Spell QR;
         private float RCastTime = 0;
         private Vector3 BallPos;
         private int FarmId;
         private bool Rsmart = false;
         private Obj_AI_Hero best;
 
-        public void LoadOKTW()
+        public Orianna()
         {
             Q = new Spell(SpellSlot.Q, 800);
             W = new Spell(SpellSlot.W, 210);
@@ -48,8 +43,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("E Shield Config").AddItem(new MenuItem("AGC", "AntiGapcloserE", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQout", "Farm Q out range aa minion", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LCminions", "LaneClear minimum minions", true).SetValue(new Slider(2, 10, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "LaneClear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "LaneClear W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmE", "LaneClear E", true).SetValue(false));
@@ -324,7 +317,7 @@ namespace OneKeyToWin_AIO_Sebby
             }
             
 
-            if ((Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value || (Player.UnderTurret(false) && !Player.UnderTurret(true))))
+            if ((FarmSpells || (Player.UnderTurret(false) && !Player.UnderTurret(true))))
             {
                 var Qfarm = Q.GetCircularFarmLocation(allMinions, 100);
                 var QWfarm = Q.GetCircularFarmLocation(allMinions, W.Width);
@@ -333,7 +326,7 @@ namespace OneKeyToWin_AIO_Sebby
                     return;
                 if (Config.Item("farmQ", true).GetValue<bool>())
                 {
-                    if (Qfarm.MinionsHit > Config.Item("LCminions", true).GetValue<Slider>().Value && !W.IsReady() && Q.IsReady())
+                    if (Qfarm.MinionsHit >= FarmMinions && !W.IsReady() && Q.IsReady())
                     {
                         Q.Cast(Qfarm.Position);
                     }

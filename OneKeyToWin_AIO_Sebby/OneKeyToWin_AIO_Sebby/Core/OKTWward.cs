@@ -20,13 +20,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public Vector3 pos { get; set; }
     }
 
-    class OKTWward
+    class OKTWward : Base
     {
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-        private Menu Config = Program.Config;
         private bool rengar = false;
         Obj_AI_Hero Vayne = null;
-        private static Spell Q, W, E, R;
 
         public static List<HiddenObj> HiddenObjList = new List<HiddenObj>();
 
@@ -44,10 +41,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         public void LoadOKTW()
         {
-            Q = new Spell(SpellSlot.Q);
-            E = new Spell(SpellSlot.E);
-            W = new Spell(SpellSlot.W);
-            R = new Spell(SpellSlot.R);
 
             Config.SubMenu("AutoWard OKTW©").AddItem(new MenuItem("AutoWard", "Auto Ward").SetValue(true));
             Config.SubMenu("AutoWard OKTW©").AddItem(new MenuItem("autoBuy", "Auto buy blue trinket after lvl 9").SetValue(false));
@@ -97,9 +90,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void AutoWardLogic()
         {
-            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValid && !enemy.IsVisible && !enemy.IsDead))
+            foreach (var need in OKTWtracker.ChampionInfoList.Where(x => x.Hero.IsValid && !x.Hero.IsVisible && !x.Hero.IsDead))
             {
-                var need = OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
+                //var need = OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
 
                 if (need == null || need.PredictedPos == null)
                     continue;
@@ -149,7 +142,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (timer < 4)
                 {
-                    if (Config.Item("AutoWardCombo").GetValue<bool>() && Program.AIOmode != 2 && !Program.Combo)
+                    if (Config.Item("AutoWardCombo").GetValue<bool>() && Program.AioModeSet != Program.AioMode.ChampionOnly && !Program.Combo)
                         return;
 
                     if (NavMesh.IsWallOfGrass(need.PredictedPos, 0))
@@ -215,7 +208,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 if ( !missile.SpellCaster.IsVisible)
                 {
-
                     if ((missile.SData.Name == "BantamTrapShort" || missile.SData.Name == "BantamTrapBounceSpell") && !HiddenObjList.Exists(x => missile.EndPosition == x.pos))
                         AddWard("teemorcast", missile.EndPosition);
                 }

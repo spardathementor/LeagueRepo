@@ -67,13 +67,22 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
         {
-           return;
             if (!sender.IsMe)
-                Program.debug(args.Buff.Name);
+                Program.debug(args.Buff.Name + " " + args.Buff.Type + " " + args.Buff.SourceName);
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+
+
+
+            foreach (var enemy in HeroManager.Enemies.Where(x=> x.IsValidTarget(400)))
+            {
+                if(!SebbyLib.OktwCommon.CanMove(enemy))
+                {
+                    Console.WriteLine("cant move");
+                }
+            }
             return;
             foreach (var mast in ObjectManager.Player.Masteries)
             {
@@ -116,6 +125,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Drawing_OnDraw(EventArgs args)
         {
+
+
+            var obj = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(x => x.Distance(Game.CursorPos) < 100);
+            if (obj != null)
+            {
+                var wts = Drawing.WorldToScreen(Game.CursorPos);
+                Drawing.DrawText(wts[0], wts[1], System.Drawing.Color.Aqua, obj.Name);
+            }
+
+
             return;
             GetConeTarget(endPosG.To2D());
             Render.Circle.DrawCircle(endPosG, 50, System.Drawing.Color.Red, 1);
@@ -174,6 +193,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
         {
+            return;
+            if (ObjectManager.Player.Distance(sender.Position)<500 )
+                Program.debug(sender.Name + " " + sender.Type + " "  +sender.IsAlly);
             return;
             if (sender.IsValid && sender.IsAlly )
             {

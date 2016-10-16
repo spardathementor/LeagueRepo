@@ -5,32 +5,24 @@ using LeagueSharp.Common;
 using SharpDX;
 using SebbyLib;
 
-namespace OneKeyToWin_AIO_Sebby
+namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Kalista
+    class Kalista : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        public Spell Q, Q2, W, E, R;
-        public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-
         private int wCount = 0;
         private float grabTime = Game.Time, lastecast = 0f;
-
         private static Obj_AI_Hero AllyR;
 
-        public Obj_AI_Hero Player { get { return ObjectManager.Player; } }
-
-        public void LoadOKTW()
+        public Kalista()
         {
             Q = new Spell(SpellSlot.Q, 1170);
-            Q2 = new Spell(SpellSlot.Q, 1170);
+            Q1 = new Spell(SpellSlot.Q, 1170);
             W = new Spell(SpellSlot.W, 5000);
             E = new Spell(SpellSlot.E, 1000);
             R = new Spell(SpellSlot.R, 1500f);
 
             Q.SetSkillshot(0.1f, 40f, 2400f, true, SkillshotType.SkillshotLine);
-            Q2.SetSkillshot(0.1f, 40f, 2400f, false, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.1f, 40f, 2400f, false, SkillshotType.SkillshotLine);
 
             LoadMenuOKTW();
 
@@ -48,7 +40,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
             foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Harras Q").AddItem(new MenuItem("haras" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Harass Q").AddItem(new MenuItem("Harass" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("qMana", "Q harass mana %", true).SetValue(new Slider(50, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("qMode", "Q combo mode", true).SetValue(new StringList(new[] { "Always", "OKTW logic" }, 1)));
@@ -200,7 +192,7 @@ namespace OneKeyToWin_AIO_Sebby
                     else if (!SebbyLib.Orbwalking.InAutoAttackRange(t) || CountMeleeInRange(400) > 0)
                         castQ(cast, t);
                 }
-                else if (Program.Farm && !SebbyLib.Orbwalking.InAutoAttackRange(t) && Config.Item("haras" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.ManaPercent > Config.Item("qMana", true).GetValue<Slider>().Value)
+                else if (Program.Farm && !SebbyLib.Orbwalking.InAutoAttackRange(t) && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.ManaPercent > Config.Item("qMana", true).GetValue<Slider>().Value)
                     castQ(cast, t);
                 if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
                 {
@@ -242,7 +234,7 @@ namespace OneKeyToWin_AIO_Sebby
                 countMinion += 1;
             }
             if (bestMinion != null && countMinion >= Config.Item("farmQcount", true).GetValue<Slider>().Value)
-                Q2.Cast(bestMinion);
+                Q1.Cast(bestMinion);
         
         }
 
@@ -451,7 +443,7 @@ namespace OneKeyToWin_AIO_Sebby
         void castQ(bool cast, Obj_AI_Base t)
         {
             if (cast)
-                Program.CastSpell(Q2, t);
+                Program.CastSpell(Q1, t);
             else
                 Program.CastSpell(Q, t);
         }

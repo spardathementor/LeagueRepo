@@ -4,24 +4,17 @@ using LeagueSharp;
 using LeagueSharp.Common;
 using SebbyLib;
 
-namespace OneKeyToWin_AIO_Sebby
+namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Annie
+    class Annie : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        public Spell Q, W, E, R, FR;
-        public float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private SpellSlot flash;
-
         public Obj_AI_Base Tibbers;
         public float TibbersTimer = 0;
         private bool HaveStun = false;
-        private Obj_AI_Hero Player
-        {
-            get { return ObjectManager.Player; }
-        }
-        public void LoadOKTW()
+        private Spell FR;
+
+        public Annie()
         {
             Q = new Spell(SpellSlot.Q, 625f);
             W = new Spell(SpellSlot.W, 550f);
@@ -42,10 +35,10 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harrasQ", "Harass Q", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harassQ", "Harass Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harrasW", "Harass W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harassW", "Harass W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E stack stun", true).SetValue(true));
 
@@ -63,7 +56,6 @@ namespace OneKeyToWin_AIO_Sebby
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(60, 100, 0)));
 
             Game.OnUpdate += Game_OnGameUpdate;
             GameObject.OnCreate += Obj_AI_Base_OnCreate;
@@ -150,7 +142,7 @@ namespace OneKeyToWin_AIO_Sebby
                 {
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         Q.Cast(t);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harrasQ", true).GetValue<bool>())
+                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harassQ", true).GetValue<bool>())
                         Q.Cast(t);
                     else
                     {
@@ -169,7 +161,7 @@ namespace OneKeyToWin_AIO_Sebby
 
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         W.Cast(poutput.CastPosition);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harrasW", true).GetValue<bool>())
+                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harassW", true).GetValue<bool>())
                         W.Cast(poutput.CastPosition);
                     else
                     {
@@ -266,10 +258,10 @@ namespace OneKeyToWin_AIO_Sebby
                 var minion = minionsList.Where(x => SebbyLib.HealthPrediction.LaneClearHealthPrediction(x, 250, 50) < Q.GetDamage(x) && x.Health > Player.GetAutoAttackDamage(x)).FirstOrDefault();
                 Q.Cast(minion);
             }
-            else if (Program.LaneClear && W.IsReady() && Player.ManaPercent > Config.Item("Mana", true).GetValue<Slider>().Value && Config.Item("farmW", true).GetValue<bool>())
+            else if (FarmSpells && W.IsReady() && Config.Item("farmW", true).GetValue<bool>())
             {
                 var farmLocation = W.GetCircularFarmLocation(minionsList, W.Width);
-                if (farmLocation.MinionsHit > 1)
+                if (farmLocation.MinionsHit >= FarmMinions)
                     W.Cast(farmLocation.Position);
             }
         }

@@ -7,22 +7,12 @@ using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Champions
 {
-    class Blitzcrank
+    class Blitzcrank : Base
     {
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-
-        private Spell E, Q, R, W;
-
-        private float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
-
         private int grab = 0 , grabS = 0;
-
         private float grabW = 0;
 
-        public Obj_AI_Hero Player {get { return ObjectManager.Player; }}
-
-        public void LoadOKTW()
+        public  Blitzcrank()
         {
             Q = new Spell(SpellSlot.Q, 920);
             W = new Spell(SpellSlot.W, 200);
