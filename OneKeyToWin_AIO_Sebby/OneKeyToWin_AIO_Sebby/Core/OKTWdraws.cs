@@ -39,7 +39,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private static int NotTimer = Utils.TickCount + 1500;
 
-        public static string[] IgnoreR = { "Corki", "Jayce", "Kassadin", "KogMaw", "Leblanc", "Teemo", "Swain", "Shyvana", "Nidalee", "Anivia" };
+        public static string[] IgnoreR = { "Corki", "Jayce", "Kassadin", "KogMaw", "Leblanc", "Teemo", "Swain", "Shyvana", "Nidalee", "Anivia", "Quinn" };
 
 
         public void LoadOKTW()
