@@ -39,6 +39,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private static int NotTimer = Utils.TickCount + 1500;
 
+        public static string[] IgnoreR = { "Corki", "Jayce", "Kassadin", "KogMaw", "Leblanc", "Teemo", "Swain", "Shyvana" };
+
+
         public void LoadOKTW()
         {
             Flash = ImageLoader.CreateSummonerSprite("Flash");
@@ -134,7 +137,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     var rSlot = hero.Hero.Spellbook.Spells[3];
                     var sum1 = hero.Hero.Spellbook.Spells[4];
                     var sum2 = hero.Hero.Spellbook.Spells[5];
-                    if (rSlot != null)
+                    if (rSlot != null && !IgnoreR.Any(x => x == hero.Hero.ChampionName))
                     {
                         var time = rSlot.CooldownExpires - Game.Time;
                         if (time < 1 && time >= 0)
