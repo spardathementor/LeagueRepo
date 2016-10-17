@@ -88,8 +88,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             Utility.DelayAction.Add(7000, () => Intro.Remove());
 
-            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "DISABLE UTILITY DRAWS").SetValue(false));
-
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("championInfo", "Show enemy avatars").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posX", "posX").SetValue(new Slider(839, 1000, 0)));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posY", "posY").SetValue(new Slider(591, 1000, 0)));
