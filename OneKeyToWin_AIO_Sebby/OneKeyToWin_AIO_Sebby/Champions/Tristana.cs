@@ -30,10 +30,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wks", "W KS logic (W+E+R calculation)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("smartW", "SmartCast W key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harassE", "Harass E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eafter", "E after attack", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("focusE", "Focus target with E", true).SetValue(true));
-            foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Harass E").AddItem(new MenuItem("Harass" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Use E on").AddItem(new MenuItem("useEon" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
@@ -102,16 +102,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (!Player.HasBuff("itemstatikshankcharge"))
                             args.Process = false;
                     }
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                    else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     {
                         E.Cast(t);
                         if (!Player.HasBuff("itemstatikshankcharge"))
                             args.Process = false;
                     }
                 }
-            }
-
-            
+            } 
         }
 
         private void Game_OnUpdate(EventArgs args)
