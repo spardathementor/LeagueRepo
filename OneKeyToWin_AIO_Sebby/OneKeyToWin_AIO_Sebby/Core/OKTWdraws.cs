@@ -99,10 +99,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("HpBar", "Damage indicators").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Spell tracker").AddItem(new MenuItem("SpellTrackerEnemy", "Enemy").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Spell tracker").AddItem(new MenuItem("SpellTrackerAlly", "Ally").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Spell tracker").AddItem(new MenuItem("SpellTrackerMe", "Me").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("ShowClicks", "Show enemy clicks").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("showWards", "Show hidden objects, wards").SetValue(true));
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Minimap").AddItem(new MenuItem("minimap", "Mini-map hack").SetValue(true));
+
+            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "DISABLE UTILITY DRAWS").SetValue(false));
 
             Tahoma13B = new Font(Drawing.Direct3DDevice, new FontDescription
             { FaceName = "Tahoma", Height = 14, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Antialiased });
@@ -182,6 +185,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var ScreenRadarJungler = Config.Item("ScreenRadarJungler").GetValue<bool>();
             var SpellTrackerEnemy = Config.Item("SpellTrackerEnemy").GetValue<bool>();
             var SpellTrackerAlly = Config.Item("SpellTrackerAlly").GetValue<bool>();
+            var SpellTrackerMe = Config.Item("SpellTrackerMe").GetValue<bool>();
+            
             var ShowClicks = Config.Item("ShowClicks").GetValue<bool>();
 
             float posY = (Config.Item("posY").GetValue<Slider>().Value * 0.001f) * Drawing.Height;
@@ -317,7 +322,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 var e = hero.Hero.Spellbook.GetSpell(SpellSlot.E);
                 var r = hero.Hero.Spellbook.GetSpell(SpellSlot.R);
 
-                if (hero.Hero.IsVisible && ((SpellTrackerAlly && hero.Hero.IsAlly) || (SpellTrackerEnemy && hero.Hero.IsEnemy)))
+                if (hero.Hero.IsVisible && ((SpellTrackerAlly && (hero.Hero.IsAlly && !hero.Hero.IsMe)) || (SpellTrackerEnemy && hero.Hero.IsEnemy) || (SpellTrackerMe && hero.Hero.IsMe)))
                 {
                     if (hero.Hero.IsAlly)
                         barPos = barPos + new Vector2(0, -4);
