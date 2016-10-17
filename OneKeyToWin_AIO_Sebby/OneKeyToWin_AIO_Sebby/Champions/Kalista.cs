@@ -39,9 +39,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
-            foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Harass Q").AddItem(new MenuItem("Harass" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
-
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("qMana", "Q harass mana %", true).SetValue(new Slider(50, 100, 0)));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("qMode", "Q combo mode", true).SetValue(new StringList(new[] { "Always", "OKTW logic" }, 1)));
 

@@ -33,8 +33,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
-            foreach (var enemy in HeroManager.Enemies)
-                Config.SubMenu(Player.ChampionName).SubMenu("Q Config").SubMenu("Harass").AddItem(new MenuItem("Harass" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("Qharras", "Harass Q", true).SetValue(true));
+
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGCW", "AntiGapcloser W", true).SetValue(true));
@@ -152,10 +152,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         return;
                     }
                 }
-
+                
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA + QMANA)
+                else if (Program.Farm && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA + QMANA && Config.Item("Qharras", true).GetValue<bool>())
                     Program.CastSpell(Q, t);
                 else
                 {
