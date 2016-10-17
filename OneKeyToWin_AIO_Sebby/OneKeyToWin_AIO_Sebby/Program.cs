@@ -61,7 +61,7 @@ namespace OneKeyToWin_AIO_Sebby
             #endregion
 
             Config.AddItem(new MenuItem("AIOmode", "AIO mode", true).SetValue(new StringList(new[] { "Utility and champion", "Only Champion", "Only Utility" }, 0))).ValueChanged += Program_ValueChanged;
-            Config.SubMenu("Utility, Draws OKTW©").AddItem(new MenuItem("disableDraws", "DISABLE UTILITY DRAWS").SetValue(false));
+           
             var aioModeMenu = Config.Item("AIOmode", true).GetValue<StringList>().SelectedIndex;
 
             if (aioModeMenu == 0)
@@ -232,6 +232,7 @@ namespace OneKeyToWin_AIO_Sebby
                 else
                     Config.SubMenu("Prediction MODE").AddItem(new MenuItem("322", "SPREDICTION NOT LOADED"));
 
+                new Core.OktwTs();
             }
 
             if (Config.Item("debug").GetValue<bool>())
