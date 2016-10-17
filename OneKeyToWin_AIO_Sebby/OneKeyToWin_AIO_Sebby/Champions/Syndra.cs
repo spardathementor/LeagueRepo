@@ -304,11 +304,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.IsWindingUp)
                 return;
 
-            if (!Program.None && !Program.Combo && FarmSpells)
+            if (!Program.None && !Program.Combo )
             {
                 var allMinions = Cache.GetMinions(Player.ServerPosition, Q.Range);
 
-                if (Config.Item("farmQout", true).GetValue<bool>())
+                if (Config.Item("farmQout", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + EMANA + WMANA)
                 {
                     foreach (var minion in allMinions.Where(minion => minion.IsValidTarget(Q.Range) && (!Orbwalker.InAutoAttackRange(minion) || (!minion.UnderTurret(true) && minion.UnderTurret()))))
                     {
