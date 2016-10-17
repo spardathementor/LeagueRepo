@@ -128,7 +128,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (!E.IsReady())
                 EQcastNow = false;
 
-            if (Program.LagFree(1))
+            if (Program.LagFree(0))
             { 
                 SetMana();
                 BallCleaner();
