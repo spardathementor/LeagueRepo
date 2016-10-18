@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public Vector3 pos { get; set; }
     }
 
-    class OKTWward : Base
+    class OKTWward : Program
     {
         private bool rengar = false;
         Obj_AI_Hero Vayne = null;

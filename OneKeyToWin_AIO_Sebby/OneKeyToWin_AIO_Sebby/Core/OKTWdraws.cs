@@ -23,12 +23,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
         }
     }
 
-    class OKTWdraws
+    class OKTWdraws : Program
     {
         public static List<OktwNotification> NotificationsList = new List<OktwNotification>();
-        private Menu Config = Program.Config;
-        public static SebbyLib.Orbwalking.Orbwalker Orbwalker = Program.Orbwalker;
-        private Obj_AI_Hero Player { get { return ObjectManager.Player; } }
 
         public static Font Tahoma13, Tahoma13B, TextBold, HudLevel, HudCd, RecFont;
         public static Vector2 centerScreen = new Vector2(Drawing.Width / 2 - 20, Drawing.Height / 2 - 90);

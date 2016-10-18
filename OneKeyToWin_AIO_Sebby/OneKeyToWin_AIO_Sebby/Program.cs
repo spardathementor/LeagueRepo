@@ -22,6 +22,8 @@ namespace OneKeyToWin_AIO_Sebby
                                                     "Graves", "Jayce", "Jhin", "Jinx", "Kalista", "Karthus", "Kayle", "Kindred", "KogMaw", "Lucian", "Lux", "Malzahar", "MissFortune", "Morgana" ,
                                                     "Orianna", "Quinn", "Sivir", "Swain", "Syndra", "Thresh", "Tristana", "TwistedFate", "Twitch", "Urgot", "Varus", "Vayne", "Velkoz", "Xerath" };
 
+        public static Spell Q, W, E, R, Q1, W1, E1, R1;
+
         private static string OktNews = "NEW champion - TEEMO, Sivir E impove";
 
         public static AioMode AioModeSet = AioMode.All;
@@ -271,9 +273,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnUpdate(EventArgs args)
         {
-            Farm = (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Config.Item("harassLaneclear").GetValue<bool>()) || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Freeze;
-            None = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None;
-
+            
             if (AioModeSet == AioMode.UtilityOnly)
             {
                 if (Player.IsMoving)
@@ -282,9 +282,12 @@ namespace OneKeyToWin_AIO_Sebby
                     Combo = false;
             }
             else
+            {
                 Combo = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo;
-
-            LaneClear = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear;
+                Farm = (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Config.Item("harassLaneclear").GetValue<bool>()) || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Freeze;
+                None = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None;
+                LaneClear = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear;
+            }
 
             tickIndex++;
             if (tickIndex > 4)
@@ -519,7 +522,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnDraw(EventArgs args)
         {
-            if (!SPredictionLoad && (int)Game.Time % 2 == 0 && (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 2
+                if (AioModeSet != AioMode.UtilityOnly && !SPredictionLoad && (int)Game.Time % 2 == 0 && (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 2
                 || Config.Item("Epred", true).GetValue<StringList>().SelectedIndex == 2 || Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex == 2))
                 drawText("PRESS F5 TO LOAD SPREDICTION", Player.Position, System.Drawing.Color.Yellow, -300);
 

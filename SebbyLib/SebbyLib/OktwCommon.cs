@@ -373,8 +373,9 @@ namespace SebbyLib
             
             if (targed != null)
             {
-                if (targed.Type == GameObjectType.obj_AI_Hero && targed.Team != sender.Team && sender.IsMelee)
+                if (targed.Type == GameObjectType.obj_AI_Hero && targed.Team != sender.Team && (sender.IsMelee || !args.SData.IsAutoAttack()))
                 {
+
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(targed, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }

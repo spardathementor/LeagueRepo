@@ -12,7 +12,7 @@ namespace OneKeyToWin_AIO_Sebby
 {
     class Base : Program
     {
-        public static Spell Q, W, E, R, Q1, W1, E1, R1;
+        
         public static float QMANA = 0, WMANA = 0, EMANA = 0, RMANA = 0;
         private static Font TextBold;
         private static float spellFarmTimer = 0;
