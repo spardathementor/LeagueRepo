@@ -339,7 +339,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         Drawing.DrawLine(barPos + new Vector2(9, 36), barPos + new Vector2(33 - (24 * qCal), 36), 5, qCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
                         if (SpellTrackerLvl)
-                            for (int i = 0 ; i < Math.Max(q.Level, 5) ; i++)
+                            for (int i = 0 ; i < Math.Min(q.Level, 5) ; i++)
                                 Drawing.DrawLine(barPos + new Vector2(10 + i * 5, 37), barPos + new Vector2(11 + i * 5, 37), 3, System.Drawing.Color.Black);
                             
                         
@@ -348,7 +348,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         Drawing.DrawLine(barPos + new Vector2(35, 36), barPos + new Vector2(59 - (24 * wCal), 36), 5, wCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
                         if (SpellTrackerLvl)
-                            for (int i = 0 ; i < Math.Max(w.Level, 5) ; i++)
+                            for (int i = 0 ; i < Math.Min(w.Level, 5) ; i++)
                                 Drawing.DrawLine(barPos + new Vector2(36 + i * 5, 37), barPos + new Vector2(37 + i * 5, 37), 3, System.Drawing.Color.Black);
                         
                     }
@@ -356,7 +356,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         Drawing.DrawLine(barPos + new Vector2(61, 36), barPos + new Vector2(85 - (24 * eCal), 36), 5, eCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
                         if (SpellTrackerLvl)
-                            for (int i = 0 ; i < Math.Max(e.Level, 5) ; i++)
+                            for (int i = 0 ; i < Math.Min(e.Level, 5) ; i++)
                                 Drawing.DrawLine(barPos + new Vector2(62 + i * 5, 37), barPos + new Vector2(63 + i * 5, 37), 3, System.Drawing.Color.Black);
                         
                     }
@@ -364,9 +364,8 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     {
                         Drawing.DrawLine(barPos + new Vector2(87, 36), barPos + new Vector2(112 - (24 * rCal), 36), 5, rCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
                         if (SpellTrackerLvl)
-                            for (int i = 0 ; i < Math.Max(r.Level, 5) ; i++)
+                            for (int i = 0 ; i < Math.Min(r.Level, 5) ; i++)
                                 Drawing.DrawLine(barPos + new Vector2(88 + i * 5, 37), barPos + new Vector2(89 + i * 5, 37), 3, System.Drawing.Color.Black);
-                        
                     }
                 }
 
@@ -615,6 +614,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                     hudSpace += 65;
                 }
+
                 if (ScreenRadar && !hero.Hero.Position.IsOnScreen() && (!ScreenRadarEnemy || hero.Hero.IsEnemy) && (!ScreenRadarJungler || hero.IsJungler))
                 {
                     var dis = centerScreenWorld.Distance(hero.Hero.Position);
@@ -641,6 +641,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                             else
                                 normalSprite.Color = new ColorBGRA(System.Drawing.Color.White.ToArgb());
                         }
+                        normalSprite.Scale = new Vector2(scale, scale);
                         normalSprite.Position = dupa2;
                         normalSprite.OnEndScene();
                     }
