@@ -335,13 +335,37 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     var rCal = Math.Max(Math.Min((r.CooldownExpires - Game.Time) / r.Cooldown, 1), 0);
 
                     if (q.Level > 0)
+                    {
                         Drawing.DrawLine(barPos + new Vector2(9, 36), barPos + new Vector2(33 - (24 * qCal), 36), 5, qCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
+                        for(int i = 0; i < q.Level; i++)
+                        {
+                            Drawing.DrawLine(barPos + new Vector2(10 + i * 5 , 37), barPos + new Vector2(11 + i * 5, 37), 3,  System.Drawing.Color.Black);
+                        }
+                    }
                     if (w.Level > 0)
+                    {
                         Drawing.DrawLine(barPos + new Vector2(35, 36), barPos + new Vector2(59 - (24 * wCal), 36), 5, wCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
+                        for (int i = 0; i < w.Level; i++)
+                        {
+                            Drawing.DrawLine(barPos + new Vector2(36 + i * 5, 37), barPos + new Vector2(37 + i * 5, 37), 3, System.Drawing.Color.Black);
+                        }
+                    }
                     if (e.Level > 0)
+                    {
                         Drawing.DrawLine(barPos + new Vector2(61, 36), barPos + new Vector2(85 - (24 * eCal), 36), 5, eCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
+                        for (int i = 0; i < e.Level; i++)
+                        {
+                            Drawing.DrawLine(barPos + new Vector2(62 + i * 5, 37), barPos + new Vector2(63 + i * 5, 37), 3, System.Drawing.Color.Black);
+                        }
+                    }
                     if (r.Level > 0)
+                    {
                         Drawing.DrawLine(barPos + new Vector2(87, 36), barPos + new Vector2(112 - (24 * rCal), 36), 5, rCal > 0 ? System.Drawing.Color.Orange : System.Drawing.Color.YellowGreen);
+                        for (int i = 0; i < r.Level; i++)
+                        {
+                            Drawing.DrawLine(barPos + new Vector2(88 + i * 5, 37), barPos + new Vector2(89 + i * 5, 37), 3, System.Drawing.Color.Black);
+                        }
+                    }
                 }
 
                 if (hero.Hero.IsMe)

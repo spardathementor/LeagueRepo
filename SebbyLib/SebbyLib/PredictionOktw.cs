@@ -660,10 +660,9 @@ namespace SebbyLib.Prediction
             var pLength = path.PathLength();
 
             //Skillshots with only a delay
-            if (pLength >= input.Delay * speed - input.RealRadius && Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
+            var tDistance = input.Delay * speed - input.RealRadius;
+            if (pLength >= tDistance && Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
             {
-                var tDistance = input.Delay * speed - input.RealRadius;
-
                 for (var i = 0; i < path.Count - 1; i++)
                 {
                     var a = path[i];
@@ -695,10 +694,9 @@ namespace SebbyLib.Prediction
             }
 
             //Skillshot with a delay and speed.
-            if (pLength >= input.Delay * speed - input.RealRadius &&
-                Math.Abs(input.Speed - float.MaxValue) > float.Epsilon)
+            if (pLength >= tDistance && Math.Abs(input.Speed - float.MaxValue) > float.Epsilon)
             {
-                var d = input.Delay * speed - input.RealRadius;
+                var d = tDistance;
                 if (input.Type == SkillshotType.SkillshotLine || input.Type == SkillshotType.SkillshotCone)
                 {
                     if (input.From.Distance(input.Unit.ServerPosition, true) < 200 * 200)
