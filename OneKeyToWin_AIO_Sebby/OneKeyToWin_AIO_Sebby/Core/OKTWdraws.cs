@@ -27,7 +27,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
     {
         public static List<OktwNotification> NotificationsList = new List<OktwNotification>();
 
-        public static Font Tahoma13, Tahoma13B, TextBold, HudLevel, HudCd, RecFont;
+        public static Font Tahoma13, Tahoma13B, TextBold, HudLevel, HudCd, RecFont, HudLevel2;
         public static Vector2 centerScreen = new Vector2(Drawing.Width / 2 - 20, Drawing.Height / 2 - 90);
         private float IntroTimer = Game.Time;
         private Render.Sprite Intro;
@@ -86,6 +86,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Utility.DelayAction.Add(7000, () => Intro.Remove());
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("championInfo", "Show enemy avatars").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("championInfoHD", "Full HD screen size").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posX", "posX").SetValue(new Slider(839, 1000, 0)));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posY", "posY").SetValue(new Slider(591, 1000, 0)));
 
@@ -116,6 +117,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             HudLevel = new Font(Drawing.Direct3DDevice, new FontDescription
             { FaceName = "Tahoma", Height = 17, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Antialiased });
+
+            HudLevel2 = new Font(Drawing.Direct3DDevice, new FontDescription
+            { FaceName = "Tahoma", Height = 12, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Antialiased });
 
             RecFont = new Font(Drawing.Direct3DDevice, new FontDescription
             { FaceName = "Tahoma", Height = 12, Weight = FontWeight.Bold, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Antialiased });
@@ -186,7 +190,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var SpellTrackerMe = Config.Item("SpellTrackerMe").GetValue<bool>();
             var SpellTrackerLvl = Config.Item("SpellTrackerLvl").GetValue<bool>();
             var ShowClicks = Config.Item("ShowClicks").GetValue<bool>();
-
+            var championInfoHD = Config.Item("championInfoHD").GetValue<bool>();
             float posY = (Config.Item("posY").GetValue<Slider>().Value * 0.001f) * Drawing.Height;
             float posX = (Config.Item("posX").GetValue<Slider>().Value * 0.001f) * Drawing.Width;
 
@@ -463,7 +467,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         }
                     }
 
-                    if (championInfo)
+                    if (championInfo && championInfoHD)
                     {
 
                         var hudSprite = hero.HudSprite;
@@ -610,9 +614,154 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 DrawFontTextScreen(HudCd, MakeNiceNumber(sumTime), vecHudCd.X, vecHudCd.Y, SharpDX.Color.White);
                             }
                         }
-
+                        hudSpace += 65;
                     }
-                    hudSpace += 65;
+                    else if (championInfo)
+                    {
+                        var hudSprite = hero.HudSprite;
+
+                        if (!hero.Hero.IsVisible)
+                            hudSprite.Color = new ColorBGRA(System.Drawing.Color.DimGray.ToArgb());
+                        else
+                            hudSprite.Color = new ColorBGRA(System.Drawing.Color.White.ToArgb());
+
+                        Vector2 hudPos = new Vector2(posX + hudSpace, posY);
+                        float scale = 0.33f;
+                        hudSprite.Scale = new Vector2(scale, scale);
+                        hudSprite.Position = hudPos - new Vector2(11, -8);
+                        hudSprite.OnEndScene();
+
+                        var vec1manaB = new Vector2(hudPos.X - 9, hudPos.Y + 48);
+                        var vec2manaB = new Vector2(hudPos.X - 8 + 33 + 3, hudPos.Y + 48);
+                        Drawing.DrawLine(vec1manaB, vec2manaB, 18, System.Drawing.Color.DarkGoldenrod);
+
+                        var vec1hpB = new Vector2(hudPos.X - 8, hudPos.Y + 49);
+                        var vec2hpB = new Vector2(hudPos.X - 8 + 33 + 2, hudPos.Y + 49);
+                        Drawing.DrawLine(vec1hpB, vec2hpB, 16, System.Drawing.Color.Black);
+
+                        System.Drawing.Color color = System.Drawing.Color.LimeGreen;
+                        if (hero.Hero.HealthPercent < 30)
+                            color = System.Drawing.Color.OrangeRed;
+                        else if (hero.Hero.HealthPercent < 50)
+                            color = System.Drawing.Color.DarkOrange;
+                        var vec1hp = new Vector2(hudPos.X - 7, hudPos.Y + 50);
+                        var vec2hp = new Vector2(hudPos.X - 7 +  33 * hero.Hero.HealthPercent * 0.01f, hudPos.Y + 50);
+                        Drawing.DrawLine(vec1hp, vec2hp, 7, color);
+
+                        var vec1mana = new Vector2(hudPos.X - 7, hudPos.Y + 59);
+                        var vec2mana = new Vector2(hudPos.X - 7 + 33 * hero.Hero.ManaPercent * 0.01f, hudPos.Y + 59);
+                        Drawing.DrawLine(vec1mana, vec2mana, 5, System.Drawing.Color.DodgerBlue);
+                        var vecHudLevel = new Vector2(hudPos.X + 15, hudPos.Y + 36);
+                        DrawFontTextScreen(HudLevel2, hero.Hero.Level.ToString(), vecHudLevel.X, vecHudLevel.Y, SharpDX.Color.White);
+                        {
+                            if (Game.Time - hero.FinishRecallTime < 4)
+                            {
+                                DrawFontTextScreen(HudLevel2, "FINISH", hudPos.X - 9, hudPos.Y + 18, SharpDX.Color.YellowGreen);
+                            }
+                            else if (hero.StartRecallTime <= hero.AbortRecallTime && Game.Time - hero.AbortRecallTime < 4)
+                            {
+                                DrawFontTextScreen(HudLevel2, "ABORT", hudPos.X - 9, hudPos.Y + 18, SharpDX.Color.Yellow);
+                            }
+                            else if (Game.Time - hero.StartRecallTime < 8)
+                            {
+                                var recallPercent = (Game.Time - hero.StartRecallTime) / 8;
+                                var vec1rec = new Vector2(hudPos.X - 9, hudPos.Y + 35);
+                                var vec2rec = new Vector2(hudPos.X - 8 + 33 + 3, hudPos.Y + 35);
+                                Drawing.DrawLine(vec1rec, vec2rec, 14, System.Drawing.Color.DarkGoldenrod);
+
+                                vec1rec = new Vector2(hudPos.X - 8, hudPos.Y + 36);
+                                vec2rec = new Vector2(hudPos.X - 8 + 33 + 2, hudPos.Y + 36);
+                                Drawing.DrawLine(vec1rec, vec2rec, 12, System.Drawing.Color.Black);
+
+                                vec1rec = new Vector2(hudPos.X - 7, hudPos.Y + 37);
+                                vec2rec = new Vector2(hudPos.X - 7 + 33 * recallPercent, hudPos.Y + 37);
+                                Drawing.DrawLine(vec1rec, vec2rec, 10, System.Drawing.Color.Yellow);
+
+                                if (blink)
+                                    DrawFontTextScreen(HudLevel2, "RECALL", hudPos.X - 9, hudPos.Y + 18, SharpDX.Color.White);
+
+                            }
+                        }
+
+                        var ult = hero.Hero.Spellbook.Spells[3];
+                        var sum1 = hero.Hero.Spellbook.Spells[4];
+                        var sum2 = hero.Hero.Spellbook.Spells[5];
+
+                        if (ult != null)
+                        {
+                            var sumTime = ult.CooldownExpires - Game.Time;
+
+                            var spritePos = new Vector2(hudPos.X - 2, hudPos.Y - 30);
+                            var vecHudCd = new Vector2(hudPos.X + 2, hudPos.Y - 24);
+                            var sumSprite = GetSummonerIcon("r");
+                            sumSprite.Position = spritePos;
+
+                            sumSprite.Scale = new Vector2(0.35f, 0.35f);
+                            if (hero.Hero.Level < 6)
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.DimGray.ToArgb());
+                                sumSprite.OnEndScene();
+                            }
+                            else if (sumTime < 0)
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.White.ToArgb());
+                                sumSprite.OnEndScene();
+                            }
+                            else
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.DimGray.ToArgb());
+                                sumSprite.OnEndScene();
+                                DrawFontTextScreen(HudCd, MakeNiceNumber(sumTime), vecHudCd.X, vecHudCd.Y, SharpDX.Color.White);
+                            }
+                        }
+
+                        if (sum1 != null)
+                        {
+                            var sumTime = sum1.CooldownExpires - Game.Time;
+
+                            var vecFlashPos = new Vector2(hudPos.X - 13, hudPos.Y - 10);
+                            var vecHudCd = new Vector2(hudPos.X - 8, hudPos.Y - 5);
+                            var sumSprite = GetSummonerIcon(sum1.Name);
+                            sumSprite.Position = vecFlashPos;
+                            sumSprite.Scale = new Vector2(0.35f, 0.35f);
+                            
+                            if (sumTime < 0)
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.White.ToArgb());
+                                sumSprite.OnEndScene();
+                            }
+                            else
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.DimGray.ToArgb());
+                                sumSprite.OnEndScene();
+                                DrawFontTextScreen(HudCd, MakeNiceNumber(sumTime), vecHudCd.X, vecHudCd.Y, SharpDX.Color.White);
+                            }
+                        }
+
+                        if (sum2 != null)
+                        {
+                            var sumTime = sum2.CooldownExpires - Game.Time;
+
+                            var vecHealPos = new Vector2(hudPos.X + 9, hudPos.Y - 10);
+                            var vecHudCd = new Vector2(hudPos.X + 15, hudPos.Y - 5);
+                            var sumSprite = GetSummonerIcon(sum2.Name);
+                            sumSprite.Position = vecHealPos;
+                            sumSprite.Scale = new Vector2(0.35f, 0.35f);
+
+                            if (sumTime < 0)
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.White.ToArgb());
+                                sumSprite.OnEndScene();
+                            }
+                            else
+                            {
+                                sumSprite.Color = new ColorBGRA(System.Drawing.Color.DimGray.ToArgb());
+                                sumSprite.OnEndScene();
+                                DrawFontTextScreen(HudCd, MakeNiceNumber(sumTime), vecHudCd.X, vecHudCd.Y, SharpDX.Color.White);
+                            }
+                        }
+                        hudSpace += 45;
+                    }
                 }
 
                 if (ScreenRadar && !hero.Hero.Position.IsOnScreen() && (!ScreenRadarEnemy || hero.Hero.IsEnemy) && (!ScreenRadarJungler || hero.IsJungler))
