@@ -533,7 +533,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                                 if (blink)
                                     DrawFontTextScreen(RecFont, "RECALLING", hudPos.X - 10, hudPos.Y + 18, SharpDX.Color.White);
-
+                            }
+                            else if (!hero.Hero.IsVisible)
+                            {
+                                DrawFontTextScreen(RecFont, "SS  " + (int)(Game.Time - hero.LastVisableTime), hudPos.X, hudPos.Y + 18, SharpDX.Color.White);
                             }
                         }
 
@@ -680,6 +683,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
                                 if (blink)
                                     DrawFontTextScreen(HudLevel2, "RECALL", hudPos.X - 9, hudPos.Y + 18, SharpDX.Color.White);
 
+                            }
+                            else if (!hero.Hero.IsVisible)
+                            {
+                                DrawFontTextScreen(HudLevel2, "SS  " + (int)(Game.Time - hero.LastVisableTime), hudPos.X - 9, hudPos.Y + 21, SharpDX.Color.White);
                             }
                         }
 

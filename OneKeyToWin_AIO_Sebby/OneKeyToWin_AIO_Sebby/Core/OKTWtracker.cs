@@ -105,6 +105,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         ChampionInfoOne.LastVisablePos = spawnPos;
                         ChampionInfoOne.PredictedPos = spawnPos;
                         ChampionInfoOne.LastWayPoint = spawnPos;
+                        ChampionInfoOne.LastVisableTime = Game.Time;
                         break;
                 }
             }
