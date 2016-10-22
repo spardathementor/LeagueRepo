@@ -250,11 +250,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         var timer = jungler.LastVisablePos.Distance(Player.Position) / 330;
                         var time2 = timer - (Game.Time - jungler.LastVisableTime);
                         stringg = "Jungler in jungle " + (int)time2;
+                        time2 = time2 - 10;
                         if (time2 > 0)
                             percent = 0;
                         else
-                            percent = -time2 * 0.1f;
-                        Console.WriteLine(timer + " " + time2);
+                            percent = (-time2) * 0.05f;
+                        //Console.WriteLine(timer + " " + time2);
                         percent = Math.Min(percent, 1);
                     }
 
