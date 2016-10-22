@@ -360,7 +360,6 @@ namespace SebbyLib.Prediction
                 result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
-            OktwCommon.debug("WAIT.....");
             // CAN'T MOVE SPELLS ///////////////////////////////////////////////////////////////////////////////////
 
             if (UnitTracker.GetSpecialSpellEndTime(input.Unit) > 100 || input.Unit.HasBuff("Recall") || (UnitTracker.GetLastStopMoveTime(input.Unit) < 100 && input.Unit.IsRooted))
