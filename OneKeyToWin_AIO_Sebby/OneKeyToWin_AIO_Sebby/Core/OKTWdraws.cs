@@ -90,6 +90,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posX", "posX").SetValue(new Slider(839, 1000, 0)));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posY", "posY").SetValue(new Slider(591, 1000, 0)));
 
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("gankalert", "Gank alert").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posXj", "alert posX ").SetValue(new Slider(639, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posYj", "alert posY").SetValue(new Slider(591, 1000, 0)));
+
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("Notification", "Notifications").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadar", "Enable").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadarEnemy", "Only enemy").SetValue(true));
@@ -206,6 +210,60 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var notPos = new Vector2(Drawing.Width / 2 - 150, Drawing.Height / 6);
 
             var centerScreenWorld = Drawing.ScreenToWorld(centerScreen);
+            if (Config.Item("gankalert").GetValue<bool>())
+            {
+                var jungler = OKTWtracker.ChampionInfoList.FirstOrDefault(x => x.Hero.IsEnemy && x.IsJungler);
+                var stringg = "Jungler not detected";
+                float posXj = (Config.Item("posXj").GetValue<Slider>().Value * 0.001f) * Drawing.Width;
+                float posYj = (Config.Item("posYj").GetValue<Slider>().Value * 0.001f) * Drawing.Height;
+                
+
+                var jungleAlertPos = new Vector2(posXj, posYj);
+                if (jungler != null)
+                {
+                    Drawing.DrawLine(jungleAlertPos, jungleAlertPos + new Vector2(120, 0), 20, System.Drawing.Color.Black);
+                    Drawing.DrawLine(jungleAlertPos + new Vector2(1, 1), jungleAlertPos + new Vector2(119, 1), 18, System.Drawing.Color.DarkGreen);
+                    float percent = 0;
+                    var distance = jungler.LastVisablePos.Distance(Player.Position);
+                    if (Game.Time - jungler.FinishRecallTime < 4)
+                    {
+                        stringg = "Jungler in base";
+                        percent = 0;
+                    }
+                    else if (jungler.Hero.IsDead)
+                    {
+                        stringg = "Jungler dead";
+                        percent = 0;
+                    }
+                    else if (distance < 3500)
+                    {
+                        stringg = "Jungler NEAR you";
+                        percent = 1;
+                    }
+                    else if (jungler.Hero.IsVisible)
+                    {
+                        stringg = "Jungler visable";
+                        percent = 0;
+                    }
+                    else
+                    {
+                        var timer = jungler.LastVisablePos.Distance(Player.Position) / 330;
+                        var time2 = timer - (Game.Time - jungler.LastVisableTime);
+                        stringg = "Jungler in jungle " + (int)time2;
+                        if (time2 > 0)
+                            percent = 0;
+                        else
+                            percent = -time2 * 0.1f;
+                        Console.WriteLine(timer + " " + time2);
+                        percent = Math.Min(percent, 1);
+                    }
+
+                    if (percent != 0)
+                        Drawing.DrawLine(jungleAlertPos + new Vector2(1, 1), jungleAlertPos + new Vector2(1 + 118 * percent, 1), 18, System.Drawing.Color.OrangeRed);
+                }
+                DrawFontTextScreen(RecFont, stringg, jungleAlertPos.X + 3, jungleAlertPos.Y + 3, SharpDX.Color.White);
+            }
+
             if (Config.Item("Notification").GetValue<bool>())
             {
                 var noti = NotificationsList.FirstOrDefault();
@@ -378,6 +436,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 if (hero.Hero.IsEnemy)
                 {
+
+
+                   
+
                     if (ShowClicks && hero.Hero.IsValidTarget() && hero.LastWayPoint.IsValid() && hero.Hero.Position.Distance(hero.LastWayPoint) > 100)
                     {
                         drawLine(hero.Hero.Position, hero.LastWayPoint, 1, System.Drawing.Color.Red);
