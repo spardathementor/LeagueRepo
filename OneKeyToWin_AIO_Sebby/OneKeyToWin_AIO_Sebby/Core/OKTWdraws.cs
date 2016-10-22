@@ -253,8 +253,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         if (time2 > 0)
                             percent = 0;
                         else
-                            percent = -time2 * 0.1f;
-                        Console.WriteLine(timer + " " + time2);
+                            percent = -time2 - 10 * 0.5f;
                         percent = Math.Min(percent, 1);
                     }
 
