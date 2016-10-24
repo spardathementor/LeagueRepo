@@ -210,13 +210,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else if (FarmSpells && QMissile == null && Config.Item("farmW", true).GetValue<bool>())
             {
                 var minionList = Cache.GetMinions(Player.ServerPosition, W.Range, MinionTeam.Enemy);
-                if (FarmMinions >= minionList.Count)
-                {
-                    foreach (var minion in minionList.Where(minion => minion.Health < W.GetDamage(minion)))
-                    {
-                        W.Cast();
-                    }
-                }
+                if (minionList.Count >= FarmMinions && minionList.Any(minion => minion.Health < W.GetDamage(minion)))
+                     W.Cast();
             }
         }
 
@@ -253,10 +248,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && E.GetDamage(enemy) + Q.GetDamage(enemy) + W.GetDamage(enemy) + OktwCommon.GetEchoLudenDamage(enemy) > enemy.Health))
-            {
+            foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && OktwCommon.GetKsDamage(enemy,E) + Q.GetDamage(enemy) + W.GetDamage(enemy) > enemy.Health))
                 Program.CastSpell(E, enemy);
-            }
+            
             var t = Orbwalker.GetTarget() as Obj_AI_Hero;
             if (!t.IsValidTarget())
                 t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
@@ -264,11 +258,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("Eon" + t.ChampionName, true).GetValue<bool>())
                     Program.CastSpell(E, t);
-                else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() )
                     Program.CastSpell(E, t);
-                else if (OktwCommon.GetKsDamage(t, E) > t.Health )
-                    Program.CastSpell(E, t);
-                if (Player.Mana > RMANA + EMANA)
+                if (!Program.None && Player.Mana > RMANA + EMANA)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy) && Config.Item("Eon" + enemy.ChampionName, true).GetValue<bool>()))
                         E.Cast(enemy);
