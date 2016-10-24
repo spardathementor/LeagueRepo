@@ -181,7 +181,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Q.Cast(t, true);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true))
+                else if (Program.Harass && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true))
                 {
                      if (Player.Mana > Player.MaxMana * 0.9)
                         Program.CastSpell(Q, t);

@@ -123,7 +123,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Program.Combo && Player.Mana > RMANA + EMANA)
                         E.Cast(t);
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
+                    else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                     {
                         E.Cast(t);
                     }
@@ -134,7 +134,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Program.Combo && Player.Mana > RMANA + QMANA)
                         Program.CastSpell(Q, t);
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
+                    else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                     {
                         Program.CastSpell(Q, t);
                     }
@@ -180,7 +180,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
+                else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                 {
                     Program.CastSpell(Q, t);
                 }

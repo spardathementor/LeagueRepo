@@ -159,7 +159,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > EMANA + QMANA - 10)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                 {
                     Program.CastSpell(Q, t);
                 }
@@ -224,7 +224,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         E.Cast(t, true);
                     }
-                    else if ( Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && !Player.UnderTurret(true) && QMissile == null)
+                    else if ( Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && QMissile == null)
                     {
                         E.Cast(t, true);
                     }

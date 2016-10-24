@@ -185,7 +185,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 int[] mana = new int[] { 0, 30, 33, 36, 42, 48, 54, 63, 72, 81, 90, 102, 114, 126, 138, 150, 165, 180, 195 };
                 if (!Player.HasBuff("xerathascended2onhit") || Player.Mana + mana[Player.Level] > Player.MaxMana)
                     Orbwalker.ForceTarget(null);
-                else if ((Program.Combo || Program.Farm) && Config.Item("force", true).GetValue<bool>() && Orbwalker.GetTarget() == null)
+                else if ((Program.Combo || Program.Harass) && Config.Item("force", true).GetValue<bool>() && Orbwalker.GetTarget() == null)
                 {
                     var minion = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2).OrderByDescending(x => x.Health).FirstOrDefault();
 
@@ -251,9 +251,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(W, t);
                 else if (Program.Combo && Player.Mana > RMANA + WMANA )
                     Program.CastSpell(W, t);
-                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA)
+                else if (Program.Harass && OktwCommon.CanHarras() && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA)
                     Program.CastSpell(W, t);
-                else if ((Program.Combo || Program.Farm))
+                else if ((Program.Combo || Program.Harass))
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy, true);
@@ -294,11 +294,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         Q.StartCharging();
                     }
-                    else if (Program.Farm &&  t.IsValidTarget(1200) &&  Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + QMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                    else if (Program.Harass &&  t.IsValidTarget(1200) &&  Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + QMANA + QMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && OktwCommon.CanHarras())
                     {
                         Q.StartCharging();
                     }
-                    else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA)
+                    else if ((Program.Combo || Program.Harass) && Player.Mana > RMANA + WMANA)
                     {
                         foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                             Q.StartCharging();
@@ -327,7 +327,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
                     Program.CastSpell(E, t);
-                if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                if (Program.Harass && OktwCommon.CanHarras() && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     Program.CastSpell(E, t);
                 foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                     E.Cast(enemy);

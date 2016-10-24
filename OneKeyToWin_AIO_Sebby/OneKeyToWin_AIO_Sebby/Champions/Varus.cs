@@ -242,11 +242,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if ((OktwCommon.GetBuffCount(t, "varuswdebuff") == 3 && CanCast && !E.IsReady()) || !SebbyLib.Orbwalking.InAutoAttackRange(t))
                 {
-                    if ((Program.Combo || (OktwCommon.GetBuffCount(t, "varuswdebuff") == 3 && Program.Farm)) && Player.Mana > RMANA + QMANA)
+                    if ((Program.Combo || (OktwCommon.GetBuffCount(t, "varuswdebuff") == 3 && Program.Harass)) && Player.Mana > RMANA + QMANA)
                     {
                         CastQ(t);
                     }
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + QMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && OktwCommon.CanHarras())
+                    else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + QMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && OktwCommon.CanHarras())
                     {
                         CastQ(t);
                     }
@@ -283,7 +283,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         Program.CastSpell(E, t);
                     }
-                    else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA)
+                    else if (!Program.None && Player.Mana > RMANA + WMANA)
                     {
                         foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                             E.Cast(enemy);

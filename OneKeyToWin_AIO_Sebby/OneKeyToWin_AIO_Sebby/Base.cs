@@ -42,7 +42,7 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsMelee))
                 Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").SubMenu("Positioning Assistant:").AddItem(new MenuItem("posAssistant" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
             Config.SubMenu("Extra settings OKTW©").SubMenu("Anti-Melee Positioning Assistant OKTW©").AddItem(new MenuItem("positioningAssistantDraw", "Show notification").SetValue(true));
-            Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("harassLaneclear", "Skill-Harass in lane clear").SetValue(true));
+            Config.SubMenu("Extra settings OKTW©").AddItem(new MenuItem("harassMixed", "Spell-harass only in mixed mode").SetValue(false));
             Config.Item("supportMode", true).SetValue(false);
 
             foreach (var enemy in HeroManager.Enemies)
@@ -56,6 +56,7 @@ namespace OneKeyToWin_AIO_Sebby
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("Mana", "LaneClear Mana", true).SetValue(new Slider(50, 100, 0)));
 
             Config.Item("spellFarm").Permashow(true);
+            Config.Item("harassMixed").Permashow(true);
 
             SebbyLib.Orbwalking.BeforeAttack += Orbwalking_BeforeAttack;
             Game.OnWndProc += Game_OnWndProc;

@@ -132,7 +132,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo)
                     Q.Cast(t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() &&  Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() &&  Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA)
                     Q.Cast(t);
                 else if (Player.Health < Player.Level * 40 && !W.IsReady() && !R.IsReady())
                     Q.Cast(t);
@@ -179,7 +179,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if(Program.Combo && Player.Mana > WMANA + EMANA && Player.CountEnemiesInRange(700) > 0)
                 E.Cast();
-            else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > WMANA + EMANA + QMANA && Player.CountEnemiesInRange(500) > 0)
+            else if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > WMANA + EMANA + QMANA && Player.CountEnemiesInRange(500) > 0)
                 E.Cast();
             else if (FarmSpells && Config.Item("farmE", true).GetValue<bool>() && FarmE())
                 E.Cast();

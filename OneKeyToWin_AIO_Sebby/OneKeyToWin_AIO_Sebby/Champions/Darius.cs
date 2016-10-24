@@ -131,7 +131,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Player.Mana > RMANA + QMANA && Program.Combo)
                         Q.Cast();
-                    else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA && Config.Item("Harass", true).GetValue<bool>())
+                    else if (Program.Harass && Player.Mana > RMANA + QMANA + EMANA + WMANA && Config.Item("Harass", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                         Q.Cast();
                 }
 

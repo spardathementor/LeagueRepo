@@ -62,7 +62,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 foreach (var t in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(enemy => enemy.Health))
                 {
 
-                    if (Program.Farm && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
+                    if (Program.Harass && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
                         Q.Cast(t);
 
                     if (t.IsMelee && t.IsFacing(Player) && t.ServerPosition.Distance(Player.ServerPosition) > 300)
@@ -259,7 +259,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if(Config.Item("QafterAA", true).GetValue<bool>())
                     continue;
                 
-                if (Program.Farm && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
+                if (Program.Harass && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA)
                     Q.Cast(t);
 
                 if (t.IsMelee && t.IsFacing(Player) && t.ServerPosition.Distance(Player.ServerPosition) > 300)

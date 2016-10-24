@@ -189,7 +189,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     CastQ(t);
-                else if (Program.Farm  && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass  && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
                     CastQ(t);
                 else if(OktwCommon.GetKsDamage(t,Q) > t.Health)
                     CastQ(t);
@@ -239,7 +239,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (Program.Combo && Player.Mana > RMANA + EMANA)
                             Program.CastSpell(E, t);
-                        else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + EMANA + RMANA)
+                        else if (Program.Harass && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + EMANA + RMANA)
                             Program.CastSpell(E, t);
                         else if (OktwCommon.GetKsDamage(t, E) > t.Health)
                                 Program.CastSpell(E, t);

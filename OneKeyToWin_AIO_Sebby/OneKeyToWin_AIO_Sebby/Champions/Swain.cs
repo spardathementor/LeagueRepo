@@ -156,7 +156,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast();
 
                 }
-                else if ((Player.Position.CountEnemiesInRange(R.Range + 400) == 0 || Player.Mana < EMANA) && ((Program.Farm && Config.Item("farmR", true).GetValue<bool>()) || Program.None)  )
+                else if ((Player.Position.CountEnemiesInRange(R.Range + 400) == 0 || Player.Mana < EMANA) && ((Program.Harass && Config.Item("farmR", true).GetValue<bool>()) || Program.None)  )
                 {
                     R.Cast();
                 }
@@ -168,7 +168,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if(Program.Combo && Config.Item("autoR", true).GetValue<bool>())
                         R.Cast();
-                    else if (Program.Farm && Config.Item("harassR", true).GetValue<bool>())
+                    else if (Program.Harass && Config.Item("harassR", true).GetValue<bool>())
                         R.Cast();
                     else if(countAOE >= Config.Item("Raoe", true).GetValue<Slider>().Value)
                         R.Cast();
@@ -240,9 +240,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
                     Q.Cast(t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Q.Cast(t);
-                else if ((Program.Combo || Program.Farm))
+                else if ((Program.Combo || Program.Harass))
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         Q.Cast(enemy);
@@ -262,7 +262,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
                     E.CastOnUnit(t);
-                else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     E.CastOnUnit(t);
             }
         }

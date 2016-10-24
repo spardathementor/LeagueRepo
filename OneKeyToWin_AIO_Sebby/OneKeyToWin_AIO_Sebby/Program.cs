@@ -42,7 +42,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static bool SPredictionLoad = false;
 
-        public static bool LaneClear = false, None = false, Farm = false, Combo = false;
+        public static bool LaneClear = false, None = false, Harass = false, Combo = false, Farm = false;
 
         private static float dodgeTime = Game.Time;
 
@@ -284,7 +284,13 @@ namespace OneKeyToWin_AIO_Sebby
             else
             {
                 Combo = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo;
-                Farm = (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear && Config.Item("harassLaneclear").GetValue<bool>()) || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Freeze;
+
+                if(Config.Item("harassMixed").GetValue<bool>())
+                    Harass = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed;
+                else
+                    Harass = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Freeze;
+
+                Farm = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed || Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Freeze;
                 None = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None;
                 LaneClear = Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear;
             }

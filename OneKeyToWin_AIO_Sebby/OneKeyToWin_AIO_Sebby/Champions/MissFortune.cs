@@ -111,7 +111,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Q.Cast(t);
                     else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                         Q.Cast(t);
-                    else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA)
+                    else if (Program.Harass && Player.Mana > RMANA + QMANA + EMANA + WMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                         Q.Cast(t);
                 }
                 if (W.IsReady())
@@ -262,7 +262,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Q.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                     Q.Cast(t);
-                else if (Program.Farm && Player.Mana > RMANA + QMANA + EMANA + WMANA)
+                else if (Program.Harass && Player.Mana > RMANA + QMANA + EMANA + WMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Q.Cast(t);
             }
             else if (t1.IsValidTarget(Q1.Range) && Config.Item("harassQ", true).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 50)

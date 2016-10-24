@@ -203,7 +203,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 
                 if (Program.Combo && Player.Mana > RMANA + QMANA + WMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && OktwCommon.CanHarras() && Config.Item("harassQ", true).GetValue<bool>() 
+                else if (Program.Harass && OktwCommon.CanHarras() && Config.Item("harassQ", true).GetValue<bool>() 
                     && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.ManaPercent > Config.Item("QHarassMana", true).GetValue<Slider>().Value)
                     Program.CastSpell(Q, t);
                 else if (OktwCommon.GetKsDamage(t, Q) > t.Health)
@@ -252,7 +252,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            if ((Program.Combo || (Program.Farm && Config.Item("harassW", true).GetValue<bool>())) && Player.Mana > RMANA + WMANA)
+            if ((Program.Combo || (Program.Harass && Config.Item("harassW", true).GetValue<bool>())) && Player.Mana > RMANA + WMANA)
             {
                 if (Config.Item("WmodeCombo", true).GetValue<StringList>().SelectedIndex == 1)
                 {

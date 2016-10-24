@@ -116,7 +116,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
                     W.Cast();
-                else if (Program.Farm && Config.Item("harassW", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                else if (Program.Harass && Config.Item("harassW", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     W.Cast();
             }
             var tks = TargetSelector.GetTarget(1600, TargetSelector.DamageType.Physical);
@@ -149,7 +149,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         return;
                     if (Program.Combo && Player.Mana > RMANA + EMANA)
                         E.CastOnUnit(t);
-                    else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                    else if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                         E.CastOnUnit(t);
                 }
             }

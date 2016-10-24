@@ -246,7 +246,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (Program.Combo && Player.Mana > RMANA + WMANA)
                             Program.CastSpell(W, t);
-                        else if (Program.Farm && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>()
+                        else if (Program.Harass && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>()
                             && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
                             Program.CastSpell(W, t);
                     }
@@ -349,7 +349,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                                 Q.CastOnUnit(minion);
                             if (Program.Combo && Player.Mana > RMANA + EMANA)
                                 Q.CastOnUnit(minion);
-                            else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                            else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                                 Q.CastOnUnit(minion);
                         }
                     }
@@ -363,7 +363,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Q.CastOnUnit(t);
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Q.CastOnUnit(t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Q.CastOnUnit(t);
             }
             if (FarmSpells && Config.Item("farmQ", true).GetValue<bool>())

@@ -192,7 +192,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Program.CastSpell(Q, t);
 
                 if (Player.Mana > RMANA + QMANA)
@@ -225,7 +225,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     W.Cast(Player.Position.Extend(t.Position, 450));
                 else if (Program.Combo && Player.Mana > RMANA + WMANA)
                     W.Cast(Player.Position.Extend(t.Position, 450));
-                else if (Program.Farm && Config.Item("harassW", true).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                     W.Cast(Player.Position.Extend(t.Position, 450));
             }
             else if (FarmSpells && Config.Item("farmW", true).GetValue<bool>() )
@@ -253,7 +253,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     E.CastOnUnit(t);
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
                     E.CastOnUnit(t);
-                else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     E.CastOnUnit(t);
             }
             else if (FarmSpells && Config.Item("farmE", true).GetValue<bool>())
@@ -267,7 +267,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                 }
             }
-            else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harrasEminion", true).GetValue<bool>())
+            else if (Program.Harass && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harrasEminion", true).GetValue<bool>())
             {
                 var te = TargetSelector.GetTarget(E.Range + 400, TargetSelector.DamageType.Magical);
                 if (te.IsValidTarget())

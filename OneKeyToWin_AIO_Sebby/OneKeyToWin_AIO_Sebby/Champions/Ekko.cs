@@ -206,7 +206,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 missileManager.Target = t;
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
                         Program.CastSpell(Q, t);
                 else if (OktwCommon.GetKsDamage(t, Q) * 2 > t.Health)
                     Program.CastSpell(Q, t);
@@ -222,7 +222,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 missileManager.Target = t1;
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q1, t1);
-                else if (Program.Farm && Config.Item("Harass" + t1.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("Harass" + t1.ChampionName).GetValue<bool>() && Player.Mana > RMANA + WMANA + QMANA + QMANA && OktwCommon.CanHarras())
                     Program.CastSpell(Q1, t1);
                 else if (OktwCommon.GetKsDamage(t1, Q1) * 2 > t1.Health)
                     Program.CastSpell(Q1, t1);

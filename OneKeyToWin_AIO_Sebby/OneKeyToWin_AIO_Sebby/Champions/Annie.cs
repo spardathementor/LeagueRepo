@@ -142,7 +142,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         Q.Cast(t);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harassQ", true).GetValue<bool>())
+                    else if (Program.Harass && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                         Q.Cast(t);
                     else
                     {
@@ -161,7 +161,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                     if (Program.Combo && RMANA + WMANA < Player.Mana)
                         W.Cast(poutput.CastPosition);
-                    else if (Program.Farm && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harassW", true).GetValue<bool>())
+                    else if (Program.Harass && RMANA + WMANA + QMANA < Player.Mana && Config.Item("harassW", true).GetValue<bool>())
                         W.Cast(poutput.CastPosition);
                     else
                     {
@@ -185,7 +185,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     }
                     else
                     {
-                        if ((!HaveStun || Program.LaneClear) && Program.Farm)
+                        if ((!HaveStun || Program.LaneClear) && Program.Harass)
                             farm();
                     }
                 }

@@ -53,7 +53,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if(Program.Combo && Config.Item("autoE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA)
                     E.Cast(args.Target.Position);
-                if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA + QMANA && OktwCommon.CanHarras())
+                if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > EMANA + RMANA + QMANA && OktwCommon.CanHarras())
                     E.Cast(args.Target.Position);
                 if (!Q.IsReady() && !R.IsReady() && args.Target.Health < Player.FlatPhysicalDamageMod * 2)
                     E.Cast();
@@ -102,7 +102,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         CastR(R, t);
                     }
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("Rammo", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
+                    else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && Player.Spellbook.GetSpell(SpellSlot.R).Ammo >= Config.Item("Rammo", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                     {
                         foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(R.Range) && Config.Item("Harass" + enemy.ChampionName).GetValue<bool>()))
                             CastR(R, enemy);
@@ -162,7 +162,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + RMANA && OktwCommon.CanHarras())
                     Program.CastSpell(Q, t);
                 else
                 {

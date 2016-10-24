@@ -183,7 +183,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (!SebbyLib.Orbwalking.CanMove(50) )
                     return;
                 bool cc = !Program.None && Player.Mana > RMANA + QMANA + EMANA;
-                bool harass = Program.Farm && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
+                bool harass = Program.Harass && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
 
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                 {
@@ -213,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LagFree(2))
             {
-                if (Farm && Player.Mana > QMANA)
+                if (Harass && Player.Mana > QMANA)
                 {
                     farmQ();
                     lag = Game.Time;
@@ -232,7 +232,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA + EMANA)
                     Program.CastSpell(W, t);
-                else if (Program.Farm && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && (Player.Mana > Player.MaxMana * 0.8 || Config.Item("apEz", true).GetValue<bool>()) && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && (Player.Mana > Player.MaxMana * 0.8 || Config.Item("apEz", true).GetValue<bool>()) && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                     Program.CastSpell(W, t);
                 else
                 {

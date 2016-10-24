@@ -135,7 +135,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if(Program.Combo && Player.Mana > RMANA + QMANA )
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>()  && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Program.CastSpell(Q, t);
 
                 if (Player.Mana > RMANA + QMANA)
@@ -163,7 +163,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
                     Program.CastSpell(W, t);
-                else if (Program.Farm && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>()  && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>()  && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                     Program.CastSpell(W, t);
                 else
                 {
@@ -199,7 +199,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
                     E.CastOnUnit(t);
-                else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA)
+                else if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     E.CastOnUnit(t);
                 else
                 {
@@ -215,7 +215,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if(Config.Item("minionE", true).GetValue<bool>())
                 {
-                    if ((Program.Combo && Player.Mana > RMANA + EMANA) || (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA ))
+                    if ((Program.Combo && Player.Mana > RMANA + EMANA) || (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + EMANA ))
                     {
                         foreach (var minion in Cache.GetMinions(Player.Position, E.Range).Where(minion => minion.IsValidTarget(E.Range) && minion.CountEnemiesInRange(300) > 0 && minion.HasBuff("brandablaze")))
                         {

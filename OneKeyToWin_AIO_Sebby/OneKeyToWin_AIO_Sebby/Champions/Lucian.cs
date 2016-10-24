@@ -148,14 +148,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Q.Cast(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Q.Cast(t);
-                else if (Program.Farm && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + QMANA + EMANA + WMANA)
+                else if (Program.Harass && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && Player.Mana > RMANA + QMANA + EMANA + WMANA)
                     Q.Cast(t);
             }
-            else if ((Program.Farm || Program.Combo) && Config.Item("harassQ", true).GetValue<bool>() && t1.IsValidTarget(Q1.Range) && Config.Item("Harass" + t1.ChampionName).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 100)
+            else if ((Program.Harass || Program.Combo) && Config.Item("harassQ", true).GetValue<bool>() && t1.IsValidTarget(Q1.Range) && Config.Item("Harass" + t1.ChampionName).GetValue<bool>() && Player.Distance(t1.ServerPosition) > Q.Range + 100)
             {
                 if (Program.Combo && Player.Mana < RMANA + QMANA)
                     return;
-                if (Program.Farm && Player.Mana < RMANA + QMANA + EMANA + WMANA )
+                if (Program.Harass && Player.Mana < RMANA + QMANA + EMANA + WMANA )
                     return;
                 if (!OktwCommon.CanHarras())
                     return;
@@ -216,9 +216,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 
                 if (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Combo && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                     Program.CastSpell(W, t);
-                else if (Program.Farm && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > Player.MaxMana * 0.8 && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA)
+                else if (Program.Harass && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.Mana > Player.MaxMana * 0.8 && Player.Mana > RMANA + WMANA + EMANA + QMANA + WMANA)
                     Program.CastSpell(W, t);
-                else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
+                else if ((Program.Combo || Program.Harass) && Player.Mana > RMANA + WMANA + EMANA)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy, true);

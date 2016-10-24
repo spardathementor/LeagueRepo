@@ -220,7 +220,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if(Player.Mana > RMANA + EMANA + QMANA)
                         E.CastIfWillHit(t, 2, true);
                 }
-                if (Program.Farm && Config.Item("autoE2", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA)
+                if (Program.Harass && Config.Item("autoE2", true).GetValue<bool>() && Player.Mana > RMANA + EMANA + WMANA + QMANA)
                 {
                     E.CastIfWillHit(t, 2, true);
                 }
@@ -397,7 +397,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 return;
             }
 
-            if (Config.Item("axeTower2", true).GetValue<bool>() && Program.Farm && Axe.Position.UnderTurret(true))
+            if (Config.Item("axeTower2", true).GetValue<bool>() && Program.Harass && Axe.Position.UnderTurret(true))
             {
                 Orbwalker.SetOrbwalkingPoint(Game.CursorPos);
                 return;

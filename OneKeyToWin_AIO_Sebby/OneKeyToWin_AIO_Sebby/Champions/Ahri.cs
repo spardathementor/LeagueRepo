@@ -202,7 +202,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
                     W.Cast();
-                else if (Program.Farm && Player.Mana > RMANA + QMANA + WMANA && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                else if (Program.Harass && Player.Mana > RMANA + QMANA + WMANA && Config.Item("harassW", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     W.Cast();
                 else if (W.GetDamage(t) + W.GetDamage(t, 1) + Q.GetDamage(t) * 2 > t.Health - OktwCommon.GetIncomingDamage(t))
                     W.Cast();
@@ -226,7 +226,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     
                     if (Program.Combo && Player.Mana > RMANA + QMANA)
                         Program.CastSpell(Q, t);
-                    else if (Program.Farm  && Player.Mana > RMANA + WMANA + QMANA + QMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
+                    else if (Program.Harass  && Player.Mana > RMANA + WMANA + QMANA + QMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && OktwCommon.CanHarras())
                         Program.CastSpell(Q, t);
                     else if (Q.GetDamage(t) * 2 + OktwCommon.GetEchoLudenDamage(t) > t.Health - OktwCommon.GetIncomingDamage(t))
                         Q.Cast(t, true);
@@ -258,7 +258,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + EMANA && Config.Item("Eon" + t.ChampionName, true).GetValue<bool>())
                     Program.CastSpell(E, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() )
+                else if (Program.Harass && Player.Mana > RMANA + EMANA + WMANA + EMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>() )
                     Program.CastSpell(E, t);
                 if (!Program.None && Player.Mana > RMANA + EMANA)
                 {

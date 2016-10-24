@@ -257,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 W.Cast();
                 return;
             }
-            if (Config.Item("W", true).GetValue<bool>() && !Program.Farm && !Program.Combo && ObjectManager.Player.Mana > Player.MaxMana * 0.95 && Player.HasBuff("orianaghostself"))
+            if (Config.Item("W", true).GetValue<bool>() && !Program.Harass && !Program.Combo && ObjectManager.Player.Mana > Player.MaxMana * 0.95 && Player.HasBuff("orianaghostself"))
                 W.Cast();
         }
 
@@ -270,7 +270,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     CastQ(t);
                 else if (Program.Combo && Player.Mana > RMANA + QMANA - 10)
                     CastQ(t);
-                else if (Program.Farm && Player.Mana > RMANA + QMANA + WMANA + EMANA)
+                else if (Program.Harass && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     CastQ(t);
             }
             if (Config.Item("W", true).GetValue<bool>() && !t.IsValidTarget() && Program.Combo && Player.Mana > RMANA + 3 * QMANA + WMANA + EMANA + WMANA)
@@ -288,7 +288,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicFarm()
         {
-            if (!Program.Farm)
+            if (!Program.Harass)
                 return;
 
             var allMinions = Cache.GetMinions(Player.ServerPosition, Q.Range);

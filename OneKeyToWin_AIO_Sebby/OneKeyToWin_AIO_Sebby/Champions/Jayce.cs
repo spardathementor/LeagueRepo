@@ -330,14 +330,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     CastQ(t);
                 else if (Program.Combo && Player.Mana > EMANA + QMANA)
                     CastQ(t);
-                else if (Program.Farm && Player.ManaPercent > Config.Item("harassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
+                else if (Program.Harass && Player.ManaPercent > Config.Item("harassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras())
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Qtype.Range) && Config.Item("Harass" + enemy.ChampionName).GetValue<bool>()))
                     {
                         CastQ(t);
                     }
                 }
-                else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
+                else if ((Program.Combo || Program.Harass) && Player.Mana > RMANA + QMANA + EMANA)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Qtype.Range) && !OktwCommon.CanMove(enemy)))
                         CastQ(t);

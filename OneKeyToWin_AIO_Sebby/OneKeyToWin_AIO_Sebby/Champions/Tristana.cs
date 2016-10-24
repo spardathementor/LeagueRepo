@@ -68,7 +68,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 {
                     if (Program.Combo)
                         Q.Cast();
-                    else if (Program.Farm && Config.Item("harassQ", true).GetValue<bool>())
+                    else if (Program.Harass && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                         Q.Cast();
                 }
             }
@@ -102,7 +102,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (!Player.HasBuff("itemstatikshankcharge"))
                             args.Process = false;
                     }
-                    else if (Program.Farm && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                    else if (Program.Harass && Player.Mana > RMANA + EMANA + WMANA + RMANA && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     {
                         E.Cast(t);
                         if (!Player.HasBuff("itemstatikshankcharge"))

@@ -189,9 +189,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     else if (!SebbyLib.Orbwalking.InAutoAttackRange(t) || CountMeleeInRange(400) > 0)
                         castQ(cast, t);
                 }
-                else if (Program.Farm && !SebbyLib.Orbwalking.InAutoAttackRange(t) && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.ManaPercent > Config.Item("qMana", true).GetValue<Slider>().Value)
+                else if (Program.Harass && !SebbyLib.Orbwalking.InAutoAttackRange(t) && Config.Item("Harass" + t.ChampionName).GetValue<bool>() && !Player.UnderTurret(true) && Player.ManaPercent > Config.Item("qMana", true).GetValue<Slider>().Value)
                     castQ(cast, t);
-                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
+                if ((Program.Combo || Program.Harass) && Player.Mana > RMANA + QMANA + EMANA)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                         castQ(cast, t);
@@ -298,7 +298,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if ((count >= Config.Item("farmEcount", true).GetValue<Slider>().Value || ((Player.UnderTurret(false) && !Player.UnderTurret(true)) && Player.Mana > RMANA + QMANA + EMANA)))
                 {
                     CastE();
-
                 }
             }
         }

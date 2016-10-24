@@ -125,7 +125,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                 if (Program.Combo && Player.Mana > WMANA + RMANA + EMANA && (Player.GetAutoAttackDamage(t) * 2 < t.Health || !SebbyLib.Orbwalking.InAutoAttackRange(t)))
                     Program.CastSpell(W, t);
-                else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
+                else if (!Program.None && Player.Mana > RMANA + WMANA + EMANA)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(enemy, true);

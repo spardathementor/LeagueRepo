@@ -271,7 +271,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (Program.Combo && Player.Mana > RMANA + QMANA + EMANA + 10 && Player.CountEnemiesInRange(bonusRange() + 100 + t.BoundingRadius) == 0 && !Config.Item("autoQ", true).GetValue<bool>())
                     Program.CastSpell(Q, t);
-                if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA && Player.CountEnemiesInRange(400) == 0)
+                if ((Program.Combo || Program.Harass) && Player.Mana > RMANA + QMANA && Player.CountEnemiesInRange(400) == 0)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && (!OktwCommon.CanMove(enemy) || enemy.HasBuff("caitlynyordletrapinternal"))))
                         Q.Cast(enemy, true);
@@ -313,7 +313,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             Program.CastSpell(E, t);
                             Program.debug("E + Q FINISH");
                         }
-                        else if ((Program.Farm || Program.Combo) && Config.Item("harrasEQ", true).GetValue<bool>() && Player.Mana > EMANA + QMANA + RMANA)
+                        else if ((Program.Harass || Program.Combo) && Config.Item("harrasEQ", true).GetValue<bool>() && Player.Mana > EMANA + QMANA + RMANA)
                         {
                             Program.CastSpell(E, t);
                             Program.debug("E + Q Harras");

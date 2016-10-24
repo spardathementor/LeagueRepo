@@ -220,7 +220,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         W.Cast();
                     else if (Orbwalker.GetTarget() != null)
                     {
-                        if (Program.Farm && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harassW", true).GetValue<bool>())
+                        if (Program.Harass && Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Hero && Config.Item("harassW", true).GetValue<bool>())
                             W.Cast();
                         else if (Program.LaneClear && (Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Minion || Orbwalker.GetTarget().Type == GameObjectType.obj_AI_Turret) && Config.Item("farmW", true).GetValue<bool>())
                             W.Cast();
@@ -261,7 +261,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (wName == "TwistedFate_Base_W_BlueCard.troy")
                             W.Cast();
                     }
-                    else if (Program.Farm && orbTarget.IsValidTarget())
+                    else if (Program.Harass && orbTarget.IsValidTarget())
                     {
                         FindCard = 1;
                         if (wName == "TwistedFate_Base_W_BlueCard.troy")
@@ -343,7 +343,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (Program.Combo && Player.Mana > RMANA + QMANA)
                             Program.CastSpell(Q, t);
-                        if (Program.Farm && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("harassQ", true).GetValue<bool>() && OktwCommon.CanHarras())
+                        if (Program.Harass && Player.Mana > RMANA + QMANA + WMANA + EMANA && Config.Item("harassQ", true).GetValue<bool>() && OktwCommon.CanHarras() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                             Program.CastSpell(Q, t);
                     }
 

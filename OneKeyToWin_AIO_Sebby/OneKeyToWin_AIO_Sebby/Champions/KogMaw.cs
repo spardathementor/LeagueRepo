@@ -178,7 +178,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Program.CastSpell(R, target);
                     else if (Program.Combo && countR < comboStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
-                    else if (Program.Farm && countR < harasStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
+                    else if (Program.Harass && countR < harasStack && Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(R, target);
                 }
             }
@@ -190,7 +190,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo)
                     W.Cast();
-                else if (Program.Farm && Config.Item("harassW", true).GetValue<bool>() && Player.CountEnemiesInRange(Player.AttackRange) > 0)
+                else if (Program.Harass && Config.Item("harassW", true).GetValue<bool>() && Player.CountEnemiesInRange(Player.AttackRange) > 0)
                     W.Cast();
             }
         }
@@ -208,9 +208,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Program.CastSpell(Q, t);
                     else if (Program.Combo && Player.Mana > RMANA + QMANA * 2 + EMANA)
                         Program.CastSpell(Q, t);
-                    else if ((Program.Farm && Player.Mana > RMANA + EMANA + QMANA * 2 + WMANA) && Config.Item("harassQ", true).GetValue<bool>() && !Player.UnderTurret(true))
+                    else if ((Program.Harass && Player.Mana > RMANA + EMANA + QMANA * 2 + WMANA) && Config.Item("harassQ", true).GetValue<bool>() && !Player.UnderTurret(true))
                         Program.CastSpell(Q, t);
-                    else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + QMANA + EMANA)
+                    else if ((Program.Combo || Program.Harass) && Player.Mana > RMANA + QMANA + EMANA)
                     {
                         foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
                              Q.Cast(enemy, true);
@@ -235,9 +235,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         Program.CastSpell(E, t);
                     else if (Program.Combo && ObjectManager.Player.Mana > RMANA + WMANA + EMANA + QMANA)
                         Program.CastSpell(E, t);
-                    else if (Program.Farm && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + EMANA)
+                    else if (Program.Harass && Config.Item("harassE", true).GetValue<bool>() && Player.Mana > RMANA + WMANA + EMANA + QMANA + EMANA)
                         Program.CastSpell(E, t);
-                    else if ((Program.Combo || Program.Farm) && ObjectManager.Player.Mana > RMANA + WMANA + EMANA)
+                    else if ((Program.Combo || Program.Harass) && ObjectManager.Player.Mana > RMANA + WMANA + EMANA)
                     {
                         foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                                 E.Cast(enemy, true);

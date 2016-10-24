@@ -166,7 +166,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         }
         private void LogicQ()
         {
-            if (Program.Combo || Program.Farm)
+            if (Program.Combo || Program.Harass)
             {
                 foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q1.Range) && enemy.HasBuff("urgotcorrosivedebuff")))
                 {
@@ -190,7 +190,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
                     Program.CastSpell(Q, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("Harass" + t.ChampionName).GetValue<bool>()))
                         Program.CastSpell(Q, enemy);
@@ -239,9 +239,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(E, t);
                 else if (Program.Combo && Player.Mana > EMANA + QMANA * 2 && qCd < 0.5f)
                     Program.CastSpell(E, t);
-                else if (Program.Farm && Player.Mana > RMANA + EMANA + QMANA * 5 && Config.Item("autoE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA * 5 && Config.Item("autoE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Program.CastSpell(E, t);
-                else if ((Program.Combo || Program.Farm) && Player.Mana > RMANA + WMANA + EMANA)
+                else if (!Program.None && Player.Mana > RMANA + WMANA + EMANA)
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range) && !OktwCommon.CanMove(enemy)))
                         E.Cast(enemy, true, true);
