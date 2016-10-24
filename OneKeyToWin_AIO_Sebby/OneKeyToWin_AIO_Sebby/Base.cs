@@ -48,7 +48,7 @@ namespace OneKeyToWin_AIO_Sebby
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("Harass").AddItem(new MenuItem("Harass" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarm", "OKTW spells farm").SetValue(true)).Show();
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("spellFarm", "OKTW spells farm").SetValue(true)).Show();
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmMode", "SPELLS FARM TOGGLE MODE").SetValue(new StringList(new[] { "Scroll down", "Scroll press", "Key toggle", "Disable" }, 1)));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("spellFarmKeyToggle", "Key toggle").SetValue(new KeyBind("N".ToCharArray()[0], KeyBindType.Toggle))).ValueChanged += Base_ValueChanged; ;
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").SubMenu("SPELLS FARM TOGGLE").AddItem(new MenuItem("showNot", "Show notification").SetValue(true));
