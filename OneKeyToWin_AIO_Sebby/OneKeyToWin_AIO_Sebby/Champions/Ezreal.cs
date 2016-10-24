@@ -404,11 +404,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     .FirstOrDefault();
         }
 
-        private bool Farm
-        {
-            get { return (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LaneClear) || (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.Mixed) || (Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.LastHit); }
-        }
-
         public void farmQ()
         {
             if (Program.LaneClear)
