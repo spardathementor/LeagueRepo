@@ -273,7 +273,17 @@ namespace SebbyLib.Prediction
             {
                 result = GetPositionOnPath(input, input.Unit.GetWaypoints(), input.Unit.MoveSpeed);
             }
-
+            if (input.Unit is Obj_AI_Hero && input.Radius > 1)
+            {
+                var moveOutWall = input.Unit.BoundingRadius + input.Radius / 2 + 10;
+                var wallPoint = GetWallPoint(result.CastPosition, moveOutWall);
+                if (!wallPoint.IsZero)
+                {
+                    result.CastPosition = wallPoint.Extend(result.CastPosition, moveOutWall);
+                    result.Hitchance = HitChance.Immobile;
+                    Console.WriteLine("Near wall" + moveOutWall);
+                }
+            }
             //Check if the unit position is in range
             if (Math.Abs(input.Range - float.MaxValue) > float.Epsilon)
             {
@@ -305,7 +315,8 @@ namespace SebbyLib.Prediction
                     }
                 }
             }
-
+           
+           
             //Check for collision
             if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
             {
@@ -414,6 +425,8 @@ namespace SebbyLib.Prediction
                 result.Hitchance = HitChance.Medium;
                 return result; 
             }
+            
+
 
             if (distanceUnitToWaypoint > 0)
             {
@@ -620,6 +633,53 @@ namespace SebbyLib.Prediction
                 Hitchance = HitChance.High
                 /*timeToReachTargetPosition - remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed < 0.4d ? HitChance.High : HitChance.Medium*/
             };
+        }
+
+        internal static Vector3 GetWallPoint(Vector3 from, float range)
+        {
+            var count = 30;
+            var points = OktwCommon.CirclePoints(count, range, from);
+            Vector3 first = Vector3.Zero, last = Vector3.Zero;
+
+            for (int i = 0; i<count; i ++ )
+            {
+                if (points[i].IsWall())
+                {
+                    if (first.IsZero)
+                    {
+                        if (i == count - 1)
+                        {
+                            if (!points[0].IsWall())
+                                first = points[i];
+                        }
+                        else
+                        {
+                            if (!points[i + 1].IsWall())
+                                first = points[i];
+                        }
+                    }
+                    if (last.IsZero)
+                    {
+                        if (i == 0)
+                        {
+                            if (!points[count - 1].IsWall())
+                                last = points[i];
+                        }
+                        else
+                        {
+                            if (!points[i - 1].IsWall())
+                                last = points[i];
+                        }
+                    }
+                } 
+            }
+            if (!first.IsZero && !last.IsZero)
+            {
+                var finnaly = new Vector3((last.X + first.X) / 2, (last.Y + first.Y) / 2, (last.Z + first.Z) / 2);
+                return finnaly;
+            }
+            else
+                return Vector3.Zero;
         }
 
         internal static double UnitIsImmobileUntil(Obj_AI_Base unit)
