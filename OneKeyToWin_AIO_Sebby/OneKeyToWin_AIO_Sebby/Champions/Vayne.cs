@@ -32,6 +32,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Dash = new Core.OKTWdash(Q);
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("GapCloser").AddItem(new MenuItem("gapE", "Enable", true).SetValue(true));
+            
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("GapCloser").AddItem(new MenuItem("gap" + enemy.ChampionName, enemy.ChampionName).SetValue(true));
             foreach (var enemy in HeroManager.Enemies)
@@ -39,6 +40,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("useE", "OneKeyToCast E closest person", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eks", "E KS", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Ecombo", "E combo only", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("visibleR", "Unvisable block AA ", true).SetValue(true));
@@ -163,15 +165,18 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (E.IsReady())
             {
-                var ksTarget = Player;
-                foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range) && target.Path.Count() < 2 ))
-                {
-                    if (CondemnCheck(Player.ServerPosition, target) && Config.Item("stun" + target.ChampionName).GetValue<bool>() )
-                        E.Cast(target);
-                    else if (Q.IsReady() && Dash.IsGoodPosition(dashPosition) && Config.Item("QE", true).GetValue<bool>() && CondemnCheck(dashPosition, target))
+                if (!Config.Item("Ecombo", true).GetValue<bool>() || Program.Combo)
                     {
-                        Q.Cast(dashPosition);
-                        Program.debug("Q + E");
+                    var ksTarget = Player;
+                    foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range) && target.Path.Count() < 2))
+                    {
+                        if (CondemnCheck(Player.ServerPosition, target) && Config.Item("stun" + target.ChampionName).GetValue<bool>())
+                            E.Cast(target);
+                        else if (Q.IsReady() && Dash.IsGoodPosition(dashPosition) && Config.Item("QE", true).GetValue<bool>() && CondemnCheck(dashPosition, target))
+                        {
+                            Q.Cast(dashPosition);
+                            Program.debug("Q + E");
+                        }
                     }
                 }
             }
