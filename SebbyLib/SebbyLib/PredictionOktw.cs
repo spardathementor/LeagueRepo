@@ -273,6 +273,7 @@ namespace SebbyLib.Prediction
             {
                 result = GetPositionOnPath(input, input.Unit.GetWaypoints(), input.Unit.MoveSpeed);
             }
+
             if (input.Unit is Obj_AI_Hero && input.Radius > 1)
             {
                 var moveOutWall = input.Unit.BoundingRadius + input.Radius / 2 + 10;
@@ -283,10 +284,9 @@ namespace SebbyLib.Prediction
                 if (!wallPoint.IsZero)
                 {
                     result.CastPosition = wallPoint.Extend(result.CastPosition, moveOutWall);
-                    result.Hitchance = HitChance.Immobile;
-                    Console.WriteLine("Near wall" + moveOutWall);
                 }
             }
+
             //Check if the unit position is in range
             if (Math.Abs(input.Range - float.MaxValue) > float.Epsilon)
             {
