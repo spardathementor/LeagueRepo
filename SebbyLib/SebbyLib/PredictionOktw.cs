@@ -276,6 +276,9 @@ namespace SebbyLib.Prediction
             if (input.Unit is Obj_AI_Hero && input.Radius > 1)
             {
                 var moveOutWall = input.Unit.BoundingRadius + input.Radius / 2 + 10;
+                if (input.Type == SkillshotType.SkillshotCircle)
+                    moveOutWall = input.Unit.BoundingRadius;
+
                 var wallPoint = GetWallPoint(result.CastPosition, moveOutWall);
                 if (!wallPoint.IsZero)
                 {
