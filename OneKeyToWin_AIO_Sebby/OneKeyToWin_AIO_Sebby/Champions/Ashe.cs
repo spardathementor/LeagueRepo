@@ -28,7 +28,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rNot", "R key info", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harassQ", "Harass Q", true).SetValue(true));
+
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("ksW", "Auto KS W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("ccW", "W immobile target", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("harassW", "Harass W", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
 
@@ -145,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Jungle();
             }
 
-            if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp)
+            if (Program.LagFree(3) && W.IsReady() && !Player.IsWindingUp && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
 
             if (Program.LagFree(4) && R.IsReady())
@@ -209,7 +215,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = Orbwalker.GetTarget() as Obj_AI_Hero;
             if (t != null && t.IsValidTarget())
             {
-                if (Program.Combo && (Player.Mana > RMANA + QMANA || t.Health < 5 * Player.GetAutoAttackDamage(Player)))
+                if (Program.Combo && Config.Item("autoQ", true).GetValue<bool>() && (Player.Mana > RMANA + QMANA || t.Health < 5 * Player.GetAutoAttackDamage(Player)))
                     Q.Cast();
                 else if (Program.Harass && Player.Mana > RMANA + QMANA + WMANA && Config.Item("harassQ", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Q.Cast();
@@ -235,18 +241,20 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (t.IsValidTarget())
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
+                {
                     CastW(t);
-                else if (Program.Harass  && Player.Mana > RMANA + WMANA + QMANA + WMANA && OktwCommon.CanHarras())
+                }
+                else if (Program.Harass  && Player.Mana > RMANA + WMANA + QMANA + WMANA && Config.Item("harassW", true).GetValue<bool>() && OktwCommon.CanHarras())
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && Config.Item("Harass" + t.ChampionName).GetValue<bool>()))
                         CastW(enemy);
                 }
-                else if (OktwCommon.GetKsDamage(t, W) > t.Health)
+                else if (OktwCommon.GetKsDamage(t, W) > t.Health && Config.Item("ksW", true).GetValue<bool>())
                 {
                     CastW(t);
                 }
 
-                if (!Program.None && Player.Mana > RMANA + WMANA)
+                if (!Program.None && Player.Mana > RMANA + WMANA && Config.Item("ccW", true).GetValue<bool>())
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy)))
                         W.Cast(t);
