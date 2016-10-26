@@ -328,7 +328,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 #region showWards
                 var circleSize = 30;
-                foreach (var obj in OKTWward.HiddenObjList.Where(obj => Render.OnScreen(Drawing.WorldToScreen(obj.pos))))
+                foreach (var obj in OKTWward.HiddenObjList)
                 {
                     if (obj.pos.IsOnScreen())
                     {
