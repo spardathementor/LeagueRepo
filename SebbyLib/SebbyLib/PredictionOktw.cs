@@ -274,7 +274,7 @@ namespace SebbyLib.Prediction
                 result = GetPositionOnPath(input, input.Unit.GetWaypoints(), input.Unit.MoveSpeed);
             }
 
-            if (input.Unit is Obj_AI_Hero && input.Radius > 1)
+            if (input.Unit is Obj_AI_Hero && input.Radius > 1 && result.Hitchance <= HitChance.VeryHigh)
             {
                 var moveOutWall = input.Unit.BoundingRadius + input.Radius / 2 + 10;
                 if (input.Type == SkillshotType.SkillshotCircle)
