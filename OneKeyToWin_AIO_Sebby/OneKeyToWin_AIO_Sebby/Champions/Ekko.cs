@@ -21,10 +21,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 330f);
             R = new Spell(SpellSlot.R, 280f);
 
-            Q.SetSkillshot(0.25f, 60f, 1650f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            Q1.SetSkillshot(0.5f, 150f, 1000f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            W.SetSkillshot(2.5f, 200f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.4f, 280f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.25f, 60f, 1650f, false, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.5f, 150f, 1000f, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(2.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.4f, 280f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             missileManager = new Core.MissileReturn("ekkoqmis", "ekkoqreturn", Q);
 
@@ -79,7 +79,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (RMissile.Position.CountEnemiesInRange(R.Range) >= Config.Item("rCount", true).GetValue<Slider>().Value && Config.Item("rCount", true).GetValue<Slider>().Value > 0)
                         R.Cast();
 
-                    foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(SebbyLib.Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Range && RMissile.Position.Distance(t.ServerPosition) < R.Range))
+                    foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget() && RMissile.Position.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Range && RMissile.Position.Distance(t.ServerPosition) < R.Range))
                     {
                         var comboDMG = OktwCommon.GetKsDamage(t, R);
 

@@ -16,7 +16,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 620);
             R = new Spell(SpellSlot.R, 620);
 
-            W.SetSkillshot(0.35f, 250f, 1400f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            W.SetSkillshot(0.35f, 250f, 1400f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -191,7 +191,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.debug("R ks");
                 }
                 
-                var prepos = SebbyLib.Prediction.GetPrediction(enemy, 0.4f);
+                var prepos = Prediction.GetPrediction(enemy, 0.4f);
                 var finalPosition = prepos.CastPosition.Extend(Player.Position, -pushDistance);
 
                 if (Config.Item("turrentR", true).GetValue<bool>())

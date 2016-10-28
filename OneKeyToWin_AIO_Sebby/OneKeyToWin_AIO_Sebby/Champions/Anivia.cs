@@ -19,9 +19,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 650);
             R = new Spell(SpellSlot.R, 685);
 
-            Q.SetSkillshot(0.25f, 110f, 870f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            W.SetSkillshot(0.6f, 1f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.5f, 200f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.25f, 110f, 870f, false, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.6f, 1f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));

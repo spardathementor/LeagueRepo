@@ -20,8 +20,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, float.MaxValue);
             R = new Spell(SpellSlot.R, 25000f);
 
-            Q.SetSkillshot(0.25f, 90f, 1350f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            Q1.SetSkillshot(0.25f, 90f, 1350f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 90f, 1350f, false, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 90f, 1350f, true, SkillshotType.SkillshotLine);
 
             missileManager = new Core.MissileReturn("SivirQMissile", "SivirQMissileReturn", Q);
 

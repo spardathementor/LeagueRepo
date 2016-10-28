@@ -21,8 +21,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 950);
             R = new Spell(SpellSlot.R, 3000f);
 
-            E.SetSkillshot(0.25f, 100, 1400, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.4f, 160, 2000, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 100, 1400, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.4f, 160, 2000, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Draw R helper", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -308,13 +308,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var rDmg = R.GetDamage(target);
             var dmg = 0;
-            LeagueSharp.Common.PredictionOutput output = R.GetPrediction(target);
+            PredictionOutput output = R.GetPrediction(target);
             Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
             direction.Normalize();
             List<Obj_AI_Hero> enemies = HeroManager.Enemies.Where(x => x.IsValidTarget()).ToList();
             foreach (var enemy in enemies)
             {
-                LeagueSharp.Common.PredictionOutput prediction = R.GetPrediction(enemy);
+                PredictionOutput prediction = R.GetPrediction(enemy);
                 Vector3 predictedPosition = prediction.CastPosition;
                 Vector3 v = output.CastPosition - Player.ServerPosition;
                 Vector3 w = predictedPosition - Player.ServerPosition;
@@ -329,7 +329,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var allMinionsR = Cache.GetMinions(Player.ServerPosition, R.Range);
             foreach (var minion in allMinionsR)
             {
-                LeagueSharp.Common.PredictionOutput prediction = R.GetPrediction(minion);
+                PredictionOutput prediction = R.GetPrediction(minion);
                 Vector3 predictedPosition = prediction.CastPosition;
                 Vector3 v = output.CastPosition - Player.ServerPosition;
                 Vector3 w = predictedPosition - Player.ServerPosition;

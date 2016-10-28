@@ -24,11 +24,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 360);
             QR = new Spell(SpellSlot.Q, 825);
 
-            Q.SetSkillshot(0.05f, 70f, 1150f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            W.SetSkillshot(0.25f, 210f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 100f, 1700f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.4f, 370f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            QR.SetSkillshot(0.5f, 400f, 100f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.05f, 70f, 1150f, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(0.25f, 210f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 100f, 1700f, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.4f, 370f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            QR.SetSkillshot(0.5f, 400f, 100f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -206,7 +206,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicR()
         {            
-            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(LeagueSharp.Common.Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Width && BallPos.Distance(t.ServerPosition) < R.Width))
+            foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget() && BallPos.Distance(Prediction.GetPrediction(t, R.Delay).CastPosition) < R.Width && BallPos.Distance(t.ServerPosition) < R.Width))
             {
                 if (Program.Combo && Config.Item("Ralways" + t.ChampionName, true).GetValue<bool>())
                 {
@@ -358,7 +358,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 //var prepos5 = Core.Prediction.GetPrediction(target, delay, Q.Width);
 
-                var predInput2 = new SebbyLib.PredictionInput
+                var predInput2 = new SebbyLib.Prediction.PredictionInput
                 {
                     Aoe = true,
                     Collision = Q.Collision,
@@ -368,9 +368,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     From = BallPos,
                     Radius = Q.Width,
                     Unit = target,
-                    Type = SebbyLib.SkillshotType.SkillshotCircle
+                    Type = SebbyLib.Prediction.SkillshotType.SkillshotCircle
                 };
-                var prepos5 = SebbyLib.Prediction.GetPrediction(predInput2);
+                var prepos5 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
 
                 if ((int)prepos5.Hitchance > 5 - Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex)
                 {
@@ -383,7 +383,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else
             {
                 float delay = (distance / Q.Speed + Q.Delay);
-                var prepos = SebbyLib.Prediction.GetPrediction(target, delay, Q.Width);
+                var prepos = Prediction.GetPrediction(target, delay, Q.Width);
 
                 if ((int)prepos.Hitchance > 5 - Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex)
                 {
@@ -434,7 +434,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             int count = 0;
             foreach (var t in HeroManager.Enemies.Where(t => t.IsValidTarget()))
             {
-                Vector3 prepos = SebbyLib.Prediction.GetPrediction(t, delay).CastPosition;
+                Vector3 prepos = Prediction.GetPrediction(t, delay).CastPosition;
                 if (position.Distance(prepos) < range)
                     count++;
             }

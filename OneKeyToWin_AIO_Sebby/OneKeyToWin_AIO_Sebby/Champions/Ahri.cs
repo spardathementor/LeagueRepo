@@ -20,8 +20,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 950);
             R = new Spell(SpellSlot.R, 600);
 
-            Q.SetSkillshot(0.25f, 90, 1550, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 60, 1550, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 90, 1550, false, SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 60, 1550, true, SkillshotType.SkillshotLine);
 
             missileManager = new Core.MissileReturn("AhriOrbMissile", "AhriOrbReturn", Q);
 
@@ -53,7 +53,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR2", "auto R fight logic + aim Q", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Lane clear Q", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmW", "Lane clear W", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleQ", "Jungle clear Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("jungleW", "Jungle clear W", true).SetValue(true));
 

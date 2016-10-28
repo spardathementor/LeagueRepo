@@ -20,9 +20,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 920f);
             R = new Spell(SpellSlot.R, 3000f);
 
-            W.SetSkillshot(0.6f, 60f, 3300f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            E.SetSkillshot(1.2f, 100f, 1750f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.7f, 140f, 1500f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.6f, 60f, 3300f, true, SkillshotType.SkillshotLine);
+            E.SetSkillshot(1.2f, 100f, 1750f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.7f, 140f, 1500f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("semi", "Semi-manual R target", true).SetValue(false));
@@ -340,7 +340,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private float GetRealDistance(Obj_AI_Base target)
         {
             
-            return Player.ServerPosition.Distance(SebbyLib.Prediction.GetPrediction(target, 0.05f).CastPosition) + Player.BoundingRadius + target.BoundingRadius;
+            return Player.ServerPosition.Distance(Prediction.GetPrediction(target, 0.05f).CastPosition) + Player.BoundingRadius + target.BoundingRadius;
         }
 
         public bool ShouldUseE(string SpellName)

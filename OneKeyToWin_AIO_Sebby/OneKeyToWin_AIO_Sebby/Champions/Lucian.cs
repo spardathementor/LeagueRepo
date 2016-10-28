@@ -22,11 +22,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 1200f);
             R1 = new Spell(SpellSlot.R, 1200f);
 
-            Q1.SetSkillshot(0.40f, 10f, float.MaxValue, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.40f, 10f, float.MaxValue, true, SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
-            W.SetSkillshot(0.30f, 80f, 1600f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.1f, 110, 2800, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R1.SetSkillshot(0.1f, 110, 2800, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.30f, 80f, 1600f, true, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.1f, 110, 2800, true, SkillshotType.SkillshotLine);
+            R1.SetSkillshot(0.1f, 110, 2800, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -159,7 +159,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                 if (!OktwCommon.CanHarras())
                     return;
-                var prepos = SebbyLib.Prediction.GetPrediction(t1, Q1.Delay); 
+                var prepos = Prediction.GetPrediction(t1, Q1.Delay); 
                 if ((int)prepos.Hitchance < 5)
                     return;
                 var distance = Player.Distance(prepos.CastPosition);

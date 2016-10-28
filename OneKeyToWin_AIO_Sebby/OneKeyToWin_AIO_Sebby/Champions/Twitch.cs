@@ -20,7 +20,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 1200);
             R = new Spell(SpellSlot.R, 975);
 
-            W.SetSkillshot(0.25f, 100f, 1410f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            W.SetSkillshot(0.25f, 100f, 1410f, false, SkillshotType.SkillshotCircle);
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notif", "Notification (timers)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));

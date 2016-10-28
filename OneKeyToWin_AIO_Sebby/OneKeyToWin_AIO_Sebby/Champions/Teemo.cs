@@ -18,7 +18,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             R = new Spell(SpellSlot.R, 400);
 
             Q.SetTargetted(0.5f, 1500f);
-            R.SetSkillshot(1.7f, 130f, 1000f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            R.SetSkillshot(1.7f, 130f, 1000f, false, SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -196,7 +196,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if(Config.Item("autoRcc", true).GetValue<bool>() && !OktwCommon.CanMove(enemy))
                             R.Cast(enemy);
                         if (Config.Item("autoRdash", true).GetValue<bool>())
-                            R.CastIfHitchanceEquals(enemy, LeagueSharp.Common.HitChance.Dashing);
+                            R.CastIfHitchanceEquals(enemy, HitChance.Dashing);
                         if (Config.Item("autoRslow", true).GetValue<bool>() && enemy.HasBuffOfType(BuffType.Slow))
                             Program.CastSpell(R, enemy);
                         if (Config.Item("Raoe", true).GetValue<bool>())
@@ -204,7 +204,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         if (Config.Item("comboR", true).GetValue<bool>() && OktwCommon.IsMovingInSameDirection(Player, enemy))
                         {
                             var predPos = R.GetPrediction(enemy,true);
-                            if (predPos.CastPosition.Distance(enemy.Position) > 300 && predPos.Hitchance >= LeagueSharp.Common.HitChance.Low)
+                            if (predPos.CastPosition.Distance(enemy.Position) > 300 && predPos.Hitchance >= HitChance.Low)
                             {
                                 if (!OktwCommon.CirclePoints(8, 120, predPos.CastPosition).Any(x => x.IsWall()))
                                 {

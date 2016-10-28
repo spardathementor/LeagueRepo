@@ -35,9 +35,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 475);
             R = new Spell(SpellSlot.R, 3000f);
             
-            Q.SetSkillshot(0.25f, 60f, 2000f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            W.SetSkillshot(0.25f, 80f, 1600f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R.SetSkillshot(1.1f, 160f, 2000f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 60f, 2000f, true, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.25f, 80f, 1600f, false, SkillshotType.SkillshotLine);
+            R.SetSkillshot(1.1f, 160f, 2000f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
@@ -263,7 +263,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             
             if (Config.Item("EAntiMelee", true).GetValue<bool>())
             { 
-                if (HeroManager.Enemies.Any(target => target.IsValidTarget(1000) && target.IsMelee && Player.Distance(SebbyLib.Prediction.GetPrediction(target, 0.2f).CastPosition) < 250))
+                if (HeroManager.Enemies.Any(target => target.IsValidTarget(1000) && target.IsMelee && Player.Distance(Prediction.GetPrediction(target, 0.2f).CastPosition) < 250))
                 {
                     var dashPos = Dash.CastDash(true);
                     if (!dashPos.IsZero)
@@ -351,13 +351,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             var rDmg = R.GetDamage(target);
             var dmg = 0;
-            LeagueSharp.Common.PredictionOutput output = R.GetPrediction(target);
+            PredictionOutput output = R.GetPrediction(target);
             Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
             direction.Normalize();
             List<Obj_AI_Hero> enemies = HeroManager.Enemies.Where(x =>x.IsValidTarget()).ToList();
             foreach (var enemy in enemies)
             {
-                LeagueSharp.Common.PredictionOutput prediction = R.GetPrediction(enemy);
+                PredictionOutput prediction = R.GetPrediction(enemy);
                 Vector3 predictedPosition = prediction.CastPosition;
                 Vector3 v = output.CastPosition - Player.ServerPosition;
                 Vector3 w = predictedPosition - Player.ServerPosition;
@@ -372,7 +372,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var allMinionsR = Cache.GetMinions(ObjectManager.Player.ServerPosition, R.Range);
             foreach (var minion in allMinionsR)
             {
-                LeagueSharp.Common.PredictionOutput prediction = R.GetPrediction(minion);
+                PredictionOutput prediction = R.GetPrediction(minion);
                 Vector3 predictedPosition = prediction.CastPosition;
                 Vector3 v = output.CastPosition - Player.ServerPosition;
                 Vector3 w = predictedPosition - Player.ServerPosition;

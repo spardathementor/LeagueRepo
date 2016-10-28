@@ -16,8 +16,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 800);
             R = new Spell(SpellSlot.R, 1230);
            
-            Q.SetSkillshot(0.3f, 200f, 1000f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.2f, 40f, 2000f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.3f, 200f, 1000f, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.2f, 40f, 2000f, true, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -127,7 +127,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var col = poutput.CollisionObjects.Count(ColObj => ColObj.IsEnemy && ColObj.IsMinion && !ColObj.IsDead);
 
                 //hitchance
-                var prepos = SebbyLib.Prediction.GetPrediction(t, 0.4f);
+                var prepos = Prediction.GetPrediction(t, 0.4f);
 
                 if (col == 0 && (int)prepos.Hitchance < 5)
                     return;

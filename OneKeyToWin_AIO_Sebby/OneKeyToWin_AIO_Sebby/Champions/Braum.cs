@@ -16,8 +16,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 0);
             R = new Spell(SpellSlot.R, 1250);
 
-            Q.SetSkillshot(0.25f, 60f, 1700f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.5f, 115f, 1400f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 60f, 1700f, true, SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.5f, 115f, 1400f, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("notif", "Notification (timers)", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show KS notification", true).SetValue(true));

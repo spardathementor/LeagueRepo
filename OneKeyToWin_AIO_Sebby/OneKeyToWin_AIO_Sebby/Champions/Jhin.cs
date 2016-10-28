@@ -32,9 +32,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 760);
             R = new Spell(SpellSlot.R, 3500);
 
-            W.SetSkillshot(0.75f, 40, 10000, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
-            E.SetSkillshot(1f, 120, 1600, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.24f, 80, 5000, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.75f, 40, 10000, false, SkillshotType.SkillshotLine);
+            E.SetSkillshot(1f, 120, 1600, false, SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.24f, 80, 5000, false, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -342,7 +342,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (t.IsValidTarget() )
                     {
                         
-                        var minion = Cache.GetMinions(SebbyLib.Prediction.GetPrediction(t, 0.1f).CastPosition, 300).Where(minion2 => minion2.IsValidTarget(Q.Range)).OrderBy(x => x.Distance(t)).FirstOrDefault();
+                        var minion = Cache.GetMinions(Prediction.GetPrediction(t, 0.1f).CastPosition, 300).Where(minion2 => minion2.IsValidTarget(Q.Range)).OrderBy(x => x.Distance(t)).FirstOrDefault();
                         if (minion.IsValidTarget())
                         {
                             if (t.Health < GetQdmg(t))

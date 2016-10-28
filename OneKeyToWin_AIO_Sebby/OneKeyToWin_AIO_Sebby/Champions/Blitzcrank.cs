@@ -19,7 +19,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 475);
             R = new Spell(SpellSlot.R, 600);
 
-            Q.SetSkillshot(0.25f, 80f, 1800f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 80f, 1800f, true, SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoW", "Auto W", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
@@ -171,8 +171,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if(!OktwCommon.CanMove(t))
                             Q.Cast(t, true);
-                        Q.CastIfHitchanceEquals(t, LeagueSharp.Common.HitChance.Dashing);
-                        Q.CastIfHitchanceEquals(t, LeagueSharp.Common.HitChance.Immobile);
+                        Q.CastIfHitchanceEquals(t, HitChance.Dashing);
+                        Q.CastIfHitchanceEquals(t, HitChance.Immobile);
                     }
                 }
             }

@@ -9,7 +9,7 @@ using SharpDX;
 
 namespace OneKeyToWin_AIO_Sebby.Core
 {
-    class OKTWlab : Program
+    class OKTWlab
     {
         private GameObject obj;
         private float time = 0;
@@ -67,7 +67,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
         {
-            return;
             if (!sender.IsMe)
                 Program.debug(args.Buff.Name + " " + args.Buff.Type + " " + args.Buff.SourceName);
         }
@@ -75,13 +74,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private void Game_OnGameUpdate(EventArgs args)
         {
 
-            if(Program.Combo)    
-                Console.WriteLine("" + Player.IsRooted + " " + Player.IsWindingUp + " " + Player.CanMove  + " " + Player.IsImmovable);
-            if (!SebbyLib.OktwCommon.CanMove(ObjectManager.Player))
-                {
-                    //Console.WriteLine("cant move" );
-                }
 
+
+            foreach (var enemy in HeroManager.Enemies.Where(x=> x.IsValidTarget(400)))
+            {
+                if(!SebbyLib.OktwCommon.CanMove(enemy))
+                {
+                    Console.WriteLine("cant move");
+                }
+            }
+            return;
             foreach (var mast in ObjectManager.Player.Masteries)
             {
                 //Program.debug(" " + mast.Id + " " + mast.Page + " " + mast.Points);
@@ -124,9 +126,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private void Drawing_OnDraw(EventArgs args)
         {
 
-            
-            
-            return;
+
             var obj = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(x => x.Distance(Game.CursorPos) < 100);
             if (obj != null)
             {
@@ -140,6 +140,36 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Render.Circle.DrawCircle(endPosG, 50, System.Drawing.Color.Red, 1);
             //OktwCommon.DrawLineRectangle(Game.CursorPos, ObjectManager.Player.Position, 75, 1, System.Drawing.Color.DimGray);
             //drawText("Range " + ObjectManager.Player.Distance(Game.CursorPos), ObjectManager.Player.Position.Extend(Game.CursorPos, 400), System.Drawing.Color.Gray);
+
+
+            int radius = 100;
+            var start2 = ObjectManager.Player.ServerPosition;
+            var end2 = Game.CursorPos;
+
+
+            Vector2 start = start2.To2D();
+            Vector2 end = end2.To2D();
+            var dir = (end - start).Normalized();
+            var pDir = dir.Perpendicular();
+
+            var rightEndPos = end + pDir * radius;
+            var leftEndPos = end - pDir * radius;
+
+            
+            var rEndPos = new Vector3(rightEndPos.X, rightEndPos.Y, ObjectManager.Player.Position.Z);
+            var lEndPos  =new Vector3(leftEndPos.X, leftEndPos.Y, ObjectManager.Player.Position.Z);
+
+
+            var step = start2.Distance(rEndPos) / 10;
+            for (var i = 0; i < 10; i++)
+            {
+                var pr = start2.Extend(rEndPos, step * i);
+                var pl = start2.Extend(lEndPos, step * i);
+                Render.Circle.DrawCircle(pr, 50, System.Drawing.Color.Orange, 1);
+                Render.Circle.DrawCircle(pl, 50, System.Drawing.Color.Orange, 1);
+            }
+
+            
 
 
             if (obj != null &&  obj.IsValid)
