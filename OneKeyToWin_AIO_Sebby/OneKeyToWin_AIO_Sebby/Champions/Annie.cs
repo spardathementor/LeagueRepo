@@ -23,9 +23,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             FR = new Spell(SpellSlot.R, 1000f );
 
             Q.SetTargetted(0.25f, 1400f);
-            W.SetSkillshot(0.3f, 80f, float.MaxValue, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.25f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            FR.SetSkillshot(0.25f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            W.SetSkillshot(0.3f, 80f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.25f, 180f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            FR.SetSkillshot(0.25f, 180f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
 
             flash = Player.GetSpellSlot("summonerflash");
 

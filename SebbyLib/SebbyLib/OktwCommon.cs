@@ -135,7 +135,7 @@ namespace SebbyLib
             if (args.Target == null && target.IsValidTarget(float.MaxValue,false))
             {
 
-                var pred = Prediction.Prediction.GetPrediction(target, 0.25f).CastPosition;
+                var pred = Prediction.GetPrediction(target, 0.25f).CastPosition;
                 if (pred == null)
                     return false;
 

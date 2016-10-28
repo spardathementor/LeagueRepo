@@ -262,7 +262,7 @@ namespace SebbyLib
             {
                 return
                 Vector2.DistanceSquared(
-                   Prediction.Prediction.GetPrediction(hero, 0).CastPosition.To2D(),  Player.Position.To2D()) <= myRange * myRange;
+                   Prediction.GetPrediction(hero, 0).CastPosition.To2D(),  Player.Position.To2D()) <= myRange * myRange;
             }
 
 

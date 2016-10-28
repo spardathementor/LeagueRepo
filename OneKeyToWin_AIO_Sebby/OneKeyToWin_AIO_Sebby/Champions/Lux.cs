@@ -22,11 +22,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 1075);
             R = new Spell(SpellSlot.R, 3000);
 
-            Q1.SetSkillshot(0.25f, 70f, 1200f, true, SkillshotType.SkillshotLine);
-            Q.SetSkillshot(0.25f, 70f, 1200f, false, SkillshotType.SkillshotLine);
-            W.SetSkillshot(0.25f, 110f, 1200f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.3f, 250f, 1050f, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(1f, 110f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 70f, 1200f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 70f, 1200f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.25f, 110f, 1200f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.3f, 250f, 1050f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            R.SetSkillshot(1f, 110f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));

@@ -54,7 +54,6 @@
   <ItemGroup>
     <Compile Include="Cache.cs" />
     <Compile Include="HealthPrediction.cs" />
-    <Compile Include="Movement.cs" />
     <Compile Include="OktwCommon.cs" />
     <Compile Include="Orbwalking.cs" />
     <Compile Include="PredictionOktw.cs" />

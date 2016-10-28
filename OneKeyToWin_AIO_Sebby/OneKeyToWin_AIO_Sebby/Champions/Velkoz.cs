@@ -23,12 +23,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 800);
             R = new Spell(SpellSlot.R, 1500);
 
-            Q.SetSkillshot(0.25f, 70f, 1300f, true, SkillshotType.SkillshotLine);
-            QSplit.SetSkillshot(0.1f, 70f, 2100f, true, SkillshotType.SkillshotLine);
-            QDummy.SetSkillshot(0.5f, 55f, 1200, false, SkillshotType.SkillshotLine);
-            W.SetSkillshot(0.25f, 85f, 1700f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(1f, 180f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.1f, 80f, float.MaxValue, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 70f, 1300f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            QSplit.SetSkillshot(0.1f, 70f, 2100f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            QDummy.SetSkillshot(0.5f, 55f, 1200, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.25f, 85f, 1700f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            E.SetSkillshot(1f, 180f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.1f, 80f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -287,14 +287,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         private void CastQ(Obj_AI_Base t)
         {
             var Qpred = Q.GetPrediction(t);
-            if (Qpred.Hitchance >= HitChance.High)
+            if (Qpred.Hitchance >= LeagueSharp.Common.HitChance.High)
             {
                 Program.CastSpell(Q, t);
             }
             else
             {
                 var pred = QDummy.GetPrediction(t);
-                if (pred.Hitchance >= HitChance.High)
+                if (pred.Hitchance >= LeagueSharp.Common.HitChance.High)
                 {
                     if (Program.LagFree(1))
                         pointList = AimQ(pred.CastPosition);

@@ -5,7 +5,7 @@ using SharpDX;
 using LeagueSharp;
 using LeagueSharp.Common;
 
-namespace SebbyLib.Prediction
+namespace SebbyLib
 {
     public enum HitChance
     {

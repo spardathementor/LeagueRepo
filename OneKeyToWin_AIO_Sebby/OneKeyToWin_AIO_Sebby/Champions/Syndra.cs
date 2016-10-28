@@ -23,11 +23,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Eany = new Spell(SpellSlot.Q, Q.Range + 400);
             R = new Spell(SpellSlot.R, 675);
 
-            Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            W.SetSkillshot(0.25f, 140f, 1600f, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 100, 2500f, false, SkillshotType.SkillshotLine);
-            EQ.SetSkillshot(0.6f, 100f, 2500f, false, SkillshotType.SkillshotLine);
-            Eany.SetSkillshot(0.30f, 50f, 2500f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.6f, 125f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            W.SetSkillshot(0.25f, 140f, 1600f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 100, 2500f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            EQ.SetSkillshot(0.6f, 100f, 2500f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Eany.SetSkillshot(0.30f, 50f, 2500f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -157,7 +157,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if(!EQcastNow)
             {
                 var ePred = Eany.GetPrediction(t);
-                if (ePred.Hitchance >= HitChance.VeryHigh)
+                if (ePred.Hitchance >= LeagueSharp.Common.HitChance.VeryHigh)
                 {
                     var playerToCP = Player.Distance(ePred.CastPosition);
                     foreach (var ball in BallsList.Where(ball => Player.Distance(ball.Position) < E.Range))
@@ -353,9 +353,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void CastQE(Obj_AI_Base target)
         {
-            SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
+            SebbyLib.SkillshotType CoreType2 = SebbyLib.SkillshotType.SkillshotLine;
 
-            var predInput2 = new SebbyLib.Prediction.PredictionInput
+            var predInput2 = new SebbyLib.PredictionInput
             {
                 Aoe = false,
                 Collision = EQ.Collision,
@@ -368,7 +368,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Type = CoreType2
             };
 
-            var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
+            var poutput2 = SebbyLib.Prediction.GetPrediction(predInput2);
 
             if (OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
                 return;
@@ -380,7 +380,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 0)
             {
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
+                if (poutput2.Hitchance >= SebbyLib.HitChance.VeryHigh)
                 {
                     EQcastNow = true;
                     Q.Cast(castQpos);
@@ -389,7 +389,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 1)
             {
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
+                if (poutput2.Hitchance >= SebbyLib.HitChance.High)
                 {
                     EQcastNow = true;
                     Q.Cast(castQpos);
@@ -398,7 +398,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 2)
             {
-                if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.Medium)
+                if (poutput2.Hitchance >= SebbyLib.HitChance.Medium)
                 {
                     EQcastNow = true;
                     Q.Cast(castQpos);

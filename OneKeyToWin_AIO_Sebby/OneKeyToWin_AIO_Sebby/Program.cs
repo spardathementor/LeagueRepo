@@ -38,7 +38,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static int HitChanceNum = 4, tickNum = 4, tickIndex = 0;
 
-        public static SebbyLib.Prediction.PredictionOutput DrawSpellPos;
+        public static SebbyLib.PredictionOutput DrawSpellPos;
 
         public static bool SPredictionLoad = false;
 
@@ -213,13 +213,13 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 #endregion
 
-                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Qpred", "Q Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK"}, 1)));
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Qpred", "Q Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("QHitChance", "Q Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
-                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Wpred", "W Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK"}, 1)));
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Wpred", "W Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("WHitChance", "W Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
-                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Epred", "E Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK" }, 1)));
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Epred", "E Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("EHitChance", "E Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
-                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Rpred", "R Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded", "SDK" }, 1)));
+                Config.SubMenu("Prediction MODE").AddItem(new MenuItem("Rpred", "R Prediction MODE", true).SetValue(new StringList(new[] { "Common prediction", "OKTW© PREDICTION", "SPediction press F5 if not loaded"}, 1)));
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("RHitChance", "R Hit Chance", true).SetValue(new StringList(new[] { "Very High", "High", "Medium" }, 0)));
 
                 Config.SubMenu("Prediction MODE").AddItem(new MenuItem("debugPred", "Draw Aiming OKTW© PREDICTION").SetValue(false));
@@ -312,64 +312,65 @@ namespace OneKeyToWin_AIO_Sebby
         public static void CastSpell(Spell QWER, Obj_AI_Base target)
         {
             int predIndex = 0;
-            HitChance hitchance = HitChance.Low;
+            SebbyLib.HitChance hitchance = SebbyLib.HitChance.Low;
 
             if (QWER.Slot == SpellSlot.Q)
             {
                 predIndex = Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex;
                 if (Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                    hitchance = HitChance.VeryHigh;
+                    hitchance = SebbyLib.HitChance.VeryHigh;
                 else if (Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                    hitchance = HitChance.High;
+                    hitchance = SebbyLib.HitChance.High;
                 else if (Config.Item("QHitChance", true).GetValue<StringList>().SelectedIndex == 2)
-                    hitchance = HitChance.Medium;
+                    hitchance = SebbyLib.HitChance.Medium;
             }
             else if (QWER.Slot == SpellSlot.W)
             {
                 predIndex = Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex;
                 if (Config.Item("WHitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                    hitchance = HitChance.VeryHigh;
+                    hitchance = SebbyLib.HitChance.VeryHigh;
                 else if (Config.Item("WHitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                    hitchance = HitChance.High;
+                    hitchance = SebbyLib.HitChance.High;
                 else if (Config.Item("WHitChance", true).GetValue<StringList>().SelectedIndex == 2)
-                    hitchance = HitChance.Medium;
+                    hitchance = SebbyLib.HitChance.Medium;
             }
             else if (QWER.Slot == SpellSlot.E)
             {
                 predIndex = Config.Item("Epred", true).GetValue<StringList>().SelectedIndex;
                 if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                    hitchance = HitChance.VeryHigh;
+                    hitchance = SebbyLib.HitChance.VeryHigh;
                 else if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                    hitchance = HitChance.High;
+                    hitchance = SebbyLib.HitChance.High;
                 else if (Config.Item("EHitChance", true).GetValue<StringList>().SelectedIndex == 2)
-                    hitchance = HitChance.Medium;
+                    hitchance = SebbyLib.HitChance.Medium;
             }
             else if (QWER.Slot == SpellSlot.R)
             {
                 predIndex = Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex;
                 if (Config.Item("RHitChance", true).GetValue<StringList>().SelectedIndex == 0)
-                    hitchance = HitChance.VeryHigh;
+                    hitchance = SebbyLib.HitChance.VeryHigh;
                 else if (Config.Item("RHitChance", true).GetValue<StringList>().SelectedIndex == 1)
-                    hitchance = HitChance.High;
+                    hitchance = SebbyLib.HitChance.High;
                 else if (Config.Item("RHitChance", true).GetValue<StringList>().SelectedIndex == 2)
-                    hitchance = HitChance.Medium;
+                    hitchance = SebbyLib.HitChance.Medium;
             }
 
-            if (predIndex == 3)
+           
+            if (predIndex == 1)
             {
-                SebbyLib.Movement.SkillshotType CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotLine;
+                SebbyLib.SkillshotType CoreType2 = SebbyLib.SkillshotType.SkillshotLine;
                 bool aoe2 = false;
 
-                if (QWER.Type == SkillshotType.SkillshotCircle)
+                if (QWER.Type == LeagueSharp.Common.SkillshotType.SkillshotCircle)
                 {
-                    //CoreType2 = SebbyLib.Movement.SkillshotType.SkillshotCircle;
-                    //aoe2 = true;
+                    CoreType2 = SebbyLib.SkillshotType.SkillshotCircle;
+                    aoe2 = true;
                 }
 
                 if (QWER.Width > 80 && !QWER.Collision)
                     aoe2 = true;
 
-                var predInput2 = new SebbyLib.Movement.PredictionInput
+                var predInput2 = new SebbyLib.PredictionInput
                 {
                     Aoe = aoe2,
                     Collision = QWER.Collision,
@@ -381,7 +382,7 @@ namespace OneKeyToWin_AIO_Sebby
                     Unit = target,
                     Type = CoreType2
                 };
-                var poutput2 = SebbyLib.Movement.Prediction.GetPrediction(predInput2);
+                var poutput2 = SebbyLib.Prediction.GetPrediction(predInput2);
 
                 //var poutput2 = QWER.GetPrediction(target);
 
@@ -390,9 +391,9 @@ namespace OneKeyToWin_AIO_Sebby
 
                 if ((int)hitchance == 6)
                 {
-                    if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.VeryHigh)
+                    if (poutput2.Hitchance >= SebbyLib.HitChance.VeryHigh)
                         QWER.Cast(poutput2.CastPosition);
-                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
+                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= SebbyLib.HitChance.High)
                     {
                         QWER.Cast(poutput2.CastPosition);
                     }
@@ -400,68 +401,13 @@ namespace OneKeyToWin_AIO_Sebby
                 }
                 else if ((int)hitchance == 5)
                 {
-                    if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.High)
+                    if (poutput2.Hitchance >= SebbyLib.HitChance.High)
                         QWER.Cast(poutput2.CastPosition);
 
                 }
                 else if ((int)hitchance == 4)
                 {
-                    if (poutput2.Hitchance >= SebbyLib.Movement.HitChance.Medium)
-                        QWER.Cast(poutput2.CastPosition);
-                }
-            }
-            else if (predIndex == 1)
-            {
-                SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
-                bool aoe2 = false;
-
-                if (QWER.Type == SkillshotType.SkillshotCircle)
-                {
-                    CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotCircle;
-                    aoe2 = true;
-                }
-
-                if (QWER.Width > 80 && !QWER.Collision)
-                    aoe2 = true;
-
-                var predInput2 = new SebbyLib.Prediction.PredictionInput
-                {
-                    Aoe = aoe2,
-                    Collision = QWER.Collision,
-                    Speed = QWER.Speed,
-                    Delay = QWER.Delay,
-                    Range = QWER.Range,
-                    From = Player.ServerPosition,
-                    Radius = QWER.Width,
-                    Unit = target,
-                    Type = CoreType2
-                };
-                var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
-
-                //var poutput2 = QWER.GetPrediction(target);
-
-                if (QWER.Speed != float.MaxValue && OktwCommon.CollisionYasuo(Player.ServerPosition, poutput2.CastPosition))
-                    return;
-
-                if ((int)hitchance == 6)
-                {
-                    if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.VeryHigh)
-                        QWER.Cast(poutput2.CastPosition);
-                    else if (predInput2.Aoe && poutput2.AoeTargetsHitCount > 1 && poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
-                    {
-                        QWER.Cast(poutput2.CastPosition);
-                    }
-
-                }
-                else if ((int)hitchance == 5)
-                {
-                    if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
-                        QWER.Cast(poutput2.CastPosition);
-
-                }
-                else if ((int)hitchance == 4)
-                {
-                    if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.Medium)
+                    if (poutput2.Hitchance >= SebbyLib.HitChance.Medium)
                         QWER.Cast(poutput2.CastPosition);
                 }
                 if (Game.Time - DrawSpellTime > 0.5)
@@ -474,18 +420,18 @@ namespace OneKeyToWin_AIO_Sebby
             }
             else if (predIndex == 0)
             {
-                QWER.CastIfHitchanceEquals(target, hitchance);
+                QWER.CastIfHitchanceEquals(target, (LeagueSharp.Common.HitChance)hitchance);
             }
             else if (predIndex == 2)
             {
                 if (target is Obj_AI_Hero && target.IsValid)
                 {
                     var t = target as Obj_AI_Hero;
-                    QWER.SPredictionCast(t, hitchance);
+                    QWER.SPredictionCast(t, (LeagueSharp.Common.HitChance)hitchance);
                 }
                 else
                 {
-                    QWER.CastIfHitchanceEquals(target, HitChance.High);
+                    QWER.CastIfHitchanceEquals(target, LeagueSharp.Common.HitChance.High);
                 }
             }
         }

@@ -21,8 +21,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 1000);
             R = new Spell(SpellSlot.R, 1500f);
 
-            Q.SetSkillshot(0.1f, 40f, 2400f, true, SkillshotType.SkillshotLine);
-            Q1.SetSkillshot(0.1f, 40f, 2400f, false, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.1f, 40f, 2400f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.1f, 40f, 2400f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
 
             LoadMenuOKTW();
 

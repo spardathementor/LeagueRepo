@@ -27,11 +27,11 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 770f);
             R = new Spell(SpellSlot.R, 3000f);
 
-            Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
-            Q1.SetSkillshot(0.65f, 60f, 2200f, true, SkillshotType.SkillshotLine);
-            W.SetSkillshot(1.5f, 20f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.30f, 70f, 2000f, true, SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.7f, 200f, 1500f, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.65f, 60f, 2200f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.65f, 60f, 2200f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(1.5f, 20f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.30f, 70f, 2000f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.7f, 200f, 1500f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("noti", "Show notification & line", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
@@ -181,7 +181,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (OktwCommon.GetKsDamage(target, R) > target.Health )
                 {
                     cast = true;
-                    PredictionOutput output = R.GetPrediction(target);
+                    LeagueSharp.Common.PredictionOutput output = R.GetPrediction(target);
                     Vector2 direction = output.CastPosition.To2D() - Player.Position.To2D();
                     direction.Normalize();
                     List<Obj_AI_Hero> enemies = HeroManager.Enemies.Where(x => x.IsValidTarget()).ToList();
@@ -189,7 +189,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (enemy.SkinName == target.SkinName || !cast)
                             continue;
-                        PredictionOutput prediction = R.GetPrediction(enemy);
+                        LeagueSharp.Common.PredictionOutput prediction = R.GetPrediction(enemy);
                         Vector3 predictedPosition = prediction.CastPosition;
                         Vector3 v = output.CastPosition - Player.ServerPosition;
                         Vector3 w = predictedPosition - Player.ServerPosition;
@@ -324,7 +324,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (Config.Item("Ehitchance", true).GetValue<bool>())
                         {
-                            E.CastIfHitchanceEquals(t, HitChance.Dashing);
+                            E.CastIfHitchanceEquals(t, LeagueSharp.Common.HitChance.Dashing);
                         }
                         if (Player.Health < Player.MaxHealth * 0.3)
                         {

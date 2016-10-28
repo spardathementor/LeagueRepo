@@ -23,10 +23,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 1050);
             R = new Spell(SpellSlot.R, 675);
 
-            Q.SetSkillshot(0.6f, 95f, float.MaxValue, false, SkillshotType.SkillshotLine);
-            W.SetSkillshot(0.7f, 125f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            E.SetSkillshot(0.25f, 60f, 1400f, true, SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.7f, 130f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.6f, 95f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.7f, 125f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 60f, 1400f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.7f, 130f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
 
             Q.SetCharged("XerathArcanopulseChargeUp", "XerathArcanopulseChargeUp", 750, 1550, 1.5f);
 
@@ -282,7 +282,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp") < 1 || (Player.CountEnemiesInRange(800) > 0) || Player.Distance(t) > 1450)
                         Q.Cast(Q.GetPrediction(t).CastPosition);
                     else if(OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp") < 2 || (Player.CountEnemiesInRange(1000) > 0))
-                        Q.CastIfHitchanceEquals(t, HitChance.VeryHigh);
+                        Q.CastIfHitchanceEquals(t, LeagueSharp.Common.HitChance.VeryHigh);
 
                     return;
                 }

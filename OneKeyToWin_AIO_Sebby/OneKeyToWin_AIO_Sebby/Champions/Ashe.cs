@@ -20,9 +20,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 2500);
             R = new Spell(SpellSlot.R, 2500);
 
-            W.SetSkillshot(0.25f, 20f, 1500f, true, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 299f, 1400f, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(0.25f, 130f, 1600f, false, SkillshotType.SkillshotLine);
+            W.SetSkillshot(0.25f, 20f, 1500f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 299f, 1400f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            R.SetSkillshot(0.25f, 130f, 1600f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("wRange", "W range", true).SetValue(false));
@@ -272,9 +272,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void CastW(Obj_AI_Base t)
         {
-            SebbyLib.Prediction.SkillshotType CoreType2 = SebbyLib.Prediction.SkillshotType.SkillshotLine;
+            SebbyLib.SkillshotType CoreType2 = SebbyLib.SkillshotType.SkillshotLine;
 
-            var predInput2 = new SebbyLib.Prediction.PredictionInput
+            var predInput2 = new SebbyLib.PredictionInput
             {
                 Aoe = false,
                 Collision = W.Collision,
@@ -287,9 +287,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 Type = CoreType2
             };
 
-            var poutput2 = SebbyLib.Prediction.Prediction.GetPrediction(predInput2);
+            var poutput2 = SebbyLib.Prediction.GetPrediction(predInput2);
 
-            if (poutput2.Hitchance >= SebbyLib.Prediction.HitChance.High)
+            if (poutput2.Hitchance >= SebbyLib.HitChance.High)
             {
                 W.Cast(poutput2.CastPosition);
             }

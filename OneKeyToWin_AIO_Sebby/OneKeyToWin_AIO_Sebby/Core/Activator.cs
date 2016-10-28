@@ -464,7 +464,7 @@ namespace OneKeyToWin_AIO_Sebby
                     {
                         if (pred <= IgnDmg && enemy.CountAlliesInRange(450) < 2)
                         {
-                            var enemyPred = Prediction.GetPrediction(enemy, 0.1f).CastPosition;
+                            var enemyPred = SebbyLib.Prediction.GetPrediction(enemy, 0.1f).CastPosition;
                             if (Player.ServerPosition.Distance(enemyPred) > 500 || NavMesh.IsWallOfGrass(enemyPred, 0))
                                 Player.Spellbook.CastSpell(ignite, enemy);
                         }
@@ -607,11 +607,11 @@ namespace OneKeyToWin_AIO_Sebby
                 if (t.IsValidTarget())
                 {
                     if (Config.Item("GLP800KS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 200 + Player.FlatMagicDamageMod * 0.35) > t.Health - OktwCommon.GetIncomingDamage(t))
-                        GLP800.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                        GLP800.Cast(SebbyLib.Prediction.GetPrediction(t, 0.5f).CastPosition);
                     if (Config.Item("GLP800Combo").GetValue<bool>() && Program.Combo)
                     {
                         Program.debug("PRO");
-                        GLP800.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                        GLP800.Cast(SebbyLib.Prediction.GetPrediction(t, 0.5f).CastPosition);
                     }
                 }
             }
@@ -622,11 +622,11 @@ namespace OneKeyToWin_AIO_Sebby
                 if (t.IsValidTarget())
                 {
                     if (Config.Item("ProtobeltKS").GetValue<bool>() && Player.CalcDamage(t, Damage.DamageType.Magical, 150 + Player.FlatMagicDamageMod * 0.35) > t.Health - OktwCommon.GetIncomingDamage(t))
-                        Protobelt.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                        Protobelt.Cast(SebbyLib.Prediction.GetPrediction(t, 0.5f).CastPosition);
                     if (Config.Item("ProtobeltCombo").GetValue<bool>() && Program.Combo)
                     {
                         Program.debug("PRO");
-                        Protobelt.Cast(Prediction.GetPrediction(t, 0.5f).CastPosition);
+                        Protobelt.Cast(SebbyLib.Prediction.GetPrediction(t, 0.5f).CastPosition);
                     }
                 }
             }

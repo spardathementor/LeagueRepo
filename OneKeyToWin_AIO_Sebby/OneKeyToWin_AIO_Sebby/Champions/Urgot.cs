@@ -20,9 +20,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 900);
             R = new Spell(SpellSlot.R, 850);
 
-            Q.SetSkillshot(0.25f, 60f, 1600f, true, SkillshotType.SkillshotLine);
-            Q1.SetSkillshot(0.25f, 60f, 1600f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.25f, 60f, 1600f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 60f, 1600f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 120f, 1500f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
             LoadMenuOKTW();
 
             Drawing.OnDraw += Drawing_OnDraw;

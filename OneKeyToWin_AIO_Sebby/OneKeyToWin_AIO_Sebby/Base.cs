@@ -73,9 +73,9 @@ namespace OneKeyToWin_AIO_Sebby
             if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 1 || Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 1
                 || Config.Item("Epred", true).GetValue<StringList>().SelectedIndex == 1 || Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex == 1))
             {
-                if (DrawSpell.Type == SkillshotType.SkillshotLine)
+                if (DrawSpell.Type == LeagueSharp.Common.SkillshotType.SkillshotLine)
                     OktwCommon.DrawLineRectangle(DrawSpellPos.CastPosition, Player.Position, (int)DrawSpell.Width, 1, System.Drawing.Color.DimGray);
-                if (DrawSpell.Type == SkillshotType.SkillshotCircle)
+                if (DrawSpell.Type == LeagueSharp.Common.SkillshotType.SkillshotCircle)
                     Render.Circle.DrawCircle(DrawSpellPos.CastPosition, DrawSpell.Width, System.Drawing.Color.DimGray, 1);
 
                 drawText("Aiming " + DrawSpellPos.Hitchance, Player.Position.Extend(DrawSpellPos.CastPosition, 400), System.Drawing.Color.Gray);

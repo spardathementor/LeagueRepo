@@ -16,7 +16,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             W = new Spell(SpellSlot.W, 2100);
             R = new Spell(SpellSlot.R, 550);
 
-            Q.SetSkillshot(0.25f, 90f, 1550, true, SkillshotType.SkillshotLine);
+            Q.SetSkillshot(0.25f, 90f, 1550, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
             E.SetTargetted(0.25f, 2000f);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));

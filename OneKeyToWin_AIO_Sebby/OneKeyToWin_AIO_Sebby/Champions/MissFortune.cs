@@ -20,10 +20,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 1000f);
             R = new Spell(SpellSlot.R, 1350f);
 
-            Q1.SetSkillshot(0.25f, 70f, 1500f, true, SkillshotType.SkillshotLine);
+            Q1.SetSkillshot(0.25f, 70f, 1500f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
             Q.SetTargetted(0.25f, 1400f);
-            E.SetSkillshot(0.5f, 200f, float.MaxValue, false, SkillshotType.SkillshotCircle);
-            R.SetSkillshot(0.25f, 50f, 3000f, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.5f, 200f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
+            R.SetSkillshot(0.25f, 50f, 3000f, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("QRange", "Q range", true).SetValue(false));
@@ -277,7 +277,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         return;
                 }
 
-                var enemyPredictionPos = SebbyLib.Prediction.Prediction.GetPrediction(t1, 0.2f).CastPosition;
+                var enemyPredictionPos = SebbyLib.Prediction.GetPrediction(t1, 0.2f).CastPosition;
                 foreach(var minion in minions)
                 {
                     if (Config.Item("killQ", true).GetValue<bool>() && Q.GetDamage(minion) < minion.Health)

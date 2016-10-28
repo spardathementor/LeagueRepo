@@ -17,9 +17,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             E = new Spell(SpellSlot.E, 1200);
             R = new Spell(SpellSlot.R, 1800);
 
-            Q.SetSkillshot(0.25f, 50f, 2000f, true, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 120f, 1400f, false, SkillshotType.SkillshotLine);
-            R.SetSkillshot(1.2f, 120f, float.MaxValue, false, SkillshotType.SkillshotCircle);
+            Q.SetSkillshot(0.25f, 50f, 2000f, true, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            E.SetSkillshot(0.25f, 120f, 1400f, false, LeagueSharp.Common.SkillshotType.SkillshotLine);
+            R.SetSkillshot(1.2f, 120f, float.MaxValue, false, LeagueSharp.Common.SkillshotType.SkillshotCircle);
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("autoQ", "Auto Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("harassQ", "Harass Q", true).SetValue(true));
