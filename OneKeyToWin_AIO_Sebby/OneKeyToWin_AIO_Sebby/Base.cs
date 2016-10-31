@@ -69,6 +69,9 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnDraw(EventArgs args)
         {
+            
+            if (AioModeSet != AioMode.UtilityOnly && Config.Item("debugOrb").GetValue<bool>())
+                DrawFontTextScreen(TextBold, "mode: " + Orbwalker.ActiveMode.ToString().ToUpper() , Drawing.Width * 0.1f, Drawing.Height * 0.1f, Color.White);
 
             if (Game.Time - DrawSpellTime < 0.5 && Config.Item("debugPred").GetValue<bool>() && (Config.Item("Qpred", true).GetValue<StringList>().SelectedIndex == 1 || Config.Item("Wpred", true).GetValue<StringList>().SelectedIndex == 1
                 || Config.Item("Epred", true).GetValue<StringList>().SelectedIndex == 1 || Config.Item("Rpred", true).GetValue<StringList>().SelectedIndex == 1))
