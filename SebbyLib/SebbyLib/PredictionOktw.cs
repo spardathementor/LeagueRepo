@@ -428,8 +428,13 @@ namespace SebbyLib.Prediction
                 result.Hitchance = HitChance.Medium;
                 return result; 
             }
-            
 
+            if ( totalDelay - input.Radius / 2 / input.Speed > 0.6 && (input.Unit.IsWindingUp || !ObjectManager.Player.CanMove || ObjectManager.Player.IsRooted))
+            {
+                OktwCommon.debug("PRED: After CC detection " + totalDelay);
+                result.Hitchance = HitChance.High;
+                return result;
+            }
 
             if (distanceUnitToWaypoint > 0)
             {
