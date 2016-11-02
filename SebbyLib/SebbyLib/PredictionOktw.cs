@@ -429,7 +429,7 @@ namespace SebbyLib.Prediction
                 return result; 
             }
 
-            if ( totalDelay - input.Radius / 2 / input.Speed > 0.6 && (input.Unit.IsWindingUp || !ObjectManager.Player.CanMove || ObjectManager.Player.IsRooted))
+            if ( totalDelay - input.Radius / 2 / input.Speed > 0.6 && (input.Unit.IsWindingUp || !input.Unit.CanMove || input.Unit.IsRooted))
             {
                 OktwCommon.debug("PRED: After CC detection " + totalDelay);
                 result.Hitchance = HitChance.High;
