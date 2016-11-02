@@ -191,7 +191,7 @@ namespace SebbyLib
 
         public static bool CanMove(Obj_AI_Hero target)
         {
-            if ( (!target.IsWindingUp && target.IsRooted) || target.MoveSpeed < 50 || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup)  || target.HasBuff("Recall") ||
+            if ( (!target.IsWindingUp && target.IsRooted && !target.CanMove) || target.MoveSpeed < 50 || target.IsStunned || target.HasBuffOfType(BuffType.Stun) || target.HasBuffOfType(BuffType.Fear) || target.HasBuffOfType(BuffType.Snare) || target.HasBuffOfType(BuffType.Knockup)  || target.HasBuff("Recall") ||
                 target.HasBuffOfType(BuffType.Knockback) || target.HasBuffOfType(BuffType.Charm) || target.HasBuffOfType(BuffType.Taunt) || target.HasBuffOfType(BuffType.Suppression))
             {
                 return false;
