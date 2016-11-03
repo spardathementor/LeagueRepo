@@ -330,32 +330,14 @@ namespace SebbyLib.Prediction
             }
 
             //Set hit chance
-            if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
+            if (result.Hitchance == HitChance.High)
             {
 
                 result = WayPointAnalysis(result, input);
                 //.debug(input.Unit.BaseSkinName + result.Hitchance);
 
             }
-            if (result.Hitchance >= HitChance.VeryHigh && input.Unit is Obj_AI_Hero && input.Radius > 1)
-            {
-
-                var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
-                var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
-                var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
-                var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
-                float speedDelay = distanceFromToUnit / input.Speed;
-
-                if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
-                    speedDelay = 0;
-
-                float totalDelay = speedDelay + input.Delay;
-                float moveArea = input.Unit.MoveSpeed * totalDelay;
-                float fixRange = moveArea * 0.35f;
-                float pathMinLen = 800 + moveArea;
-
-                OktwCommon.debug(input.Radius + " RES Ways: " + input.Unit.GetWaypoints().Count + " W " + input.Unit.IsWindingUp + " D " + distanceUnitToWaypoint + " T " + UnitTracker.GetLastNewPathTime(input.Unit) + " " + result.Hitchance);
-            }
+            
             return result;
         }
 
@@ -638,7 +620,7 @@ namespace SebbyLib.Prediction
                 Input = input,
                 CastPosition = input.Unit.ServerPosition,
                 UnitPosition = input.Unit.ServerPosition,
-                Hitchance = HitChance.High
+                Hitchance = HitChance.VeryHigh
                 /*timeToReachTargetPosition - remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed < 0.4d ? HitChance.High : HitChance.Medium*/
             };
         }
