@@ -45,10 +45,6 @@
     <Reference Include="LeagueSharp.Common">
       <HintPath>C:\Users\Sebby\Documents\jS0Edyyvy\References\LeagueSharp.Common.dll</HintPath>
     </Reference>
-    <Reference Include="SebbyLib, Version=1.0.0.3, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Users\Sebby\Documents\jS0Edyyvy\References\SebbyLib.dll</HintPath>
-    </Reference>
     <Reference Include="SharpDX">
       <HintPath>C:\Users\Sebby\Documents\jS0Edyyvy\References\SharpDX.dll</HintPath>
     </Reference>
@@ -129,6 +125,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource1.resx</DependentUpon>
     </Compile>
+    <Compile Include="SebbyLib\Cache.cs" />
+    <Compile Include="SebbyLib\HealthPrediction.cs" />
+    <Compile Include="SebbyLib\Movement.cs" />
+    <Compile Include="SebbyLib\OktwCommon.cs" />
+    <Compile Include="SebbyLib\Orbwalking.cs" />
+    <Compile Include="SebbyLib\PredictionOktw.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -303,6 +305,7 @@
     <Content Include="Resources\Zilean_Square_0.png" />
     <Content Include="Resources\Zyra_Square_0.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

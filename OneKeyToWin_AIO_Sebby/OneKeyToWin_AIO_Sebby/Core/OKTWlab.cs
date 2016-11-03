@@ -67,13 +67,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
         {
-            if (!sender.IsMe)
+
+            if (sender.IsEnemy)
                 Program.debug(args.Buff.Name + " " + args.Buff.Type + " " + args.Buff.SourceName);
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-
+            if(ObjectManager.Player.IsWindingUp || !ObjectManager.Player.CanMove || ObjectManager.Player.IsRooted)
+                Console.WriteLine(ObjectManager.Player.IsWindingUp + " " + ObjectManager.Player.CanMove  + " " + ObjectManager.Player.IsRooted);
 
 
             foreach (var enemy in HeroManager.Enemies.Where(x=> x.IsValidTarget(400)))
@@ -194,8 +196,10 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
         {
             return;
-            if (ObjectManager.Player.Distance(sender.Position)<500 )
-                Program.debug(sender.Name + " " + sender.Type + " "  +sender.IsAlly);
+            var minion = sender as Obj_AI_Minion;
+
+            if (minion != null )
+                Program.debug(" render: " + minion.IsHPBarRendered+" " + minion.Name +  " type "  + minion.Team + " mana " + minion.MaxMana + " hp "+ minion.Health + " attack "+ minion.IsMinion + minion.AttackSpeedMod  );
             return;
             if (sender.IsValid && sender.IsAlly )
             {
