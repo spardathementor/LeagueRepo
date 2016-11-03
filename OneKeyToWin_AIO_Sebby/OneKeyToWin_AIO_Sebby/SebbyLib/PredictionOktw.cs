@@ -260,12 +260,7 @@ namespace SebbyLib.Prediction
             }
             else
             {
-                //Unit is immobile.
-                var remainingImmobileT = UnitIsImmobileUntil(input.Unit);
-                if (remainingImmobileT >= 0d)
-                {
-                    result = GetImmobilePrediction(input, remainingImmobileT);
-                }
+                result = GetImmobilePrediction(input);
             }
 
             //Normal prediction
@@ -330,32 +325,11 @@ namespace SebbyLib.Prediction
             }
 
             //Set hit chance
-            if (result.Hitchance == HitChance.High || result.Hitchance == HitChance.VeryHigh)
+            if (result.Hitchance == HitChance.High)
             {
-
                 result = WayPointAnalysis(result, input);
-                //.debug(input.Unit.BaseSkinName + result.Hitchance);
-
             }
-            if (result.Hitchance >= HitChance.VeryHigh && input.Unit is Obj_AI_Hero && input.Radius > 1)
-            {
 
-                var lastWaypiont = input.Unit.GetWaypoints().Last().To3D();
-                var distanceUnitToWaypoint = lastWaypiont.Distance(input.Unit.ServerPosition);
-                var distanceFromToUnit = input.From.Distance(input.Unit.ServerPosition);
-                var distanceFromToWaypoint = lastWaypiont.Distance(input.From);
-                float speedDelay = distanceFromToUnit / input.Speed;
-
-                if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
-                    speedDelay = 0;
-
-                float totalDelay = speedDelay + input.Delay;
-                float moveArea = input.Unit.MoveSpeed * totalDelay;
-                float fixRange = moveArea * 0.35f;
-                float pathMinLen = 800 + moveArea;
-
-                OktwCommon.debug(input.Radius + " RES Ways: " + input.Unit.GetWaypoints().Count + " W " + input.Unit.IsWindingUp + " D " + distanceUnitToWaypoint + " T " + UnitTracker.GetLastNewPathTime(input.Unit) + " " + result.Hitchance);
-            }
             return result;
         }
 
@@ -619,28 +593,33 @@ namespace SebbyLib.Prediction
             return result;
         }
 
-        internal static PredictionOutput GetImmobilePrediction(PredictionInput input, double remainingImmobileT)
+        internal static PredictionOutput GetImmobilePrediction(PredictionInput input)
         {
-            var timeToReachTargetPosition = input.Delay + input.Unit.Distance(input.From) / input.Speed;
-
-            if (timeToReachTargetPosition <= remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed)
+            if ((!input.Unit.IsWindingUp && input.Unit.IsRooted && !input.Unit.CanMove) || input.Unit.IsStunned || input.Unit.HasBuffOfType(BuffType.Stun) || input.Unit.HasBuffOfType(BuffType.Fear) || input.Unit.HasBuffOfType(BuffType.Snare) || input.Unit.HasBuffOfType(BuffType.Knockup) ||
+                 input.Unit.HasBuffOfType(BuffType.Knockback) || input.Unit.HasBuffOfType(BuffType.Charm) || input.Unit.HasBuffOfType(BuffType.Taunt) || input.Unit.HasBuffOfType(BuffType.Suppression))
             {
+                var timeToReachTargetPosition = input.Delay + input.Unit.Distance(input.From) / input.Speed;
+
+                if (timeToReachTargetPosition <= 0.05 + input.RealRadius / input.Unit.MoveSpeed)
+                {
+                    return new PredictionOutput
+                    {
+                        CastPosition = input.Unit.ServerPosition,
+                        UnitPosition = input.Unit.Position,
+                        Hitchance = HitChance.Immobile
+                    };
+                }
+
                 return new PredictionOutput
                 {
+                    Input = input,
                     CastPosition = input.Unit.ServerPosition,
-                    UnitPosition = input.Unit.Position,
-                    Hitchance = HitChance.Immobile
+                    UnitPosition = input.Unit.ServerPosition,
+                    Hitchance = HitChance.VeryHigh
+                    /*timeToReachTargetPosition - remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed < 0.4d ? HitChance.High : HitChance.Medium*/
                 };
             }
-
-            return new PredictionOutput
-            {
-                Input = input,
-                CastPosition = input.Unit.ServerPosition,
-                UnitPosition = input.Unit.ServerPosition,
-                Hitchance = HitChance.High
-                /*timeToReachTargetPosition - remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed < 0.4d ? HitChance.High : HitChance.Medium*/
-            };
+            return new PredictionOutput { Input = input };
         }
 
         internal static Vector3 GetWallPoint(Vector3 from, float range)
@@ -688,19 +667,6 @@ namespace SebbyLib.Prediction
             }
             else
                 return Vector3.Zero;
-        }
-
-        internal static double UnitIsImmobileUntil(Obj_AI_Base unit)
-        {
-            var result =
-                unit.Buffs.Where(
-                    buff =>
-                        buff.IsActive && Game.Time <= buff.EndTime &&
-                        (buff.Type == BuffType.Charm || buff.Type == BuffType.Knockup || buff.Type == BuffType.Stun ||
-                         buff.Type == BuffType.Suppression || buff.Type == BuffType.Snare || buff.Type == BuffType.Fear
-                         || buff.Type == BuffType.Taunt || buff.Type == BuffType.Knockback))
-                    .Aggregate(0d, (current, buff) => Math.Max(current, buff.EndTime));
-            return (result - Game.Time);
         }
 
         internal static PredictionOutput GetPositionOnPath(PredictionInput input, List<Vector2> path, float speed = -1)
