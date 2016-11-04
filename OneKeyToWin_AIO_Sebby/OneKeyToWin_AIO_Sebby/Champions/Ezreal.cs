@@ -429,10 +429,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("FQ", true).GetValue<bool>())
             {
-                foreach (var minion in minions.Where(minion => minion.IsValidTarget() && orbTarget != minion.NetworkId && minion.HealthPercent < 70 && !Orbwalker.InAutoAttackRange(minion) && minion.Health < Q.GetDamage(minion)))
+                foreach (var minion in minions.Where(minion => minion.IsValidTarget() && orbTarget != minion.NetworkId && minion.HealthPercent < 70 && !Orbwalker.InAutoAttackRange(minion)))
                 {
-                    if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
-                        return;
+                    var hpPred = SebbyLib.HealthPrediction.GetHealthPrediction(minion, 300);
+                    if (hpPred > 0 && hpPred < Q.GetDamage(minion))
+                    {
+                        if (Q.Cast(minion) == Spell.CastStates.SuccessfullyCasted)
+                            return;
+                    }
                 }
             }
 
