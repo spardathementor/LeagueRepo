@@ -552,7 +552,7 @@ namespace SebbyLib
         public class Orbwalker
         {
 
-            private const float LaneClearWaitTimeMod = 2f;
+            private const float LaneClearWaitTimeMod = 2.1f;
 
             /// <summary>
             ///     The configuration
@@ -780,7 +780,7 @@ namespace SebbyLib
                 var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
                 return
                     MinionListAA.Any( 
-                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion) * 1.1);
+                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion) * 1.2);
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
@@ -1152,8 +1152,7 @@ namespace SebbyLib
                         {
                             MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly)
                             .Where(minion => ShouldAttackMinion(minion))
-                                .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
-                                .ThenByDescending(minion => HealthPrediction.GetHealthPrediction(minion, 1500));
+                                .OrderBy(minion => HealthPrediction.GetHealthPrediction(minion, 2000));
                         }
                         else
                         {
@@ -1170,7 +1169,7 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             var damage = Player.GetAutoAttackDamage(minion);
-                            if (predHealth >= 2.5 * damage && predHealth > 0 )
+                            if (predHealth >= 2.6 * damage)
                                 return minion;
                         }
                     }
