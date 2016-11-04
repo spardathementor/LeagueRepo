@@ -777,10 +777,10 @@ namespace SebbyLib
 
             public bool ShouldWait()
             {
-                var attackCalc = (int)(Player.AttackDelay * 1000 * 1.8) + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
+                var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
                 return
                     MinionListAA.Any( 
-                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
+                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion) * 1.1);
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
@@ -855,9 +855,10 @@ namespace SebbyLib
                             .ThenByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                             .ThenBy(minion => HealthPrediction.GetHealthPrediction(minion, 1500));
 
+                    var firstT = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                     foreach (var minion in MinionList)
                     {
-                        var t = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                        var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / (int)GetMyProjectileSpeed();
 
                         if (mode == OrbwalkingMode.Freeze)
                         {
@@ -880,7 +881,6 @@ namespace SebbyLib
                         {
                             if (CanAttack())
                             {
-
                                 DelayOnFire = t + Utils.TickCount;
                                 DelayOnFireId = minion.NetworkId;
                             }
@@ -1147,36 +1147,34 @@ namespace SebbyLib
                 {
                     if (!ShouldWait())
                     {
-                        if (_prevMinion.IsValidTarget() && InAutoAttackRange(_prevMinion))
+                        IOrderedEnumerable<Obj_AI_Base> MinionList;
+                        if (Cache.GetMinions(Player.Position, 0, MinionTeam.Ally).Any())
                         {
-                            var predHealth = HealthPrediction.LaneClearHealthPrediction(
-                                _prevMinion, (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod), FarmDelay);
-                            if (predHealth >= 2 * Player.GetAutoAttackDamage(_prevMinion) ||
-                                Math.Abs(predHealth - _prevMinion.Health) < float.Epsilon)
-                            {
-                                return _prevMinion;
-                            }
+                            MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly)
+                            .Where(minion => ShouldAttackMinion(minion))
+                                .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
+                                .ThenByDescending(minion => HealthPrediction.GetHealthPrediction(minion, 1500));
+                        }
+                        else
+                        {
+                            return Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly)
+                           .Where(minion => ShouldAttackMinion(minion))
+                               .OrderBy(minion => minion.Health)
+                               .ThenByDescending(minion => minion.Health).FirstOrDefault();
                         }
 
-                        result = (from minion in
-                            MinionListAA.Where(
-                                    minion => ShouldAttackMinion(minion, false))
-                                  let predHealth =
-                                      HealthPrediction.LaneClearHealthPrediction(
-                                          minion, (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod), FarmDelay)
-                                  where
-                                      predHealth >= 2 * Player.GetAutoAttackDamage(minion) ||
-                                      Math.Abs(predHealth - minion.Health) < float.Epsilon
-                                  select minion).MaxOrDefault(
-                                m => m.Health);
-
-                        if (result != null)
+                        var firstT = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
+                        foreach (var minion in MinionList)
                         {
-                            _prevMinion = (Obj_AI_Minion)result;
+                            var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+
+                            var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
+                            var damage = Player.GetAutoAttackDamage(minion);
+                            if (predHealth >= 2.5 * damage && predHealth > 0 )
+                                return minion;
                         }
                     }
                 }
-
                 return result;
             }
 
