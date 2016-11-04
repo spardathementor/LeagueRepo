@@ -86,6 +86,10 @@ namespace SebbyLib
                 
                 return MinionsListNeutral.Where(minion => CanReturn(minion, from, range)).OrderByDescending(minion => minion.MaxHealth).ToList();
             }
+            else if (team == MinionTeam.NotAlly)
+            {
+                return AllMinionsObj.FindAll(minion => CanReturn(minion, from, range));
+            }
             else
             {
                 return AllMinionsObj.FindAll(minion => CanReturn(minion, from, range));

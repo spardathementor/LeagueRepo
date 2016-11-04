@@ -1220,7 +1220,7 @@ namespace SebbyLib
                     {
                         return;
                     }
-                    MinionListAA = Cache.GetMinions(Player.Position, 0);
+                    MinionListAA = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly);
                     var target = GetTarget();
                      
                     Orbwalk(
