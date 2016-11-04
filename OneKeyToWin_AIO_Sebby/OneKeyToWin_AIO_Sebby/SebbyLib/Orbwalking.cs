@@ -107,19 +107,6 @@ namespace SebbyLib
             Spellbook.OnStopCast += SpellbookOnStopCast;
             AttackableUnit.OnDamage += Obj_AI_Base_OnDamage;
             Obj_AI_Base.OnDelete += Obj_AI_Base_OnDelete;
-            Obj_AI_Base.OnCreate += Obj_AI_Base_OnCreate;
-        }
-
-        private static void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
-        {
-            var missile = sender as MissileClient;
-            if (missile != null)
-            {
-                if (missile.SpellCaster.IsMe)
-                {
-                    //Console.WriteLine(Player.BoundingRadius + " dis " + (missile.Position.Distance(Player.Position)));
-                }
-            }
         }
 
         private static void Obj_AI_Base_OnDelete(GameObject sender, EventArgs args)
@@ -790,7 +777,7 @@ namespace SebbyLib
 
             public bool ShouldWait()
             {
-                var attackCalc = (int)(Player.AttackDelay * 1000 * 1.6) + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
+                var attackCalc = (int)(Player.AttackDelay * 1000 * 1.8) + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
                 return
                     MinionListAA.Any( 
                         minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
@@ -862,64 +849,58 @@ namespace SebbyLib
                 /*Killable Minion*/
                 if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit || mode == OrbwalkingMode.Freeze)
                 {
-
-                    var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly).OrderBy(minion => HealthPrediction.GetHealthPrediction(minion, 1200));
+                    var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly)
+                        .Where(minion => minion.Team != GameObjectTeam.Neutral && ShouldAttackMinion(minion))
+                            .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Super"))
+                            .ThenByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
+                            .ThenBy(minion => HealthPrediction.GetHealthPrediction(minion, 1500));
 
                     foreach (var minion in MinionList)
                     {
-                        if (minion.Team != GameObjectTeam.Neutral)
+                        var t = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+
+                        if (mode == OrbwalkingMode.Freeze)
                         {
-                            if (!ShouldAttackMinion(minion))
-                                continue;
+                            t += 200 + Game.Ping / 2;
+                        }
+                            
+                        var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
+                        var damage = Player.GetAutoAttackDamage(minion, _config.Item("PassiveDmg", true).GetValue<bool>()) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
+                            
+                        var killable = predHealth <= damage;
 
-                            var t = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / (int)GetMyProjectileSpeed();
-
-                            if (mode == OrbwalkingMode.Freeze)
+                        if (mode == OrbwalkingMode.Freeze)
+                        {
+                            if (minion.Health < 50 || predHealth <= 50)
                             {
-                                t += 200 + Game.Ping / 2;
+                                return minion;
                             }
-                            
-                            var predHealth = HealthPrediction.GetHealthPrediction(minion, t, FarmDelay);
-
-                            
-                            var damage = Player.GetAutoAttackDamage(minion, _config.Item("PassiveDmg", true).GetValue<bool>()) + _config.Item("DamageAdjust").GetValue<Slider>().Value;
-                            
-
-                            var killable = predHealth <= damage;
-
-                            if (mode == OrbwalkingMode.Freeze)
+                        }
+                        else
+                        {
+                            if (CanAttack())
                             {
-                                if (minion.Health < 50 || predHealth <= 50)
+
+                                DelayOnFire = t + Utils.TickCount;
+                                DelayOnFireId = minion.NetworkId;
+                            }
+
+                            if (predHealth <= 0 )
+                            {
+                                if (HealthPrediction.GetHealthPrediction(minion, t - 50, FarmDelay) > 0)
                                 {
+                                    FireOnNonKillableMinion(minion);
                                     return minion;
                                 }
                             }
-                            else
+                            else if (killable)
                             {
-                                if (CanAttack())
-                                {
-
-                                    DelayOnFire = t + Utils.TickCount;
-                                    DelayOnFireId = minion.NetworkId;
-                                }
-
-                                if (predHealth <= 0 )
-                                {
-                                    if (HealthPrediction.GetHealthPrediction(minion, t - 50, FarmDelay) > 0)
-                                    {
-                                        FireOnNonKillableMinion(minion);
-                                        return minion;
-                                    }
-                                }
-
-                                else if (killable)
-                                {
-                                    return minion;
-                                }
+                                return minion;
                             }
                         }
                     }
                 }
+                
                 if (CanAttack())
                 {
                     DelayOnFire = 0;
