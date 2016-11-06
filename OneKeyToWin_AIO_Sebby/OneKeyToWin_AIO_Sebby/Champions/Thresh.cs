@@ -48,6 +48,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("pushE", "Auto push", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("pulldashE", "Auto pull on dash", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("inter", "OnPossibleToInterrupt" , true)).SetValue(true);
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("Gap", "OnEnemyGapcloser", true)).SetValue(true);
             Config.SubMenu(Player.ChampionName).SubMenu("E option").AddItem(new MenuItem("Emin", "Min pull range E", true).SetValue(new Slider(200, 0, (int)E.Range)));
@@ -207,6 +208,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 else if (Config.Item("pushE", true).GetValue<bool>())
                 {
                     CastE(true, t);
+                }
+                else if (Config.Item("pulldashE", true).GetValue<bool>() && t.IsDashing())
+                {
+                    var pred =  Prediction.GetPrediction(t, 0.15f);
+                    if(pred.CastPosition.Distance(Player.Position) < E.Range)
+                        E.Cast(pred.CastPosition);
                 }
             }
         }
