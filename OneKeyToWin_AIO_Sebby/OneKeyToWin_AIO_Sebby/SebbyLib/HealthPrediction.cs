@@ -23,7 +23,7 @@ namespace SebbyLib
             Obj_AI_Base.OnProcessSpellCast += ObjAiBaseOnOnProcessSpellCast;
             Game.OnUpdate += Game_OnGameUpdate;
             Spellbook.OnStopCast += SpellbookOnStopCast;
-            MissileClient.OnDelete += MissileClient_OnDelete;
+            GameObject.OnDelete += MissileClient_OnDelete;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
         }
 
