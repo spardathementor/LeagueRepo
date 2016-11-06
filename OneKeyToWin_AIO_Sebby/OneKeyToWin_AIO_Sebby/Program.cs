@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static Spell Q, W, E, R, Q1, W1, E1, R1;
 
-        private static string OktNews = "NEW champion - TEEMO, Sivir E impove";
+        private static string OktNews = "ORBWALKER BETA";
 
         public static AioMode AioModeSet = AioMode.All;
         public static Menu Config;
@@ -257,7 +257,6 @@ namespace OneKeyToWin_AIO_Sebby
             Config.Item("aiomodes").Show(false);
             Config.AddToMainMenu();
             Game.OnUpdate += OnUpdate;
-            
             Drawing.OnDraw += OnDraw;
 
             if (Config.Item("print").GetValue<bool>())
@@ -274,7 +273,6 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void OnUpdate(EventArgs args)
         {
-            
             if (AioModeSet == AioMode.UtilityOnly)
             {
                 if (Player.IsMoving)
