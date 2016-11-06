@@ -925,6 +925,21 @@ namespace SebbyLib
                     }
                 }
 
+                /*Jungle minions*/
+                if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
+                {
+                    var jminions = Cache.GetMinions(Player.Position, 0, MinionTeam.Neutral);
+
+                    result = _config.Item("Smallminionsprio").GetValue<bool>()
+                        ? jminions.MinOrDefault(mob => mob.MaxHealth)
+                        : jminions.MaxOrDefault(mob => mob.MaxHealth);
+
+                    if (result != null)
+                    {
+                        return result;
+                    }
+                }
+
                 /*WARDS*/
 
                 if ((mode == OrbwalkingMode.Combo && _config.Item("AttackWardsCombo").GetValue<bool>())
@@ -1014,21 +1029,6 @@ namespace SebbyLib
                     }
                 }
 
-
-                /*Jungle minions*/
-                if (mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed)
-                {
-                    var jminions = Cache.GetMinions(Player.Position, 0, MinionTeam.Neutral);
-
-                    result = _config.Item("Smallminionsprio").GetValue<bool>()
-                        ? jminions.MinOrDefault(mob => mob.MaxHealth)
-                        : jminions.MaxOrDefault(mob => mob.MaxHealth);
-
-                    if (result != null)
-                    {
-                        return result;
-                    }
-                }
 
                 /* UnderTurret Farming */
                 if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit ||
