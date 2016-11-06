@@ -646,6 +646,14 @@ namespace SebbyLib
                 misc.AddItem(
                     new MenuItem("LimitAttackSpeed", "Don't kite if Attack Speed > 2.5").SetShared().SetValue(false));
 
+                /* Missile check */
+                misc.AddItem(new MenuItem("MissileCheck", "Use Missile Check").SetShared().SetValue(true));
+
+                /* Delay sliders */
+                misc.AddItem(
+                    new MenuItem("ExtraWindup", "Extra windup time").SetShared().SetValue(new Slider(80, 0, 200)));
+                misc.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
+
                 _config.AddSubMenu(misc);
 
 
@@ -656,13 +664,7 @@ namespace SebbyLib
                 sebbyFix.AddItem(new MenuItem("PassiveDmg", "Last hit include passive damage", true).SetShared().SetValue(true));
 
                 _config.AddSubMenu(sebbyFix);
-                /* Missile check */
-                _config.AddItem(new MenuItem("MissileCheck", "Use Missile Check").SetShared().SetValue(true));
 
-                /* Delay sliders */
-                _config.AddItem(
-                    new MenuItem("ExtraWindup", "Extra windup time").SetShared().SetValue(new Slider(80, 0, 200)));
-                _config.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
                 
                 /*Load the menu*/
                 _config.AddItem(
