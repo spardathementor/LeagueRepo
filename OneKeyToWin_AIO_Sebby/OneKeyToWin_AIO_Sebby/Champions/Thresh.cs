@@ -273,7 +273,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
 
             var rCountOut = Player.CountEnemiesInRange(R.Range);
-            var rCountIn = Player.CountEnemiesInRange(R.Range - 180);
+            var rCountIn = Player.CountEnemiesInRange(200);
 
             if (rCountOut < rCountIn)
                 return;
