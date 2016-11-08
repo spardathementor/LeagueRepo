@@ -80,7 +80,7 @@ namespace SebbyLib
             if (target.HasBuffOfType(BuffType.Poison))
                 totalDamage += target.Level * 5;
             if (target.HasBuffOfType(BuffType.Damage))
-                totalDamage += target.Level * 5;
+                totalDamage += target.Level * 6;
             return totalDamage;
         }
 
