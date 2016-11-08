@@ -90,12 +90,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void AutoWardLogic()
         {
-            foreach (var need in OKTWtracker.ChampionInfoList.Where(x => x.Hero.IsValid && !x.Hero.IsVisible && !x.Hero.IsDead))
+            foreach (var need in OKTWtracker.ChampionInfoList.Where(x => x.Hero.IsValid && x.PredictedPos != null && !x.Hero.IsVisible && !x.Hero.IsDead))
             {
                 //var need = OKTWtracker.ChampionInfoList.Find(x => x.NetworkId == enemy.NetworkId);
-
-                if (need == null || need.PredictedPos == null)
-                    continue;
 
                 var PPDistance = need.PredictedPos.Distance(Player.Position);
 
