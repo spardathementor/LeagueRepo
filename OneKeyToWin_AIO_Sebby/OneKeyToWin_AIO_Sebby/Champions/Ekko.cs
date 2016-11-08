@@ -101,20 +101,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
 
                 double dmg = OktwCommon.GetIncomingDamage(Player, 1);
-                var enemys = Player.CountEnemiesInRange(800);
 
-                if (dmg > 0 || enemys > 0)
+                if (dmg > 0)
                 {
-                    if (dmg > Player.Level * 50)
-                    {
-                        R.Cast();
-                    }
-                    else if (Player.Health - dmg < enemys * Player.Level * 20)
-                    {
-                        R.Cast();
-
-                    }
-                    else if (Player.Health - dmg < Player.Level * 10)
+                    if (Player.Health - dmg < Player.Level * 10)
                     {
                         R.Cast();
                     }
