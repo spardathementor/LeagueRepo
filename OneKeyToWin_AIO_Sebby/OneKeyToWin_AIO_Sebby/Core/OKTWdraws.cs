@@ -94,9 +94,11 @@ namespace OneKeyToWin_AIO_Sebby.Core
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posXj", "Alert posX").SetValue(new Slider(639, 1000, 0)));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posYj", "Alert posY").SetValue(new Slider(591, 1000, 0)));
 
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("Notification", "Notifications").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("posXn", "Notifications posX ").SetValue(new Slider(400, 1000, 0)));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("posYn", "Notifications posY").SetValue(new Slider(50, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Notification").AddItem(new MenuItem("Notification", "Enable").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Notification").AddItem(new MenuItem("NotificationR", "Ultimate").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Notification").AddItem(new MenuItem("NotificationS", "Summoners").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Notification").AddItem(new MenuItem("posXn", "Notifications posX ").SetValue(new Slider(400, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Notification").AddItem(new MenuItem("posYn", "Notifications posY").SetValue(new Slider(50, 1000, 0)));
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadar", "Enable").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadarEnemy", "Only enemy").SetValue(true));
@@ -157,7 +159,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     var rSlot = hero.Hero.Spellbook.Spells[3];
                     var sum1 = hero.Hero.Spellbook.Spells[4];
                     var sum2 = hero.Hero.Spellbook.Spells[5];
-                    if (rSlot != null && !IgnoreR.Any(x => x == hero.Hero.ChampionName))
+                    if (Config.Item("NotificationR").GetValue<bool>() && rSlot != null && !IgnoreR.Any(x => x == hero.Hero.ChampionName))
                     {
                         var time = rSlot.CooldownExpires - Game.Time;
                         if (time < 1 && time >= 0)
@@ -165,21 +167,24 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         else if (rSlot.Cooldown - time < 1 && rSlot.Cooldown - time >= 0)
                             NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS("r"), true));
                     }
-                    if (sum1 != null)
+                    if (Config.Item("NotificationS").GetValue<bool>())
                     {
-                        var time = sum1.CooldownExpires - Game.Time;
-                        if (time < 1 && time >= 0)
-                            NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum1.Name), false));
-                        else if (sum1.Cooldown - time < 1 && sum1.Cooldown - time >= 0)
-                            NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum1.Name), true));
-                    }
-                    if (sum2 != null)
-                    {
-                        var time = sum2.CooldownExpires - Game.Time;
-                        if (time < 1 && time >= 0)
-                            NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum2.Name), false));
-                        else if (sum2.Cooldown - time < 1 && sum2.Cooldown - time >= 0)
-                            NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum2.Name), true));
+                        if (sum1 != null)
+                        {
+                            var time = sum1.CooldownExpires - Game.Time;
+                            if (time < 1 && time >= 0)
+                                NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum1.Name), false));
+                            else if (sum1.Cooldown - time < 1 && sum1.Cooldown - time >= 0)
+                                NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum1.Name), true));
+                        }
+                        if (sum2 != null)
+                        {
+                            var time = sum2.CooldownExpires - Game.Time;
+                            if (time < 1 && time >= 0)
+                                NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum2.Name), false));
+                            else if (sum2.Cooldown - time < 1 && sum2.Cooldown - time >= 0)
+                                NotificationsList.Add(new OktwNotification(hero.SquareSprite, GetSummonerIconS(sum2.Name), true));
+                        }
                     }
                 }
                 NotTimer = Utils.TickCount;
