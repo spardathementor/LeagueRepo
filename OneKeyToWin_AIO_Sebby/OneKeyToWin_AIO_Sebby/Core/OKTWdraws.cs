@@ -33,7 +33,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private Render.Sprite Intro;
         private static Render.Sprite Flash, Heal, Exhaust, Teleport, Smite, Ignite, Barrier, Clairvoyance, Cleanse, Ghost, Ultimate, Pink, Ward, PinkMM, WardMM, Not;
         private static Render.Sprite FlashS, HealS, ExhaustS, TeleportS, SmiteS, IgniteS, BarrierS, ClairvoyanceS, CleanseS, GhostS, UltimateS, Isready, Lost;
-
+        private bool MenuOpen = false;
         private static int NotTimer = Utils.TickCount + 1500;
 
         public static string[] IgnoreR = { "Corki", "Jayce", "Kassadin", "KogMaw", "Leblanc", "Teemo", "Swain", "Shyvana", "Nidalee", "Anivia", "Quinn", "Gnar" };
@@ -87,14 +87,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("championInfo", "Show enemy avatars").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("championInfoHD", "Full HD screen size").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posX", "posX").SetValue(new Slider(839, 1000, 0)));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posY", "posY").SetValue(new Slider(591, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posX", "Avatars posX").SetValue(new Slider(839, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posY", "Avatars posY").SetValue(new Slider(591, 1000, 0)));
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("gankalert", "Gank alert").SetValue(true));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posXj", "alert posX ").SetValue(new Slider(639, 1000, 0)));
-            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posYj", "alert posY").SetValue(new Slider(591, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posXj", "Alert posX").SetValue(new Slider(639, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Hud").AddItem(new MenuItem("posYj", "Alert posY").SetValue(new Slider(591, 1000, 0)));
 
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("Notification", "Notifications").SetValue(true));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("posXn", "Notifications posX ").SetValue(new Slider(400, 1000, 0)));
+            Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").AddItem(new MenuItem("posYn", "Notifications posY").SetValue(new Slider(50, 1000, 0)));
+
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadar", "Enable").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadarEnemy", "Only enemy").SetValue(true));
             Config.SubMenu("Utility, Draws OKTW©").SubMenu("Screen").SubMenu("Awareness radar").AddItem(new MenuItem("ScreenRadarJungler", "Only jungler").SetValue(true));
@@ -133,6 +136,16 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             Drawing.OnEndScene += Drawing_OnEndScene;
             Game.OnUpdate += Game_OnUpdate;
+            Game.OnWndProc += Game_OnWndProc;
+        }
+
+        private void Game_OnWndProc(WndEventArgs args)
+        {
+            if (args.Msg == 256)
+                MenuOpen = true;
+            if (args.Msg == 257)
+                MenuOpen = false;
+            
         }
 
         private void Game_OnUpdate(EventArgs args)
@@ -198,6 +211,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
             float posY = (Config.Item("posY").GetValue<Slider>().Value * 0.001f) * Drawing.Height;
             float posX = (Config.Item("posX").GetValue<Slider>().Value * 0.001f) * Drawing.Width;
 
+            float posYn = (Config.Item("posYn").GetValue<Slider>().Value * 0.001f) * Drawing.Height;
+            float posXn = (Config.Item("posXn").GetValue<Slider>().Value * 0.001f) * Drawing.Width;
+
             int Width = 103;
             int Height = 8;
             int XOffset = 10;
@@ -207,7 +223,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             var hudSpace = 0;
             var area = 5000;
-            var notPos = new Vector2(Drawing.Width / 2 - 150, Drawing.Height / 6);
+            var notPos = new Vector2(posXn, posYn);
 
             var centerScreenWorld = Drawing.ScreenToWorld(centerScreen);
             if (Config.Item("gankalert").GetValue<bool>())
@@ -267,6 +283,12 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (Config.Item("Notification").GetValue<bool>())
             {
+                if (MenuOpen)
+                {
+                    Not.Position = notPos;
+                    Not.Color = new ColorBGRA(0, 0.5f, 1f, 0.6f * 1);
+                    Not.OnEndScene();
+                }
                 var noti = NotificationsList.FirstOrDefault();
                 if (noti != null)
                 {
