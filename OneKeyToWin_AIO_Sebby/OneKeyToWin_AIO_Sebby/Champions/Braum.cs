@@ -192,7 +192,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Config.Item("spell" + args.SData.Name.ToLower()) != null && !Config.Item("spell" + args.SData.Name.ToLower()).GetValue<bool>())
                 return;
 
-            if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && OktwCommon.CanHitSkillShot(Player, args))
+            if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && OktwCommon.CanHitSkillShot(Player, args.Start, args.End, args.SData))
             {
                 E.Cast(sender.Position);
             }
@@ -201,7 +201,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && Player.Distance(ally.ServerPosition) < W.Range && Config.Item("Eon" + ally.ChampionName).GetValue<bool>()))
                 {
-                    if (OktwCommon.CanHitSkillShot(ally, args) || OktwCommon.GetIncomingDamage(ally,1) > ally.Health * Config.Item("Edmg", true).GetValue<Slider>().Value * 0.01)
+                    if (OktwCommon.CanHitSkillShot(ally, args.Start, args.End, args.SData) || OktwCommon.GetIncomingDamage(ally,1) > ally.Health * Config.Item("Edmg", true).GetValue<Slider>().Value * 0.01)
                     {
                         if (E.IsReady())
                             Utility.DelayAction.Add(200, () => E.Cast(sender.Position));

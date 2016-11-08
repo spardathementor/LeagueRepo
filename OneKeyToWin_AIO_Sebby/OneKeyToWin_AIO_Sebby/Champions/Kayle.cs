@@ -82,7 +82,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>()))
                 {
-                    if(OktwCommon.CanHitSkillShot(ally, args))
+                    if(OktwCommon.CanHitSkillShot(ally, args.Start, args.End, args.SData))
                         R.CastOnUnit(ally);
                 }
             }

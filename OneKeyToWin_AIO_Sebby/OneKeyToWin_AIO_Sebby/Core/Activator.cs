@@ -208,7 +208,7 @@ namespace OneKeyToWin_AIO_Sebby
                     else
                     {
                         ;
-                        if (OktwCommon.CanHitSkillShot(Player, args))
+                        if (OktwCommon.CanHitSkillShot(Player, args.Start, args.End, args.SData))
                             ZhonyaTryCast();
                     }
                 }
@@ -225,7 +225,7 @@ namespace OneKeyToWin_AIO_Sebby
                     }
                     else
                     {
-                        if (OktwCommon.CanHitSkillShot(ally, args))
+                        if (OktwCommon.CanHitSkillShot(ally, args.Start, args.End, args.SData))
                             dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                         else
                             continue;

@@ -131,7 +131,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (args.Target.IsMe)
                     E.Cast();
             }
-            else if (OktwCommon.CanHitSkillShot(Player, args))
+            else if (OktwCommon.CanHitSkillShot(Player, args.Start, args.End, args.SData))
             {
                 E.Cast();
             }

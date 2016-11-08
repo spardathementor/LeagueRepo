@@ -106,7 +106,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 }
                 else if (Config.Item("skillshot" + ally.ChampionName ,true).GetValue<bool>())
                 {
-                    if (!OktwCommon.CanHitSkillShot(ally, args))
+                    if (!OktwCommon.CanHitSkillShot(ally, args.Start, args.End, args.SData))
                         continue;
                     //dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                     E.CastOnUnit(ally);
