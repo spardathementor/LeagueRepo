@@ -361,7 +361,6 @@ namespace SebbyLib
                             totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
                             if(totalDamage == 0)
                                 totalDamage += target.Level * 3;
-                            Console.WriteLine("found " + missile.SData.Name + " " + missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name));
                         }
                     }
                     else
@@ -369,7 +368,6 @@ namespace SebbyLib
                         if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
                         {
                             totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
-                            Console.WriteLine("found skillshot " + missile.SData.Name + " " + missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name)); 
                         }
                     }
                 }
