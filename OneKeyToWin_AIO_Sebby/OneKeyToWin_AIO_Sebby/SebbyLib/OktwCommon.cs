@@ -349,11 +349,7 @@ namespace SebbyLib
                         totalDamage += damage.Damage;
                 }
             }
-            if (target.HasBuffOfType(BuffType.Poison))
-                totalDamage += target.Level * 5;
-            if (target.HasBuffOfType(BuffType.Damage))
-                totalDamage += target.Level * 6;
-
+            
             if (totalDamage == 0)
             {
                 foreach (var missile in Cache.MissileList.Where(missile => missile.IsValid && missile.SpellCaster != null && missile.SData != null && missile.SpellCaster.Team != target.Team))
@@ -363,6 +359,9 @@ namespace SebbyLib
                         if (missile.Target.NetworkId == target.NetworkId)
                         {
                             totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
+                            if(totalDamage == 0)
+                                totalDamage += target.Level * 4;
+                            Console.WriteLine("found " + missile.SData.Name + " " + missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name));
                         }
                     }
                     else
@@ -370,10 +369,16 @@ namespace SebbyLib
                         if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
                         {
                             totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
+                            Console.WriteLine("found skillshot " + missile.SData.Name + " " + missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name)); 
                         }
                     }
                 }
             }
+
+            if (target.HasBuffOfType(BuffType.Poison))
+                totalDamage += target.Level * 5;
+            if (target.HasBuffOfType(BuffType.Damage))
+                totalDamage += target.Level * 6;
 
             return totalDamage;
         }
