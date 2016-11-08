@@ -288,7 +288,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
             if (Config.Item("Notification").GetValue<bool>())
             {
-                if (false && MenuOpen)
+                if (MenuGlobals.DrawMenu)
                 {
                     Not.Position = notPos;
                     Not.Color = new ColorBGRA(0, 0.5f, 1f, 0.6f * 1);
