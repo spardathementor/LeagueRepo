@@ -111,15 +111,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 70 && Player.ServerPosition.Distance(ally.ServerPosition) < R.Range && Config.Item("Rally" + ally.ChampionName).GetValue<bool>() ))
             {
-                double dmg = OktwCommon.GetIncomingDamage(ally, 1);
+                double dmg = OktwCommon.GetIncomingDamage(ally, 0.75f);
                 var enemys = ally.CountEnemiesInRange(800);
                
                 if (dmg == 0 && enemys == 0)
                     continue;
 
-                enemys = (enemys == 0) ? 1 : enemys;
-
-                if (ally.Health - dmg < enemys * ally.Level * 20)
+                if (ally.Health - dmg <  ally.Level * 20)
                     R.CastOnUnit(ally);
             }
         }
