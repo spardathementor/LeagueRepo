@@ -360,7 +360,7 @@ namespace SebbyLib
                         {
                             totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
                             if(totalDamage == 0)
-                                totalDamage += target.Level * 4;
+                                totalDamage += target.Level * 3;
                             Console.WriteLine("found " + missile.SData.Name + " " + missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name));
                         }
                     }
