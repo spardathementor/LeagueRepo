@@ -398,7 +398,7 @@ namespace SebbyLib
                 if (!sender.IsEnemy || sender.IsMinion || args.SData.IsAutoAttack() || sender.Type != GameObjectType.obj_AI_Hero)
                     return;
 
-                if (args.SData.Name == "YasuoWMovingWall")
+                if (args.SData.Name.Contains("YasuoWMovingWall"))
                 {
                     yasuoWall.CastTime = Game.Time;
                     yasuoWall.CastPosition = sender.Position.Extend(args.End, 400);
