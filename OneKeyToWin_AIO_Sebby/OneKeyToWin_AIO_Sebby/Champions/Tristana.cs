@@ -31,7 +31,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("smartW", "SmartCast W key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
 
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harassE", "Harass E", true).SetValue(true));
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eafter", "E after attack", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("Eturet", "E on turrent laneclear", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("focusE", "Focus target with E", true).SetValue(true));
 
             foreach (var enemy in HeroManager.Enemies)
@@ -78,10 +78,13 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
-            if (E.IsReady() && args.Target is Obj_AI_Hero )
-            {
-                var t = (Obj_AI_Hero)args.Target;
+            if (!E.IsReady())
+                return;
+            //Eturet
 
+            var t = args.Target as Obj_AI_Hero;
+            if (t != null && t.IsValidTarget())
+            {
                 if (t.IsValidTarget())
                 {
                     if (E.GetDamage(t) > t.Health)
@@ -109,8 +112,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                             args.Process = false;
                     }
                 }
-            } 
-        }
+            }
+
+            var tur = args.Target as Obj_AI_Turret;
+            if (LaneClear && tur != null && tur.IsValidTarget() && Player.Mana > RMANA + EMANA + WMANA + RMANA)
+            {
+                E.Cast(tur);
+            }
+    }
 
         private void Game_OnUpdate(EventArgs args)
         {
