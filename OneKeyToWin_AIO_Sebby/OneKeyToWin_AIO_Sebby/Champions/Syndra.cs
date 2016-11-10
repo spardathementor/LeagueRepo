@@ -212,9 +212,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(enemy);
 
                 var comboDMG = OktwCommon.GetKsDamage(enemy, R) ;
-                comboDMG += (R.GetDamage(enemy, 1) * (R.Instance.Ammo - 3));
-                comboDMG += OktwCommon.GetEchoLudenDamage(enemy);
-
+                comboDMG += (R.GetDamage(enemy, 1) * BallsList.Count; //  (R.Instance.Ammo - 3));
+                Console.WriteLine(comboDMG + " " + R.Instance.Ammo);
                 if (Rcombo)
                 {
                     if (Q.IsReady() && enemy.IsValidTarget(600))
