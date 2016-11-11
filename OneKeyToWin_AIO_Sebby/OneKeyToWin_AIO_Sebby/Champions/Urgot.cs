@@ -22,7 +22,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Q.SetSkillshot(0.25f, 60f, 1600f, true, SkillshotType.SkillshotLine);
             Q1.SetSkillshot(0.25f, 60f, 1600f, false, SkillshotType.SkillshotLine);
-            E.SetSkillshot(0.25f, 120f, 1500f, false, SkillshotType.SkillshotCircle);
+            E.SetSkillshot(0.25f, 130f, 1500f, false, SkillshotType.SkillshotCircle);
             LoadMenuOKTW();
 
             Drawing.OnDraw += Drawing_OnDraw;
@@ -56,6 +56,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             foreach (var enemy in HeroManager.Enemies)
                 Config.SubMenu(Player.ChampionName).SubMenu("R Config").SubMenu("GapCloser R").AddItem(new MenuItem("GapCloser" + enemy.ChampionName, enemy.ChampionName, true).SetValue(false));
+
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("HarassMana", "Harass Mana", true).SetValue(new Slider(30, 100, 0)));
+            Config.SubMenu(Player.ChampionName).AddItem(new MenuItem("stack", "Stack Tear if full mana", true).SetValue(false));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("farmQ", "Farm Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Farm").AddItem(new MenuItem("LC", "LaneClear", true).SetValue(true));
@@ -120,16 +123,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SetMana();
             }
 
-            if (Program.LagFree(1) && !Player.IsWindingUp && E.IsReady())
+            if (Program.LagFree(1) && E.IsReady())
                 LogicE();
 
             if (Program.LagFree(2) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
                 LogicW();
 
-            if (Program.LagFree(3) && !Player.IsWindingUp && Q.IsReady())
+            if (!Player.IsWindingUp && Q.IsReady())
             {
                 LogicQ();
-                LogicQ2();
             }
 
             if (Program.LagFree(4) && !Player.IsWindingUp && R.IsReady())
@@ -164,45 +166,66 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             else if (Config.Item("stack", true).GetValue<bool>() && Utils.TickCount - Q.LastCastAttemptT > 4000 && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Orbwalker.ActiveMode == SebbyLib.Orbwalking.OrbwalkingMode.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
                 Q.Cast(Player.ServerPosition);
         }
+
         private void LogicQ()
         {
-            if (Program.Combo || Program.Harass)
+            if (!Program.None)
             {
-                foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q1.Range) && enemy.HasBuff("urgotcorrosivedebuff")))
+                var eTarget = HeroManager.Enemies.OrderBy(x => x.Health).FirstOrDefault(x => x.IsValidTarget(Q1.Range) && x.HasBuff("urgotcorrosivedebuff"));
+
+                if(eTarget != null)
                 {
-                    if (W.IsReady() && (Player.Mana > WMANA + QMANA * 4 || Q.GetDamage(enemy) * 3 > enemy.Health) &&  Config.Item("autoW", true).GetValue<bool>())
+                    Q1.Cast(eTarget.ServerPosition);
+                    if (W.IsReady() && (Player.Mana > WMANA + QMANA * 4 || Q.GetDamage(eTarget) * 3 > eTarget.Health) &&  Config.Item("autoW", true).GetValue<bool>())
                     {
                         W.Cast();
                         Program.debug("W");
                     }
-                    Program.debug("E");
-                    Q1.Cast(enemy.ServerPosition);
                     return;
                 }
             }
 
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
-
-            if (Player.CountEnemiesInRange(Q.Range - 200) > 0)
-                t = TargetSelector.GetTarget(Q.Range - 200, TargetSelector.DamageType.Physical);
-
-            if (t.IsValidTarget())
+            if (Program.LagFree(1))
             {
+                if (!SebbyLib.Orbwalking.CanMove(50))
+                    return;
+                bool cc = !Program.None && Player.Mana > RMANA + QMANA + EMANA;
+                bool harass = Program.Harass && Player.ManaPercent > Config.Item("HarassMana", true).GetValue<Slider>().Value && OktwCommon.CanHarras();
+
                 if (Program.Combo && Player.Mana > RMANA + QMANA)
-                    Program.CastSpell(Q, t);
-                else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA + WMANA && OktwCommon.CanHarras())
                 {
-                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && Config.Item("Harass" + t.ChampionName).GetValue<bool>()))
-                        Program.CastSpell(Q, enemy);
+                    var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+
+                    if (t.IsValidTarget())
+                        Program.CastSpell(Q, t);
                 }
-                else if (OktwCommon.GetKsDamage(t, Q) * 2 > t.Health)
+
+                foreach (var t in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range)).OrderBy(t => t.Health))
                 {
-                    Program.CastSpell(Q, t);
+                    var qDmg = OktwCommon.GetKsDamage(t, Q);
+
+                    if (qDmg * 2 > t.Health)
+                    {
+                        Program.CastSpell(Q, t);
+                        return;
+                    }
+
+                    if (cc && !OktwCommon.CanMove(t))
+                        Q.Cast(t);
+
+                    if (harass && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                        Program.CastSpell(Q, t);
                 }
-                if (!Program.None && Player.Mana > RMANA + QMANA)
+            }
+            else if (Program.LagFree(2))
+            {
+                if (Harass && Player.Mana > QMANA)
                 {
-                    foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(Q.Range) && !OktwCommon.CanMove(enemy)))
-                        Q.Cast(enemy, true);
+                    LogicQ2();
+                }
+                else if (Config.Item("stack", true).GetValue<bool>() && Utils.TickCount - Q.LastCastAttemptT > 4000 && !Player.HasBuff("Recall") && Player.Mana > Player.MaxMana * 0.95 && Program.None && (Items.HasItem(Tear) || Items.HasItem(Manamune)))
+                {
+                    Q.Cast(Player.Position.Extend(Game.CursorPos, 500));
                 }
             }
         }
