@@ -108,7 +108,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
         {
-            return;
             if (sender.IsEnemy && args.Buff.Name == "ThreshQ")
             {
                 Marked = sender;
