@@ -409,22 +409,19 @@ namespace SebbyLib
             {
                 if (targed.Type == GameObjectType.obj_AI_Hero && targed.Team != sender.Team && (sender.IsMelee || !args.SData.IsAutoAttack()))
                 {
-
                     IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(targed, args.SData.Name), TargetNetworkId = args.Target.NetworkId, Time = Game.Time, Skillshot = false });
                 }
             }
             else
             {
-                if (false)
+                foreach (var champion in ChampionList.Where(champion => !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                 {
-                    foreach (var champion in ChampionList.Where(champion => !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
+                    if (CanHitSkillShot(champion, args.Start, args.End, args.SData))
                     {
-                        if (CanHitSkillShot(champion, args.Start, args.End, args.SData))
-                        {
-                            IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
-                        }
+                        IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
                     }
                 }
+                
                 if (!YasuoInGame)
                     return;
 
