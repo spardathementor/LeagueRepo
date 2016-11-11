@@ -552,8 +552,11 @@ namespace SebbyLib
 
         public class Orbwalker
         {
-
-            private const float LaneClearWaitTimeMod = 2.1f;
+            private double LaneClearWaitTimeMod
+            {
+                get { return 2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value; }
+            }
+           
 
             /// <summary>
             ///     The configuration
@@ -653,6 +656,7 @@ namespace SebbyLib
                 misc.AddItem(
                     new MenuItem("ExtraWindup", "Extra windup time").SetShared().SetValue(new Slider(80, 0, 200)));
                 misc.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
+                misc.AddItem(new MenuItem("LaneClearSpeed", "LaneClear speed").SetShared().SetValue(new Slider(0, -100, 100))).SetTooltip("higher number = faster");
 
                 _config.AddSubMenu(misc);
 
