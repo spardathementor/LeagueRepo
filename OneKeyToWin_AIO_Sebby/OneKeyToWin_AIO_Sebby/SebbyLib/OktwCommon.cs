@@ -140,6 +140,7 @@ namespace SebbyLib
         public static float GetKsDamage(Obj_AI_Hero t, Spell QWER)
         {
             var totalDmg = QWER.GetDamage(t);
+            totalDmg += OktwCommon.GetEchoLudenDamage(t);
             totalDmg -= t.HPRegenRate;
 
             if (totalDmg > t.Health)
@@ -349,29 +350,31 @@ namespace SebbyLib
                         totalDamage += damage.Damage;
                 }
             }
+            double damage2 = 0;
             
-            if (totalDamage == 0)
+            foreach (var missile in Cache.MissileList.Where(missile => missile.IsValid && missile.SpellCaster != null && missile.SData != null && missile.SpellCaster.Team != target.Team))
             {
-                foreach (var missile in Cache.MissileList.Where(missile => missile.IsValid && missile.SpellCaster != null && missile.SData != null && missile.SpellCaster.Team != target.Team))
+                if (missile.Target != null)
                 {
-                    if (missile.Target != null)
+                    if (missile.Target.NetworkId == target.NetworkId)
                     {
-                        if (missile.Target.NetworkId == target.NetworkId)
-                        {
-                            totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
-                            if(totalDamage == 0)
-                                totalDamage += target.Level * 3;
-                        }
+                        var damageExtra = missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
+                        if(damageExtra == 0)
+                            damageExtra += target.Level * 3;
+                        damage2 = damageExtra;
                     }
-                    else
+                }
+                else if(skillshots)
+                {
+                    if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
                     {
-                        if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
-                        {
-                            totalDamage += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
-                        }
+                        damage2 += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
                     }
                 }
             }
+
+            if (damage2 > totalDamage)
+                totalDamage = damage2;
 
             if (target.HasBuffOfType(BuffType.Poison))
                 totalDamage += target.Level * 5;
@@ -412,14 +415,16 @@ namespace SebbyLib
             }
             else
             {
-                foreach (var champion in ChampionList.Where(champion => !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
+                if (false)
                 {
-                    if (CanHitSkillShot(champion, args.Start , args.End, args.SData))
+                    foreach (var champion in ChampionList.Where(champion => !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                     {
-                        IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
+                        if (CanHitSkillShot(champion, args.Start, args.End, args.SData))
+                        {
+                            IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
+                        }
                     }
                 }
-
                 if (!YasuoInGame)
                     return;
 
