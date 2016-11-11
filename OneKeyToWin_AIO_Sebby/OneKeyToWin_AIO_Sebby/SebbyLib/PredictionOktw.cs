@@ -284,6 +284,7 @@ namespace SebbyLib.Prediction
                 if (!wallPoint.IsZero)
                 {
                     result.CastPosition = wallPoint.Extend(result.CastPosition, moveOutWall);
+                    OktwCommon.debug("PRED: Near WALL");
                 }
             }
 
