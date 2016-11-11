@@ -48,7 +48,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("AGC", "AntiGapcloserW", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wdmg", "W dmg % hp", true).SetValue(new Slider(10, 100, 0)));
 
-            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E haras", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harassE", "E harass", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R under turrent", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("inter", "OnPossibleToInterrupt R", true).SetValue(true));
@@ -123,7 +124,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SetMana();
             }
 
-            if (Program.LagFree(1) && E.IsReady())
+            if (Program.LagFree(1) && E.IsReady() && Config.Item("autoE", true).GetValue<bool>())
                 LogicE();
 
             if (Program.LagFree(2) && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
@@ -262,7 +263,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     Program.CastSpell(E, t);
                 else if (Program.Combo && Player.Mana > EMANA + QMANA * 2 && qCd < 0.5f)
                     Program.CastSpell(E, t);
-                else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA * 5 && Config.Item("autoE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
+                else if (Program.Harass && Player.Mana > RMANA + EMANA + QMANA * 5  && Config.Item("harassE", true).GetValue<bool>() && Config.Item("Harass" + t.ChampionName).GetValue<bool>())
                     Program.CastSpell(E, t);
                 else if (!Program.None && Player.Mana > RMANA + WMANA + EMANA)
                 {
