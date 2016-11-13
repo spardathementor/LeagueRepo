@@ -53,11 +53,11 @@ namespace SebbyLib
         {
             if (true)
             {
-                Console.WriteLine(msg);
+                //Console.WriteLine(msg);
             }
             if (false)
             {
-                Game.PrintChat(msg);
+                //Game.PrintChat(msg);
             }
         }
 

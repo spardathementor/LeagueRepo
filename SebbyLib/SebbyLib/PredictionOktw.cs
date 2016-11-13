@@ -1382,12 +1382,10 @@ namespace SebbyLib.Prediction
 
                 if (TrackerUnit.PathBank[1].Position.Distance(TrackerUnit.PathBank[2].Position) < 50)
                 {
-                    Console.WriteLine("SPAM PLACE");
                     return true;
                 }
                 else if (Math.Cos((AB + BC - AC) / (2 * Math.Sqrt(AB) * Math.Sqrt(BC))) * 180 / Math.PI < 31)
                 {
-                    Console.WriteLine("SPAM ANGLE");
                     return true;
                 }
                 else
