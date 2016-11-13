@@ -115,7 +115,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.Mana > RMANA + EMANA )
             {
                 var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-                if (target.IsValidTarget() && Config.Item("Eon" + t.ChampionName, true).GetValue<bool>() && ((Player.UnderTurret(false) && !Player.UnderTurret(true)) || Program.Combo) )
+                if (target.IsValidTarget() && Config.Item("Eon" + target.ChampionName, true).GetValue<bool>() && ((Player.UnderTurret(false) && !Player.UnderTurret(true)) || Program.Combo) )
                 {
                     if (!SebbyLib.Orbwalking.InAutoAttackRange(target))
                     {
