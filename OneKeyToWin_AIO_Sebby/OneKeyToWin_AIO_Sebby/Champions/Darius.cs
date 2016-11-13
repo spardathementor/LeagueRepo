@@ -81,7 +81,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Program.LagFree(1) && W.IsReady())
                 LogicW();
-            if (Program.LagFree(2) && Q.IsReady())
+            if (Program.LagFree(2) && Q.IsReady() && SebbyLib.Orbwalking.CanMove(50) && !Player.IsWindingUp)
                 LogicQ();
             if (Program.LagFree(3) && E.IsReady())
                 LogicE();
@@ -159,14 +159,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.Cast(targetR, true);
             }
 
-            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target) ))
+            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && OktwCommon.ValidUlt(target)))
             {
+                var dmgR = OktwCommon.GetKsDamage(target, R, false);
 
-                var dmgR = OktwCommon.GetKsDamage(target, R);
                 if (target.HasBuff("dariushemo"))
                     dmgR += R.GetDamage(target) * target.GetBuff("dariushemo").Count * 0.2f;
 
-                if (dmgR > target.Health + target.HPRegenRate)
+                if (dmgR > target.Health)
                 {
                     R.Cast(target);
                 }
