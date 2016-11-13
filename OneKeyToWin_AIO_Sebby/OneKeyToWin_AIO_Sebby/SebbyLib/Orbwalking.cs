@@ -554,7 +554,7 @@ namespace SebbyLib
         {
             private double LaneClearWaitTimeMod
             {
-                get { return 2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value; }
+                get { return 1.8 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value; }
             }
            
 
@@ -1236,7 +1236,7 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             var damage = Player.GetAutoAttackDamage(minion);
-                            if (predHealth >= (2.5 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage)
+                            if (predHealth >= (2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage)
                                 return minion;
                         }
                     }
