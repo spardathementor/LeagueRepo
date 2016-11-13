@@ -246,7 +246,7 @@
     <Content Include="Resources\pink.png" />
     <Content Include="Resources\Poppy_Square_0.png" />
     <Content Include="Resources\Quinn_Square_0.png" />
-    <Content Include="Resources\r.png" />
+    <None Include="Resources\r.png" />
     <Content Include="Resources\Rammus_Square_0.png" />
     <Content Include="Resources\RekSai_Square_0.png" />
     <Content Include="Resources\Renekton_Square_0.png" />
