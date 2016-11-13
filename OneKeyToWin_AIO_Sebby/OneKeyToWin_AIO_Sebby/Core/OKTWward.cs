@@ -251,7 +251,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         private void GameObject_OnDelete(GameObject sender, EventArgs args)
         {
             var minion = sender as Obj_AI_Minion;
-            if (minion != null && minion.Health < 100)
+            if (minion != null && minion.MaxHealth < 100)
             {
 
                 foreach (var obj in HiddenObjList)
@@ -266,9 +266,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         HiddenObjList.Remove(obj);
                         return;
                     }
-                    else if (obj.pos.Distance(sender.Position) < 400)
+                    else if (obj.pos.Distance(sender.Position) < 400 && minion.MaxHealth < 5)
                     {
-                        if (obj.type == 2 && sender.Name.ToLower() == "jammerdevice")
+                        if (obj.type == 2 )
                         {
                             HiddenObjList.Remove(obj);
                             return;
