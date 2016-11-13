@@ -1236,7 +1236,7 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             var damage = Player.GetAutoAttackDamage(minion);
-                            if (predHealth >= 2.5 * damage)
+                            if (predHealth >= (2.5 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage)
                                 return minion;
                         }
                     }
