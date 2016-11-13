@@ -1224,11 +1224,10 @@ namespace SebbyLib
                     if (!ShouldWait())
                     {
                         
-                        if (!Cache.GetMinions(Player.Position, 0, MinionTeam.Ally).Any())
+                        if (!Cache.GetMinions(Player.Position, 600, MinionTeam.Ally).Any())
                         {
                             return 
-                            minionsFiltered.OrderBy(minion => minion.Health)
-                               .ThenByDescending(minion => minion.Health).FirstOrDefault();
+                            minionsFiltered.Where(minion => minion.IsValidTarget()).OrderBy(minion => minion.Health).FirstOrDefault();
                         }
 
                         var firstT = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
