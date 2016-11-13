@@ -1221,14 +1221,13 @@ namespace SebbyLib
                 /*Lane Clear minions*/
                 if (mode == OrbwalkingMode.LaneClear)
                 {
+                    if (!Cache.GetMinions(Player.Position, 600, MinionTeam.Ally).Any( x => x is Obj_AI_Minion && MinionManager.IsMinion(x as Obj_AI_Minion)))
+                    {
+                        return
+                        minionsFiltered.Where(minion => minion.IsValidTarget()).OrderBy(minion => minion.Health).FirstOrDefault();
+                    }
                     if (!ShouldWait())
                     {
-                        
-                        if (!Cache.GetMinions(Player.Position, 600, MinionTeam.Ally).Any())
-                        {
-                            return 
-                            minionsFiltered.Where(minion => minion.IsValidTarget()).OrderBy(minion => minion.Health).FirstOrDefault();
-                        }
 
                         var firstT = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                         foreach (var minion in minionsFiltered)
