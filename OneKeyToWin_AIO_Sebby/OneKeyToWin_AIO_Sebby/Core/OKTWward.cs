@@ -28,7 +28,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public static List<HiddenObj> HiddenObjList = new List<HiddenObj>();
 
         private Items.Item
-            VisionWard = new Items.Item(2043, 550f),
+            VisionWard = new Items.Item(2055, 550f),
             OracleLens = new Items.Item(3364, 550f),
             WardN = new Items.Item(2044, 600f),
             TrinketN = new Items.Item(3340, 600f),
@@ -213,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             var minion = sender as Obj_AI_Minion;
             if (minion != null)
             {
-                if ((sender.Name.ToLower() == "visionward" || sender.Name.ToLower() == "sightward") && !HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100))
+                if ((sender.Name.ToLower() == "jammerdevice" || sender.Name.ToLower() == "sightward") && !HiddenObjList.Exists(x => x.pos.Distance(sender.Position) < 100))
                 {
                     foreach (var obj in HiddenObjList)
                     {
@@ -268,7 +268,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                     }
                     else if (obj.pos.Distance(sender.Position) < 400)
                     {
-                        if (obj.type == 2 && sender.Name.ToLower() == "visionward")
+                        if (obj.type == 2 && sender.Name.ToLower() == "jammerdevice")
                         {
                             HiddenObjList.Remove(obj);
                             return;
@@ -328,7 +328,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             switch (name)
             {
                 //PINKS
-                case "visionward":
+                case "jammerdevice":
                     HiddenObjList.Add(new HiddenObj() { type = 2, pos = posCast, endTime = float.MaxValue });
                     break;
                 case "trinkettotemlvl3B":
