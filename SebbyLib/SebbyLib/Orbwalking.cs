@@ -139,7 +139,6 @@ namespace SebbyLib
                     {
                         BrainFarmInt += 2;
                     }
-                    Console.WriteLine(BrainFarmInt + " ADJ " + (Utils.TickCount - DelayOnFire));
                     //Console.WriteLine(missile.Target.BoundingRadius + " dis2 " + (missile.Position.Distance(missile.Target.Position)));
                 }
             }
