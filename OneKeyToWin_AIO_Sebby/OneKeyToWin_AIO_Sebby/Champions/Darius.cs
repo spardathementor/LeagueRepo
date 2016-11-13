@@ -25,6 +25,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("Harass", "Harass Q", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("Q option").AddItem(new MenuItem("qOutRange", "Auto Q only out range AA", true).SetValue(true));
 
+            foreach (var enemy in HeroManager.Enemies)
+                Config.SubMenu(Player.ChampionName).SubMenu("E Config").SubMenu("Use E on").AddItem(new MenuItem("Eon" + enemy.ChampionName, enemy.ChampionName, true).SetValue(true));
+
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoR", "Auto R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
             Config.SubMenu(Player.ChampionName).SubMenu("R option").AddItem(new MenuItem("autoRbuff", "Auto R if darius execute multi cast time out ", true).SetValue(true));
@@ -112,7 +115,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Player.Mana > RMANA + EMANA )
             {
                 var target = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-                if (target.IsValidTarget() && ((Player.UnderTurret(false) && !Player.UnderTurret(true)) || Program.Combo) )
+                if (target.IsValidTarget() && Config.Item("Eon" + t.ChampionName, true).GetValue<bool>() && ((Player.UnderTurret(false) && !Player.UnderTurret(true)) || Program.Combo) )
                 {
                     if (!SebbyLib.Orbwalking.InAutoAttackRange(target))
                     {
