@@ -843,7 +843,7 @@ namespace SebbyLib
 
                 if (mode != OrbwalkingMode.None)
                 {
-                    foreach (var minion in MinionList.Where(x => x.IsValidTarget() && x.IsHPBarRendered))
+                    foreach (var minion in MinionList.Where(x => x.IsValidTarget() && x.IsHPBarRendered ))
                     {
                         var minionObj = minion as Obj_AI_Minion;
 
@@ -853,7 +853,7 @@ namespace SebbyLib
                                 minionsFiltered.Add(minion);
                             else if (MinionManager.IsWard(minionObj))
                                 wards.Add(minion);
-                            else if (minion.CharData.BaseSkinName != "gangplankbarrel")
+                            else if (minion.CharData.BaseSkinName != "gangplankbarrel" && !minion.Name.ToLower().Contains("sru"))
                                 other.Add(minion);
                         }
                     }
