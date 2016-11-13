@@ -34,9 +34,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LoadMenuOKTW()
         {
+
+            
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("qRange", "Q range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eRange", "E range", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("rRange", "R range", true).SetValue(false));
+            Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("eDamage", "E damage %", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("Draw").AddItem(new MenuItem("onlyRdy", "Draw only ready spells", true).SetValue(true));
 
             Config.SubMenu(Player.ChampionName).SubMenu("Q Config").AddItem(new MenuItem("qMana", "Q harass mana %", true).SetValue(new Slider(50, 100, 0)));
@@ -512,21 +515,22 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Drawing_OnDraw(EventArgs args)
         {
-
-            foreach (var enemy in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range + 500) && target.IsEnemy))
+            if (Config.Item("eDamage", true).GetValue<bool>())
             {
-                float hp = enemy.Health - E.GetDamage(enemy);
-                int stack = GetEStacks(enemy);
-                float dmg = (float)Player.GetAutoAttackDamage(enemy) * 2f;
-                if (stack > 0)
-                    dmg = (float)Player.GetAutoAttackDamage(enemy) + (E.GetDamage(enemy) / (float)stack);
+                foreach (var enemy in HeroManager.Enemies.Where(target => target.IsValidTarget(E.Range + 500) && target.IsEnemy))
+                {
+                    float hp = enemy.Health - E.GetDamage(enemy);
+                    int stack = GetEStacks(enemy);
+                    float dmg = (float)Player.GetAutoAttackDamage(enemy) * 2f;
+                    if (stack > 0)
+                        dmg = (float)Player.GetAutoAttackDamage(enemy) + (E.GetDamage(enemy) / (float)stack);
 
-                if (hp > 0)
-                    drawText((int)((E.GetDamage(enemy) / enemy.Health) * 100) + " %", enemy, System.Drawing.Color.GreenYellow);
-                else
-                    drawText("KILL E", enemy, System.Drawing.Color.Red);
+                    if (hp > 0)
+                        drawText((int)((E.GetDamage(enemy) / enemy.Health) * 100) + " %", enemy, System.Drawing.Color.GreenYellow);
+                    else
+                        drawText("KILL E", enemy, System.Drawing.Color.Red);
+                }
             }
-
             var mobs = Cache.GetMinions(Player.ServerPosition, E.Range, MinionTeam.Neutral);
             if (mobs.Count > 0)
             {
