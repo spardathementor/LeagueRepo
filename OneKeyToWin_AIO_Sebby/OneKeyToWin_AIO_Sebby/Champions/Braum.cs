@@ -192,7 +192,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             if (Config.Item("spell" + args.SData.Name.ToLower()) != null && !Config.Item("spell" + args.SData.Name.ToLower()).GetValue<bool>())
                 return;
 
-            if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && OktwCommon.CanHitSkillShot(Player, args.Start, args.End, args.SData))
+            if (E.IsReady() && Config.Item("autoE", true).GetValue<bool>() && args.Target == null && OktwCommon.CanHitSkillShot(Player, args.Start, args.End, args.SData))
             {
                 E.Cast(sender.Position);
             }
