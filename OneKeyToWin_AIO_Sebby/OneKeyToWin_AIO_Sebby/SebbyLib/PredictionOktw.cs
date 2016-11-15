@@ -1157,7 +1157,14 @@ namespace SebbyLib.Prediction
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius)
+                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius + input.Unit.BoundingRadius / 2)
+                                {
+                                    if (MinionIsDead(input, minion, distanceFromToUnit))
+                                        continue;
+                                    else
+                                        return true;
+                                }
+                                else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < minion.BoundingRadius + input.Unit.BoundingRadius / 2)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
@@ -1167,7 +1174,7 @@ namespace SebbyLib.Prediction
                                 else
                                 {
                                     var minionPos = minion.ServerPosition;
-                                    int bonusRadius = 15;
+                                    int bonusRadius = 17;
                                     if (minion.IsMoving)
                                     {
                                         var predInput2 = new PredictionInput
