@@ -119,15 +119,16 @@ namespace SebbyLib
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
-                    if (x < 110 + TimeAdjust - Game.Ping / 2)
+                    if (x < 80 + TimeAdjust)
                     {
                         BrainFarmInt -= 2;
                     }
-                    else if (x > 130 + TimeAdjust - Game.Ping / 2)
+                    else if (x > 110 + TimeAdjust )
                     {
                         BrainFarmInt += 2;
                     }
-                    Console.WriteLine(BrainFarmInt + " ADJ " + (Utils.TickCount - DelayOnFire));
+
+                    Console.WriteLine(BrainFarmInt + " ADJ " + x + " " + TimeAdjust);
                     //Console.WriteLine(missile.Target.BoundingRadius + " dis2 " + (missile.Position.Distance(missile.Target.Position)));
                 }
             }
