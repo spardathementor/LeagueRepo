@@ -104,7 +104,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     return;
                     //dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                 }
-                else if (Config.Item("skillshot" + ally.ChampionName ,true).GetValue<bool>())
+                else if (args.Target == null && Config.Item("skillshot" + ally.ChampionName ,true).GetValue<bool>())
                 {
                     if (!OktwCommon.CanHitSkillShot(ally, args.Start, args.End, args.SData))
                         continue;

@@ -201,13 +201,14 @@ namespace OneKeyToWin_AIO_Sebby
             {
                 if (Config.Item("spellZ" + args.SData.Name) != null && Config.Item("spellZ" + args.SData.Name).GetValue<bool>())
                 {
-                    if (args.Target != null && args.Target.NetworkId == Player.NetworkId)
+                    if (args.Target != null)
                     {
-                        ZhonyaTryCast();
+                        if (args.Target.NetworkId == Player.NetworkId)
+                            ZhonyaTryCast();
                     }
                     else
                     {
-                        ;
+                        
                         if (OktwCommon.CanHitSkillShot(Player, args.Start, args.End, args.SData))
                             ZhonyaTryCast();
                     }
@@ -219,9 +220,10 @@ namespace OneKeyToWin_AIO_Sebby
                 foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 51 && Player.Distance(ally.ServerPosition) < 700))
                 {
                     double dmg = 0;
-                    if (args.Target != null && args.Target.NetworkId == ally.NetworkId)
+                    if (args.Target != null)
                     {
-                        dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
+                        if (args.Target.NetworkId == ally.NetworkId)
+                            dmg = dmg + sender.GetSpellDamage(ally, args.SData.Name);
                     }
                     else
                     {
