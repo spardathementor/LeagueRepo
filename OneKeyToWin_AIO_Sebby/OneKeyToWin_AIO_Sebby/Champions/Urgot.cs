@@ -143,19 +143,15 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.Mana > RMANA + WMANA)
             {
-                int sensitivity = 20;
                 double dmg = OktwCommon.GetIncomingDamage(Player);
-                int nearEnemys = Player.CountEnemiesInRange(900);
                 double shieldValue = 20 + W.Level * 40 + 0.08 * Player.MaxMana + 0.8 * Player.FlatMagicDamageMod;
                 double HpPercentage = (dmg * 100) / Player.Health;
-
-                nearEnemys = (nearEnemys == 0) ? 1 : nearEnemys;
 
                 if (dmg > shieldValue)
                     W.Cast();
                 else if (HpPercentage >= Config.Item("Wdmg", true).GetValue<Slider>().Value)
                     W.Cast();
-                else if (Player.Health - dmg < nearEnemys * Player.Level * sensitivity)
+                else if (Player.Health - dmg <  Player.Level * 10)
                     W.Cast();
             }
         }

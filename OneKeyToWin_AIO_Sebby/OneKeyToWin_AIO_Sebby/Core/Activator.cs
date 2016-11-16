@@ -309,9 +309,9 @@ namespace OneKeyToWin_AIO_Sebby
 
             foreach (var ally in HeroManager.Allies.Where(ally => ally.IsValid && !ally.IsDead && ally.HealthPercent < 50 && Player.Distance(ally.ServerPosition) < 700))
             {
-                double dmg = OktwCommon.GetIncomingDamage(ally, 1);
-                var enemys = ally.CountEnemiesInRange(700);
-                if (dmg == 0 && enemys == 0)
+                double dmg = OktwCommon.GetIncomingDamage(ally);
+
+                if (dmg == 0)
                     continue;
 
                 if (CanUse(heal) && Config.Item("Heal").GetValue<bool>())
@@ -319,7 +319,7 @@ namespace OneKeyToWin_AIO_Sebby
                     if (!Config.Item("AllyHeal").GetValue<bool>() && !ally.IsMe)
                         return;
 
-                    if (ally.Health - dmg < enemys * ally.Level * 15)
+                    if (ally.Health - dmg < ally.Level * 10)
                         Player.Spellbook.CastSpell(heal, ally);
                     else if (ally.Health - dmg < ally.Level * 10)
                        Player.Spellbook.CastSpell(heal, ally);
@@ -330,7 +330,7 @@ namespace OneKeyToWin_AIO_Sebby
                     var value = 75 + (15 * Player.Level);
                     if (dmg > value && Player.HealthPercent < 50)
                         Solari.Cast();
-                    else if (ally.Health - dmg < enemys * ally.Level * 15)
+                    else if (ally.Health - dmg < ally.Level * 10)
                         Solari.Cast();
                     else if (ally.Health - dmg < ally.Level * 10)
                         Solari.Cast();
@@ -341,7 +341,7 @@ namespace OneKeyToWin_AIO_Sebby
                     var value = 0.1 * Player.MaxHealth;
                     if (dmg > value && Player.HealthPercent < 50)
                         FaceOfTheMountain.Cast(ally);
-                    else if (ally.Health - dmg < enemys * ally.Level * 15)
+                    else if (ally.Health - dmg < ally.Level * 10)
                         FaceOfTheMountain.Cast(ally);
                     else if (ally.Health - dmg < ally.Level * 10)
                         FaceOfTheMountain.Cast(ally);
