@@ -345,7 +345,7 @@ namespace SebbyLib
                 {
                     totalDamage += damage.Damage;
                 }
-                else
+                else 
                 {
                     if (!damage.Skillshot)
                         totalDamage += damage.Damage;
@@ -367,9 +367,12 @@ namespace SebbyLib
                 }
                 else if(skillshots)
                 {
-                    if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
+                    if (target.HasBuffOfType(BuffType.Slow) || target.IsWindingUp || !CanMove(target))
                     {
-                        damage2 += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
+                        if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
+                        {
+                            damage2 += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
+                        }
                     }
                 }
             }
@@ -417,9 +420,12 @@ namespace SebbyLib
             {
                 foreach (var champion in ChampionList.Where(champion => !champion.IsDead && champion.IsVisible && champion.Team != sender.Team && champion.Distance(sender) < 2000))
                 {
-                    if (CanHitSkillShot(champion, args.Start, args.End, args.SData))
+                    if (champion.HasBuffOfType(BuffType.Slow) || champion.IsWindingUp || !CanMove(champion))
                     {
-                        IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
+                        if (CanHitSkillShot(champion, args.Start, args.End, args.SData))
+                        {
+                            IncomingDamageList.Add(new UnitIncomingDamage { Damage = sender.GetSpellDamage(champion, args.SData.Name), TargetNetworkId = champion.NetworkId, Time = Game.Time, Skillshot = true });
+                        }
                     }
                 }
                 
