@@ -319,16 +319,7 @@ namespace SebbyLib.Prediction
                     }
                 }
             }
-           
-           
-            //Check for collision
-            if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
-            {
-                var positions = new List<Vector3> { result.CastPosition };
-                var originalUnit = input.Unit;
-                if (Collision.GetCollision(positions, input))
-                    result.Hitchance = HitChance.Collision;
-            }
+
 
             //Set hit chance
             if (result.Hitchance == HitChance.High)
@@ -337,6 +328,15 @@ namespace SebbyLib.Prediction
                 result = WayPointAnalysis(result, input);
                 //.debug(input.Unit.BaseSkinName + result.Hitchance);
 
+            }
+
+            //Check for collision
+            if (checkCollision && input.Collision && result.Hitchance > HitChance.Impossible)
+            {
+                var positions = new List<Vector3> { result.CastPosition };
+                var originalUnit = input.Unit;
+                if (Collision.GetCollision(positions, input))
+                    result.Hitchance = HitChance.Collision;
             }
             
             return result;
