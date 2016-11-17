@@ -119,11 +119,11 @@ namespace SebbyLib
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
-                    if (x < 80 + TimeAdjust)
+                    if (x < 80 )
                     {
                         BrainFarmInt -= 2;
                     }
-                    else if (x > 110 + TimeAdjust )
+                    else if (x > 120)
                     {
                         BrainFarmInt += 2;
                     }
@@ -665,6 +665,7 @@ namespace SebbyLib
                 var sebbyFix = new Menu("Sebby FIX [ADVANCE]", "Sebby FIX [ADVANCE]");
 
                 sebbyFix.AddItem(new MenuItem("DamageAdjust", "Last hit auto attack damage [0 default]").SetShared().SetValue(new Slider(0,-100, 100)));
+                sebbyFix.AddItem(new MenuItem("AutoTimeAdjust", "Auto lasthit time adjust", true).SetShared().SetValue(false));
                 sebbyFix.AddItem(new MenuItem("TimeAdjust", "Last hit time adjust [0 default]").SetShared().SetValue(new Slider(0, -100, 100)));
                 sebbyFix.AddItem(new MenuItem("PassiveDmg", "Last hit include passive damage", true).SetShared().SetValue(true));
 
@@ -836,11 +837,16 @@ namespace SebbyLib
                     }
                 }
 
-                
                 var MinionList = Cache.GetMinions(Player.Position, 0, MinionTeam.NotAlly);
                 List<Obj_AI_Base> minionsFiltered = new List<Obj_AI_Base>();
                 List<Obj_AI_Base> wards = new List<Obj_AI_Base>();
                 List<Obj_AI_Base> other = new List<Obj_AI_Base>();
+
+                if (!_config.Item("AutoTimeAdjust").GetValue<bool>())
+                    BrainFarmInt = TimeAdjust - 100;
+
+                var firstT = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
+                var projectileSpeed = (int)GetMyProjectileSpeed();
 
                 if (mode != OrbwalkingMode.None)
                 {
@@ -869,11 +875,9 @@ namespace SebbyLib
                                 .ThenByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
                                     .ThenBy(minion => HealthPrediction.GetHealthPrediction(minion, 1500));
 
-                    var firstT = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 ;
-
                     foreach (var minion in LastHitList)
                     {
-                        var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                        var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition)- Player.BoundingRadius) / projectileSpeed;
 
                         if (mode == OrbwalkingMode.Freeze)
                             t += 200 + Game.Ping / 2;
@@ -981,7 +985,7 @@ namespace SebbyLib
                                 if (barrel.Health <= 1f)
                                     return barrel;
 
-                                var t = (int)(Player.AttackCastDelay * 1000) + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(barrel) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                                var t = (int)(Player.AttackCastDelay * 1000) + Game.Ping / 2 + 1000 * (int)Math.Max(0, Player.Distance(barrel) - Player.BoundingRadius) / projectileSpeed;
 
                                 var barrelBuff = barrel.Buffs.FirstOrDefault(b => b.Name.Equals("gangplankebarrelactive", StringComparison.InvariantCultureIgnoreCase));
 
@@ -1233,7 +1237,7 @@ namespace SebbyLib
                         var firstT = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                         foreach (var minion in minionsFiltered)
                         {
-                            var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / (int)GetMyProjectileSpeed();
+                            var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / projectileSpeed;
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             var damage = Player.GetAutoAttackDamage(minion);
