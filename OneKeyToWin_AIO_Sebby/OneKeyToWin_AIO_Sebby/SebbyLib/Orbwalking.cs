@@ -1234,10 +1234,10 @@ namespace SebbyLib
                     if (!ShouldWait())
                     {
 
-                        var firstT = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
+                        var firstT2 = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                         foreach (var minion in minionsFiltered)
                         {
-                            var t = firstT + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / projectileSpeed;
+                            var t = firstT2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / projectileSpeed;
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             var damage = Player.GetAutoAttackDamage(minion);
