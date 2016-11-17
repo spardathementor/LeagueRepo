@@ -842,7 +842,7 @@ namespace SebbyLib
                 List<Obj_AI_Base> wards = new List<Obj_AI_Base>();
                 List<Obj_AI_Base> other = new List<Obj_AI_Base>();
 
-                if (!_config.Item("AutoTimeAdjust").GetValue<bool>())
+                if (!_config.Item("AutoTimeAdjust" , true).GetValue<bool>())
                     BrainFarmInt = TimeAdjust - 100;
 
                 var firstT = (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
