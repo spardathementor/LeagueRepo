@@ -1174,7 +1174,7 @@ namespace SebbyLib.Prediction
                                 else
                                 {
                                     var minionPos = minion.ServerPosition;
-                                    int bonusRadius = 17;
+                                    int bonusRadius = 15;
                                     if (minion.IsMoving)
                                     {
                                         var predInput2 = new PredictionInput
@@ -1189,7 +1189,7 @@ namespace SebbyLib.Prediction
                                             Type = input.Type
                                         };
                                         minionPos = Prediction.GetPrediction(predInput2).CastPosition;
-                                        bonusRadius = 50 + (int)input.Radius;
+                                        bonusRadius = 55 + (int)input.Radius;
                                     }
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
