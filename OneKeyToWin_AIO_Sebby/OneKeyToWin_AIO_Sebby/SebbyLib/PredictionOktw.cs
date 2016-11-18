@@ -621,7 +621,7 @@ namespace SebbyLib.Prediction
                 Input = input,
                 CastPosition = input.Unit.ServerPosition,
                 UnitPosition = input.Unit.ServerPosition,
-                Hitchance = HitChance.VeryHigh
+                Hitchance = HitChance.High
                 /*timeToReachTargetPosition - remainingImmobileT + input.RealRadius / input.Unit.MoveSpeed < 0.4d ? HitChance.High : HitChance.Medium*/
             };
         }
@@ -1119,14 +1119,14 @@ namespace SebbyLib.Prediction
         /// 
         private static bool MinionIsDead(PredictionInput input, Obj_AI_Base minion, float distance)
         {
-            float delay = (distance / input.Speed) + input.Delay;
+            float delay = (distance / input.Speed) + input.Delay - 0.1f;
 
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 delay = input.Delay;
 
             int convert = (int)(delay * 1000);
 
-            if (HealthPrediction.LaneClearHealthPrediction(minion, convert, 0) <= 0)
+            if (HealthPrediction.GetHealthPrediction(minion, convert, 0) <= 0)
             {
                 return true;
             }
@@ -1157,14 +1157,14 @@ namespace SebbyLib.Prediction
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius + input.Unit.BoundingRadius / 2)
+                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius + input.Unit.BoundingRadius )
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < minion.BoundingRadius + input.Unit.BoundingRadius / 2)
+                                else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < minion.BoundingRadius + input.Unit.BoundingRadius)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
