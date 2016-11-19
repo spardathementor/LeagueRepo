@@ -412,7 +412,7 @@ namespace SebbyLib.Prediction
                 return result; 
             }
 
-            if ( totalDelay - input.Radius / 2 / input.Speed > 0.6 && (input.Unit.IsWindingUp || !input.Unit.CanMove || input.Unit.IsRooted))
+            if (false &&  totalDelay - input.Radius / 2 / input.Speed > 0.6 && (input.Unit.IsWindingUp || !input.Unit.CanMove || input.Unit.IsRooted))
             {
                 OktwCommon.debug("PRED: After CC detection " + totalDelay);
                 result.Hitchance = HitChance.High;
@@ -1117,24 +1117,7 @@ namespace SebbyLib.Prediction
         ///     Returns the list of the units that the skillshot will hit before reaching the set positions.
         /// </summary>
         /// 
-        private static bool MinionIsDead(PredictionInput input, Obj_AI_Base minion, float distance)
-        {
-            float delay = (distance / input.Speed) + input.Delay - 0.1f;
 
-            if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
-                delay = input.Delay;
-
-            int convert = (int)(delay * 1000);
-
-            if (HealthPrediction.GetHealthPrediction(minion, convert, 0) <= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
 
 
         public static bool GetCollision(List<Vector3> positions, PredictionInput input)
@@ -1152,7 +1135,7 @@ namespace SebbyLib.Prediction
                             foreach (var minion in minionList)
                             {
                                 var distanceFromToMinion = minion.ServerPosition.Distance(input.From);
-                                var colSafeRange = minion.BoundingRadius + input.Unit.BoundingRadius;
+                                var colSafeRange = minion.BoundingRadius / 2  + input.Unit.BoundingRadius/ 2;
 
                                 if (distanceFromToMinion < colSafeRange)
                                 {
@@ -1189,8 +1172,7 @@ namespace SebbyLib.Prediction
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
                                     {
-                                        if(!MinionIsDead(input, minion, distanceFromToMinion))
-                                            return true;
+                                        return true;
                                     }
                                 }
                             }
