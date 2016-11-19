@@ -688,9 +688,9 @@ namespace SebbyLib.Prediction
 
         internal static PredictionOutput GetPositionOnPath(PredictionInput input, List<Vector2> path, float speed = -1)
         {
-            if (input.Unit.Distance(input.From, true) < 250 * 250)
+            if (input.Unit.Distance(input.From, true) < 230 * 230)
             {
-                //input.Delay /= 2;
+                input.Delay /= 2;
                 speed /= 1.5f;
             }
 
