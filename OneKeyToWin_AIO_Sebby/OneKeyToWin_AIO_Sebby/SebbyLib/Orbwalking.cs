@@ -106,8 +106,7 @@ namespace SebbyLib
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
             Obj_AI_Base.OnDoCast += Obj_AI_Base_OnDoCast;
             Spellbook.OnStopCast += SpellbookOnStopCast;
-            AttackableUnit.OnDamage += Obj_AI_Base_OnDamage;
-            Obj_AI_Base.OnDelete += Obj_AI_Base_OnDelete;
+            GameObject.OnDelete += Obj_AI_Base_OnDelete;
         }
 
         private static void Obj_AI_Base_OnDelete(GameObject sender, EventArgs args)
