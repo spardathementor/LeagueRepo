@@ -412,10 +412,10 @@ namespace SebbyLib.Prediction
                 return result; 
             }
 
-            if (false &&  totalDelay - input.Radius / 2 / input.Speed > 0.6 && (input.Unit.IsWindingUp || !input.Unit.CanMove || input.Unit.IsRooted))
+            if (!input.Unit.IsWindingUp && (!input.Unit.CanMove || input.Unit.IsRooted))
             {
                 OktwCommon.debug("PRED: After CC detection " + totalDelay);
-                result.Hitchance = HitChance.High;
+                result.Hitchance = HitChance.VeryHigh;
                 return result;
             }
 
@@ -1153,7 +1153,12 @@ namespace SebbyLib.Prediction
                                 {
                                     var minionPos = minion.ServerPosition;
                                     int bonusRadius = 15;
-                                    if (minion.IsMoving)
+                                    var temp = Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2);
+                                    if (minion.ServerPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= temp)
+                                    {
+                                        return true;
+                                    }
+                                    else if (minion.IsMoving)
                                     {
                                         var predInput2 = new PredictionInput
                                         {
@@ -1166,13 +1171,10 @@ namespace SebbyLib.Prediction
                                             Unit = minion,
                                             Type = input.Type
                                         };
-                                        minionPos = Prediction.GetPrediction(predInput2).CastPosition;
+                                        
                                         bonusRadius = 55 + (int)input.Radius;
-                                    }
-
-                                    if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
-                                    {
-                                        return true;
+                                        if (Prediction.GetPrediction(predInput2).CastPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
+                                            return true;
                                     }
                                 }
                             }
