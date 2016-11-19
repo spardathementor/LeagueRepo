@@ -1151,17 +1151,18 @@ namespace SebbyLib.Prediction
                             var minionList = Cache.GetMinions(input.From, range).Concat(Cache.GetMinions(input.From, range, MinionTeam.Neutral));
                             foreach (var minion in minionList)
                             {
-                                var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
+                                var distanceFromToMinion = minion.ServerPosition.Distance(input.From);
+                                var colSafeRange = minion.BoundingRadius + input.Unit.BoundingRadius;
 
-                                if (distanceFromToUnit < 10 + minion.BoundingRadius)
+                                if (distanceFromToMinion < colSafeRange)
                                 {
                                     return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius + input.Unit.BoundingRadius )
+                                else if (minion.ServerPosition.Distance(position) < colSafeRange)
                                 {
                                     return true;
                                 }
-                                else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < minion.BoundingRadius + input.Unit.BoundingRadius)
+                                else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < colSafeRange)
                                 {
                                     return true;
                                 }
@@ -1188,7 +1189,7 @@ namespace SebbyLib.Prediction
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
                                     {
-                                        if(!MinionIsDead(input, minion, distanceFromToUnit))
+                                        if(!MinionIsDead(input, minion, distanceFromToMinion))
                                             return true;
                                     }
                                 }
