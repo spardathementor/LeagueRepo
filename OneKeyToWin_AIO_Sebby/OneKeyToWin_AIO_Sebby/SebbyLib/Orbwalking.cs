@@ -119,11 +119,11 @@ namespace SebbyLib
                 {
                     var x = Utils.TickCount - DelayOnFire;
 
-                    if (x < 80 )
+                    if (x < 110 - Game.Ping / 2)
                     {
                         BrainFarmInt -= 2;
                     }
-                    else if (x > 120)
+                    else if (x > 130 - Game.Ping / 2)
                     {
                         BrainFarmInt += 2;
                     }
@@ -134,13 +134,6 @@ namespace SebbyLib
             }
         }
 
-        private static void Obj_AI_Base_OnDamage(AttackableUnit sender, AttackableUnitDamageEventArgs args)
-        {
-            if (args.SourceNetworkId == Player.NetworkId)
-            {
-                //Console.WriteLine("OD4 "+ (Utils.TickCount - DelayOnFire) );
-            }
-        }
 
         public static event BeforeAttackEvenH BeforeAttack;
 
