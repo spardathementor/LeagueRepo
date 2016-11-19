@@ -213,7 +213,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             else if (Program.LagFree(2))
             {
-                if (Harass && Player.Mana > QMANA)
+                if (Player.Mana > QMANA && Farm)
                 {
                     farmQ();
                     lag = Game.Time;
