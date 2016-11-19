@@ -1135,6 +1135,8 @@ namespace SebbyLib.Prediction
                 return false;
             }
         }
+
+
         public static bool GetCollision(List<Vector3> positions, PredictionInput input)
         {
 
@@ -1145,31 +1147,23 @@ namespace SebbyLib.Prediction
                     switch (objectType)
                     {
                         case CollisionableObjects.Minions:
-                            foreach (var minion in Cache.GetMinions(input.From, Math.Min(input.Range + input.Radius + 100, 2000)))
+                            var range = Math.Min(input.Range + input.Radius + 100, 2000);
+                            var minionList = Cache.GetMinions(input.From, range).Concat(Cache.GetMinions(input.From, range, MinionTeam.Neutral));
+                            foreach (var minion in minionList)
                             {
-
                                 var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
 
                                 if (distanceFromToUnit < 10 + minion.BoundingRadius)
                                 {
-                                    if (MinionIsDead(input, minion, distanceFromToUnit))
-                                        continue;
-                                    else
-                                        return true;
+                                    return true;
                                 }
                                 else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius + input.Unit.BoundingRadius )
                                 {
-                                    if (MinionIsDead(input, minion, distanceFromToUnit))
-                                        continue;
-                                    else
-                                        return true;
+                                    return true;
                                 }
                                 else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < minion.BoundingRadius + input.Unit.BoundingRadius)
                                 {
-                                    if (MinionIsDead(input, minion, distanceFromToUnit))
-                                        continue;
-                                    else
-                                        return true;
+                                    return true;
                                 }
                                 else
                                 {
@@ -1194,9 +1188,7 @@ namespace SebbyLib.Prediction
 
                                     if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
                                     {
-                                        if (MinionIsDead(input, minion, distanceFromToUnit))
-                                            continue;
-                                        else
+                                        if(!MinionIsDead(input, minion, distanceFromToUnit))
                                             return true;
                                     }
                                 }
