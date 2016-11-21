@@ -865,7 +865,8 @@ namespace SebbyLib
                         .Where(minion => minion.Team != GameObjectTeam.Neutral)
                             .OrderByDescending(minion => minion.CharData.BaseSkinName.Contains("Super"))
                                 .ThenByDescending(minion => minion.CharData.BaseSkinName.Contains("Siege"))
-                                    .ThenBy(minion => HealthPrediction.GetHealthPrediction(minion, 1500));
+                                    .ThenBy(minion => HealthPrediction.GetHealthPrediction(minion, 1500))
+                                     .ThenByDescending(minion => minion.MaxHealth);
 
                     foreach (var minion in LastHitList)
                     {
@@ -1216,22 +1217,16 @@ namespace SebbyLib
                 /*Lane Clear minions*/
                 if (mode == OrbwalkingMode.LaneClear)
                 {
-                    if (!Cache.GetMinions(Player.Position, 600, MinionTeam.Ally).Any( x => x is Obj_AI_Minion && MinionManager.IsMinion(x as Obj_AI_Minion)))
-                    {
-                        return
-                        minionsFiltered.Where(minion => minion.IsValidTarget()).OrderBy(minion => minion.Health).FirstOrDefault();
-                    }
                     if (!ShouldWait())
                     {
-
                         var firstT2 = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
-                        foreach (var minion in minionsFiltered)
+                        foreach (var minion in minionsFiltered.OrderBy(minion => minion.Health))
                         {
                             var t = firstT2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / projectileSpeed;
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             var damage = Player.GetAutoAttackDamage(minion);
-                            if (predHealth >= (2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage)
+                            if (predHealth >= (2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage || Math.Abs(predHealth - minion.Health) < float.Epsilon)
                                 return minion;
                         }
                     }
