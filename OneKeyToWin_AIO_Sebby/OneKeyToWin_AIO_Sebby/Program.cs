@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         public static Spell Q, W, E, R, Q1, W1, E1, R1;
 
-        private static string OktNews = "ORBWALKER BETA, Notifications options, new incoming damage calculation";
+        private static string OktNews = "ORBWALKER last hit fixed, new Malzahar R options";
 
         public static AioMode AioModeSet = AioMode.All;
         public static Menu Config;

@@ -1225,8 +1225,10 @@ namespace SebbyLib
                             var t = firstT2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / projectileSpeed;
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
+                            if(Math.Abs(predHealth - minion.Health) < float.Epsilon)
+                                return minion;
                             var damage = Player.GetAutoAttackDamage(minion);
-                            if (predHealth >= (2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage || Math.Abs(predHealth - minion.Health) < float.Epsilon)
+                            if (predHealth >= (2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage)
                                 return minion;
                         }
                     }
