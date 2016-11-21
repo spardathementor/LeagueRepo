@@ -113,9 +113,10 @@ namespace OneKeyToWin_AIO_Sebby
 
         private static void Orbwalking_BeforeAttack(SebbyLib.Orbwalking.BeforeAttackEventArgs args)
         {
-            if (Combo && Config.Item("comboDisableMode", true).GetValue<bool>())
+            var t = args.Target as Obj_AI_Hero;
+            if (t != null && Combo && Config.Item("comboDisableMode", true).GetValue<bool>())
             {
-                var t = (Obj_AI_Hero)args.Target;
+                
                 if (4 * Player.GetAutoAttackDamage(t) < t.Health - OktwCommon.GetIncomingDamage(t) && !t.HasBuff("luxilluminatingfraulein") && !Player.HasBuff("sheen") && !Player.HasBuff("Mastery6261"))
                     args.Process = false;
             }
