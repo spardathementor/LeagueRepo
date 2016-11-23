@@ -412,6 +412,15 @@ namespace SebbyLib.Prediction
                 return result; 
             }
 
+            // SHORT CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
+
+            if (distanceUnitToWaypoint > 0 && distanceUnitToWaypoint < 100)
+            {
+                OktwCommon.debug("PRED: SHORT CLICK DETECTION");
+                result.Hitchance = HitChance.Medium;
+                return result;
+            }
+
             if (!input.Unit.IsWindingUp && (!input.Unit.CanMove || input.Unit.IsRooted))
             {
                 OktwCommon.debug("PRED: After CC detection " + totalDelay);
@@ -459,14 +468,7 @@ namespace SebbyLib.Prediction
                 }
             }
 
-            // SHORT CLICK DETECTION ///////////////////////////////////////////////////////////////////////////////////
-
-            if (distanceUnitToWaypoint > 0 && distanceUnitToWaypoint < 100)
-            {
-                OktwCommon.debug("PRED: SHORT CLICK DETECTION");
-                result.Hitchance = HitChance.Medium;
-                return result;
-            }
+          
 
             if (input.Unit.GetWaypoints().Count == 1)
             {
@@ -1134,27 +1136,28 @@ namespace SebbyLib.Prediction
                             var minionList = Cache.GetMinions(input.From, range).Concat(Cache.GetMinions(input.From, range, MinionTeam.Neutral));
                             foreach (var minion in minionList)
                             {
-                                var distanceFromToMinion = minion.ServerPosition.Distance(input.From);
+                                var distanceFromToMinion = minion.Position.Distance(input.From);
                                 var colSafeRange = minion.BoundingRadius  + input.Unit.BoundingRadius;
 
                                 if (distanceFromToMinion < colSafeRange)
                                 {
                                     return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < colSafeRange)
+                                else if (minion.Position.Distance(position) < colSafeRange)
                                 {
                                     return true;
                                 }
-                                else if (minion.ServerPosition.Distance(input.Unit.ServerPosition) < colSafeRange)
+                                else if (minion.Position.Distance(input.Unit.Position) < colSafeRange)
                                 {
                                     return true;
                                 }
                                 else
                                 {
-                                    var minionPos = minion.ServerPosition;
+                                    
+                                    var minionPos = minion.Position;
                                     int bonusRadius = 15;
                                     var temp = Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2);
-                                    if (minion.ServerPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= temp)
+                                    if (minion.Position.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= temp)
                                     {
                                         return true;
                                     }
