@@ -249,7 +249,7 @@ namespace SebbyLib
             Vector2 pos2 = targetLW.To2D() - target.Position.To2D();
             var getAngle = pos1.AngleBetween(pos2);
 
-            if(getAngle < 25)
+            if(getAngle < 20)
                 return true;
             else
                 return false;

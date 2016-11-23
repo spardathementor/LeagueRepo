@@ -431,7 +431,7 @@ namespace SebbyLib.Prediction
             if (distanceUnitToWaypoint > 0)
             {
                 // RUN IN LANE DETECTION /////////////////////////////////////////////////////////////////////////////////// 
-                if (getAngle < 20 || getAngle > 160 || (getAngle > 130 && distanceUnitToWaypoint > 400) || OktwCommon.IsMovingInSameDirection(ObjectManager.Player, input.Unit))
+                if (getAngle < 15 || getAngle > 160 || (getAngle > 130 && distanceUnitToWaypoint > 500) || OktwCommon.IsMovingInSameDirection(ObjectManager.Player, input.Unit))
                 {
                     OktwCommon.debug("PRED: ANGLE " + getAngle);
                     result.Hitchance = HitChance.VeryHigh;
@@ -440,7 +440,7 @@ namespace SebbyLib.Prediction
 
                 // WALL LOGIC  ///////////////////////////////////////////////////////////////////////////////////
 
-                var points = OktwCommon.CirclePoints(15, 350, input.Unit.Position).Where(x => x.IsWall());
+                var points = OktwCommon.CirclePoints(15, 300, input.Unit.Position).Where(x => x.IsWall());
 
                 if (points.Count() > 2)
                 {
