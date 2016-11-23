@@ -57,7 +57,7 @@ namespace SebbyLib
                 {
                     MinionsListNeutral.Add(minion);
                 }
-                else if (minion.MaxMana == 0 && minion.MaxHealth >= 300)
+                else if (minion.MaxMana == 0 && minion.MaxHealth >= 250)
                 {
                     if (minion.Team == GameObjectTeam.Unknown)
                         return;
