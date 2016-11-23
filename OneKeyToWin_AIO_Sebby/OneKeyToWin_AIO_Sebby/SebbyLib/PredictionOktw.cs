@@ -1119,9 +1119,24 @@ namespace SebbyLib.Prediction
         ///     Returns the list of the units that the skillshot will hit before reaching the set positions.
         /// </summary>
         /// 
+        private static bool MinionIsDead(PredictionInput input, Obj_AI_Base minion, float distance)
+        {
+            float delay = (distance / input.Speed) + input.Delay;
 
+            if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
+                delay = input.Delay;
 
+            int convert = (int)(delay * 1000);
 
+            if (HealthPrediction.LaneClearHealthPrediction(minion, convert, 0) <= 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
         public static bool GetCollision(List<Vector3> positions, PredictionInput input)
         {
 
@@ -1132,36 +1147,30 @@ namespace SebbyLib.Prediction
                     switch (objectType)
                     {
                         case CollisionableObjects.Minions:
-                            var range = Math.Min(input.Range + input.Radius + 100, 2000);
-                            var minionList = Cache.GetMinions(input.From, range).Concat(Cache.GetMinions(input.From, range, MinionTeam.Neutral));
-                            foreach (var minion in minionList)
+                            foreach (var minion in Cache.GetMinions(input.From, Math.Min(input.Range + input.Radius + 100, 2000)))
                             {
-                                var distanceFromToMinion = minion.Position.Distance(input.From);
-                                var colSafeRange = minion.BoundingRadius  + input.Unit.BoundingRadius;
 
-                                if (distanceFromToMinion < colSafeRange)
+                                var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
+
+                                if (distanceFromToUnit < 10 + minion.BoundingRadius)
                                 {
-                                    return true;
+                                    if (MinionIsDead(input, minion, distanceFromToUnit))
+                                        continue;
+                                    else
+                                        return true;
                                 }
-                                else if (minion.Position.Distance(position) < colSafeRange)
+                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius)
                                 {
-                                    return true;
-                                }
-                                else if (minion.Position.Distance(input.Unit.Position) < colSafeRange)
-                                {
-                                    return true;
+                                    if (MinionIsDead(input, minion, distanceFromToUnit))
+                                        continue;
+                                    else
+                                        return true;
                                 }
                                 else
                                 {
-                                    
-                                    var minionPos = minion.Position;
+                                    var minionPos = minion.ServerPosition;
                                     int bonusRadius = 15;
-                                    var temp = Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2);
-                                    if (minion.Position.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= temp)
-                                    {
-                                        return true;
-                                    }
-                                    else if (minion.IsMoving)
+                                    if (minion.IsMoving)
                                     {
                                         var predInput2 = new PredictionInput
                                         {
@@ -1174,9 +1183,15 @@ namespace SebbyLib.Prediction
                                             Unit = minion,
                                             Type = input.Type
                                         };
-                                        
-                                        bonusRadius = 55 + (int)input.Radius;
-                                        if (Prediction.GetPrediction(predInput2).CastPosition.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
+                                        minionPos = Prediction.GetPrediction(predInput2).CastPosition;
+                                        bonusRadius = 50 + (int)input.Radius;
+                                    }
+
+                                    if (minionPos.To2D().Distance(input.From.To2D(), position.To2D(), true, true) <= Math.Pow((input.Radius + bonusRadius + minion.BoundingRadius), 2))
+                                    {
+                                        if (MinionIsDead(input, minion, distanceFromToUnit))
+                                            continue;
+                                        else
                                             return true;
                                     }
                                 }
