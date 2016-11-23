@@ -1135,7 +1135,7 @@ namespace SebbyLib.Prediction
                             foreach (var minion in minionList)
                             {
                                 var distanceFromToMinion = minion.ServerPosition.Distance(input.From);
-                                var colSafeRange = minion.BoundingRadius / 2  + input.Unit.BoundingRadius/ 2;
+                                var colSafeRange = minion.BoundingRadius  + input.Unit.BoundingRadius;
 
                                 if (distanceFromToMinion < colSafeRange)
                                 {
