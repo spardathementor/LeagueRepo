@@ -90,7 +90,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             }
             if (W.IsReady() && args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA+ EMANA)
             {
-                args.Process = false;
                 W.Cast(args.EndPosition); 
             }
         }
