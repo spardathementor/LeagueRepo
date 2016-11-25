@@ -88,18 +88,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower()) ))
                     args.Process = false;
             }
-            if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
+            if (W.IsReady() && args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA+ EMANA)
             {
-                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 50));
-                Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
+                args.Process = false;
+                W.Cast(args.EndPosition); 
             }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe && (args.SData.Name == "CaitlynPiltoverPeacemaker" || args.SData.Name == "CaitlynEntrapment"))
+            if (sender.IsMe )
             {
-                QCastTime = Game.Time;
+                if(args.Slot == SpellSlot.W)
+                    Utility.DelayAction.Add(10, () => E.Cast(E.GetPrediction(HeroManager.Enemies.Where(x => x.IsValidTarget(E.Range)).OrderBy(x => x.Distance(args.End)).FirstOrDefault()).CastPosition));
+                if(args.SData.Name == "CaitlynPiltoverPeacemaker" || args.SData.Name == "CaitlynEntrapment")
+                    QCastTime = Game.Time;
             }
 
             if (!W.IsReady() || sender.IsMinion || !sender.IsEnemy || !Config.Item("Wspell", true).GetValue<bool>() || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(W.Range))
