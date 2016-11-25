@@ -101,7 +101,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
                 var timer = Game.Time - need.LastVisableTime;
 
-                if (timer > 1 && timer < 3)
+                if (timer > 1 && timer < 3 && AioModeSet != AioMode.UtilityOnly)
                 {
                     if (Program.Combo && PPDistance < 1500 && Player.ChampionName == "Quinn" && W.IsReady() && Config.Item("autoW", true).GetValue<bool>())
                     {
@@ -123,15 +123,15 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         E.Cast(Player.Position.Extend(need.PredictedPos, 800));
                     }
 
-                    if (!Player.IsWindingUp && PPDistance < 800 && Player.ChampionName == "Caitlyn" && W.IsReady() && Player.Mana > 200f && Config.Item("bushW", true).GetValue<bool>() && Utils.TickCount - W.LastCastAttemptT > 2000)
+                    if ( Player.ChampionName == "Caitlyn" && !Player.IsWindingUp && PPDistance < 800 && W.IsReady() && Player.Mana > 200f && Config.Item("bushW", true).GetValue<bool>() && Utils.TickCount - W.LastCastAttemptT > 2000)
                     {
                         W.Cast(need.PredictedPos);
                     }
-                    if (!Player.IsWindingUp && PPDistance < 150 + R.Level * 250 && Player.ChampionName == "Teemo" && R.IsReady() && Player.Mana > 200f && Config.Item("bushR", true).GetValue<bool>() && Utils.TickCount - W.LastCastAttemptT > 2000)
+                    if (Player.ChampionName == "Teemo" && !Player.IsWindingUp &&  PPDistance < 150 + R.Level * 250 && R.IsReady() && Player.Mana > 200f && Config.Item("bushR", true).GetValue<bool>() && Utils.TickCount - W.LastCastAttemptT > 2000)
                     {
                         R.Cast(need.PredictedPos);
                     }
-                    if (!Player.IsWindingUp && PPDistance < 760 && Player.ChampionName == "Jhin" && E.IsReady() && Player.Mana > 200f && Config.Item("bushE", true).GetValue<bool>() && Utils.TickCount - E.LastCastAttemptT > 2000)
+                    if (Player.ChampionName == "Jhin" && !Player.IsWindingUp && PPDistance < 760 && E.IsReady() && Player.Mana > 200f && Config.Item("bushE", true).GetValue<bool>() && Utils.TickCount - E.LastCastAttemptT > 2000)
                     {
                         E.Cast(need.PredictedPos);
                     }
