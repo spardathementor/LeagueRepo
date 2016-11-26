@@ -85,23 +85,21 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (args.Slot == SpellSlot.W)
             {
-                if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower()) ))
+                if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower())))
                     args.Process = false;
             }
-            if (W.IsReady() && args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA+ EMANA)
+            if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
             {
-                W.Cast(args.EndPosition); 
+                W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 50));
+                Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
             }
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            if (sender.IsMe )
+            if (sender.IsMe && (args.SData.Name == "CaitlynPiltoverPeacemaker" || args.SData.Name == "CaitlynEntrapment"))
             {
-                if(args.Slot == SpellSlot.W)
-                    Utility.DelayAction.Add(10, () => E.Cast(E.GetPrediction(HeroManager.Enemies.Where(x => x.IsValidTarget(E.Range)).OrderBy(x => x.Distance(args.End)).FirstOrDefault()).CastPosition));
-                if(args.SData.Name == "CaitlynPiltoverPeacemaker" || args.SData.Name == "CaitlynEntrapment")
-                    QCastTime = Game.Time;
+                QCastTime = Game.Time;
             }
 
             if (!W.IsReady() || sender.IsMinion || !sender.IsEnemy || !Config.Item("Wspell", true).GetValue<bool>() || !sender.IsValid<Obj_AI_Hero>() || !sender.IsValidTarget(W.Range))
@@ -116,7 +114,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void AntiGapcloser_OnEnemyGapcloser(ActiveGapcloser gapcloser)
         {
-            if ( Player.Mana > RMANA + WMANA)
+            if (Player.Mana > RMANA + WMANA)
             {
                 var t = gapcloser.Sender;
                 if (E.IsReady() && t.IsValidTarget(E.Range) && Config.Item("EGCchampion" + t.ChampionName, true).GetValue<bool>())
@@ -158,7 +156,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 R.Range = (500 * R.Level) + 1500;
                 //debug("" + ObjectManager.Player.AttackRange);
             }
-            
+
             if (Program.LagFree(1) && E.IsReady() && SebbyLib.Orbwalking.CanMove(40))
                 LogicE();
             if (Program.LagFree(2) && W.IsReady() && SebbyLib.Orbwalking.CanMove(40))
@@ -178,9 +176,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 return;
 
 
-            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.Distance(target.Position) > Config.Item("Rrange", true).GetValue<Slider>().Value && target.CountEnemiesInRange(Config.Item("Rcol", true).GetValue<Slider>().Value) == 1 && target.CountAlliesInRange(500) == 0 && OktwCommon.ValidUlt(target) ))
+            foreach (var target in HeroManager.Enemies.Where(target => target.IsValidTarget(R.Range) && Player.Distance(target.Position) > Config.Item("Rrange", true).GetValue<Slider>().Value && target.CountEnemiesInRange(Config.Item("Rcol", true).GetValue<Slider>().Value) == 1 && target.CountAlliesInRange(500) == 0 && OktwCommon.ValidUlt(target)))
             {
-                if (OktwCommon.GetKsDamage(target, R) > target.Health )
+                if (OktwCommon.GetKsDamage(target, R) > target.Health)
                 {
                     cast = true;
                     PredictionOutput output = R.GetPrediction(target);
@@ -216,7 +214,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (Program.Combo)
                     return;
                 if (Config.Item("autoW", true).GetValue<bool>())
-                { 
+                {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && !enemy.HasBuff("caitlynyordletrapinternal")))
                     {
                         if (Utils.TickCount - W.LastCastAttemptT > 1000)
@@ -231,16 +229,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         }
                     }
                 }
-                
+
                 if (Config.Item("telE", true).GetValue<bool>())
                 {
                     var trapPos = OktwCommon.GetTrapPos(W.Range);
                     if (!trapPos.IsZero)
                         W.Cast(trapPos);
                 }
-                if((int)(Game.Time * 10) % 2 == 0 && Config.Item("bushW2", true).GetValue<bool>())
+                if ((int)(Game.Time * 10) % 2 == 0 && Config.Item("bushW2", true).GetValue<bool>())
                 {
-                    if (Player.Spellbook.GetSpell(SpellSlot.W).Ammo == new int[]{0,3,3,4,4,5}[W.Level] && Player.CountEnemiesInRange(1000) == 0)
+                    if (Player.Spellbook.GetSpell(SpellSlot.W).Ammo == new int[] { 0, 3, 3, 4, 4, 5 }[W.Level] && Player.CountEnemiesInRange(1000) == 0)
                     {
                         var points = OktwCommon.CirclePoints(8, W.Range, Player.Position);
                         foreach (var point in points)
@@ -281,7 +279,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         if (t.HasBuffOfType(BuffType.Slow) && Config.Item("Qslow", true).GetValue<bool>())
                             Q.Cast(t);
-                        if(Config.Item("Qaoe", true).GetValue<bool>())
+                        if (Config.Item("Qaoe", true).GetValue<bool>())
                             Q.CastIfWillHit(t, 2, true);
                     }
                 }
@@ -299,10 +297,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.Combo && Player.IsWindingUp)
                 return;
-            if (Config.Item("autoE", true).GetValue<bool>() )
+            if (Config.Item("autoE", true).GetValue<bool>())
             {
                 var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
-                if (t.IsValidTarget() )
+                if (t.IsValidTarget())
                 {
                     var positionT = Player.ServerPosition - (t.Position - Player.ServerPosition);
 
@@ -310,7 +308,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     {
                         var eDmg = E.GetDamage(t);
                         var qDmg = Q.GetDamage(t);
-                        if (Config.Item("EQks", true).GetValue<bool>() && qDmg + eDmg + Player.GetAutoAttackDamage(t) > t.Health && Player.Mana > EMANA + QMANA  )
+                        if (Config.Item("EQks", true).GetValue<bool>() && qDmg + eDmg + Player.GetAutoAttackDamage(t) > t.Health && Player.Mana > EMANA + QMANA)
                         {
                             Program.CastSpell(E, t);
                             Program.debug("E + Q FINISH");
@@ -336,7 +334,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                                 E.Cast(t, true);
                         }
                     }
-                        
+
                 }
             }
             if (Config.Item("useE", true).GetValue<KeyBind>().Active)
@@ -448,7 +446,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 var tw = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
                 if (tw.IsValidTarget())
                 {
-                    if (Q.GetDamage(tw)> tw.Health)
+                    if (Q.GetDamage(tw) > tw.Health)
                         Drawing.DrawText(Drawing.Width * 0.1f, Drawing.Height * 0.4f, System.Drawing.Color.Red, "Q can kill: " + t.ChampionName + " have: " + t.Health + "hp");
                 }
             }
