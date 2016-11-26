@@ -1126,7 +1126,7 @@ namespace SebbyLib.Prediction
             if (Math.Abs(input.Speed - float.MaxValue) < float.Epsilon)
                 delay = input.Delay;
 
-            int convert = (int)(delay * 1000);
+            int convert = (int)(delay * 1000) - Game.Ping;
 
             if (HealthPrediction.LaneClearHealthPrediction(minion, convert, 0) <= 0)
             {
@@ -1151,15 +1151,22 @@ namespace SebbyLib.Prediction
                             {
 
                                 var distanceFromToUnit = minion.ServerPosition.Distance(input.From);
-
-                                if (distanceFromToUnit < 10 + minion.BoundingRadius)
+                                var bOffset = minion.BoundingRadius + input.Unit.BoundingRadius;
+                                if (distanceFromToUnit < bOffset)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
                                     else
                                         return true;
                                 }
-                                else if (minion.ServerPosition.Distance(position) < minion.BoundingRadius)
+                                else if (minion.ServerPosition.Distance(position) < bOffset)
+                                {
+                                    if (MinionIsDead(input, minion, distanceFromToUnit))
+                                        continue;
+                                    else
+                                        return true;
+                                }
+                                else if (minion.ServerPosition.Distance(input.Unit.Position) < bOffset)
                                 {
                                     if (MinionIsDead(input, minion, distanceFromToUnit))
                                         continue;
