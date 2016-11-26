@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using SebbyLib;
 
 namespace OneKeyToWin_AIO_Sebby.Core
 {
@@ -67,13 +68,20 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnBuffAdd(Obj_AI_Base sender, Obj_AI_BaseBuffAddEventArgs args)
         {
-
-            if (sender.IsEnemy)
+            return;
+            if (sender.IsAlly)
                 Program.debug(args.Buff.Name + " " + args.Buff.Type + " " + args.Buff.SourceName);
         }
 
         private void Game_OnGameUpdate(EventArgs args)
         {
+            return;
+            foreach (var minion in ObjectManager.Get<Obj_AI_Minion>().Where(x =>x.IsValid && x.Distance(Game.CursorPos) < 500))
+            {
+                if (minion != null)
+                    Program.debug(minion.CharData.GoldGivenOnDeath + " render: " + minion.IsHPBarRendered + " " + minion.BaseSkinName + " type " + minion.Team + " mana " + minion.MaxMana + " hp " + minion.Health + " attack " + minion.IsMinion + minion.AttackSpeedMod);
+            }
+                return;
             if(ObjectManager.Player.IsWindingUp || !ObjectManager.Player.CanMove || ObjectManager.Player.IsRooted)
                 Console.WriteLine(ObjectManager.Player.IsWindingUp + " " + ObjectManager.Player.CanMove  + " " + ObjectManager.Player.IsRooted);
 
@@ -127,8 +135,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Drawing_OnDraw(EventArgs args)
         {
-
-
+            return;
+            var minionList = Cache.GetMinions(ObjectManager.Player.Position, 2000).Concat(Cache.GetMinions(ObjectManager.Player.Position, 2000, MinionTeam.Neutral));
+            foreach (var minion in minionList)
+            {
+                Render.Circle.DrawCircle(minion.Position, 50, System.Drawing.Color.Red, 1);
+                Render.Circle.DrawCircle(minion.ServerPosition, 50, System.Drawing.Color.YellowGreen, 1);
+            }
             var obj = ObjectManager.Get<Obj_AI_Base>().FirstOrDefault(x => x.Distance(Game.CursorPos) < 100);
             if (obj != null)
             {
@@ -182,12 +195,13 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, GameObjectProcessSpellCastEventArgs args)
         {
-            return;
+            //return;
             if (sender.IsMe && !args.SData.IsAutoAttack())
             {
+                Program.debug("name: " + args.SData.Name + " " +(Game.Time - castTime));
                 castTime = Game.Time;
                 //Program.debug("speed: " +args.SData.MissileSpeed);
-                Program.debug("name: " + args.SData.Name);
+                
                 //Program.debug("" + args.SData.DelayTotalTimePercent);
                 //time = Game.Time;
             }
@@ -195,11 +209,20 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)
         {
+            if(Game.CursorPos.Distance(sender.Position)<1000)
+            {
+                Console.WriteLine(sender.Name + " " + (Game.Time - castTime));
+            }
+            var missile = sender as MissileClient;
+            if(missile != null && missile.SpellCaster.IsMe)
+            {
+                Console.WriteLine(missile.SData.MissileSpeed + " " + (Game.Time - castTime));
+            }
             return;
             var minion = sender as Obj_AI_Minion;
 
             if (minion != null )
-                Program.debug(" render: " + minion.IsHPBarRendered+" " + minion.Name +  " type "  + minion.Team + " mana " + minion.MaxMana + " hp "+ minion.Health + " attack "+ minion.IsMinion + minion.AttackSpeedMod  );
+                Program.debug(minion.CharData.GoldGivenOnDeath + " render: " + minion.IsHPBarRendered+" " + minion.BaseSkinName +  " type "  + minion.Team + " mana " + minion.MaxMana + " hp "+ minion.Health + " attack "+ minion.IsMinion + minion.AttackSpeedMod  );
             return;
             if (sender.IsValid && sender.IsAlly )
             {
@@ -208,14 +231,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 if (!sender.IsValid<MissileClient>())
                     return;
 
-                MissileClient missile = (MissileClient)sender;
-                if (missile.SData.LineWidth == 0)
-                    return;
-                Program.debug(missile.SData.Name + " " + missile.SData.LineWidth + " " + missile.SData.MissileSpeed + " " + (Game.Time - castTime));
-                if (missile.IsValid && missile.IsAlly && missile.SData.Name != null && (missile.SData.Name == "SivirQMissile" || missile.SData.Name == "SivirQMissileReturn"))
-                {
-                    
-                }
+               
                 //Program.debug(""+);
                 //Program.debug("cast time" +(time - Game.Time));
             }
