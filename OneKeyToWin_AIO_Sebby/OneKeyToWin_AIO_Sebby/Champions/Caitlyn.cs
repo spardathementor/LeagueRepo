@@ -159,7 +159,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Program.LagFree(1) && E.IsReady() && SebbyLib.Orbwalking.CanMove(40))
                 LogicE();
-            if (Program.LagFree(2) && W.IsReady() && SebbyLib.Orbwalking.CanMove(40))
+            if (Program.LagFree(2) && W.IsReady() )
                 LogicW();
             if (Program.LagFree(3) && Q.IsReady() && SebbyLib.Orbwalking.CanMove(40) && Config.Item("autoQ2", true).GetValue<bool>())
                 LogicQ();
@@ -211,8 +211,6 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Player.Mana > RMANA + WMANA)
             {
-                if (Program.Combo)
-                    return;
                 if (Config.Item("autoW", true).GetValue<bool>())
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && !enemy.HasBuff("caitlynyordletrapinternal")))
@@ -236,6 +234,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     if (!trapPos.IsZero)
                         W.Cast(trapPos);
                 }
+                if (!SebbyLib.Orbwalking.CanMove(40))
+                    return;
                 if ((int)(Game.Time * 10) % 2 == 0 && Config.Item("bushW2", true).GetValue<bool>())
                 {
                     if (Player.Spellbook.GetSpell(SpellSlot.W).Ammo == new int[] { 0, 3, 3, 4, 4, 5 }[W.Level] && Player.CountEnemiesInRange(1000) == 0)

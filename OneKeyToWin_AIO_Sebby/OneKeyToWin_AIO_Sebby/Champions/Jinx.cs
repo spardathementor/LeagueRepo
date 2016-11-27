@@ -246,7 +246,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(E.Range + 50) && !OktwCommon.CanMove(enemy)))
                 {
-                    E.Cast(enemy);
+                    E.Cast(enemy.Position);
                     return;
                 }
                 if (!Program.LagFree(1))
