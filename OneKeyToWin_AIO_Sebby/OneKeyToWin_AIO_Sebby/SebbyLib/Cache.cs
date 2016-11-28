@@ -50,8 +50,14 @@ namespace SebbyLib
             }
             var missile = sender as MissileClient;
             if (missile != null)
-            {
-                MissileList.Add(missile); 
+            { 
+                if(missile.Target != null)
+                {
+                    if(missile.Target is Obj_AI_Hero)
+                        MissileList.Add(missile);
+                }
+                else
+                    MissileList.Add(missile); 
             }
         }
 
