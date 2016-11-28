@@ -48,7 +48,7 @@ namespace SebbyLib
             "heimertbluebasicattack", "annietibbersbasicattack", "annietibbersbasicattack2",
             "yorickdecayedghoulbasicattack", "yorickravenousghoulbasicattack", "yorickspectralghoulbasicattack",
             "malzaharvoidlingbasicattack", "malzaharvoidlingbasicattack2", "malzaharvoidlingbasicattack3",
-            "kindredwolfbasicattack"
+            "kindredwolfbasicattack", "gravesautoattackrecoil"
         };
 
         private static readonly string[] Attacks =
@@ -651,6 +651,7 @@ namespace SebbyLib
                 misc.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
                 misc.AddItem(new MenuItem("LaneClearSpeed", "LaneClear speed").SetShared().SetValue(new Slider(0, -100, 100))).SetTooltip("higher number = faster");
 
+
                 _config.AddSubMenu(misc);
 
 
@@ -793,6 +794,8 @@ namespace SebbyLib
 
             public bool ShouldWait()
             {
+                if(Player.Level > 16)
+                    return false;
                 var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
                 return
                     MinionListAA.Any( 
@@ -1034,7 +1037,7 @@ namespace SebbyLib
 
                 /* UnderTurret Farming */
                 if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit ||
-                    mode == OrbwalkingMode.Freeze) && CanAttack())
+                    mode == OrbwalkingMode.Freeze) && CanAttack() && Player.Level < 17)
                 {
                     var closestTower =
                         ObjectManager.Get<Obj_AI_Turret>().MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
