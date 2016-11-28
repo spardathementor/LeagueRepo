@@ -148,7 +148,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.CastOnUnit(t);
             }
 
-
+            var orbT = Orbwalker.GetTarget() as Obj_AI_Hero;
+            if (orbT != null)
+            {
+                if (Player.GetAutoAttackDamage(orbT) * 2 > orbT.Health)
+                    return;
+            }
 
             if (Program.LagFree(0))
             {
@@ -165,7 +170,8 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 LogicQ();
             if (Program.LagFree(4) && R.IsReady() && Config.Item("autoR", true).GetValue<bool>() && !ObjectManager.Player.UnderTurret(true) && Game.Time - QCastTime > 1)
                 LogicR();
-            return;
+            
+
         }
 
         private void LogicR()
@@ -209,22 +215,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
+            
             if (Player.Mana > RMANA + WMANA)
             {
                 if (Config.Item("autoW", true).GetValue<bool>())
                 {
                     foreach (var enemy in HeroManager.Enemies.Where(enemy => enemy.IsValidTarget(W.Range) && !OktwCommon.CanMove(enemy) && !enemy.HasBuff("caitlynyordletrapinternal")))
                     {
-                        if (Utils.TickCount - W.LastCastAttemptT > 1000)
-                        {
-                            W.Cast(enemy);
-                            LastW = enemy;
-                        }
-                        else if (LastW.NetworkId != enemy.NetworkId)
-                        {
-                            W.Cast(enemy);
-                            LastW = enemy;
-                        }
+                        W.Cast(enemy);
                     }
                 }
 
