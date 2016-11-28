@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q = new Spell(SpellSlot.Q, 1250f);
             Q1 = new Spell(SpellSlot.Q, 1250f);
             W = new Spell(SpellSlot.W, 800f);
-            E = new Spell(SpellSlot.E, 770f);
+            E = new Spell(SpellSlot.E, 850f);
             R = new Spell(SpellSlot.R, 3000f);
 
             Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
@@ -148,12 +148,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     R.CastOnUnit(t);
             }
 
-            var orbT = Orbwalker.GetTarget() as Obj_AI_Hero;
-            if (orbT != null)
-            {
-                if (Player.GetAutoAttackDamage(orbT) * 2 > orbT.Health)
-                    return;
-            }
+
 
             if (Program.LagFree(0))
             {
@@ -164,6 +159,12 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Program.LagFree(1) && E.IsReady() && SebbyLib.Orbwalking.CanMove(40))
                 LogicE();
+            var orbT = Orbwalker.GetTarget() as Obj_AI_Hero;
+            if (orbT != null)
+            {
+                if (Player.GetAutoAttackDamage(orbT) * 2 > orbT.Health)
+                    return;
+            }
             if (Program.LagFree(2) && W.IsReady() )
                 LogicW();
             if (Program.LagFree(3) && Q.IsReady() && SebbyLib.Orbwalking.CanMove(40) && Config.Item("autoQ2", true).GetValue<bool>())
