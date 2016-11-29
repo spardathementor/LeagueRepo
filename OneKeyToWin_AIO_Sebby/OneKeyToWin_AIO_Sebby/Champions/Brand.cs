@@ -116,7 +116,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicQ()
         {
-            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(Q.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 if (OktwCommon.GetKsDamage(t, Q) + BonusDmg(t) + OktwCommon.GetEchoLudenDamage(t) > t.Health)
@@ -158,7 +158,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(W.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 if (Program.Combo && Player.Mana > RMANA + WMANA)
@@ -194,7 +194,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicE()
         {
-            var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
+            var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget())
             {
                 if (Program.Combo && Player.Mana > RMANA + EMANA)
