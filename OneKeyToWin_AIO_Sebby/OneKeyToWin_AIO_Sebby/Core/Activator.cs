@@ -686,6 +686,7 @@ namespace OneKeyToWin_AIO_Sebby
 
         private void PotionManagement()
         {
+            if (Player.Health - OktwCommon.GetIncomingDamage(Player) + 250 > Player.MaxHealth )
                 return;
 
             if(Player.HealthPercent > 50 && Player.CountEnemiesInRange(700) == 0)
