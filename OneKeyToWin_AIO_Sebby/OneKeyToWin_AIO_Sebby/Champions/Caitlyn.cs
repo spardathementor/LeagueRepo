@@ -24,7 +24,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Q = new Spell(SpellSlot.Q, 1250f);
             Q1 = new Spell(SpellSlot.Q, 1250f);
             W = new Spell(SpellSlot.W, 800f);
-            E = new Spell(SpellSlot.E, 850f);
+            E = new Spell(SpellSlot.E, 830f);
             R = new Spell(SpellSlot.R, 3000f);
 
             Q.SetSkillshot(0.65f, 60f, 2200f, false, SkillshotType.SkillshotLine);
@@ -47,6 +47,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("autoW", "Auto W on hard CC", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("telE", "Auto W teleport", true).SetValue(true));
+            Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("forceW", "Force W before E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW", "Auto W bush after enemy enter", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("bushW2", "Auto W bush and turret if full ammo", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("W Config").AddItem(new MenuItem("Wspell", "W on special spell detection", true).SetValue(true));
@@ -88,7 +89,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 if (ObjectManager.Get<Obj_GeneralParticleEmitter>().Any(obj => obj.IsValid && obj.Position.Distance(args.EndPosition) < 300 && obj.Name.ToLower().Contains("yordleTrap_idle_green.troy".ToLower())))
                     args.Process = false;
             }
-            if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA)
+            if (args.Slot == SpellSlot.E && Player.Mana > RMANA + WMANA && Config.Item("forceW", true).GetValue<bool>() )
             {
                 W.Cast(Player.Position.Extend(args.EndPosition, Player.Distance(args.EndPosition) + 50));
                 Utility.DelayAction.Add(10, () => E.Cast(args.EndPosition));
