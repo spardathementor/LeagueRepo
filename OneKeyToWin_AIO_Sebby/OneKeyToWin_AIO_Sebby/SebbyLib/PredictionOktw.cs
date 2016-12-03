@@ -397,12 +397,12 @@ namespace SebbyLib.Prediction
 
             float totalDelay = speedDelay + input.Delay;
             float moveArea = input.Unit.MoveSpeed * totalDelay;
-            float fixRange = moveArea * 0.25f;
+            float fixRange = moveArea * 0.27f;
             float pathMinLen = 1000;
 
             if (input.Type == SkillshotType.SkillshotCircle)
             {
-                fixRange -= input.Radius / 2;
+                fixRange -= input.Radius / 1.5f;
             }
 
             // FIX RANGE ///////////////////////////////////////////////////////////////////////////////////
