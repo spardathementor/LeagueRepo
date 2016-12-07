@@ -900,8 +900,9 @@ namespace SebbyLib
 
                             if (predHealth <= 0 )
                             {
-                                if (HealthPrediction.GetHealthPrediction(minion, t - 50, FarmDelay) > 0)
+                                if (HealthPrediction.GetHealthPrediction(minion, t - 30, FarmDelay) > 0)
                                 {
+                                    Console.WriteLine("try kill");
                                     FireOnNonKillableMinion(minion);
                                     return minion;
                                 }
@@ -1220,8 +1221,9 @@ namespace SebbyLib
                 /*Lane Clear minions*/
                 if (mode == OrbwalkingMode.LaneClear)
                 {
-                    if(!Cache.GetMinions(Player.Position,0, MinionTeam.Ally).Any())
+                    if(!Cache.GetMinions(Player.Position,600, MinionTeam.Ally).Any())
                     {
+                        Console.WriteLine("clear");
                         var at =  minionsFiltered.OrderBy(minion => minion.Health).FirstOrDefault();
                         if (at != null)
                             return at;
