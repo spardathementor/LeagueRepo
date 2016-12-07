@@ -1220,7 +1220,13 @@ namespace SebbyLib
                 /*Lane Clear minions*/
                 if (mode == OrbwalkingMode.LaneClear)
                 {
-                    if (!ShouldWait())
+                    if(!Cache.GetMinions(Player.Position,0, MinionTeam.Ally).Any())
+                    {
+                        var at =  minionsFiltered.OrderBy(minion => minion.Health).FirstOrDefault();
+                        if (at != null)
+                            return at;
+                    }
+                    else if (!ShouldWait())
                     {
                         var firstT2 = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                         foreach (var minion in minionsFiltered.OrderBy(minion => minion.Health))
