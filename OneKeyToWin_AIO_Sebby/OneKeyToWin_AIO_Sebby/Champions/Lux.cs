@@ -478,13 +478,14 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
             if (Config.Item("rRangeMini", true).GetValue<bool>())
             {
-                if (R.IsReady())
+                if (Config.Item("onlyRdy", true).GetValue<bool>())
+                {
+                    if(R.IsReady())
+                        Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
+                }
+                else
                     Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
             }
-            else
-                Utility.DrawCircle(Player.Position, R.Range, System.Drawing.Color.Aqua, 1, 20, true);
-
-
         }
 
         private void Drawing_OnDraw(EventArgs args)
