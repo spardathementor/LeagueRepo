@@ -1223,7 +1223,6 @@ namespace SebbyLib
                 {
                     if(!Cache.GetMinions(Player.Position,600, MinionTeam.Ally).Any())
                     {
-                        Console.WriteLine("clear");
                         var at =  minionsFiltered.OrderBy(minion => minion.Health).FirstOrDefault();
                         if (at != null)
                             return at;
