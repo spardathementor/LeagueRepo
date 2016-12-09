@@ -257,7 +257,7 @@ namespace OneKeyToWin_AIO_Sebby
         {
             if (Player.HealthPercent < 60 && (Seraph.IsReady() || Zhonya.IsReady()  || CanUse(barrier)))
             {
-                double dmg = OktwCommon.GetIncomingDamage(Player, 1);
+                double dmg = OktwCommon.GetIncomingDamage(Player);
                 var enemys = Player.CountEnemiesInRange(800);
                 if(dmg > 0 || enemys > 0)
                 { 

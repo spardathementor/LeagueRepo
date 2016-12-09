@@ -9,7 +9,7 @@ namespace SebbyLib
 {
     public class Cache
     {
-        public static List<MissileClient> MissileList = new List<MissileClient>();
+        public static HashSet<MissileClient> MissileList = new HashSet<MissileClient>();
         public static List<Obj_AI_Base> AllMinionsObj = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListEnemy = new List<Obj_AI_Base>();
         public static List<Obj_AI_Base> MinionsListAlly = new List<Obj_AI_Base>();
@@ -36,7 +36,7 @@ namespace SebbyLib
             MinionsListNeutral.RemoveAll(minion => !IsValidMinion(minion));
             MinionsListAlly.RemoveAll(minion => !IsValidMinion(minion));
             AllMinionsObj.RemoveAll(minion => !IsValidMinion(minion));
-            MissileList.RemoveAll(missile => !missile.IsValid);
+            MissileList.RemoveWhere(missile => !missile.IsValid);
         }
 
         private static void Obj_AI_Base_OnCreate(GameObject sender, EventArgs args)

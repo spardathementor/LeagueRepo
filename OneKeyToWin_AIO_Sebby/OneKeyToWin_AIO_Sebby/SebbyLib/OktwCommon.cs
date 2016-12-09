@@ -4,6 +4,7 @@ using System.Linq;
 using LeagueSharp;
 using LeagueSharp.Common;
 using SharpDX;
+using OneKeyToWin_AIO_Sebby.Core;
 
 namespace SebbyLib
 {
@@ -116,6 +117,8 @@ namespace SebbyLib
         {
             if (target.IsValidTarget(float.MaxValue,false))
             {
+                if (target.Position.Distance(Start) > 1600)
+                    return false;
 
                 var pred = Prediction.Prediction.GetPrediction(target, 0.25f).CastPosition;
                 if (pred == null)
@@ -335,7 +338,12 @@ namespace SebbyLib
             }
         }
 
-        public static double GetIncomingDamage(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true)
+        public static double GetIncomingDamage(Obj_AI_Hero target)
+        {
+            return OKTWtracker.ChampionInfoList.FirstOrDefault(x => x.Hero.NetworkId == target.NetworkId).IncomingDamage;
+        }
+
+        public static double GetIncomingDamage2(Obj_AI_Hero target, float time = 0.5f, bool skillshots = true)
         {
             double totalDamage = 0;
 
@@ -367,9 +375,9 @@ namespace SebbyLib
                 }
                 else if(skillshots)
                 {
-                    if (target.HasBuffOfType(BuffType.Slow) || target.IsWindingUp || !CanMove(target))
+                    if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
                     {
-                        if (CanHitSkillShot(target, missile.StartPosition, missile.EndPosition, missile.SData))
+                        if (target.HasBuffOfType(BuffType.Slow) || target.IsWindingUp || !CanMove(target))
                         {
                             damage2 += missile.SpellCaster.GetSpellDamage((Obj_AI_Base)missile.Target, missile.SData.Name);
                         }

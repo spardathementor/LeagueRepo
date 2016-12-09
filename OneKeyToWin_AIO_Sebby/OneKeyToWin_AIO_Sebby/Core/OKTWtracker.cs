@@ -23,7 +23,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
         public float AbortRecallTime { get; set; }
         public float FinishRecallTime { get; set; }
         public bool IsJungler { get; set; }
-
+        public double IncomingDamage = 0;
         public Render.Sprite NormalSprite;
         public Render.Sprite HudSprite;
         public Render.Sprite MinimapSprite;
@@ -52,7 +52,9 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnUpdate(EventArgs args)
         {
-            if (Program.LagFree(0))
+            if (!Program.LagFree(0) || Program.LagFree(3))
+                IncomingDamage = SebbyLib.OktwCommon.GetIncomingDamage2(Hero, 0.5f);
+            if (!Program.LagFree(0))
                 return;
             NormalSprite.VisibleCondition = sender => !Hero.IsDead;
             HudSprite.VisibleCondition = sender => !Hero.IsDead;
@@ -62,7 +64,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
     class OKTWtracker
     {
-        public static List<ChampionInfo> ChampionInfoList = new List<ChampionInfo>();
+        public static HashSet<ChampionInfo> ChampionInfoList = new HashSet<ChampionInfo>();
 
         private Vector3 EnemySpawn;
 
