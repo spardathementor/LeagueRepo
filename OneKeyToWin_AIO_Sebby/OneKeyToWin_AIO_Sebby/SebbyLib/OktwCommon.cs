@@ -227,9 +227,9 @@ namespace SebbyLib
             foreach (var obj in ObjectManager.Get<Obj_GeneralParticleEmitter>().Where(obj => obj.IsValid && obj.Position.Distance(Player.Position) < range ))
             {
                 var name = obj.Name.ToLower();
-                
-                if (name.Contains("GateMarker_red.troy".ToLower()) || name.Contains("global_ss_teleport_target_red.troy".ToLower())
-                    || name.Contains("R_indicator_red.troy".ToLower()))
+
+                if (name.Contains("gatemarker_red.troy") || name.Contains("global_ss_teleport_target_red.troy") || (name.Contains("lifeaura") && HeroManager.Enemies.Any(x=>x.IsValid && x.Position.Distance(obj.Position) < 200))
+                    || name.Contains("r_indicator_red.troy"))
                     return obj.Position;
             }
 
