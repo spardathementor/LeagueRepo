@@ -108,9 +108,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
             {
                 foreach (var extra in ChampionInfoList.Where(x => x.Hero.IsEnemy))
                 {
-                    extra.NormalSprite.VisibleCondition = sender => !extra.Hero.IsDead;
-                    extra.HudSprite.VisibleCondition = sender => !extra.Hero.IsDead;
-
                     extra.IncomingDamage = SebbyLib.OktwCommon.GetIncomingDamage2(extra.Hero, 0.5f);
                     var enemy = extra.Hero;
                     if (enemy.IsDead)
@@ -136,7 +133,6 @@ namespace OneKeyToWin_AIO_Sebby.Core
                 {
                     extra.NormalSprite.VisibleCondition = sender => !extra.Hero.IsDead;
                     extra.HudSprite.VisibleCondition = sender => !extra.Hero.IsDead;
-
                     extra.IncomingDamage = SebbyLib.OktwCommon.GetIncomingDamage2(extra.Hero, 0.5f);
                 }
             }
