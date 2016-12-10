@@ -104,7 +104,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnUpdate(EventArgs args)
         {
-            if (Program.LagFree(0) || Program.LagFree(3))
+            if (Program.LagFree(0))
             {
                 foreach (var extra in ChampionInfoList.Where(x => x.Hero.IsEnemy))
                 {
@@ -127,6 +127,17 @@ namespace OneKeyToWin_AIO_Sebby.Core
                         extra.LastVisablePos = enemy.Position;
                         extra.LastVisableTime = Game.Time;
                     }
+                }
+            }
+
+            if(Program.LagFree(3))
+            {
+                foreach (var extra in ChampionInfoList)
+                {
+                    extra.NormalSprite.VisibleCondition = sender => !extra.Hero.IsDead;
+                    extra.HudSprite.VisibleCondition = sender => !extra.Hero.IsDead;
+
+                    extra.IncomingDamage = SebbyLib.OktwCommon.GetIncomingDamage2(extra.Hero, 0.5f);
                 }
             }
         }
