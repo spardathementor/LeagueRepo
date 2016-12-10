@@ -47,18 +47,7 @@ namespace OneKeyToWin_AIO_Sebby.Core
             StartRecallTime = 0;
             AbortRecallTime = 0;
             FinishRecallTime = 0;
-            Game.OnUpdate += OnUpdate;
-        }
 
-        private void OnUpdate(EventArgs args)
-        {
-            if (!Program.LagFree(0) || Program.LagFree(3))
-                IncomingDamage = SebbyLib.OktwCommon.GetIncomingDamage2(Hero, 0.5f);
-            if (!Program.LagFree(0))
-                return;
-            NormalSprite.VisibleCondition = sender => !Hero.IsDead;
-            HudSprite.VisibleCondition = sender => !Hero.IsDead;
-            //MinimapSprite.VisibleCondition = sender => !Hero.IsDead && !Hero.IsVisible;
         }
     }
 
@@ -115,25 +104,29 @@ namespace OneKeyToWin_AIO_Sebby.Core
 
         private void OnUpdate(EventArgs args)
         {
-            if (!Program.LagFree(0))
-                return;
-
-            foreach (var extra in ChampionInfoList.Where( x => x.Hero.IsEnemy))
+            if (Program.LagFree(0) || Program.LagFree(3))
             {
-                var enemy = extra.Hero;
-                if (enemy.IsDead)
+                foreach (var extra in ChampionInfoList.Where(x => x.Hero.IsEnemy))
                 {
-                    extra.LastVisablePos = EnemySpawn;
-                    extra.LastVisableTime = Game.Time;
-                    extra.PredictedPos = EnemySpawn;
-                    extra.LastWayPoint = EnemySpawn;
-                }
-                else if (enemy.IsVisible)
-                {
-                    extra.LastWayPoint = extra.Hero.GetWaypoints().Last().To3D();
-                    extra.PredictedPos = enemy.Position.Extend(extra.LastWayPoint, 125);
-                    extra.LastVisablePos = enemy.Position;
-                    extra.LastVisableTime = Game.Time;
+                    extra.NormalSprite.VisibleCondition = sender => !extra.Hero.IsDead;
+                    extra.HudSprite.VisibleCondition = sender => !extra.Hero.IsDead;
+
+                    extra.IncomingDamage = SebbyLib.OktwCommon.GetIncomingDamage2(extra.Hero, 0.5f);
+                    var enemy = extra.Hero;
+                    if (enemy.IsDead)
+                    {
+                        extra.LastVisablePos = EnemySpawn;
+                        extra.LastVisableTime = Game.Time;
+                        extra.PredictedPos = EnemySpawn;
+                        extra.LastWayPoint = EnemySpawn;
+                    }
+                    else if (enemy.IsVisible)
+                    {
+                        extra.LastWayPoint = extra.Hero.GetWaypoints().Last().To3D();
+                        extra.PredictedPos = enemy.Position.Extend(extra.LastWayPoint, 125);
+                        extra.LastVisablePos = enemy.Position;
+                        extra.LastVisableTime = Game.Time;
+                    }
                 }
             }
         }
