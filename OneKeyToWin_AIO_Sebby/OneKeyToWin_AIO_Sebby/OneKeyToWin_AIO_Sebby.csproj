@@ -166,6 +166,7 @@
     <Content Include="Resources\Brand_Square_0.png" />
     <Content Include="Resources\Braum_Square_0.png" />
     <Content Include="Resources\Caitlyn_Square_0.png" />
+    <None Include="Resources\Camille_Square_0.png.png" />
     <Content Include="Resources\Cassiopeia_Square_0.png" />
     <Content Include="Resources\Chogath_Square_0.png" />
     <Content Include="Resources\Clairvoyance.png" />
