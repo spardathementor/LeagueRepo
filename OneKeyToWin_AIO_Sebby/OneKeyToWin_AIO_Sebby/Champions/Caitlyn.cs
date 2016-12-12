@@ -217,7 +217,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void LogicW()
         {
-            
+            var orbT = Orbwalker.GetTarget() as Obj_AI_Hero;
+            if (orbT != null && orbT.Health - OktwCommon.GetIncomingDamage(orbT) < Player.GetAutoAttackDamage(orbT) * 2)
+                return;
             if (Player.Mana > RMANA + WMANA)
             {
                 if (Config.Item("autoW", true).GetValue<bool>())
@@ -297,6 +299,10 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (Program.Combo && Player.IsWindingUp)
                 return;
+            var orbT = Orbwalker.GetTarget() as Obj_AI_Hero;
+            if (orbT != null && orbT.Health - OktwCommon.GetIncomingDamage(orbT) < Player.GetAutoAttackDamage(orbT)*2)
+                return;
+
             if (Config.Item("autoE", true).GetValue<bool>())
             {
                 var t = TargetSelector.GetTarget(E.Range, TargetSelector.DamageType.Physical);
