@@ -233,6 +233,16 @@ namespace OneKeyToWin_AIO_Sebby {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Camille_Square_0_png {
+            get {
+                object obj = ResourceManager.GetObject("Camille_Square_0_png", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Cassiopeia_Square_0 {
             get {
                 object obj = ResourceManager.GetObject("Cassiopeia_Square_0", resourceCulture);
