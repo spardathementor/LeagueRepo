@@ -283,7 +283,7 @@ namespace SebbyLib.Prediction
                 var wallPoint = GetWallPoint(result.CastPosition, moveOutWall);
                 if (!wallPoint.IsZero)
                 {
-                    result.Hitchance = HitChance.VeryHigh;
+                    result.Hitchance = HitChance.High;
                     result.CastPosition = wallPoint.Extend(result.CastPosition, moveOutWall);
                     OktwCommon.debug("PRED: Near WALL");
                 }
