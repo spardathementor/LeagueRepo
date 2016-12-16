@@ -547,7 +547,7 @@ namespace SebbyLib
         {
             private double LaneClearWaitTimeMod
             {
-                get { return 1.8 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value; }
+                get { return 1.8; }
             }
            
 
@@ -649,8 +649,6 @@ namespace SebbyLib
                 misc.AddItem(
                     new MenuItem("ExtraWindup", "Extra windup time").SetShared().SetValue(new Slider(80, 0, 200)));
                 misc.AddItem(new MenuItem("FarmDelay", "Farm delay").SetShared().SetValue(new Slider(0, 0, 200)));
-                misc.AddItem(new MenuItem("LaneClearSpeed", "LaneClear speed").SetShared().SetValue(new Slider(0, -100, 100))).SetTooltip("higher number = faster");
-
 
                 _config.AddSubMenu(misc);
 
@@ -794,12 +792,12 @@ namespace SebbyLib
 
             public bool ShouldWait()
             {
-                if(Player.Level > 16)
+                if(Player.Level > 14)
                     return false;
                 var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
                 return
                     MinionListAA.Any( 
-                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion) * 1.2);
+                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
@@ -902,7 +900,6 @@ namespace SebbyLib
                             {
                                 if (HealthPrediction.GetHealthPrediction(minion, t - 30, FarmDelay) > 0)
                                 {
-                                    Console.WriteLine("try kill");
                                     FireOnNonKillableMinion(minion);
                                     return minion;
                                 }
@@ -1038,7 +1035,7 @@ namespace SebbyLib
 
                 /* UnderTurret Farming */
                 if ((mode == OrbwalkingMode.LaneClear || mode == OrbwalkingMode.Mixed || mode == OrbwalkingMode.LastHit ||
-                    mode == OrbwalkingMode.Freeze) && CanAttack() && Player.Level < 17)
+                    mode == OrbwalkingMode.Freeze) && CanAttack() && Player.Level < 15)
                 {
                     var closestTower =
                         ObjectManager.Get<Obj_AI_Turret>().MinOrDefault(t => t.IsAlly && !t.IsDead ? Player.Distance(t, true) : float.MaxValue);
@@ -1221,13 +1218,8 @@ namespace SebbyLib
                 /*Lane Clear minions*/
                 if (mode == OrbwalkingMode.LaneClear)
                 {
-                    if(!Cache.GetMinions(Player.Position,600, MinionTeam.Ally).Any())
-                    {
-                        var at =  minionsFiltered.OrderBy(minion => minion.Health).FirstOrDefault();
-                        if (at != null)
-                            return at;
-                    }
-                    else if (!ShouldWait())
+
+                    if (!ShouldWait())
                     {
                         var firstT2 = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                         foreach (var minion in minionsFiltered.OrderBy(minion => minion.Health))
@@ -1236,9 +1228,6 @@ namespace SebbyLib
 
                             var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
                             if(Math.Abs(predHealth - minion.Health) < float.Epsilon)
-                                return minion;
-                            var damage = Player.GetAutoAttackDamage(minion);
-                            if (predHealth >= (2 - 0.01 * _config.Item("LaneClearSpeed").GetValue<Slider>().Value) * damage)
                                 return minion;
                         }
                     }
