@@ -547,7 +547,7 @@ namespace SebbyLib
         {
             private double LaneClearWaitTimeMod
             {
-                get { return 1.8; }
+                get { return 1.5; }
             }
            
 
@@ -792,12 +792,12 @@ namespace SebbyLib
 
             public bool ShouldWait()
             {
-                if(Player.Level > 14)
+                if(Player.Level > 15)
                     return false;
-                var attackCalc = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
+                var attackCalc = (int)(Player.AttackDelay * 1000) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
+
                 return
-                    MinionListAA.Any( 
-                        minion =>HealthPrediction.LaneClearHealthPrediction(minion, attackCalc, FarmDelay) <= Player.GetAutoAttackDamage(minion));
+                    MinionListAA.Any(minion => HealthPrediction.LaneClearHealthPrediction(minion, (int)(attackCalc * 1.3), FarmDelay) <= Player.GetAutoAttackDamage(minion));
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
@@ -1218,17 +1218,11 @@ namespace SebbyLib
                 /*Lane Clear minions*/
                 if (mode == OrbwalkingMode.LaneClear)
                 {
-
                     if (!ShouldWait())
                     {
-                        var firstT2 = (int)(Player.AttackDelay * 1000 * LaneClearWaitTimeMod) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2;
                         foreach (var minion in minionsFiltered.OrderBy(minion => minion.Health))
                         {
-                            var t = firstT2 + 1000 * (int)Math.Max(0, Player.ServerPosition.Distance(minion.ServerPosition) - Player.BoundingRadius) / projectileSpeed;
-
-                            var predHealth = HealthPrediction.LaneClearHealthPrediction(minion, t, FarmDelay);
-                            if(Math.Abs(predHealth - minion.Health) < float.Epsilon)
-                                return minion;
+                            return minion;
                         }
                     }
 
