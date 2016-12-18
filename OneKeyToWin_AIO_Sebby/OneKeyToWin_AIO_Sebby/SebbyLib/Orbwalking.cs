@@ -797,7 +797,7 @@ namespace SebbyLib
                 var attackCalc = (int)(Player.AttackDelay * 1000) + (int)(Player.AttackCastDelay * 1000) + BrainFarmInt + Game.Ping / 2 + 1000 * 500 / (int)GetMyProjectileSpeed() ;
 
                 return
-                    MinionListAA.Any(minion => HealthPrediction.LaneClearHealthPrediction(minion, (int)(attackCalc * 1.3), FarmDelay) <= Player.GetAutoAttackDamage(minion));
+                    MinionListAA.Any(minion => HealthPrediction.LaneClearHealthPrediction(minion, (int)(attackCalc * 1.5), FarmDelay) <= Player.GetAutoAttackDamage(minion));
             }
 
             private bool ShouldWaitUnderTurret(Obj_AI_Minion noneKillableMinion)
