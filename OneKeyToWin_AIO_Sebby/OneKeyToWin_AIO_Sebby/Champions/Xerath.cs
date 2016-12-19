@@ -173,7 +173,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 SebbyLib.Orbwalking.Move = true;
             }
 
-            if (Q.IsCharging && (int)(Game.Time * 10) % 2 == 0)
+            if (Q.IsCharging && (int)(Game.Time * 10) % 2 == 0 && !None)
             {
                 Player.IssueOrder(GameObjectOrder.MoveTo, Game.CursorPos);
             }
