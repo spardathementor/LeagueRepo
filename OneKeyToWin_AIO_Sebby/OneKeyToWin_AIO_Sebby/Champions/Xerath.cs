@@ -151,7 +151,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
         {
             if (!Config.Item("disableR", true).GetValue<bool>())
             {
-                if (Program.LagFree(3) && R.IsReady())
+                if (R.IsReady())
                     LogicR();
             }
             //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
@@ -214,6 +214,16 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             var t = TargetSelector.GetTarget(R.Range, TargetSelector.DamageType.Magical);
             if (t.IsValidTarget() )
             {
+                if (IsCastingR)
+                {
+                    var del = (float)Config.Item("delayR", true).GetValue<Slider>().Value;
+                    if (del == 0)
+                        Program.CastSpell(R, t);
+                    else if (Game.Time - lastR > 0.001 * del)
+                        Program.CastSpell(R, t);
+                    return;
+                }
+
                 if (Config.Item("useR", true).GetValue<KeyBind>().Active && !IsCastingR)
                 {
                     R.Cast();
@@ -225,11 +235,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                         R.Cast();
                     }
                 }
-                if (Game.Time - lastR > 0.001 * (float)Config.Item("delayR", true).GetValue<Slider>().Value && IsCastingR)
-                {
-                    Program.CastSpell(R, t);
-                     
-                }
+                
                 Rtarget = R.GetPrediction(t).CastPosition;
             }
             else if (Config.Item("autoRlast", true).GetValue<bool>() && Game.Time - lastR > 0.001 * (float)Config.Item("delayR", true).GetValue<Slider>().Value && IsCastingR)
