@@ -153,9 +153,9 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             {
                 if (Program.LagFree(3) && R.IsReady())
                     LogicR();
-
-                //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
-                if (IsCastingR || Player.IsChannelingImportantSpell())
+            }
+            //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
+            if (IsCastingR || Player.IsChannelingImportantSpell())
                 {
                     OktwCommon.blockMove = true;
                     OktwCommon.blockAttack = true;
@@ -174,7 +174,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                     SebbyLib.Orbwalking.Attack = true;
                     SebbyLib.Orbwalking.Move = true;
                 }
-            }
+           
 
             if (Q.IsCharging && (int)(Game.Time * 10) % 2 == 0 && !None)
             {
