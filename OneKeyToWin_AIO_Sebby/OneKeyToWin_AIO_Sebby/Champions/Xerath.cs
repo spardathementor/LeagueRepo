@@ -47,6 +47,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("autoE", "Auto E", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("E Config").AddItem(new MenuItem("harassE", "Harass E", true).SetValue(true));
 
+            Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("disableR", "Disable R", true).SetValue(false));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoR", "Auto R 2 x dmg R", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("autoRlast", "Cast last position if no target", true).SetValue(true));
             Config.SubMenu(Player.ChampionName).SubMenu("R Config").AddItem(new MenuItem("useR", "Semi-manual cast R key", true).SetValue(new KeyBind("T".ToCharArray()[0], KeyBindType.Press))); //32 == space
@@ -148,29 +149,31 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
         private void Game_OnGameUpdate(EventArgs args)
         {
-            if (Program.LagFree(3) && R.IsReady())
-                LogicR();
-
-
-            //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
-            if (IsCastingR || Player.IsChannelingImportantSpell())
+            if (!Config.Item("disableR", true).GetValue<bool>())
             {
-                OktwCommon.blockMove = true;
-                OktwCommon.blockAttack = true;
-                OktwCommon.blockAttack = true;
-                OktwCommon.blockMove = true;
-                SebbyLib.Orbwalking.Attack = false;
-                SebbyLib.Orbwalking.Move = false;
-                return;
-            }
-            else
-            {
-                OktwCommon.blockMove = false;
-                OktwCommon.blockAttack = false;
-                OktwCommon.blockAttack = false;
-                OktwCommon.blockMove = false;
-                SebbyLib.Orbwalking.Attack = true;
-                SebbyLib.Orbwalking.Move = true;
+                if (Program.LagFree(3) && R.IsReady())
+                    LogicR();
+
+                //Program.debug(""+OktwCommon.GetPassiveTime(Player, "XerathArcanopulseChargeUp"));
+                if (IsCastingR || Player.IsChannelingImportantSpell())
+                {
+                    OktwCommon.blockMove = true;
+                    OktwCommon.blockAttack = true;
+                    OktwCommon.blockAttack = true;
+                    OktwCommon.blockMove = true;
+                    SebbyLib.Orbwalking.Attack = false;
+                    SebbyLib.Orbwalking.Move = false;
+                    return;
+                }
+                else
+                {
+                    OktwCommon.blockMove = false;
+                    OktwCommon.blockAttack = false;
+                    OktwCommon.blockAttack = false;
+                    OktwCommon.blockMove = false;
+                    SebbyLib.Orbwalking.Attack = true;
+                    SebbyLib.Orbwalking.Move = true;
+                }
             }
 
             if (Q.IsCharging && (int)(Game.Time * 10) % 2 == 0 && !None)
@@ -286,7 +289,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
 
                     return;
                 }
-                else if (t.IsValidTarget(Q.Range - 300))
+                else if (t.IsValidTarget(Q.Range - 300  + 15 * Player.Level))
                 {
                     if(t.Health < OktwCommon.GetKsDamage(t, Q))
                         Q.StartCharging();
