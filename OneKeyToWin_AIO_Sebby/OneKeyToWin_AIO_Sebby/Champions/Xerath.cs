@@ -188,7 +188,7 @@ namespace OneKeyToWin_AIO_Sebby.Champions
                 int[] mana = new int[] { 0, 30, 33, 36, 42, 48, 54, 63, 72, 81, 90, 102, 114, 126, 138, 150, 165, 180, 195 };
                 if (!Player.HasBuff("xerathascended2onhit") || Player.Mana + mana[Player.Level] > Player.MaxMana)
                     Orbwalker.ForceTarget(null);
-                else if ((Program.Combo || Program.Harass) && Config.Item("force", true).GetValue<bool>() && Orbwalker.GetTarget() == null)
+                else if ((Program.Combo || Program.Harass) && Config.Item("force", true).GetValue<bool>() && Orbwalker.GetTarget() == null && Player.CountEnemiesInRange(1500) == 0)
                 {
                     var minion = Cache.GetMinions(Player.ServerPosition, Player.AttackRange + Player.BoundingRadius * 2).OrderByDescending(x => x.Health).FirstOrDefault();
 
